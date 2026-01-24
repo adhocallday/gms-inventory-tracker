@@ -119,71 +119,71 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
   const topSellers = cogsSorted.slice(0, 5);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="g-container py-12">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <Link
             href="/"
-            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            className="text-sm font-medium g-link"
           >
             ← Back to dashboard
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-3">
+          <h1 className="text-3xl font-semibold g-title mt-3">
             {tour.name}
           </h1>
-          <p className="text-gray-600 mt-1">{tour.artist}</p>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-[var(--g-text-dim)] mt-1">
+            {tour.artist}
+          </p>
+          <p className="text-sm text-[var(--g-text-muted)] mt-2">
             {formatDate(tour.start_date)} — {formatDate(tour.end_date)}
           </p>
         </div>
-        <div className="text-sm uppercase tracking-wide text-gray-500">
+        <div className="g-kicker">
           {tour.status}
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <p className="text-sm text-gray-500">Total gross</p>
-          <p className="text-2xl font-semibold text-gray-900 mt-2">
+        <div className="g-card p-4">
+          <p className="text-xs text-[var(--g-text-muted)]">Total gross</p>
+          <p className="text-2xl font-semibold mt-2">
             {currencyFormatter.format(totalGross)}
           </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <p className="text-sm text-gray-500">Per-head</p>
-          <p className="text-2xl font-semibold text-gray-900 mt-2">
+        <div className="g-card p-4">
+          <p className="text-xs text-[var(--g-text-muted)]">Per-head</p>
+          <p className="text-2xl font-semibold mt-2">
             {currencyFormatter.format(perHead)}
           </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <p className="text-sm text-gray-500">Shows logged</p>
-          <p className="text-2xl font-semibold text-gray-900 mt-2">
+        <div className="g-card p-4">
+          <p className="text-xs text-[var(--g-text-muted)]">Shows logged</p>
+          <p className="text-2xl font-semibold mt-2">
             {shows?.length ?? 0}
           </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <p className="text-sm text-gray-500">Inventory balance</p>
-          <p className="text-2xl font-semibold text-gray-900 mt-2">
+        <div className="g-card p-4">
+          <p className="text-xs text-[var(--g-text-muted)]">Inventory balance</p>
+          <p className="text-2xl font-semibold mt-2">
             {formatNumber(totalBalance)} units
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-10">
-        <section className="bg-white border border-gray-200 rounded-lg p-6">
+        <section className="g-card p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Top sellers
-            </h2>
+            <h2 className="text-lg font-semibold g-title">Top sellers</h2>
             <Link
               href="/upload/sales-report"
-              className="text-sm font-medium text-blue-600 hover:text-blue-700"
+              className="text-sm font-medium g-link"
             >
               Add sales
             </Link>
           </div>
           <div className="mt-4 space-y-4">
             {topSellers.length === 0 ? (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-[var(--g-text-muted)]">
                 No sales data yet. Upload a sales report to populate insights.
               </p>
             ) : (
@@ -192,17 +192,17 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
                 return (
                   <div
                     key={`${row.product_id}-${row.size}`}
-                    className="border border-gray-100 rounded-md p-3"
+                    className="border border-white/10 rounded-md p-3"
                   >
-                    <p className="text-sm font-semibold text-gray-900">
+                    <p className="text-sm font-semibold">
                       {product?.sku ?? 'SKU'} · {row.size}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[var(--g-text-muted)]">
                       {product?.description ?? 'Description pending'}
                     </p>
-                    <div className="flex items-center justify-between text-sm text-gray-600 mt-2">
+                    <div className="flex items-center justify-between text-sm text-[var(--g-text-dim)] mt-2">
                       <span>{formatNumber(Number(row.total_sold ?? 0))} sold</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="font-medium text-white">
                         {currencyFormatter.format(Number(row.total_gross ?? 0))}
                       </span>
                     </div>
@@ -213,26 +213,26 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
           </div>
         </section>
 
-        <section className="bg-white border border-gray-200 rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-gray-900">Projections</h2>
-          <p className="text-sm text-gray-500 mt-2">
+        <section className="g-card p-6">
+          <h2 className="text-lg font-semibold g-title">Projections</h2>
+          <p className="text-sm text-[var(--g-text-muted)] mt-2">
             Forecast scenarios will live here once you define per-head rates,
             product mix ratios, and size curves.
           </p>
-          <div className="mt-4 p-4 border border-dashed border-gray-200 rounded-md text-sm text-gray-500">
+          <div className="mt-4 p-4 border border-dashed border-white/10 rounded-md text-sm text-[var(--g-text-muted)]">
             No projection scenarios yet. Add a scenario to compare forecasted
             units and revenue against actuals.
           </div>
         </section>
 
-        <section className="bg-white border border-gray-200 rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-gray-900">Grab sheet</h2>
-          <p className="text-sm text-gray-500 mt-2">
+        <section className="g-card p-6">
+          <h2 className="text-lg font-semibold g-title">Grab sheet</h2>
+          <p className="text-sm text-[var(--g-text-muted)] mt-2">
             Add design assets to quickly preview merch layouts for this tour.
           </p>
           <div className="grid grid-cols-2 gap-3 mt-4">
             {designAssets.length === 0 ? (
-              <div className="col-span-2 text-sm text-gray-500 border border-dashed border-gray-200 rounded-md p-4">
+              <div className="col-span-2 text-sm text-[var(--g-text-muted)] border border-dashed border-white/10 rounded-md p-4">
                 No design assets uploaded yet.
               </div>
             ) : (
@@ -241,16 +241,16 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
                 return (
                   <div
                     key={asset.id}
-                    className="border border-gray-100 rounded-md overflow-hidden"
+                    className="border border-white/10 rounded-md overflow-hidden"
                   >
-                    <div className="h-28 bg-gray-100 flex items-center justify-center text-xs text-gray-400">
+                    <div className="h-28 bg-black/40 flex items-center justify-center text-xs text-[var(--g-text-muted)]">
                       {asset.storage_path}
                     </div>
                     <div className="p-2">
-                      <p className="text-xs font-semibold text-gray-900">
+                      <p className="text-xs font-semibold">
                         {product?.sku ?? asset.sku ?? 'SKU'}
                       </p>
-                      <p className="text-[11px] text-gray-500">
+                      <p className="text-[11px] text-[var(--g-text-muted)]">
                         {asset.asset_type ?? 'asset'}
                       </p>
                     </div>
@@ -262,19 +262,19 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         </section>
       </div>
 
-      <section className="bg-white border border-gray-200 rounded-lg p-6 mt-10">
+      <section className="g-card p-6 mt-10">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">COGS report</h2>
+          <h2 className="text-lg font-semibold g-title">COGS report</h2>
           <Link
             href="/upload/po"
-            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            className="text-sm font-medium g-link"
           >
             Upload PO
           </Link>
         </div>
         <div className="overflow-x-auto mt-4">
-          <table className="min-w-full text-sm">
-            <thead className="text-left text-gray-500 border-b">
+          <table className="min-w-full text-sm g-table">
+            <thead className="text-left border-b border-white/10">
               <tr>
                 <th className="py-2 pr-4">SKU</th>
                 <th className="py-2 pr-4">Size</th>
@@ -284,7 +284,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
                 <th className="py-2 pr-4">Margin</th>
               </tr>
             </thead>
-            <tbody className="text-gray-700">
+            <tbody>
               {cogsSorted.length === 0 ? (
                 <tr>
                   <td className="py-3" colSpan={6}>
@@ -295,12 +295,15 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
                 cogsSorted.slice(0, 20).map((row) => {
                   const product = productMap.get(row.product_id);
                   return (
-                    <tr key={`${row.product_id}-${row.size}`} className="border-b">
+                    <tr
+                      key={`${row.product_id}-${row.size}`}
+                      className="border-b border-white/10"
+                    >
                       <td className="py-3 pr-4">
-                        <div className="font-semibold text-gray-900">
+                        <div className="font-semibold">
                           {product?.sku ?? 'SKU'}
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-[var(--g-text-muted)]">
                           {product?.description ?? 'Description pending'}
                         </div>
                       </td>
@@ -326,21 +329,19 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         </div>
       </section>
 
-      <section className="bg-white border border-gray-200 rounded-lg p-6 mt-10">
+      <section className="g-card p-6 mt-10">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Inventory balances
-          </h2>
+          <h2 className="text-lg font-semibold g-title">Inventory balances</h2>
           <Link
             href="/upload/packing-list"
-            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            className="text-sm font-medium g-link"
           >
             Upload packing list
           </Link>
         </div>
         <div className="overflow-x-auto mt-4">
-          <table className="min-w-full text-sm">
-            <thead className="text-left text-gray-500 border-b">
+          <table className="min-w-full text-sm g-table">
+            <thead className="text-left border-b border-white/10">
               <tr>
                 <th className="py-2 pr-4">SKU</th>
                 <th className="py-2 pr-4">Size</th>
@@ -350,7 +351,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
                 <th className="py-2 pr-4">Balance</th>
               </tr>
             </thead>
-            <tbody className="text-gray-700">
+            <tbody>
               {inventorySorted.length === 0 ? (
                 <tr>
                   <td className="py-3" colSpan={6}>
@@ -363,13 +364,13 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
                   return (
                     <tr
                       key={`${row.product_id}-${row.size}`}
-                      className="border-b"
+                      className="border-b border-white/10"
                     >
                       <td className="py-3 pr-4">
-                        <div className="font-semibold text-gray-900">
+                        <div className="font-semibold">
                           {product?.sku ?? 'SKU'}
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-[var(--g-text-muted)]">
                           {product?.description ?? 'Description pending'}
                         </div>
                       </td>

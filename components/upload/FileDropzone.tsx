@@ -100,7 +100,7 @@ export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzone
         className={`
           border-2 border-dashed rounded-lg p-12 text-center cursor-pointer
           transition-colors duration-200
-          ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}
+          ${isDragActive ? 'border-[var(--g-accent)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
           ${uploading || parsing ? 'pointer-events-none opacity-50' : ''}
         `}
       >
@@ -108,8 +108,8 @@ export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzone
         
         {uploading && (
           <div className="space-y-2">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-            <p className="text-sm text-gray-600">Uploading file...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--g-accent)] mx-auto"></div>
+            <p className="text-sm text-[var(--g-text-dim)]">Uploading file...</p>
           </div>
         )}
         
@@ -117,12 +117,12 @@ export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzone
           <div className="space-y-2">
             <div className="animate-pulse">
               <div className="h-12 w-12 mx-auto mb-2">
-                <svg className="text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="text-[var(--g-accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
               </div>
-              <p className="text-sm text-gray-600">AI is parsing your document...</p>
-              <p className="text-xs text-gray-500 mt-1">This may take 10-30 seconds</p>
+              <p className="text-sm text-[var(--g-text-dim)]">AI is parsing your document...</p>
+              <p className="text-xs text-[var(--g-text-muted)] mt-1">This may take 10-30 seconds</p>
             </div>
           </div>
         )}
@@ -130,7 +130,7 @@ export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzone
         {!uploading && !parsing && (
           <div className="space-y-2">
             <svg
-              className="mx-auto h-12 w-12 text-gray-400"
+              className="mx-auto h-12 w-12 text-[var(--g-text-muted)]"
               stroke="currentColor"
               fill="none"
               viewBox="0 0 48 48"
@@ -143,13 +143,13 @@ export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzone
               />
             </svg>
             {isDragActive ? (
-              <p className="text-sm text-gray-600">Drop the PDF here</p>
+              <p className="text-sm text-[var(--g-text-dim)]">Drop the PDF here</p>
             ) : (
               <>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-[var(--g-text-dim)]">
                   Drag & drop {getFileTypeLabel()} PDF here, or click to select
                 </p>
-                <p className="text-xs text-gray-500">PDF files only</p>
+                <p className="text-xs text-[var(--g-text-muted)]">PDF files only</p>
               </>
             )}
           </div>
@@ -157,19 +157,19 @@ export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzone
       </div>
       
       {error && (
-        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-600">
+        <div className="mt-4 p-4 border border-[rgba(225,6,20,0.35)] rounded-lg bg-[rgba(225,6,20,0.08)]">
+          <p className="text-sm text-[var(--g-accent)]">
             <strong>Error:</strong> {error}
           </p>
         </div>
       )}
       
       {parsedData && (
-        <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-sm text-green-600 font-semibold mb-2">
+        <div className="mt-4 p-4 border border-white/10 rounded-lg bg-[var(--g-surface)]">
+          <p className="text-sm text-[var(--g-text)] font-semibold mb-2">
             ✓ Document parsed successfully!
           </p>
-          <pre className="text-xs bg-white p-3 rounded border overflow-auto max-h-96">
+          <pre className="text-xs bg-black/40 p-3 rounded border border-white/10 overflow-auto max-h-96 text-[var(--g-text-dim)]">
             {JSON.stringify(parsedData, null, 2)}
           </pre>
         </div>

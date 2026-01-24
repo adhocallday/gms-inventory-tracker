@@ -153,13 +153,13 @@ export default function UploadSalesReportPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+    <div className="g-container py-12 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Upload Sales Report</h1>
-        <p className="text-gray-600">Upload a sales report PDF, review data, and post.</p>
+        <h1 className="text-3xl font-semibold g-title mb-2">Upload Sales Report</h1>
+        <p className="text-[var(--g-text-dim)]">Upload a sales report PDF, review data, and post.</p>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="g-panel">
         <FileDropzone
           fileType="sales-report"
           onParseComplete={(data, docId) => {
@@ -170,17 +170,17 @@ export default function UploadSalesReportPage() {
       </div>
 
       {parsedDocumentId && (
-        <div className="bg-white rounded-lg shadow p-6 space-y-6">
+        <div className="g-panel space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">Sales Report Review</h2>
-            <div className="text-sm text-gray-500">Draft ID: {parsedDocumentId}</div>
+            <h2 className="text-xl font-semibold g-title">Sales Report Review</h2>
+            <div className="text-sm text-[var(--g-text-muted)]">Draft ID: {parsedDocumentId}</div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700">Tour</label>
+              <label className="g-label">Tour</label>
               <select
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.tour_id || ''}
                 onChange={e => setForm(prev => ({ ...prev, tour_id: e.target.value }))}
               >
@@ -193,59 +193,59 @@ export default function UploadSalesReportPage() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Show Date</label>
+              <label className="g-label">Show Date</label>
               <input
                 type="date"
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.show_date}
                 onChange={e => setForm(prev => ({ ...prev, show_date: e.target.value }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Venue Name</label>
+              <label className="g-label">Venue Name</label>
               <input
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.venue_name}
                 onChange={e => setForm(prev => ({ ...prev, venue_name: e.target.value }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">City</label>
+              <label className="g-label">City</label>
               <input
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.city || ''}
                 onChange={e => setForm(prev => ({ ...prev, city: e.target.value }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">State</label>
+              <label className="g-label">State</label>
               <input
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.state || ''}
                 onChange={e => setForm(prev => ({ ...prev, state: e.target.value }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Attendance</label>
+              <label className="g-label">Attendance</label>
               <input
                 type="number"
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.attendance || 0}
                 onChange={e => setForm(prev => ({ ...prev, attendance: Number(e.target.value) }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Report Source</label>
+              <label className="g-label">Report Source</label>
               <input
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.report_source}
                 onChange={e => setForm(prev => ({ ...prev, report_source: e.target.value }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Currency</label>
+              <label className="g-label">Currency</label>
               <input
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.currency}
                 onChange={e => setForm(prev => ({ ...prev, currency: e.target.value }))}
               />
@@ -254,19 +254,19 @@ export default function UploadSalesReportPage() {
 
           <div className="border-t pt-6">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-gray-900">Sales Lines</h3>
+              <h3 className="text-lg font-semibold g-title">Sales Lines</h3>
               <button
                 type="button"
                 onClick={addLineItem}
-                className="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200"
+                className="g-button g-button-outline text-xs"
               >
                 Add line
               </button>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead className="text-gray-500">
+              <table className="min-w-full text-sm g-table">
+                <thead className="g-kicker">
                   <tr>
                     <th className="text-left py-2">SKU</th>
                     <th className="text-left py-2">Description</th>
@@ -283,21 +283,21 @@ export default function UploadSalesReportPage() {
                     <tr key={`${item.sku}-${index}`} className="border-t">
                       <td className="py-2 pr-2">
                         <input
-                          className="w-28 rounded border-gray-300"
+                          className="w-28 g-input"
                           value={item.sku}
                           onChange={e => updateLineItem(index, 'sku', e.target.value)}
                         />
                       </td>
                       <td className="py-2 pr-2">
                         <input
-                          className="w-56 rounded border-gray-300"
+                          className="w-56 g-input"
                           value={item.description || ''}
                           onChange={e => updateLineItem(index, 'description', e.target.value)}
                         />
                       </td>
                       <td className="py-2 pr-2">
                         <input
-                          className="w-20 rounded border-gray-300"
+                          className="w-20 g-input"
                           value={item.size || ''}
                           onChange={e => updateLineItem(index, 'size', e.target.value)}
                         />
@@ -305,7 +305,7 @@ export default function UploadSalesReportPage() {
                       <td className="py-2 pr-2 text-right">
                         <input
                           type="number"
-                          className="w-24 rounded border-gray-300 text-right"
+                          className="w-24 g-input text-right"
                           value={item.qty_sold}
                           onChange={e => updateLineItem(index, 'qty_sold', Number(e.target.value))}
                         />
@@ -313,7 +313,7 @@ export default function UploadSalesReportPage() {
                       <td className="py-2 pr-2 text-right">
                         <input
                           type="number"
-                          className="w-24 rounded border-gray-300 text-right"
+                          className="w-24 g-input text-right"
                           value={item.qty_comp || 0}
                           onChange={e => updateLineItem(index, 'qty_comp', Number(e.target.value))}
                         />
@@ -322,7 +322,7 @@ export default function UploadSalesReportPage() {
                         <input
                           type="number"
                           step="0.01"
-                          className="w-24 rounded border-gray-300 text-right"
+                          className="w-24 g-input text-right"
                           value={item.unit_price}
                           onChange={e => updateLineItem(index, 'unit_price', Number(e.target.value))}
                         />
@@ -331,7 +331,7 @@ export default function UploadSalesReportPage() {
                         <input
                           type="number"
                           step="0.01"
-                          className="w-24 rounded border-gray-300 text-right"
+                          className="w-24 g-input text-right"
                           value={item.gross_sales}
                           onChange={e => updateLineItem(index, 'gross_sales', Number(e.target.value))}
                         />
@@ -340,7 +340,7 @@ export default function UploadSalesReportPage() {
                         <button
                           type="button"
                           onClick={() => removeLineItem(index)}
-                          className="text-red-500 hover:text-red-700 text-xs"
+                          className="text-[var(--g-accent)] hover:text-[var(--g-accent-2)] text-xs"
                         >
                           Remove
                         </button>
@@ -350,19 +350,19 @@ export default function UploadSalesReportPage() {
                 </tbody>
               </table>
             </div>
-            <div className="mt-4 text-right text-sm text-gray-700">
+            <div className="mt-4 text-right text-sm text-[var(--g-text-dim)]">
               Total Gross: <span className="font-semibold">${lineTotal.toFixed(2)}</span>
             </div>
           </div>
 
           <div className="flex items-center justify-between pt-4 border-t">
-            <div className="text-sm text-gray-600">{statusMessage}</div>
+            <div className="text-sm text-[var(--g-text-dim)]">{statusMessage}</div>
             <div className="space-x-3">
               <button
                 type="button"
                 onClick={saveDraft}
                 disabled={saving}
-                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+                className="g-button g-button-outline"
               >
                 {saving ? 'Saving…' : 'Save Draft'}
               </button>
@@ -370,7 +370,7 @@ export default function UploadSalesReportPage() {
                 type="button"
                 onClick={approveAndPost}
                 disabled={posting}
-                className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white text-sm"
+                className="g-button"
               >
                 {posting ? 'Posting…' : 'Approve & Post'}
               </button>

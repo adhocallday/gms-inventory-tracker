@@ -1,3 +1,172 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --g-bg: #0b0b0c;
+  --g-surface: #121214;
+  --g-surface-2: #18181b;
+  --g-text: #ffffff;
+  --g-text-dim: rgba(255, 255, 255, 0.72);
+  --g-text-muted: rgba(255, 255, 255, 0.58);
+  --g-border: rgba(255, 255, 255, 0.12);
+  --g-accent: #e10614;
+  --g-accent-2: #ff2a2a;
+  --g-focus: rgba(225, 6, 20, 0.35);
+  --g-font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+    Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  --g-font-display: var(--g-font-sans);
+  --g-tracking-tight: -0.02em;
+  --g-tracking-wide: 0.08em;
+  --g-h1: clamp(2.25rem, 5vw, 4.25rem);
+  --g-h2: clamp(1.75rem, 3.2vw, 3rem);
+  --g-h3: clamp(1.25rem, 2vw, 2rem);
+  --g-body: 1rem;
+  --g-small: 0.875rem;
+  --g-lh-tight: 1.05;
+  --g-lh-body: 1.45;
+  --g-1: 0.25rem;
+  --g-2: 0.5rem;
+  --g-3: 0.75rem;
+  --g-4: 1rem;
+  --g-5: 1.25rem;
+  --g-6: 1.5rem;
+  --g-8: 2rem;
+  --g-10: 2.5rem;
+  --g-12: 3rem;
+  --g-16: 4rem;
+  --g-radius-1: 0.25rem;
+  --g-radius-2: 0.5rem;
+  --g-shadow-1: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --g-container: 1200px;
+  --g-gutter: clamp(1rem, 3vw, 2rem);
+  --g-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --g-fast: 160ms;
+  --g-med: 240ms;
+}
+
+html,
+body {
+  background: var(--g-bg);
+  color: var(--g-text);
+  font-family: var(--g-font-sans);
+  line-height: var(--g-lh-body);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.g-container {
+  max-width: var(--g-container);
+  margin: 0 auto;
+  padding: 0 var(--g-gutter);
+}
+
+.g-card {
+  background: var(--g-surface);
+  border: 1px solid var(--g-border);
+  border-radius: var(--g-radius-2);
+  box-shadow: var(--g-shadow-1);
+}
+
+.g-card-muted {
+  background: var(--g-surface-2);
+}
+
+.g-title {
+  font-family: var(--g-font-display);
+  letter-spacing: var(--g-tracking-tight);
+}
+
+.g-kicker {
+  font-size: var(--g-small);
+  text-transform: uppercase;
+  letter-spacing: var(--g-tracking-wide);
+  color: var(--g-text-muted);
+}
+
+.g-link {
+  color: var(--g-accent);
+  transition: color var(--g-fast) var(--g-ease);
+}
+
+.g-link:hover {
+  color: var(--g-accent-2);
+}
+
+.g-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--g-radius-1);
+  background: var(--g-accent);
+  color: #fff;
+  font-size: var(--g-small);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: background var(--g-fast) var(--g-ease),
+    transform var(--g-fast) var(--g-ease);
+}
+
+.g-button:hover {
+  background: var(--g-accent-2);
+  transform: translateY(-1px);
+}
+
+.g-button-outline {
+  background: transparent;
+  border: 1px solid var(--g-border);
+  color: var(--g-text);
+}
+
+.g-button-outline:hover {
+  border-color: var(--g-accent);
+}
+
+.g-table th {
+  color: var(--g-text-muted);
+  font-size: 0.8rem;
+  letter-spacing: var(--g-tracking-wide);
+  text-transform: uppercase;
+}
+
+.g-table td {
+  color: var(--g-text-dim);
+}
+
+.g-panel {
+  background: var(--g-surface);
+  border: 1px solid var(--g-border);
+  border-radius: var(--g-radius-2);
+  padding: var(--g-6);
+}
+
+.g-label {
+  font-size: var(--g-small);
+  font-weight: 600;
+  color: var(--g-text-dim);
+}
+
+.g-input {
+  border-radius: var(--g-radius-1);
+  border: 1px solid var(--g-border);
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--g-text);
+  padding: 0.45rem 0.6rem;
+  width: 100%;
+  outline: none;
+  transition: border-color var(--g-fast) var(--g-ease),
+    box-shadow var(--g-fast) var(--g-ease);
+}
+
+.g-input:focus {
+  border-color: var(--g-accent);
+  box-shadow: 0 0 0 3px var(--g-focus);
+}

@@ -162,17 +162,17 @@ export default function UploadPOPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+    <div className="g-container py-12 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-3xl font-semibold g-title mb-2">
           Upload Purchase Order
         </h1>
-        <p className="text-gray-600">
+        <p className="text-[var(--g-text-dim)]">
           Upload a PO PDF, review extracted data, and post to the database.
         </p>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="g-panel">
         <FileDropzone
           fileType="po"
           onParseComplete={(data, docId) => {
@@ -183,67 +183,67 @@ export default function UploadPOPage() {
       </div>
 
       {parsedDocumentId && (
-        <div className="bg-white rounded-lg shadow p-6 space-y-6">
+        <div className="g-panel space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">PO Review</h2>
-            <div className="text-sm text-gray-500">Draft ID: {parsedDocumentId}</div>
+            <h2 className="text-xl font-semibold g-title">PO Review</h2>
+            <div className="text-sm text-[var(--g-text-muted)]">Draft ID: {parsedDocumentId}</div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700">PO Number</label>
+              <label className="g-label">PO Number</label>
               <input
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.po_number}
                 onChange={e => setForm(prev => ({ ...prev, po_number: e.target.value }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Vendor / Supplier</label>
+              <label className="g-label">Vendor / Supplier</label>
               <input
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.vendor}
                 onChange={e => setForm(prev => ({ ...prev, vendor: e.target.value }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Order Date</label>
+              <label className="g-label">Order Date</label>
               <input
                 type="date"
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.order_date || ''}
                 onChange={e => setForm(prev => ({ ...prev, order_date: e.target.value }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Expected Delivery</label>
+              <label className="g-label">Expected Delivery</label>
               <input
                 type="date"
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.expected_delivery_date || ''}
                 onChange={e => setForm(prev => ({ ...prev, expected_delivery_date: e.target.value }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Currency</label>
+              <label className="g-label">Currency</label>
               <input
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.currency}
                 onChange={e => setForm(prev => ({ ...prev, currency: e.target.value }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Ship To Location</label>
+              <label className="g-label">Ship To Location</label>
               <input
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.ship_to_location || ''}
                 onChange={e => setForm(prev => ({ ...prev, ship_to_location: e.target.value }))}
               />
             </div>
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-gray-700">Match to Tour</label>
+              <label className="g-label">Match to Tour</label>
               <select
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.tour_id || ''}
                 onChange={e => setForm(prev => ({ ...prev, tour_id: e.target.value }))}
               >
@@ -256,9 +256,9 @@ export default function UploadPOPage() {
               </select>
             </div>
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-gray-700">Notes</label>
+              <label className="g-label">Notes</label>
               <textarea
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 rows={3}
                 value={form.notes || ''}
                 onChange={e => setForm(prev => ({ ...prev, notes: e.target.value }))}
@@ -268,19 +268,19 @@ export default function UploadPOPage() {
 
           <div className="border-t pt-6">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-gray-900">Line Items</h3>
+              <h3 className="text-lg font-semibold g-title">Line Items</h3>
               <button
                 type="button"
                 onClick={addLineItem}
-                className="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200"
+                className="g-button g-button-outline text-xs"
               >
                 Add line
               </button>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead className="text-gray-500">
+              <table className="min-w-full text-sm g-table">
+                <thead className="g-kicker">
                   <tr>
                     <th className="text-left py-2">SKU</th>
                     <th className="text-left py-2">Description</th>
@@ -299,21 +299,21 @@ export default function UploadPOPage() {
                     <tr key={`${item.sku}-${index}`} className="border-t">
                       <td className="py-2 pr-2">
                         <input
-                          className="w-28 rounded border-gray-300"
+                          className="w-28 g-input"
                           value={item.sku}
                           onChange={e => updateLineItem(index, 'sku', e.target.value)}
                         />
                       </td>
                       <td className="py-2 pr-2">
                         <input
-                          className="w-56 rounded border-gray-300"
+                          className="w-56 g-input"
                           value={item.description}
                           onChange={e => updateLineItem(index, 'description', e.target.value)}
                         />
                       </td>
                       <td className="py-2 pr-2">
                         <input
-                          className="w-20 rounded border-gray-300"
+                          className="w-20 g-input"
                           value={item.size || ''}
                           onChange={e => updateLineItem(index, 'size', e.target.value)}
                         />
@@ -321,7 +321,7 @@ export default function UploadPOPage() {
                       <td className="py-2 pr-2 text-right">
                         <input
                           type="number"
-                          className="w-24 rounded border-gray-300 text-right"
+                          className="w-24 g-input text-right"
                           value={item.quantity_ordered}
                           onChange={e => updateLineItem(index, 'quantity_ordered', Number(e.target.value))}
                         />
@@ -330,7 +330,7 @@ export default function UploadPOPage() {
                         <input
                           type="number"
                           step="0.01"
-                          className="w-24 rounded border-gray-300 text-right"
+                          className="w-24 g-input text-right"
                           value={item.unit_cost}
                           onChange={e => updateLineItem(index, 'unit_cost', Number(e.target.value))}
                         />
@@ -339,28 +339,28 @@ export default function UploadPOPage() {
                         <input
                           type="number"
                           step="0.01"
-                          className="w-24 rounded border-gray-300 text-right"
+                          className="w-24 g-input text-right"
                           value={item.line_total}
                           onChange={e => updateLineItem(index, 'line_total', Number(e.target.value))}
                         />
                       </td>
                       <td className="py-2 pr-2">
                         <input
-                          className="w-28 rounded border-gray-300"
+                          className="w-28 g-input"
                           value={item.cost_type || ''}
                           onChange={e => updateLineItem(index, 'cost_type', e.target.value)}
                         />
                       </td>
                       <td className="py-2 pr-2">
                         <input
-                          className="w-16 rounded border-gray-300"
+                          className="w-16 g-input"
                           value={item.uom || ''}
                           onChange={e => updateLineItem(index, 'uom', e.target.value)}
                         />
                       </td>
                       <td className="py-2 pr-2">
                         <input
-                          className="w-28 rounded border-gray-300"
+                          className="w-28 g-input"
                           value={item.vendor_item_code || ''}
                           onChange={e => updateLineItem(index, 'vendor_item_code', e.target.value)}
                         />
@@ -369,7 +369,7 @@ export default function UploadPOPage() {
                         <button
                           type="button"
                           onClick={() => removeLineItem(index)}
-                          className="text-red-500 hover:text-red-700 text-xs"
+                          className="text-[var(--g-accent)] hover:text-[var(--g-accent-2)] text-xs"
                         >
                           Remove
                         </button>
@@ -379,19 +379,19 @@ export default function UploadPOPage() {
                 </tbody>
               </table>
             </div>
-            <div className="mt-4 text-right text-sm text-gray-700">
+            <div className="mt-4 text-right text-sm text-[var(--g-text-dim)]">
               Line Total: <span className="font-semibold">${lineTotal.toFixed(2)}</span>
             </div>
           </div>
 
           <div className="flex items-center justify-between pt-4 border-t">
-            <div className="text-sm text-gray-600">{statusMessage}</div>
+            <div className="text-sm text-[var(--g-text-dim)]">{statusMessage}</div>
             <div className="space-x-3">
               <button
                 type="button"
                 onClick={saveDraft}
                 disabled={saving}
-                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+                className="g-button g-button-outline"
               >
                 {saving ? 'Saving…' : 'Save Draft'}
               </button>
@@ -399,7 +399,7 @@ export default function UploadPOPage() {
                 type="button"
                 onClick={approveAndPost}
                 disabled={posting}
-                className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm"
+                className="g-button"
               >
                 {posting ? 'Posting…' : 'Approve & Post'}
               </button>

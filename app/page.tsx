@@ -70,13 +70,14 @@ export default async function DashboardPage() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div className="g-container py-12">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <p className="g-kicker">Tour operations</p>
+          <h1 className="text-3xl font-semibold g-title mt-3">
             Tour Dashboard
           </h1>
-          <p className="text-gray-600 mt-2 max-w-2xl">
+          <p className="text-sm text-[var(--g-text-dim)] mt-2 max-w-2xl">
             Live view of active tours, inventory status, and quick access to
             document review workflows.
           </p>
@@ -84,13 +85,13 @@ export default async function DashboardPage() {
         <div className="flex flex-wrap gap-3">
           <Link
             href="/upload/po"
-            className="inline-flex items-center px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800"
+            className="g-button"
           >
             Upload Purchase Order
           </Link>
           <Link
             href="/upload/packing-list"
-            className="inline-flex items-center px-4 py-2 text-sm font-medium bg-white border border-gray-300 text-gray-700 rounded-md hover:border-gray-400"
+            className="g-button g-button-outline"
           >
             Upload Packing List
           </Link>
@@ -98,21 +99,21 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <p className="text-sm text-gray-500">Tours tracked</p>
-          <p className="text-2xl font-semibold text-gray-900 mt-2">
+        <div className="g-card p-4">
+          <p className="text-xs text-[var(--g-text-muted)]">Tours tracked</p>
+          <p className="text-2xl font-semibold mt-2">
             {tourList.length}
           </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <p className="text-sm text-gray-500">Total gross sales</p>
-          <p className="text-2xl font-semibold text-gray-900 mt-2">
+        <div className="g-card p-4">
+          <p className="text-xs text-[var(--g-text-muted)]">Total gross sales</p>
+          <p className="text-2xl font-semibold mt-2">
             {currencyFormatter.format(totalGross)}
           </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <p className="text-sm text-gray-500">Active tour products</p>
-          <p className="text-2xl font-semibold text-gray-900 mt-2">
+        <div className="g-card p-4">
+          <p className="text-xs text-[var(--g-text-muted)]">Active tour products</p>
+          <p className="text-2xl font-semibold mt-2">
             {Array.from(productsByTour.values()).reduce(
               (sum, value) => sum + value,
               0
@@ -123,19 +124,17 @@ export default async function DashboardPage() {
 
       <div className="mt-10">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Available Tours
-          </h2>
+          <h2 className="text-lg font-semibold g-title">Available Tours</h2>
           <Link
             href="/upload/sales-report"
-            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+            className="text-sm font-medium g-link"
           >
             Upload Sales Report
           </Link>
         </div>
 
         {tourList.length === 0 ? (
-          <div className="mt-6 bg-white border border-dashed border-gray-300 rounded-lg p-6 text-gray-600">
+          <div className="mt-6 g-card g-card-muted p-6 text-sm text-[var(--g-text-muted)]">
             No tours yet. Seed the database or add a tour to get started.
           </div>
         ) : (
@@ -149,36 +148,38 @@ export default async function DashboardPage() {
                 <Link
                   key={tour.id}
                   href={`/tours/${tour.id}`}
-                  className="block bg-white border border-gray-200 rounded-lg p-6 hover:border-blue-400 hover:shadow-md transition"
+                  className="block g-card p-6 transition hover:border-[var(--g-accent)]"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
+                      <h3 className="text-lg font-semibold g-title">
                         {tour.name}
                       </h3>
-                      <p className="text-sm text-gray-500">{tour.artist}</p>
+                      <p className="text-sm text-[var(--g-text-muted)]">
+                        {tour.artist}
+                      </p>
                     </div>
-                    <span className="text-xs uppercase tracking-wide text-gray-500">
+                    <span className="g-kicker text-[10px]">
                       {tour.status}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mt-3">
+                  <p className="text-sm text-[var(--g-text-dim)] mt-3">
                     {formatDateRange(tour.start_date, tour.end_date)}
                   </p>
-                  <div className="grid grid-cols-3 gap-4 mt-4 text-sm text-gray-600">
+                  <div className="grid grid-cols-3 gap-4 mt-4 text-sm text-[var(--g-text-dim)]">
                     <div>
-                      <p className="text-gray-400">Shows</p>
-                      <p className="text-gray-900 font-semibold">{showCount}</p>
+                      <p className="text-[var(--g-text-muted)]">Shows</p>
+                      <p className="font-semibold">{showCount}</p>
                     </div>
                     <div>
-                      <p className="text-gray-400">Products</p>
-                      <p className="text-gray-900 font-semibold">
+                      <p className="text-[var(--g-text-muted)]">Products</p>
+                      <p className="font-semibold">
                         {productCount}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-400">Gross</p>
-                      <p className="text-gray-900 font-semibold">
+                      <p className="text-[var(--g-text-muted)]">Gross</p>
+                      <p className="font-semibold">
                         {currencyFormatter.format(gross)}
                       </p>
                     </div>

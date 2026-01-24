@@ -18,26 +18,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="min-h-screen bg-gray-50">
-          <nav className="bg-white shadow-sm border-b">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between h-16">
+        <div className="min-h-screen">
+          <nav className="border-b border-white/10 bg-black/40 backdrop-blur">
+            <div className="g-container">
+              <div className="flex justify-between h-16 items-center">
                 <div className="flex items-center">
-                  <h1 className="text-xl font-bold text-gray-900">
-                    GMS Inventory Tracker
+                  <h1 className="text-lg font-semibold g-title tracking-wide">
+                    Global Merch Services
                   </h1>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <Link
-                    href="/"
-                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                  >
+                <div className="flex items-center space-x-4 text-sm">
+                  <Link href="/" className="g-link">
                     Dashboard
                   </Link>
-                  <Link
-                    href="/upload/po"
-                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                  >
+                  <Link href="/upload/po" className="g-link">
                     Uploads
                   </Link>
                 </div>

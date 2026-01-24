@@ -149,13 +149,13 @@ export default function UploadSettlementPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+    <div className="g-container py-12 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Upload Settlement</h1>
-        <p className="text-gray-600">Upload a settlement PDF, review data, and post.</p>
+        <h1 className="text-3xl font-semibold g-title mb-2">Upload Settlement</h1>
+        <p className="text-[var(--g-text-dim)]">Upload a settlement PDF, review data, and post.</p>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="g-panel">
         <FileDropzone
           fileType="settlement"
           onParseComplete={(data, docId) => {
@@ -166,17 +166,17 @@ export default function UploadSettlementPage() {
       </div>
 
       {parsedDocumentId && (
-        <div className="bg-white rounded-lg shadow p-6 space-y-6">
+        <div className="g-panel space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">Settlement Review</h2>
-            <div className="text-sm text-gray-500">Draft ID: {parsedDocumentId}</div>
+            <h2 className="text-xl font-semibold g-title">Settlement Review</h2>
+            <div className="text-sm text-[var(--g-text-muted)]">Draft ID: {parsedDocumentId}</div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700">Tour</label>
+              <label className="g-label">Tour</label>
               <select
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.tour_id || ''}
                 onChange={e => setForm(prev => ({ ...prev, tour_id: e.target.value }))}
               >
@@ -189,9 +189,9 @@ export default function UploadSettlementPage() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Show</label>
+              <label className="g-label">Show</label>
               <select
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.show_id || ''}
                 onChange={e => setForm(prev => ({ ...prev, show_id: e.target.value }))}
               >
@@ -204,35 +204,35 @@ export default function UploadSettlementPage() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Show Date</label>
+              <label className="g-label">Show Date</label>
               <input
                 type="date"
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.show_date || ''}
                 onChange={e => setForm(prev => ({ ...prev, show_date: e.target.value }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Venue Name</label>
+              <label className="g-label">Venue Name</label>
               <input
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.venue_name || ''}
                 onChange={e => setForm(prev => ({ ...prev, venue_name: e.target.value }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Settlement Date</label>
+              <label className="g-label">Settlement Date</label>
               <input
                 type="date"
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.settlement_date || ''}
                 onChange={e => setForm(prev => ({ ...prev, settlement_date: e.target.value }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Currency</label>
+              <label className="g-label">Currency</label>
               <input
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.currency}
                 onChange={e => setForm(prev => ({ ...prev, currency: e.target.value }))}
               />
@@ -241,97 +241,97 @@ export default function UploadSettlementPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t pt-6">
             <div>
-              <label className="text-sm font-medium text-gray-700">Gross Sales Total</label>
+              <label className="g-label">Gross Sales Total</label>
               <input
                 type="number"
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.gross_sales_total || 0}
                 onChange={e => setForm(prev => ({ ...prev, gross_sales_total: Number(e.target.value) }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Sales Tax Total</label>
+              <label className="g-label">Sales Tax Total</label>
               <input
                 type="number"
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.sales_tax_total || 0}
                 onChange={e => setForm(prev => ({ ...prev, sales_tax_total: Number(e.target.value) }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Credit Card Fees</label>
+              <label className="g-label">Credit Card Fees</label>
               <input
                 type="number"
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.credit_card_fees || 0}
                 onChange={e => setForm(prev => ({ ...prev, credit_card_fees: Number(e.target.value) }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Venue Merch Fee</label>
+              <label className="g-label">Venue Merch Fee</label>
               <input
                 type="number"
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.venue_merch_fee || 0}
                 onChange={e => setForm(prev => ({ ...prev, venue_merch_fee: Number(e.target.value) }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Other Fees</label>
+              <label className="g-label">Other Fees</label>
               <input
                 type="number"
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.other_fees || 0}
                 onChange={e => setForm(prev => ({ ...prev, other_fees: Number(e.target.value) }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Refunds / Chargebacks</label>
+              <label className="g-label">Refunds / Chargebacks</label>
               <input
                 type="number"
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.refunds || 0}
                 onChange={e => setForm(prev => ({ ...prev, refunds: Number(e.target.value) }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Net Settlement</label>
+              <label className="g-label">Net Settlement</label>
               <input
                 type="number"
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.net_settlement_amount || 0}
                 onChange={e => setForm(prev => ({ ...prev, net_settlement_amount: Number(e.target.value) }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Split Percent</label>
+              <label className="g-label">Split Percent</label>
               <input
                 type="number"
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.split_percent || 0}
                 onChange={e => setForm(prev => ({ ...prev, split_percent: Number(e.target.value) }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Paid To</label>
+              <label className="g-label">Paid To</label>
               <input
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.paid_to || ''}
                 onChange={e => setForm(prev => ({ ...prev, paid_to: e.target.value }))}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700">Payment Method</label>
+              <label className="g-label">Payment Method</label>
               <input
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 value={form.payment_method || ''}
                 onChange={e => setForm(prev => ({ ...prev, payment_method: e.target.value }))}
               />
             </div>
             <div className="md:col-span-3">
-              <label className="text-sm font-medium text-gray-700">Notes</label>
+              <label className="g-label">Notes</label>
               <textarea
-                className="mt-1 w-full rounded border-gray-300"
+                className="mt-1 g-input"
                 rows={3}
                 value={form.notes || ''}
                 onChange={e => setForm(prev => ({ ...prev, notes: e.target.value }))}
@@ -341,18 +341,18 @@ export default function UploadSettlementPage() {
 
           <div className="border-t pt-6">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-gray-900">Comps</h3>
+              <h3 className="text-lg font-semibold g-title">Comps</h3>
               <button
                 type="button"
                 onClick={addComp}
-                className="px-3 py-1.5 text-sm rounded bg-gray-100 hover:bg-gray-200"
+                className="g-button g-button-outline text-xs"
               >
                 Add comp
               </button>
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead className="text-gray-500">
+              <table className="min-w-full text-sm g-table">
+                <thead className="g-kicker">
                   <tr>
                     <th className="text-left py-2">Type</th>
                     <th className="text-left py-2">SKU</th>
@@ -368,7 +368,7 @@ export default function UploadSettlementPage() {
                     <tr key={`${item.sku}-${index}`} className="border-t">
                       <td className="py-2 pr-2">
                         <select
-                          className="w-32 rounded border-gray-300"
+                          className="w-32 g-input"
                           value={item.comp_type}
                           onChange={e => updateComp(index, 'comp_type', e.target.value)}
                         >
@@ -383,21 +383,21 @@ export default function UploadSettlementPage() {
                       </td>
                       <td className="py-2 pr-2">
                         <input
-                          className="w-28 rounded border-gray-300"
+                          className="w-28 g-input"
                           value={item.sku}
                           onChange={e => updateComp(index, 'sku', e.target.value)}
                         />
                       </td>
                       <td className="py-2 pr-2">
                         <input
-                          className="w-48 rounded border-gray-300"
+                          className="w-48 g-input"
                           value={item.description || ''}
                           onChange={e => updateComp(index, 'description', e.target.value)}
                         />
                       </td>
                       <td className="py-2 pr-2">
                         <input
-                          className="w-20 rounded border-gray-300"
+                          className="w-20 g-input"
                           value={item.size || ''}
                           onChange={e => updateComp(index, 'size', e.target.value)}
                         />
@@ -405,7 +405,7 @@ export default function UploadSettlementPage() {
                       <td className="py-2 pr-2 text-right">
                         <input
                           type="number"
-                          className="w-20 rounded border-gray-300 text-right"
+                          className="w-20 g-input text-right"
                           value={item.quantity}
                           onChange={e => updateComp(index, 'quantity', Number(e.target.value))}
                         />
@@ -413,7 +413,7 @@ export default function UploadSettlementPage() {
                       <td className="py-2 pr-2 text-right">
                         <input
                           type="number"
-                          className="w-24 rounded border-gray-300 text-right"
+                          className="w-24 g-input text-right"
                           value={item.unit_retail_value || 0}
                           onChange={e => updateComp(index, 'unit_retail_value', Number(e.target.value))}
                         />
@@ -422,7 +422,7 @@ export default function UploadSettlementPage() {
                         <button
                           type="button"
                           onClick={() => removeComp(index)}
-                          className="text-red-500 hover:text-red-700 text-xs"
+                          className="text-[var(--g-accent)] hover:text-[var(--g-accent-2)] text-xs"
                         >
                           Remove
                         </button>
@@ -435,13 +435,13 @@ export default function UploadSettlementPage() {
           </div>
 
           <div className="flex items-center justify-between pt-4 border-t">
-            <div className="text-sm text-gray-600">{statusMessage}</div>
+            <div className="text-sm text-[var(--g-text-dim)]">{statusMessage}</div>
             <div className="space-x-3">
               <button
                 type="button"
                 onClick={saveDraft}
                 disabled={saving}
-                className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+                className="g-button g-button-outline"
               >
                 {saving ? 'Saving…' : 'Save Draft'}
               </button>
@@ -449,7 +449,7 @@ export default function UploadSettlementPage() {
                 type="button"
                 onClick={approveAndPost}
                 disabled={posting}
-                className="px-4 py-2 rounded bg-orange-600 hover:bg-orange-700 text-white text-sm"
+                className="g-button"
               >
                 {posting ? 'Posting…' : 'Approve & Post'}
               </button>
