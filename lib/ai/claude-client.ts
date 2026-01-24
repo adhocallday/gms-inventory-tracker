@@ -17,24 +17,27 @@ export async function parseDocument(
     const response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4096,
-      messages: [{
-        role: 'user',
-        content: [
-          {
-            type: 'document',
-            source: {
-              type: 'base64',
-              media_type: mediaType,
-              data: base64Data
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              // The SDK types lag behind the API; "document" is valid at runtime.
+              type: 'document',
+              source: {
+                type: 'base64',
+                media_type: mediaType,
+                data: base64Data
+              }
+            },
+            {
+              type: 'text',
+              text: instructions
             }
-          },
-          {
-            type: 'text',
-            text: instructions
-          }
-        ]
-      }]
-    });
+          ]
+        }
+      ]
+    } as any);
     
     const textContent = response.content.find(c => c.type === 'text');
     if (!textContent || textContent.type !== 'text') {
