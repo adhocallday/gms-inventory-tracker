@@ -258,3 +258,90 @@ select
 from public.tour_products tp
 left join public.sales sa on sa.tour_product_id = tp.id
 group by tp.tour_id, tp.product_id, tp.size, tp.full_package_cost;
+
+-- Forecasting & design assets
+create table if not exists public.forecast_scenarios (
+  id uuid primary key default gen_random_uuid(),
+  tour_id uuid not null references public.tours(id) on delete cascade,
+  name text not null,
+  is_baseline boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.forecast_overrides (
+  id uuid primary key default gen_random_uuid(),
+  scenario_id uuid not null references public.forecast_scenarios(id) on delete cascade,
+  tour_id uuid not null references public.tours(id) on delete cascade,
+  show_id uuid references public.shows(id) on delete set null,
+  sku text not null,
+  size text,
+  override_units integer not null default 0,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists forecast_overrides_lookup
+  on public.forecast_overrides (scenario_id, tour_id, sku);
+
+create table if not exists public.design_assets (
+  id uuid primary key default gen_random_uuid(),
+  tour_id uuid not null references public.tours(id) on delete cascade,
+  product_id uuid references public.products(id) on delete set null,
+  sku text,
+  storage_path text not null,
+  asset_type text not null default 'mockup',
+  is_primary boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists design_assets_tour_idx
+  on public.design_assets (tour_id);
+
+-- Tracker-style views
+create or replace view public.product_summary as
+select
+  tp.tour_id,
+  p.id as product_id,
+  p.sku,
+  p.description,
+  tp.size,
+  sum(sa.qty_sold) as total_sold,
+  sum(sa.gross_sales) as total_gross,
+  tp.full_package_cost,
+  (sum(sa.qty_sold) * tp.full_package_cost) as total_cogs,
+  (sum(sa.gross_sales) - (sum(sa.qty_sold) * tp.full_package_cost)) as gross_margin
+from public.tour_products tp
+join public.products p on p.id = tp.product_id
+left join public.sales sa on sa.tour_product_id = tp.id
+group by tp.tour_id, p.id, p.sku, p.description, tp.size, tp.full_package_cost;
+
+create or replace view public.show_summary as
+select
+  s.id as show_id,
+  s.tour_id,
+  s.show_date,
+  s.venue_name,
+  s.city,
+  s.state,
+  sum(sa.gross_sales) as total_gross,
+  s.attendance,
+  round(sum(sa.gross_sales) / nullif(s.attendance, 0), 2) as per_head,
+  coalesce(sum(c.quantity), 0) as total_comps
+from public.shows s
+left join public.sales sa on sa.show_id = s.id
+left join public.comps c on c.show_id = s.id
+group by s.id, s.tour_id, s.show_date, s.venue_name, s.city, s.state, s.attendance;
+
+create or replace view public.stock_movement as
+select
+  po.tour_id,
+  pl.received_date,
+  pl.delivery_number,
+  p.sku,
+  tp.size,
+  pli.quantity_received
+from public.packing_list_items pli
+join public.packing_lists pl on pl.id = pli.packing_list_id
+join public.po_line_items poli on poli.id = pli.po_line_item_id
+join public.purchase_orders po on po.id = poli.po_id
+join public.tour_products tp on tp.id = poli.tour_product_id
+join public.products p on p.id = tp.product_id;

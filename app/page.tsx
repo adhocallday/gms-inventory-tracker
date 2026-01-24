@@ -1,103 +1,193 @@
-export default function HomePage() {
+import Link from 'next/link';
+import { supabase } from '@/lib/supabase/client';
+
+type TourRow = {
+  id: string;
+  name: string;
+  artist: string;
+  start_date: string | null;
+  end_date: string | null;
+  status: string;
+};
+
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0
+});
+
+function formatDate(value?: string | null) {
+  if (!value) return 'TBD';
+  return new Date(value).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
+
+function formatDateRange(start?: string | null, end?: string | null) {
+  if (!start && !end) return 'Dates TBD';
+  if (start && !end) return `Starts ${formatDate(start)}`;
+  if (!start && end) return `Ends ${formatDate(end)}`;
+  return `${formatDate(start)} — ${formatDate(end)}`;
+}
+
+export default async function DashboardPage() {
+  const { data: tours } = await supabase
+    .from('tours')
+    .select('id, name, artist, start_date, end_date, status')
+    .order('start_date', { ascending: false });
+
+  const tourList = (tours ?? []) as TourRow[];
+
+  const { data: shows } = await supabase.from('shows').select('id, tour_id');
+  const { data: tourProducts } = await supabase
+    .from('tour_products')
+    .select('id, tour_id');
+  const { data: grossRows } = await supabase
+    .from('cogs_summary')
+    .select('tour_id, total_gross');
+
+  const showsByTour = new Map<string, number>();
+  for (const show of shows ?? []) {
+    showsByTour.set(show.tour_id, (showsByTour.get(show.tour_id) ?? 0) + 1);
+  }
+
+  const productsByTour = new Map<string, number>();
+  for (const tp of tourProducts ?? []) {
+    productsByTour.set(tp.tour_id, (productsByTour.get(tp.tour_id) ?? 0) + 1);
+  }
+
+  const grossByTour = new Map<string, number>();
+  for (const row of grossRows ?? []) {
+    const grossValue = Number(row.total_gross ?? 0);
+    grossByTour.set(row.tour_id, (grossByTour.get(row.tour_id) ?? 0) + grossValue);
+  }
+
+  const totalGross = Array.from(grossByTour.values()).reduce(
+    (sum, value) => sum + value,
+    0
+  );
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Welcome to GMS Inventory Tracker
-        </h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          Multi-tour inventory management with AI-powered document parsing
-        </p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Tour Dashboard
+          </h1>
+          <p className="text-gray-600 mt-2 max-w-2xl">
+            Live view of active tours, inventory status, and quick access to
+            document review workflows.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/upload/po"
+            className="inline-flex items-center px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800"
+          >
+            Upload Purchase Order
+          </Link>
+          <Link
+            href="/upload/packing-list"
+            className="inline-flex items-center px-4 py-2 text-sm font-medium bg-white border border-gray-300 text-gray-700 rounded-md hover:border-gray-400"
+          >
+            Upload Packing List
+          </Link>
+        </div>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-        <a
-          href="/upload/po"
-          className="block p-6 bg-white rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all"
-        >
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <h3 className="ml-4 text-lg font-semibold text-gray-900">
-              Upload Purchase Order
-            </h3>
-          </div>
-          <p className="text-gray-600 text-sm">
-            Parse vendor PO PDFs and extract line items, costs, and SKUs automatically
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-sm text-gray-500">Tours tracked</p>
+          <p className="text-2xl font-semibold text-gray-900 mt-2">
+            {tourList.length}
           </p>
-        </a>
-        
-        <a
-          href="/upload/packing-list"
-          className="block p-6 bg-white rounded-lg border-2 border-gray-200 hover:border-green-500 hover:shadow-lg transition-all"
-        >
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-              </svg>
-            </div>
-            <h3 className="ml-4 text-lg font-semibold text-gray-900">
-              Upload Packing List
-            </h3>
-          </div>
-          <p className="text-gray-600 text-sm">
-            Parse packing slips from any vendor format and reconcile with POs
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-sm text-gray-500">Total gross sales</p>
+          <p className="text-2xl font-semibold text-gray-900 mt-2">
+            {currencyFormatter.format(totalGross)}
           </p>
-        </a>
-        
-        <a
-          href="/upload/sales-report"
-          className="block p-6 bg-white rounded-lg border-2 border-gray-200 hover:border-purple-500 hover:shadow-lg transition-all"
-        >
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <h3 className="ml-4 text-lg font-semibold text-gray-900">
-              Upload Sales Report
-            </h3>
-          </div>
-          <p className="text-gray-600 text-sm">
-            Parse AtVenu sales reports and extract all sales data by SKU
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-sm text-gray-500">Active tour products</p>
+          <p className="text-2xl font-semibold text-gray-900 mt-2">
+            {Array.from(productsByTour.values()).reduce(
+              (sum, value) => sum + value,
+              0
+            )}
           </p>
-        </a>
-        
-        <a
-          href="/upload/settlement"
-          className="block p-6 bg-white rounded-lg border-2 border-gray-200 hover:border-orange-500 hover:shadow-lg transition-all"
-        >
-          <div className="flex items-center mb-4">
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="ml-4 text-lg font-semibold text-gray-900">
-              Upload Settlement
-            </h3>
-          </div>
-          <p className="text-gray-600 text-sm">
-            Parse settlement reports and extract comp data and financials
-          </p>
-        </a>
+        </div>
       </div>
-      
-      <div className="mt-12 max-w-3xl mx-auto bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-blue-900 mb-2">
-          🚀 Getting Started
-        </h3>
-        <ol className="list-decimal list-inside space-y-2 text-blue-800 text-sm">
-          <li>Set up your Supabase project and add credentials to .env.local</li>
-          <li>Add your Anthropic API key for document parsing</li>
-          <li>Run database migrations to create tables</li>
-          <li>Upload your first document to test the AI parsing</li>
-        </ol>
+
+      <div className="mt-10">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Available Tours
+          </h2>
+          <Link
+            href="/upload/sales-report"
+            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+          >
+            Upload Sales Report
+          </Link>
+        </div>
+
+        {tourList.length === 0 ? (
+          <div className="mt-6 bg-white border border-dashed border-gray-300 rounded-lg p-6 text-gray-600">
+            No tours yet. Seed the database or add a tour to get started.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            {tourList.map((tour) => {
+              const showCount = showsByTour.get(tour.id) ?? 0;
+              const productCount = productsByTour.get(tour.id) ?? 0;
+              const gross = grossByTour.get(tour.id) ?? 0;
+
+              return (
+                <Link
+                  key={tour.id}
+                  href={`/tours/${tour.id}`}
+                  className="block bg-white border border-gray-200 rounded-lg p-6 hover:border-blue-400 hover:shadow-md transition"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {tour.name}
+                      </h3>
+                      <p className="text-sm text-gray-500">{tour.artist}</p>
+                    </div>
+                    <span className="text-xs uppercase tracking-wide text-gray-500">
+                      {tour.status}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-3">
+                    {formatDateRange(tour.start_date, tour.end_date)}
+                  </p>
+                  <div className="grid grid-cols-3 gap-4 mt-4 text-sm text-gray-600">
+                    <div>
+                      <p className="text-gray-400">Shows</p>
+                      <p className="text-gray-900 font-semibold">{showCount}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Products</p>
+                      <p className="text-gray-900 font-semibold">
+                        {productCount}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400">Gross</p>
+                      <p className="text-gray-900 font-semibold">
+                        {currencyFormatter.format(gross)}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

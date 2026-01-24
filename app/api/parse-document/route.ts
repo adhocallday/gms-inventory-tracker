@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { createServiceClient } from '@/lib/supabase/client';
 import { parsePurchaseOrder } from '@/lib/ai/parsers/po-parser';
 import { parsePackingList } from '@/lib/ai/parsers/packing-list-parser';
@@ -30,9 +31,10 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Convert to base64
+    // Convert to base64 + hash for idempotency
     const buffer = Buffer.from(await fileData.arrayBuffer());
     const base64 = buffer.toString('base64');
+    const sourceHash = crypto.createHash('sha256').update(buffer).digest('hex');
     
     // Parse based on file type
     let parsed;
@@ -42,9 +44,10 @@ export async function POST(request: NextRequest) {
     const { data: logEntry } = await supabase
       .from('ai_processing_logs')
       .insert({
-        file_url: filePath,
-        file_type: fileType,
-        processing_status: 'processing'
+        doc_type: fileType,
+        source_hash: sourceHash,
+        source_filename: filePath,
+        status: 'processing'
       })
       .select()
       .single();
@@ -69,14 +72,31 @@ export async function POST(request: NextRequest) {
           throw new Error(`Unknown file type: ${fileType}`);
       }
       
+      // Upsert draft parsed document
+      const { data: parsedDoc } = await supabase
+        .from('parsed_documents')
+        .upsert(
+          {
+            doc_type: fileType,
+            source_hash: sourceHash,
+            source_filename: filePath,
+            tour_id: tourId ?? null,
+            extracted_json: parsed,
+            normalized_json: parsed,
+            status: 'draft'
+          },
+          { onConflict: 'doc_type,source_hash' }
+        )
+        .select()
+        .single();
+
       // Update log with success
       if (logId) {
         await supabase
           .from('ai_processing_logs')
           .update({
-            processing_status: 'completed',
-            extracted_data: parsed,
-            completed_at: new Date().toISOString()
+            status: 'ok',
+            parsed_json: parsed
           })
           .eq('id', logId);
       }
@@ -84,7 +104,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         data: parsed,
-        fileType
+        fileType,
+        parsedDocumentId: parsedDoc?.id ?? null
       });
       
     } catch (parseError: any) {
@@ -93,9 +114,8 @@ export async function POST(request: NextRequest) {
         await supabase
           .from('ai_processing_logs')
           .update({
-            processing_status: 'failed',
-            error_message: parseError.message,
-            completed_at: new Date().toISOString()
+            status: 'error',
+            error_message: parseError.message
           })
           .eq('id', logId);
       }

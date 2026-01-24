@@ -4,48 +4,49 @@ import { useMemo, useState } from 'react';
 import { FileDropzone } from '@/components/upload/FileDropzone';
 import { useTours } from '@/hooks/useTours';
 
-interface POLineItemForm {
+interface SalesLineItemForm {
   sku: string;
-  description: string;
+  description?: string;
   size?: string;
-  quantity_ordered: number;
-  unit_cost: number;
-  line_total: number;
-  cost_type?: string;
-  uom?: string;
-  vendor_item_code?: string;
+  qty_sold: number;
+  qty_comp?: number;
+  unit_price: number;
+  gross_sales: number;
+  tax?: number;
+  net_sales?: number;
 }
 
-interface POFormState {
-  po_number: string;
-  vendor: string;
-  order_date?: string;
-  expected_delivery_date?: string;
-  currency: string;
-  ship_to_location?: string;
-  notes?: string;
+interface SalesReportFormState {
   tour_id?: string;
-  line_items: POLineItemForm[];
-  total_amount?: number;
+  show_date: string;
+  venue_name: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  attendance?: number;
+  report_source: string;
+  currency: string;
+  line_items: SalesLineItemForm[];
 }
 
-const emptyForm: POFormState = {
-  po_number: '',
-  vendor: '',
+const emptyForm: SalesReportFormState = {
+  show_date: '',
+  venue_name: '',
+  report_source: 'AtVenu',
   currency: 'USD',
   line_items: []
 };
 
-export default function UploadPOPage() {
+export default function UploadSalesReportPage() {
   const { tours, loading: toursLoading } = useTours();
   const [parsedDocumentId, setParsedDocumentId] = useState<string | null>(null);
-  const [form, setForm] = useState<POFormState>(emptyForm);
+  const [form, setForm] = useState<SalesReportFormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [posting, setPosting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const lineTotal = useMemo(() => {
-    return form.line_items.reduce((sum, item) => sum + (item.line_total || 0), 0);
+    return form.line_items.reduce((sum, item) => sum + (item.gross_sales || 0), 0);
   }, [form.line_items]);
 
   const hydrateForm = (data: any) => {
@@ -53,39 +54,37 @@ export default function UploadPOPage() {
       sku: item.sku || '',
       description: item.description || '',
       size: item.size || '',
-      quantity_ordered: item.quantity ?? 0,
-      unit_cost: item.unitCost ?? 0,
-      line_total: item.total ?? (item.quantity ?? 0) * (item.unitCost ?? 0),
-      cost_type: '',
-      uom: 'ea',
-      vendor_item_code: ''
+      qty_sold: item.sold ?? 0,
+      qty_comp: 0,
+      unit_price: item.unitPrice ?? 0,
+      gross_sales: item.gross ?? (item.sold ?? 0) * (item.unitPrice ?? 0),
+      tax: 0,
+      net_sales: 0
     }));
 
     setForm({
-      po_number: data?.poNumber || '',
-      vendor: data?.vendor || '',
-      order_date: data?.orderDate || '',
-      expected_delivery_date: data?.expectedDelivery || '',
-      currency: 'USD',
-      ship_to_location: '',
-      notes: '',
       tour_id: '',
-      line_items: lineItems,
-      total_amount: data?.totalAmount || 0
+      show_date: data?.showDate || '',
+      venue_name: data?.venueName || '',
+      city: data?.city || '',
+      state: data?.state || '',
+      country: '',
+      attendance: data?.attendance || 0,
+      report_source: 'AtVenu',
+      currency: 'USD',
+      line_items: lineItems
     });
   };
 
-  const updateLineItem = (index: number, field: keyof POLineItemForm, value: any) => {
+  const updateLineItem = (index: number, field: keyof SalesLineItemForm, value: any) => {
     setForm(prev => {
       const next = [...prev.line_items];
       const updated = { ...next[index], [field]: value };
-
-      if (field === 'quantity_ordered' || field === 'unit_cost') {
-        const qty = Number(updated.quantity_ordered || 0);
-        const cost = Number(updated.unit_cost || 0);
-        updated.line_total = qty * cost;
+      if (field === 'qty_sold' || field === 'unit_price') {
+        const qty = Number(updated.qty_sold || 0);
+        const price = Number(updated.unit_price || 0);
+        updated.gross_sales = qty * price;
       }
-
       next[index] = updated;
       return { ...prev, line_items: next };
     });
@@ -96,17 +95,7 @@ export default function UploadPOPage() {
       ...prev,
       line_items: [
         ...prev.line_items,
-        {
-          sku: '',
-          description: '',
-          size: '',
-          quantity_ordered: 0,
-          unit_cost: 0,
-          line_total: 0,
-          cost_type: '',
-          uom: 'ea',
-          vendor_item_code: ''
-        }
+        { sku: '', description: '', size: '', qty_sold: 0, qty_comp: 0, unit_price: 0, gross_sales: 0 }
       ]
     }));
   };
@@ -122,11 +111,13 @@ export default function UploadPOPage() {
     if (!parsedDocumentId) return;
     setSaving(true);
     setStatusMessage(null);
-    const response = await fetch(`/api/parsed-documents/${parsedDocumentId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ui_overrides: form })
-    });
+    const response = await fetch(`/api/parsed-documents/${parsedDocumentId}`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ui_overrides: form })
+      }
+    );
 
     setSaving(false);
     if (!response.ok) {
@@ -142,15 +133,15 @@ export default function UploadPOPage() {
     setPosting(true);
     setStatusMessage(null);
 
-    await fetch(`/api/parsed-documents/${parsedDocumentId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ui_overrides: form, status: 'approved' })
-    });
+    await fetch(`/api/parsed-documents/${parsedDocumentId}`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ui_overrides: form, status: 'approved' })
+      }
+    );
 
-    const response = await fetch(`/api/parsed-documents/${parsedDocumentId}/post`, {
-      method: 'POST'
-    });
+    const response = await fetch(`/api/parsed-documents/${parsedDocumentId}/post`, { method: 'POST' });
 
     setPosting(false);
     if (!response.ok) {
@@ -162,19 +153,15 @@ export default function UploadPOPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Upload Purchase Order
-        </h1>
-        <p className="text-gray-600">
-          Upload a PO PDF, review extracted data, and post to the database.
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Upload Sales Report</h1>
+        <p className="text-gray-600">Upload a sales report PDF, review data, and post.</p>
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
         <FileDropzone
-          fileType="po"
+          fileType="sales-report"
           onParseComplete={(data, docId) => {
             setParsedDocumentId(docId ?? null);
             hydrateForm(data);
@@ -185,63 +172,13 @@ export default function UploadPOPage() {
       {parsedDocumentId && (
         <div className="bg-white rounded-lg shadow p-6 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">PO Review</h2>
+            <h2 className="text-xl font-semibold text-gray-900">Sales Report Review</h2>
             <div className="text-sm text-gray-500">Draft ID: {parsedDocumentId}</div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700">PO Number</label>
-              <input
-                className="mt-1 w-full rounded border-gray-300"
-                value={form.po_number}
-                onChange={e => setForm(prev => ({ ...prev, po_number: e.target.value }))}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700">Vendor / Supplier</label>
-              <input
-                className="mt-1 w-full rounded border-gray-300"
-                value={form.vendor}
-                onChange={e => setForm(prev => ({ ...prev, vendor: e.target.value }))}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700">Order Date</label>
-              <input
-                type="date"
-                className="mt-1 w-full rounded border-gray-300"
-                value={form.order_date || ''}
-                onChange={e => setForm(prev => ({ ...prev, order_date: e.target.value }))}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700">Expected Delivery</label>
-              <input
-                type="date"
-                className="mt-1 w-full rounded border-gray-300"
-                value={form.expected_delivery_date || ''}
-                onChange={e => setForm(prev => ({ ...prev, expected_delivery_date: e.target.value }))}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700">Currency</label>
-              <input
-                className="mt-1 w-full rounded border-gray-300"
-                value={form.currency}
-                onChange={e => setForm(prev => ({ ...prev, currency: e.target.value }))}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700">Ship To Location</label>
-              <input
-                className="mt-1 w-full rounded border-gray-300"
-                value={form.ship_to_location || ''}
-                onChange={e => setForm(prev => ({ ...prev, ship_to_location: e.target.value }))}
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="text-sm font-medium text-gray-700">Match to Tour</label>
+              <label className="text-sm font-medium text-gray-700">Tour</label>
               <select
                 className="mt-1 w-full rounded border-gray-300"
                 value={form.tour_id || ''}
@@ -255,20 +192,69 @@ export default function UploadPOPage() {
                 ))}
               </select>
             </div>
-            <div className="md:col-span-2">
-              <label className="text-sm font-medium text-gray-700">Notes</label>
-              <textarea
+            <div>
+              <label className="text-sm font-medium text-gray-700">Show Date</label>
+              <input
+                type="date"
                 className="mt-1 w-full rounded border-gray-300"
-                rows={3}
-                value={form.notes || ''}
-                onChange={e => setForm(prev => ({ ...prev, notes: e.target.value }))}
+                value={form.show_date}
+                onChange={e => setForm(prev => ({ ...prev, show_date: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Venue Name</label>
+              <input
+                className="mt-1 w-full rounded border-gray-300"
+                value={form.venue_name}
+                onChange={e => setForm(prev => ({ ...prev, venue_name: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">City</label>
+              <input
+                className="mt-1 w-full rounded border-gray-300"
+                value={form.city || ''}
+                onChange={e => setForm(prev => ({ ...prev, city: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">State</label>
+              <input
+                className="mt-1 w-full rounded border-gray-300"
+                value={form.state || ''}
+                onChange={e => setForm(prev => ({ ...prev, state: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Attendance</label>
+              <input
+                type="number"
+                className="mt-1 w-full rounded border-gray-300"
+                value={form.attendance || 0}
+                onChange={e => setForm(prev => ({ ...prev, attendance: Number(e.target.value) }))}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Report Source</label>
+              <input
+                className="mt-1 w-full rounded border-gray-300"
+                value={form.report_source}
+                onChange={e => setForm(prev => ({ ...prev, report_source: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Currency</label>
+              <input
+                className="mt-1 w-full rounded border-gray-300"
+                value={form.currency}
+                onChange={e => setForm(prev => ({ ...prev, currency: e.target.value }))}
               />
             </div>
           </div>
 
           <div className="border-t pt-6">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-gray-900">Line Items</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Sales Lines</h3>
               <button
                 type="button"
                 onClick={addLineItem}
@@ -285,12 +271,10 @@ export default function UploadPOPage() {
                     <th className="text-left py-2">SKU</th>
                     <th className="text-left py-2">Description</th>
                     <th className="text-left py-2">Size</th>
-                    <th className="text-right py-2">Qty</th>
-                    <th className="text-right py-2">Unit Cost</th>
-                    <th className="text-right py-2">Line Total</th>
-                    <th className="text-left py-2">Cost Type</th>
-                    <th className="text-left py-2">UOM</th>
-                    <th className="text-left py-2">Vendor Item</th>
+                    <th className="text-right py-2">Qty Sold</th>
+                    <th className="text-right py-2">Qty Comp</th>
+                    <th className="text-right py-2">Unit Price</th>
+                    <th className="text-right py-2">Gross</th>
                     <th className="text-right py-2"></th>
                   </tr>
                 </thead>
@@ -307,7 +291,7 @@ export default function UploadPOPage() {
                       <td className="py-2 pr-2">
                         <input
                           className="w-56 rounded border-gray-300"
-                          value={item.description}
+                          value={item.description || ''}
                           onChange={e => updateLineItem(index, 'description', e.target.value)}
                         />
                       </td>
@@ -322,8 +306,16 @@ export default function UploadPOPage() {
                         <input
                           type="number"
                           className="w-24 rounded border-gray-300 text-right"
-                          value={item.quantity_ordered}
-                          onChange={e => updateLineItem(index, 'quantity_ordered', Number(e.target.value))}
+                          value={item.qty_sold}
+                          onChange={e => updateLineItem(index, 'qty_sold', Number(e.target.value))}
+                        />
+                      </td>
+                      <td className="py-2 pr-2 text-right">
+                        <input
+                          type="number"
+                          className="w-24 rounded border-gray-300 text-right"
+                          value={item.qty_comp || 0}
+                          onChange={e => updateLineItem(index, 'qty_comp', Number(e.target.value))}
                         />
                       </td>
                       <td className="py-2 pr-2 text-right">
@@ -331,8 +323,8 @@ export default function UploadPOPage() {
                           type="number"
                           step="0.01"
                           className="w-24 rounded border-gray-300 text-right"
-                          value={item.unit_cost}
-                          onChange={e => updateLineItem(index, 'unit_cost', Number(e.target.value))}
+                          value={item.unit_price}
+                          onChange={e => updateLineItem(index, 'unit_price', Number(e.target.value))}
                         />
                       </td>
                       <td className="py-2 pr-2 text-right">
@@ -340,29 +332,8 @@ export default function UploadPOPage() {
                           type="number"
                           step="0.01"
                           className="w-24 rounded border-gray-300 text-right"
-                          value={item.line_total}
-                          onChange={e => updateLineItem(index, 'line_total', Number(e.target.value))}
-                        />
-                      </td>
-                      <td className="py-2 pr-2">
-                        <input
-                          className="w-28 rounded border-gray-300"
-                          value={item.cost_type || ''}
-                          onChange={e => updateLineItem(index, 'cost_type', e.target.value)}
-                        />
-                      </td>
-                      <td className="py-2 pr-2">
-                        <input
-                          className="w-16 rounded border-gray-300"
-                          value={item.uom || ''}
-                          onChange={e => updateLineItem(index, 'uom', e.target.value)}
-                        />
-                      </td>
-                      <td className="py-2 pr-2">
-                        <input
-                          className="w-28 rounded border-gray-300"
-                          value={item.vendor_item_code || ''}
-                          onChange={e => updateLineItem(index, 'vendor_item_code', e.target.value)}
+                          value={item.gross_sales}
+                          onChange={e => updateLineItem(index, 'gross_sales', Number(e.target.value))}
                         />
                       </td>
                       <td className="py-2 text-right">
@@ -380,7 +351,7 @@ export default function UploadPOPage() {
               </table>
             </div>
             <div className="mt-4 text-right text-sm text-gray-700">
-              Line Total: <span className="font-semibold">${lineTotal.toFixed(2)}</span>
+              Total Gross: <span className="font-semibold">${lineTotal.toFixed(2)}</span>
             </div>
           </div>
 
@@ -399,7 +370,7 @@ export default function UploadPOPage() {
                 type="button"
                 onClick={approveAndPost}
                 disabled={posting}
-                className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm"
+                className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white text-sm"
               >
                 {posting ? 'Posting…' : 'Approve & Post'}
               </button>

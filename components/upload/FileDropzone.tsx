@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase/client';
 interface FileDropzoneProps {
   tourId?: string;
   fileType: 'po' | 'packing-list' | 'sales-report' | 'settlement';
-  onParseComplete?: (data: any) => void;
+  onParseComplete?: (data: any, parsedDocumentId?: string | null) => void;
 }
 
 export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzoneProps) {
@@ -63,7 +63,7 @@ export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzone
       setParsedData(result.data);
       
       if (onParseComplete) {
-        onParseComplete(result.data);
+        onParseComplete(result.data, result.parsedDocumentId);
       }
       
     } catch (err: any) {
