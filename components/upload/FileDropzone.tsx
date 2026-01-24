@@ -2,15 +2,30 @@
 
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { supabase } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
+
+type DocType = 'po' | 'packing-list' | 'sales-report' | 'settlement';
 
 interface FileDropzoneProps {
   tourId?: string;
-  fileType: 'po' | 'packing-list' | 'sales-report' | 'settlement';
-  onParseComplete?: (data: any, parsedDocumentId?: string | null) => void;
+  showId?: string;
+  fileType: DocType;
+  onParseComplete?: (
+    data: any,
+    parsedDocumentId?: string | null,
+    validation?: any
+  ) => void;
+  autoRedirect?: boolean; // If true, redirects to review page after parse
 }
 
-export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzoneProps) {
+export function FileDropzone({
+  tourId,
+  showId,
+  fileType,
+  onParseComplete,
+  autoRedirect = true
+}: FileDropzoneProps) {
+  const router = useRouter();
   const [uploading, setUploading] = useState(false);
   const [parsing, setParsing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,54 +33,52 @@ export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzone
   
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) return;
-    
+
     const file = acceptedFiles[0];
     setError(null);
     setParsedData(null);
-    
+
     try {
       setUploading(true);
-      
-      // Upload to Supabase Storage
-      const fileName = `${Date.now()}_${file.name}`;
-      const filePath = `${fileType}/${tourId || 'unknown'}/${fileName}`;
-      
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('documents')
-        .upload(filePath, file);
-      
-      if (uploadError) {
-        throw new Error(`Upload failed: ${uploadError.message}`);
-      }
-      
+
+      const formData = new FormData();
+      formData.append('file', file);
+      if (tourId) formData.append('tourId', tourId);
+      if (showId) formData.append('showId', showId);
+
       setUploading(false);
       setParsing(true);
-      
-      // Trigger AI parsing
-      const response = await fetch('/api/parse-document', {
+
+      const response = await fetch(`/api/parse/${fileType}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          filePath: uploadData.path,
-          fileType,
-          tourId
-        })
+        body: formData
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Parsing failed');
       }
-      
+
       const result = await response.json();
-      setParsedData(result.data);
-      
+      setParsedData(result.normalized_json);
+
+      // Call callback if provided
       if (onParseComplete) {
-        onParseComplete(result.data, result.parsedDocumentId);
+        onParseComplete(
+          result.normalized_json,
+          result.parsedDocumentId,
+          result.validation
+        );
       }
-      
+
+      // Auto-redirect to review page if enabled
+      if (autoRedirect && result.parsedDocumentId) {
+        // Small delay to show success message
+        setTimeout(() => {
+          router.push(`/dashboard/parsed-documents/${result.parsedDocumentId}`);
+        }, 1500);
+      }
+
     } catch (err: any) {
       setError(err.message);
       console.error('Upload/Parse error:', err);
@@ -73,8 +86,8 @@ export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzone
       setUploading(false);
       setParsing(false);
     }
-  }, [fileType, tourId, onParseComplete]);
-  
+  }, [fileType, tourId, showId, onParseComplete, autoRedirect, router]);
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
@@ -82,7 +95,7 @@ export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzone
     },
     maxFiles: 1
   });
-  
+
   const getFileTypeLabel = () => {
     switch (fileType) {
       case 'po': return 'Purchase Order';
@@ -112,7 +125,7 @@ export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzone
             <p className="text-sm text-[var(--g-text-dim)]">Uploading file...</p>
           </div>
         )}
-        
+
         {parsing && (
           <div className="space-y-2">
             <div className="animate-pulse">
@@ -155,7 +168,7 @@ export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzone
           </div>
         )}
       </div>
-      
+
       {error && (
         <div className="mt-4 p-4 border border-[rgba(225,6,20,0.35)] rounded-lg bg-[rgba(225,6,20,0.08)]">
           <p className="text-sm text-[var(--g-accent)]">
@@ -163,7 +176,7 @@ export function FileDropzone({ tourId, fileType, onParseComplete }: FileDropzone
           </p>
         </div>
       )}
-      
+
       {parsedData && (
         <div className="mt-4 p-4 border border-white/10 rounded-lg bg-[var(--g-surface)]">
           <p className="text-sm text-[var(--g-text)] font-semibold mb-2">

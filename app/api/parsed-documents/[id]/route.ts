@@ -24,7 +24,8 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { ui_overrides, normalized_json, status } = await request.json();
+    const { ui_overrides, normalized_json, status, tour_id, show_id } =
+      await request.json();
 
     const updates: Record<string, any> = {
       updated_at: new Date().toISOString()
@@ -33,6 +34,8 @@ export async function PATCH(
     if (ui_overrides !== undefined) updates.ui_overrides = ui_overrides;
     if (normalized_json !== undefined) updates.normalized_json = normalized_json;
     if (status !== undefined) updates.status = status;
+    if (tour_id !== undefined) updates.tour_id = tour_id;
+    if (show_id !== undefined) updates.show_id = show_id;
 
     const supabase = createServiceClient();
     const { data, error } = await supabase

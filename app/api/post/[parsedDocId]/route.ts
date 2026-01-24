@@ -4,12 +4,14 @@ import { postParsedDocument } from '@/lib/posting/post-parsed-document';
 
 export async function POST(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { parsedDocId: string } }
 ) {
   try {
     const supabase = createServiceClient();
-    const { updated, receipt } = await postParsedDocument(supabase, params.id);
-
+    const { updated, receipt } = await postParsedDocument(
+      supabase,
+      params.parsedDocId
+    );
     return NextResponse.json({ data: updated, receipt });
   } catch (error: any) {
     return NextResponse.json(

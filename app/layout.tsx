@@ -31,6 +31,9 @@ export default function RootLayout({
                   <Link href="/" className="g-link">
                     Dashboard
                   </Link>
+                  <Link href="/dashboard/parsed-documents" className="g-link">
+                    Parsed Documents
+                  </Link>
                   <Link href="/upload/po" className="g-link">
                     Uploads
                   </Link>
