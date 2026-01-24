@@ -21,7 +21,7 @@ export async function parseDocument(
         {
           role: 'user',
           content: [
-            {
+            ({
               // The SDK types lag behind the API; "document" is valid at runtime.
               type: 'document',
               source: {
@@ -29,7 +29,7 @@ export async function parseDocument(
                 media_type: mediaType,
                 data: base64Data
               }
-            },
+            } as any),
             {
               type: 'text',
               text: instructions
