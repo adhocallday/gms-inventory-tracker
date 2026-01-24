@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { FileDropzone } from '@/components/upload/FileDropzone';
 import { useTours } from '@/hooks/useTours';
 
@@ -34,6 +35,16 @@ const emptyForm: PackingListFormState = {
 };
 
 export default function UploadPackingListPage() {
+  return (
+    <Suspense fallback={<div className="g-container py-12">Loading…</div>}>
+      <UploadPackingListPageContent />
+    </Suspense>
+  );
+}
+
+function UploadPackingListPageContent() {
+  const searchParams = useSearchParams();
+  const reviewDocId = searchParams.get('docId');
   const { tours, loading: toursLoading } = useTours();
   const [parsedDocumentId, setParsedDocumentId] = useState<string | null>(null);
   const [form, setForm] = useState<PackingListFormState>(emptyForm);
@@ -130,6 +141,24 @@ export default function UploadPackingListPage() {
     setStatusMessage('Posted successfully.');
   };
 
+  useEffect(() => {
+    if (!reviewDocId) return;
+
+    const loadDoc = async () => {
+      const response = await fetch(`/api/parsed-documents/${reviewDocId}`);
+      if (!response.ok) return;
+      const data = await response.json();
+      setParsedDocumentId(reviewDocId);
+      if (data?.parsedDocument?.ui_overrides) {
+        setForm(data.parsedDocument.ui_overrides);
+        return;
+      }
+      hydrateForm(data?.parsedDocument?.normalized_json);
+    };
+
+    loadDoc();
+  }, [reviewDocId]);
+
   return (
     <div className="g-container py-12 space-y-8">
       <div>
@@ -137,15 +166,17 @@ export default function UploadPackingListPage() {
         <p className="text-[var(--g-text-dim)]">Upload a packing list PDF, review extracted data, and post.</p>
       </div>
 
-      <div className="g-panel">
-        <FileDropzone
-          fileType="packing-list"
-          onParseComplete={(data, docId) => {
-            setParsedDocumentId(docId ?? null);
-            hydrateForm(data);
-          }}
-        />
-      </div>
+      {!reviewDocId && (
+        <div className="g-panel">
+          <FileDropzone
+            fileType="packing-list"
+            onParseComplete={(data, docId) => {
+              setParsedDocumentId(docId ?? null);
+              hydrateForm(data);
+            }}
+          />
+        </div>
+      )}
 
       {parsedDocumentId && (
         <div className="g-panel space-y-6">

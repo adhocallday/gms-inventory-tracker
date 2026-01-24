@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
+import { PurchaseOrdersPanel } from '@/components/tours/PurchaseOrdersPanel';
+import { StockMovementPanel } from '@/components/tours/StockMovementPanel';
+import { NeedsReviewPanel } from '@/components/tours/NeedsReviewPanel';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -31,6 +34,75 @@ type ProductRow = {
   description: string;
 };
 
+type ShowSummaryRow = {
+  show_id: string;
+  show_date: string | null;
+  venue_name: string | null;
+  city: string | null;
+  state: string | null;
+  total_gross: number | null;
+  attendance: number | null;
+  per_head: number | null;
+  total_comps: number | null;
+};
+
+type ProductSummaryRow = {
+  product_id: string;
+  sku: string;
+  description: string;
+  size: string | null;
+  total_sold: number | null;
+  total_gross: number | null;
+  total_cogs: number | null;
+  gross_margin: number | null;
+  full_package_cost: number | null;
+};
+
+type PurchaseOrderRow = {
+  id: string;
+  po_number: string;
+  vendor: string;
+  status: string;
+  order_date: string | null;
+  expected_delivery: string | null;
+  total_amount: number | null;
+};
+
+type OpenQtyRow = {
+  po_id: string;
+  po_line_item_id: string;
+  sku: string;
+  description: string;
+  size: string | null;
+  quantity_ordered: number;
+  quantity_received: number;
+  open_quantity: number;
+};
+
+type StockMovementRow = {
+  received_date: string | null;
+  delivery_number: string | null;
+  sku: string;
+  size: string | null;
+  quantity_received: number;
+  vendor: string | null;
+};
+
+type ParsedDocumentRow = {
+  id: string;
+  doc_type: string;
+  status: string;
+  source_filename: string | null;
+  updated_at: string | null;
+};
+
+type ForecastOverrideRow = {
+  sku: string;
+  size: string | null;
+  bucket: string | null;
+  override_units: number | null;
+};
+
 export default async function TourDetailPage({ params }: TourDetailParams) {
   const { data: tour } = await supabase
     .from('tours')
@@ -42,16 +114,19 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
     notFound();
   }
 
-  const { data: showSales } = await supabase
-    .from('show_sales_per_head')
-    .select('total_gross, attendance')
-    .eq('tour_id', params.id);
+  const { data: showSummary } = await supabase
+    .from('show_summary_view')
+    .select(
+      'show_id, show_date, venue_name, city, state, total_gross, attendance, per_head, total_comps'
+    )
+    .eq('tour_id', params.id)
+    .order('show_date', { ascending: true });
 
-  const totalGross = (showSales ?? []).reduce(
+  const totalGross = (showSummary ?? []).reduce(
     (sum, row) => sum + Number(row.total_gross ?? 0),
     0
   );
-  const totalAttendance = (showSales ?? []).reduce(
+  const totalAttendance = (showSummary ?? []).reduce(
     (sum, row) => sum + Number(row.attendance ?? 0),
     0
   );
@@ -63,9 +138,9 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
     .eq('tour_id', params.id);
 
   const { data: cogs } = await supabase
-    .from('cogs_summary')
+    .from('product_summary_view')
     .select(
-      'product_id, size, total_sold, total_gross, total_cogs, gross_margin, full_package_cost'
+      'product_id, sku, description, size, total_sold, total_gross, total_cogs, gross_margin, full_package_cost'
     )
     .eq('tour_id', params.id);
 
@@ -76,6 +151,11 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         .filter(Boolean)
     )
   ) as string[];
+
+  const { data: tourProducts } = await supabase
+    .from('tour_products')
+    .select('product_id, size, full_package_cost, suggested_retail')
+    .eq('tour_id', params.id);
 
   const { data: products } = productIds.length
     ? await supabase
@@ -88,10 +168,66 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
     (products ?? []).map((product) => [product.id, product])
   );
 
-  const { data: shows } = await supabase
-    .from('shows')
-    .select('id')
+  const skuToProductId = new Map(
+    (products ?? []).map((product) => [product.sku, product.id])
+  );
+
+  const costByKey = new Map<string, number>();
+  const retailByKey = new Map<string, number>();
+  const retailByProduct = new Map<string, number>();
+
+  (tourProducts ?? []).forEach((row) => {
+    const key = `${row.product_id}:${row.size ?? ''}`;
+    if (row.full_package_cost !== null) {
+      costByKey.set(key, Number(row.full_package_cost));
+    }
+    if (row.suggested_retail !== null) {
+      retailByKey.set(key, Number(row.suggested_retail));
+      if (!retailByProduct.has(row.product_id)) {
+        retailByProduct.set(row.product_id, Number(row.suggested_retail));
+      }
+    }
+  });
+
+  const { data: purchaseOrders } = await supabase
+    .from('purchase_orders')
+    .select('id, po_number, vendor, status, order_date, expected_delivery, total_amount')
+    .eq('tour_id', params.id)
+    .order('order_date', { ascending: false });
+
+  const { data: openQuantities } = await supabase
+    .from('po_open_qty_view')
+    .select(
+      'po_id, po_line_item_id, sku, description, size, quantity_ordered, quantity_received, open_quantity'
+    )
     .eq('tour_id', params.id);
+
+  const { data: stockMovement } = await supabase
+    .from('stock_movement_view')
+    .select('received_date, delivery_number, sku, size, quantity_received, vendor')
+    .eq('tour_id', params.id)
+    .order('received_date', { ascending: false });
+
+  const { data: needsReview } = await supabase
+    .from('parsed_documents')
+    .select('id, doc_type, status, source_filename, updated_at')
+    .eq('tour_id', params.id)
+    .in('status', ['draft', 'error', 'approved'])
+    .order('updated_at', { ascending: false });
+
+  const { data: baselineScenario } = await supabase
+    .from('forecast_scenarios')
+    .select('id, name, is_baseline')
+    .eq('tour_id', params.id)
+    .eq('is_baseline', true)
+    .maybeSingle();
+
+  const { data: forecastOverrides } = baselineScenario
+    ? await supabase
+        .from('forecast_overrides')
+        .select('sku, size, bucket, override_units')
+        .eq('scenario_id', baselineScenario.id)
+    : { data: [] as ForecastOverrideRow[] };
 
   let designAssets: any[] = [];
   const { data: designs, error: designError } = await supabase
@@ -117,6 +253,36 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
   );
 
   const topSellers = cogsSorted.slice(0, 5);
+
+  const forecastUnits = (forecastOverrides ?? []).reduce((sum, row) => {
+    if (row.bucket) return sum;
+    return sum + Number(row.override_units ?? 0);
+  }, 0);
+
+  const forecastGross = (forecastOverrides ?? []).reduce((sum, row) => {
+    if (row.bucket) return sum;
+    const productId = skuToProductId.get(row.sku);
+    if (!productId) return sum;
+    const sizeKey = `${productId}:${row.size ?? ''}`;
+    const price =
+      (row.size ? retailByKey.get(sizeKey) : undefined) ??
+      retailByProduct.get(productId) ??
+      0;
+    return sum + Number(row.override_units ?? 0) * price;
+  }, 0);
+
+  const forecastBySku = new Map<string, number>();
+  (forecastOverrides ?? []).forEach((row) => {
+    if (row.bucket) return;
+    forecastBySku.set(
+      row.sku,
+      (forecastBySku.get(row.sku) ?? 0) + Number(row.override_units ?? 0)
+    );
+  });
+
+  const topForecasted = Array.from(forecastBySku.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
 
   return (
     <div className="g-container py-12">
@@ -159,7 +325,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         <div className="g-card p-4">
           <p className="text-xs text-[var(--g-text-muted)]">Shows logged</p>
           <p className="text-2xl font-semibold mt-2">
-            {shows?.length ?? 0}
+            {showSummary?.length ?? 0}
           </p>
         </div>
         <div className="g-card p-4">
@@ -169,6 +335,65 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
           </p>
         </div>
       </div>
+
+      <section className="g-card p-6 mt-10">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold g-title">Shows</h2>
+          <Link href="/upload/sales-report" className="text-sm font-medium g-link">
+            Add show sales
+          </Link>
+        </div>
+        <div className="overflow-x-auto mt-4">
+          <table className="min-w-full text-sm g-table">
+            <thead className="text-left border-b border-white/10">
+              <tr>
+                <th className="py-2 pr-4">Date</th>
+                <th className="py-2 pr-4">Venue</th>
+                <th className="py-2 pr-4">City</th>
+                <th className="py-2 pr-4 text-right">Gross</th>
+                <th className="py-2 pr-4 text-right">Per-head</th>
+                <th className="py-2 pr-4 text-right">Comps</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(showSummary ?? []).length === 0 ? (
+                <tr>
+                  <td className="py-3" colSpan={6}>
+                    No shows logged yet.
+                  </td>
+                </tr>
+              ) : (
+                (showSummary as ShowSummaryRow[]).map((show) => (
+                  <tr key={show.show_id} className="border-b border-white/10">
+                    <td className="py-3 pr-4">
+                      <Link
+                        className="g-link"
+                        href={`/tours/${tour.id}/shows/${show.show_id}`}
+                      >
+                        {formatDate(show.show_date)}
+                      </Link>
+                    </td>
+                    <td className="py-3 pr-4">{show.venue_name ?? 'TBD'}</td>
+                    <td className="py-3 pr-4">
+                      {show.city ?? '—'}
+                      {show.state ? `, ${show.state}` : ''}
+                    </td>
+                    <td className="py-3 pr-4 text-right">
+                      {currencyFormatter.format(Number(show.total_gross ?? 0))}
+                    </td>
+                    <td className="py-3 pr-4 text-right">
+                      {currencyFormatter.format(Number(show.per_head ?? 0))}
+                    </td>
+                    <td className="py-3 pr-4 text-right">
+                      {formatNumber(Number(show.total_comps ?? 0))}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-10">
         <section className="g-card p-6">
@@ -214,15 +439,55 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         </section>
 
         <section className="g-card p-6">
-          <h2 className="text-lg font-semibold g-title">Projections</h2>
-          <p className="text-sm text-[var(--g-text-muted)] mt-2">
-            Forecast scenarios will live here once you define per-head rates,
-            product mix ratios, and size curves.
-          </p>
-          <div className="mt-4 p-4 border border-dashed border-white/10 rounded-md text-sm text-[var(--g-text-muted)]">
-            No projection scenarios yet. Add a scenario to compare forecasted
-            units and revenue against actuals.
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold g-title">Projections</h2>
+            <Link
+              href={`/tours/${tour.id}/projections`}
+              className="text-sm font-medium g-link"
+            >
+              Open sheet
+            </Link>
           </div>
+          {baselineScenario ? (
+            <div className="mt-4 space-y-3 text-sm">
+              <p className="text-[var(--g-text-muted)]">
+                Baseline scenario: <span className="text-white">{baselineScenario.name}</span>
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="border border-white/10 rounded-md p-3">
+                  <p className="text-xs text-[var(--g-text-muted)]">Forecast units</p>
+                  <p className="text-lg font-semibold mt-1">{formatNumber(forecastUnits)}</p>
+                </div>
+                <div className="border border-white/10 rounded-md p-3">
+                  <p className="text-xs text-[var(--g-text-muted)]">Forecast gross</p>
+                  <p className="text-lg font-semibold mt-1">
+                    {currencyFormatter.format(forecastGross)}
+                  </p>
+                </div>
+              </div>
+              {topForecasted.length === 0 ? (
+                <p className="text-xs text-[var(--g-text-muted)]">
+                  No overrides saved yet. Open the sheet to plan units.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-xs text-[var(--g-text-muted)]">Top forecasted SKUs</p>
+                  {topForecasted.map(([sku, units]) => (
+                    <div key={sku} className="flex items-center justify-between">
+                      <span className="text-sm">{sku}</span>
+                      <span className="text-sm text-[var(--g-text-dim)]">
+                        {formatNumber(units)} units
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="mt-4 p-4 border border-dashed border-white/10 rounded-md text-sm text-[var(--g-text-muted)]">
+              No projection scenarios yet. Add a scenario to compare forecasted units and revenue.
+            </div>
+          )}
         </section>
 
         <section className="g-card p-6">
@@ -262,6 +527,15 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         </section>
       </div>
 
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-10">
+        <PurchaseOrdersPanel
+          purchaseOrders={(purchaseOrders ?? []) as PurchaseOrderRow[]}
+          openQuantities={(openQuantities ?? []) as OpenQtyRow[]}
+        />
+        <StockMovementPanel rows={(stockMovement ?? []) as StockMovementRow[]} />
+        <NeedsReviewPanel documents={(needsReview ?? []) as ParsedDocumentRow[]} />
+      </div>
+
       <section className="g-card p-6 mt-10">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold g-title">COGS report</h2>
@@ -292,7 +566,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
                   </td>
                 </tr>
               ) : (
-                cogsSorted.slice(0, 20).map((row) => {
+                (cogsSorted as ProductSummaryRow[]).slice(0, 20).map((row) => {
                   const product = productMap.get(row.product_id);
                   return (
                     <tr
@@ -301,10 +575,10 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
                     >
                       <td className="py-3 pr-4">
                         <div className="font-semibold">
-                          {product?.sku ?? 'SKU'}
+                          {row.sku ?? product?.sku ?? 'SKU'}
                         </div>
                         <div className="text-xs text-[var(--g-text-muted)]">
-                          {product?.description ?? 'Description pending'}
+                          {row.description ?? product?.description ?? 'Description pending'}
                         </div>
                       </td>
                       <td className="py-3 pr-4">{row.size}</td>
@@ -349,18 +623,23 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
                 <th className="py-2 pr-4">Sold</th>
                 <th className="py-2 pr-4">Comps</th>
                 <th className="py-2 pr-4">Balance</th>
+                <th className="py-2 pr-4">Unit cost</th>
+                <th className="py-2 pr-4">Inventory value</th>
               </tr>
             </thead>
             <tbody>
               {inventorySorted.length === 0 ? (
                 <tr>
-                  <td className="py-3" colSpan={6}>
+                  <td className="py-3" colSpan={8}>
                     No inventory data yet.
                   </td>
                 </tr>
               ) : (
                 inventorySorted.slice(0, 20).map((row) => {
                   const product = productMap.get(row.product_id);
+                  const costKey = `${row.product_id}:${row.size ?? ''}`;
+                  const unitCost = costByKey.get(costKey) ?? 0;
+                  const inventoryValue = Number(row.balance ?? 0) * unitCost;
                   return (
                     <tr
                       key={`${row.product_id}-${row.size}`}
@@ -386,6 +665,12 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
                       </td>
                       <td className="py-3 pr-4 font-semibold">
                         {formatNumber(Number(row.balance ?? 0))}
+                      </td>
+                      <td className="py-3 pr-4">
+                        {unitCost ? currencyFormatter.format(unitCost) : '—'}
+                      </td>
+                      <td className="py-3 pr-4">
+                        {unitCost ? currencyFormatter.format(inventoryValue) : '—'}
                       </td>
                     </tr>
                   );
