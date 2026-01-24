@@ -184,7 +184,7 @@ export default function ReviewFormSalesReport({
         <LineItemsTable
           docType="sales-report"
           lineItems={data.line_items}
-          onChange={handleLineItemsChange}
+          onChange={(items) => handleLineItemsChange(items as SalesLineItem[])}
           unknownSkus={unknownSkus}
         />
       )}

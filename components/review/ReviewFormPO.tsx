@@ -149,7 +149,7 @@ export default function ReviewFormPO({
         <LineItemsTable
           docType="po"
           lineItems={data.line_items}
-          onChange={handleLineItemsChange}
+          onChange={(items) => handleLineItemsChange(items as POLineItem[])}
           unknownSkus={unknownSkus}
         />
       )}

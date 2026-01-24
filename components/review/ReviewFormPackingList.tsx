@@ -189,7 +189,7 @@ export default function ReviewFormPackingList({
         <LineItemsTable
           docType="packing-list"
           lineItems={data.line_items}
-          onChange={handleLineItemsChange}
+          onChange={(items) => handleLineItemsChange(items as PackingListLineItem[])}
           unknownSkus={unknownSkus}
         />
       )}

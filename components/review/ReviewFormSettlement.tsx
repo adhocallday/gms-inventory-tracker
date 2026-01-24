@@ -222,7 +222,7 @@ export default function ReviewFormSettlement({
         <LineItemsTable
           docType="settlement"
           lineItems={data.comps}
-          onChange={handleCompsChange}
+          onChange={(items) => handleCompsChange(items as CompLineItem[])}
           unknownSkus={unknownSkus}
         />
       )}
