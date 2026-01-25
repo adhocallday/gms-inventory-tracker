@@ -13,7 +13,8 @@ interface FileDropzoneProps {
   onParseComplete?: (
     data: any,
     parsedDocumentId?: string | null,
-    validation?: any
+    validation?: any,
+    matching?: string[]
   ) => void;
   autoRedirect?: boolean; // If true, redirects to review page after parse
 }
@@ -67,7 +68,8 @@ export function FileDropzone({
         onParseComplete(
           result.normalized_json,
           result.parsedDocumentId,
-          result.validation
+          result.validation,
+          result.matching
         );
       }
 

@@ -121,6 +121,69 @@ function normalizeSettlement(
   };
 }
 
+async function inferTourAndShow(
+  supabase: ReturnType<typeof createServiceClient>,
+  normalized: any
+) {
+  const reasoning: string[] = [];
+  let tourId = normalized?.tour_id ?? null;
+  let showId = normalized?.show_id ?? null;
+
+  if (!showId && normalized?.show_date) {
+    const query = supabase
+      .from('shows')
+      .select('id, tour_id, venue_name')
+      .eq('show_date', normalized.show_date)
+      .limit(1);
+
+    if (normalized?.venue_name) {
+      query.ilike('venue_name', `%${normalized.venue_name}%`);
+    }
+
+    const { data: showMatch } = await query.maybeSingle();
+    if (showMatch?.id) {
+      showId = showMatch.id;
+      tourId = tourId ?? showMatch.tour_id;
+      reasoning.push('Matched show by date & venue.');
+    } else {
+      reasoning.push('Unable to match show automatically.');
+    }
+  }
+
+  if (!tourId && showId) {
+    const { data: show } = await supabase
+      .from('shows')
+      .select('tour_id')
+      .eq('id', showId)
+      .maybeSingle();
+    if (show?.tour_id) {
+      tourId = show.tour_id;
+      reasoning.push('Derived tour from matched show.');
+    }
+  }
+
+  if (!tourId && normalized?.venue_name) {
+    const keyword = normalized.venue_name.split(' ')[0];
+    if (keyword) {
+      const { data: tourMatch } = await supabase
+        .from('tours')
+        .select('id, name')
+        .ilike('name', `%${keyword}%`)
+        .limit(1)
+        .maybeSingle();
+      if (tourMatch?.id) {
+        tourId = tourMatch.id;
+        reasoning.push('Matched tour via venue keyword.');
+      }
+    }
+  }
+
+  normalized.tour_id = tourId ?? normalized.tour_id ?? null;
+  normalized.show_id = showId ?? normalized.show_id ?? null;
+
+  return reasoning.filter(Boolean);
+}
+
 async function findMissingSkus(
   supabase: ReturnType<typeof createServiceClient>,
   skus: string[]
@@ -298,7 +361,9 @@ export async function POST(
   if (docType === 'sales-report') normalized = normalizeSalesReport(parsed, tourId, showId);
   if (docType === 'settlement') normalized = normalizeSettlement(parsed, tourId, showId);
 
+  const inference = await inferTourAndShow(supabase, normalized);
   const validation = await buildValidation(supabase, docType, normalized);
+  const matching = inference;
 
   const { data: parsedDoc, error } = await supabase
     .from('parsed_documents')
@@ -336,6 +401,7 @@ export async function POST(
   return NextResponse.json({
     parsedDocumentId: parsedDoc.id,
     normalized_json: parsedDoc.normalized_json,
-    validation: parsedDoc.validation
+    validation: parsedDoc.validation,
+    matching
   });
 }

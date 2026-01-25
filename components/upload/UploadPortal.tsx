@@ -58,7 +58,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
   const [showId, setShowId] = useState(searchParams.showId ?? '');
   const [parsedId, setParsedId] = useState<string | null>(null);
   const [validation, setValidation] = useState<any>(null);
-  const [parsedPayload, setParsedPayload] = useState<any>(null);
+  const [matchingSteps, setMatchingSteps] = useState<string[]>([]);
 
   const { tours } = useTours();
   const { shows } = useShows(tourId || undefined);
@@ -73,7 +73,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
 
   const handleParseComplete = (data: any, parsedDocumentId?: string | null, validationPayload?: any) => {
     setParsedId(parsedDocumentId ?? null);
-    setParsedPayload(data);
+    setMatchingSteps(validationPayload?.matching ?? []);
     setValidation(validationPayload ?? null);
   };
 
@@ -182,6 +182,16 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
                   <p>Warnings: {validation.warnings.join('; ')}</p>
                 ) : (
                   <p>No parsing warnings.</p>
+                )}
+                {matchingSteps.length > 0 && (
+                  <div>
+                    <p className="text-[var(--g-text-muted)]">Inference:</p>
+                    <ul className="list-disc list-inside text-[var(--g-text-muted)]">
+                      {matchingSteps.map((entry, index) => (
+                        <li key={index}>{entry}</li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
               </div>
               <Link
