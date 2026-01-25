@@ -11,14 +11,21 @@ select
   s.venue_name,
   s.city,
   s.state,
-  sum(sa.gross_sales) as total_gross,
+  coalesce(sales_agg.total_gross, 0) as total_gross,
   s.attendance,
-  round(sum(sa.gross_sales) / nullif(s.attendance, 0), 2) as per_head,
-  coalesce(sum(c.quantity), 0) as total_comps
+  round(coalesce(sales_agg.total_gross, 0) / nullif(s.attendance, 0), 2) as per_head,
+  coalesce(comps_agg.total_comps, 0) as total_comps
 from public.shows s
-left join public.sales sa on sa.show_id = s.id
-left join public.comps c on c.show_id = s.id
-group by s.id, s.tour_id, s.show_date, s.venue_name, s.city, s.state, s.attendance;
+left join (
+  select show_id, sum(gross_sales) as total_gross
+  from public.sales
+  group by show_id
+) sales_agg on sales_agg.show_id = s.id
+left join (
+  select show_id, sum(quantity) as total_comps
+  from public.comps
+  group by show_id
+) comps_agg on comps_agg.show_id = s.id;
 
 create or replace view public.product_summary_view as
 select
