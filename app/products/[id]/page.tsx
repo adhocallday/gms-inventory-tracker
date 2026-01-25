@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createServiceClient } from '@/lib/supabase/client';
+import { ProductSalesTable } from '@/components/products/ProductSalesTable';
 
 export const revalidate = 0;
 
@@ -148,48 +149,16 @@ export default async function ProductDetailPage({ params }: ProductDetailParams)
 
       <section className="g-card p-6 mt-8">
         <h2 className="text-lg font-semibold g-title mb-4">Sales by Show</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm g-table">
-            <thead className="text-left">
-              <tr>
-                <th className="py-2 pr-4">Date</th>
-                <th className="py-2 pr-4">Venue</th>
-                <th className="py-2 pr-4">City</th>
-                <th className="py-2 pr-4">Size</th>
-                <th className="py-2 pr-4 text-right">Qty Sold</th>
-                <th className="py-2 pr-4 text-right">Gross Sales</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(salesBySize ?? []).length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-3 text-[var(--g-text-muted)]">
-                    No sales data yet.
-                  </td>
-                </tr>
-              ) : (
-                (salesBySize ?? []).map((row: any, idx: number) => (
-                  <tr key={idx}>
-                    <td className="py-3 pr-4">
-                      {row.shows?.show_date
-                        ? new Date(row.shows.show_date).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })
-                        : '—'}
-                    </td>
-                    <td className="py-3 pr-4">{row.shows?.venue_name ?? '—'}</td>
-                    <td className="py-3 pr-4">{row.shows?.city ?? '—'}</td>
-                    <td className="py-3 pr-4">{row.size || 'OS'}</td>
-                    <td className="py-3 pr-4 text-right">{formatNumber(Number(row.qty_sold || 0))}</td>
-                    <td className="py-3 pr-4 text-right">{currencyFormatter.format(Number(row.gross_sales || 0))}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <ProductSalesTable
+          data={(salesBySize ?? []).map((row: any) => ({
+            show_date: row.shows?.show_date ?? null,
+            venue_name: row.shows?.venue_name ?? null,
+            city: row.shows?.city ?? null,
+            size: row.size || 'OS',
+            qty_sold: Number(row.qty_sold || 0),
+            gross_sales: Number(row.gross_sales || 0),
+          }))}
+        />
       </section>
     </div>
   );

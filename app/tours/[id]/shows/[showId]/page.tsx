@@ -279,88 +279,35 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
       </div>
 
       <section className="g-card p-6 mt-10">
-        <h2 className="text-lg font-semibold g-title">Sales lines</h2>
-        <div className="overflow-x-auto mt-4">
-          <table className="min-w-full text-sm g-table">
-            <thead className="text-left border-b border-white/10">
-              <tr>
-                <th className="py-2 pr-4">SKU</th>
-                <th className="py-2 pr-4">Size</th>
-                <th className="py-2 pr-4 text-right">Qty sold</th>
-                <th className="py-2 pr-4 text-right">Unit price</th>
-                <th className="py-2 pr-4 text-right">Gross</th>
-              </tr>
-            </thead>
-            <tbody>
-              {salesRows.length ? (
-                salesRows.map((row, index) => {
-                  const product = normalizeProduct(row.tour_product?.product);
-                  return (
-                    <tr key={`${row.show_id}-${index}`} className="border-b border-white/10">
-                      <td className="py-3 pr-4">
-                        <div className="font-semibold">{product?.sku ?? 'SKU'}</div>
-                        <div className="text-xs text-[var(--g-text-muted)]">
-                          {product?.description ?? 'Description pending'}
-                        </div>
-                      </td>
-                      <td className="py-3 pr-4">{row.tour_product?.size ?? '—'}</td>
-                      <td className="py-3 pr-4 text-right">{row.qty_sold}</td>
-                      <td className="py-3 pr-4 text-right">
-                        {currencyFormatter.format(Number(row.unit_price ?? 0))}
-                      </td>
-                      <td className="py-3 pr-4 text-right">
-                        {currencyFormatter.format(Number(row.gross_sales ?? 0))}
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td className="py-3" colSpan={5}>
-                    No sales recorded for this show.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <h2 className="text-lg font-semibold g-title mb-4">Sales lines</h2>
+        <SalesLinesTable
+          data={salesRows.map((row) => {
+            const product = normalizeProduct(row.tour_product?.product);
+            return {
+              sku: product?.sku ?? 'SKU',
+              description: product?.description ?? 'Description pending',
+              size: row.tour_product?.size ?? '',
+              qty_sold: row.qty_sold,
+              unit_price: Number(row.unit_price ?? 0),
+              gross_sales: Number(row.gross_sales ?? 0),
+            };
+          })}
+        />
       </section>
 
       <section className="g-card p-6 mt-10">
-        <h2 className="text-lg font-semibold g-title">Comps</h2>
-        <div className="overflow-x-auto mt-4">
-          <table className="min-w-full text-sm g-table">
-            <thead className="text-left border-b border-white/10">
-              <tr>
-                <th className="py-2 pr-4">Type</th>
-                <th className="py-2 pr-4">SKU</th>
-                <th className="py-2 pr-4">Size</th>
-                <th className="py-2 pr-4 text-right">Qty</th>
-              </tr>
-            </thead>
-            <tbody>
-              {compRows.length ? (
-                compRows.map((row, index) => {
-                  const product = normalizeProduct(row.tour_product?.product);
-                  return (
-                    <tr key={`${row.show_id}-${index}`} className="border-b border-white/10">
-                      <td className="py-3 pr-4">{row.comp_type}</td>
-                      <td className="py-3 pr-4">{product?.sku ?? 'SKU'}</td>
-                      <td className="py-3 pr-4">{row.tour_product?.size ?? '—'}</td>
-                      <td className="py-3 pr-4 text-right">{row.quantity}</td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td className="py-3" colSpan={4}>
-                    No comps recorded for this show.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <h2 className="text-lg font-semibold g-title mb-4">Comps</h2>
+        <CompsTable
+          data={compRows.map((row) => {
+            const product = normalizeProduct(row.tour_product?.product);
+            return {
+              comp_type: row.comp_type,
+              sku: product?.sku ?? 'SKU',
+              size: row.tour_product?.size ?? '',
+              quantity: row.quantity,
+            };
+          })}
+        />
       </section>
 
       <section className="g-card p-6 mt-10">
@@ -397,81 +344,16 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
       </section>
 
       <section className="g-card p-6 mt-10">
-        <h2 className="text-lg font-semibold g-title">Inventory impact</h2>
-        <div className="overflow-x-auto mt-4">
-          <table className="min-w-full text-sm g-table">
-            <thead className="text-left border-b border-white/10">
-              <tr>
-                <th className="py-2 pr-4">SKU</th>
-                <th className="py-2 pr-4">Size</th>
-                <th className="py-2 pr-4 text-right">Starting</th>
-                <th className="py-2 pr-4 text-right">Sold</th>
-                <th className="py-2 pr-4 text-right">Comps</th>
-                <th className="py-2 pr-4 text-right">Ending</th>
-              </tr>
-            </thead>
-            <tbody>
-              {inventoryImpact.map((row) => (
-                <tr key={`${row.sku}-${row.size}`} className="border-b border-white/10">
-                  <td className="py-3 pr-4">
-                    <div className="font-semibold">{row.sku}</div>
-                    <div className="text-xs text-[var(--g-text-muted)]">{row.description}</div>
-                  </td>
-                  <td className="py-3 pr-4">{row.size}</td>
-                  <td className="py-3 pr-4 text-right">
-                    {row.startingBalance === null ? '—' : row.startingBalance}
-                  </td>
-                  <td className="py-3 pr-4 text-right">{row.soldThisShow}</td>
-                  <td className="py-3 pr-4 text-right">{row.compsThisShow}</td>
-                  <td className="py-3 pr-4 text-right">
-                    {row.endingBalance === null ? '—' : row.endingBalance}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <h2 className="text-lg font-semibold g-title mb-4">Inventory impact</h2>
+        <InventoryImpactTable data={inventoryImpact} />
       </section>
 
       <section className="g-card p-6 mt-10">
-        <h2 className="text-lg font-semibold g-title">Receiving context</h2>
-        <p className="text-sm text-[var(--g-text-muted)] mt-2">
+        <h2 className="text-lg font-semibold g-title mb-2">Receiving context</h2>
+        <p className="text-sm text-[var(--g-text-muted)] mb-4">
           Receipts since the previous show.
         </p>
-        <div className="overflow-x-auto mt-4">
-          <table className="min-w-full text-sm g-table">
-            <thead className="text-left border-b border-white/10">
-              <tr>
-                <th className="py-2 pr-4">Date</th>
-                <th className="py-2 pr-4">Delivery</th>
-                <th className="py-2 pr-4">SKU</th>
-                <th className="py-2 pr-4">Size</th>
-                <th className="py-2 pr-4 text-right">Received</th>
-                <th className="py-2 pr-4">Vendor</th>
-              </tr>
-            </thead>
-            <tbody>
-              {receiptsBetween.length === 0 ? (
-                <tr>
-                  <td className="py-3" colSpan={6}>
-                    No receipts between shows.
-                  </td>
-                </tr>
-              ) : (
-                receiptsBetween.map((row, index) => (
-                  <tr key={`${row.delivery_number ?? 'delivery'}-${index}`} className="border-b border-white/10">
-                    <td className="py-3 pr-4">{formatDate(row.received_date)}</td>
-                    <td className="py-3 pr-4">{row.delivery_number ?? '—'}</td>
-                    <td className="py-3 pr-4">{row.sku}</td>
-                    <td className="py-3 pr-4">{row.size ?? '—'}</td>
-                    <td className="py-3 pr-4 text-right">{row.quantity_received}</td>
-                    <td className="py-3 pr-4">{row.vendor ?? '—'}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <ReceivingContextTable data={receiptsBetween} />
       </section>
     </div>
   );
