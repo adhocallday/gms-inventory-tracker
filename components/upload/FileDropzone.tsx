@@ -14,6 +14,15 @@ interface ClassificationResult {
   indicators: string[];
 }
 
+interface TourShowMatch {
+  tourId: string | null;
+  tourName: string | null;
+  showId: string | null;
+  showDate: string | null;
+  venueName: string | null;
+  matchReasoning: string[];
+}
+
 interface FileDropzoneProps {
   tourId?: string;
   showId?: string;
@@ -26,7 +35,7 @@ interface FileDropzoneProps {
   ) => void;
   autoRedirect?: boolean; // If true, redirects to review page after parse
   autoDetect?: boolean; // If true, uses AI to detect document type
-  onTypeDetected?: (type: DocType, classification: ClassificationResult) => void;
+  onTypeDetected?: (type: DocType, classification: ClassificationResult, tourShowMatch?: TourShowMatch) => void;
 }
 
 export function FileDropzone({
@@ -46,6 +55,7 @@ export function FileDropzone({
   const [parsedData, setParsedData] = useState<any>(null);
   const [detectedType, setDetectedType] = useState<DocType | null>(null);
   const [classification, setClassification] = useState<ClassificationResult | null>(null);
+  const [tourShowMatch, setTourShowMatch] = useState<TourShowMatch | null>(null);
   const [pdfPreview, setPdfPreview] = useState<string | null>(null);
   const [currentFile, setCurrentFile] = useState<File | null>(null);
 
@@ -84,10 +94,15 @@ export function FileDropzone({
       const result = await response.json();
       setDetectedType(result.classification.detectedType);
       setClassification(result.classification);
+      setTourShowMatch(result.tourShowMatch || null);
 
       // Call callback if provided
       if (onTypeDetected) {
-        onTypeDetected(result.classification.detectedType, result.classification);
+        onTypeDetected(
+          result.classification.detectedType,
+          result.classification,
+          result.tourShowMatch
+        );
       }
     } catch (err: any) {
       setError(err.message);
@@ -161,6 +176,7 @@ export function FileDropzone({
     setError(null);
     setParsedData(null);
     setClassification(null);
+    setTourShowMatch(null);
     setPdfPreview(null);
 
     // If auto-detect is enabled, detect first
@@ -313,6 +329,33 @@ export function FileDropzone({
               </ul>
             </div>
 
+            {/* Tour/Show Match Information */}
+            {tourShowMatch && (tourShowMatch.tourId || tourShowMatch.showId) && (
+              <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                <p className="text-xs font-semibold text-blue-400 mb-2">Auto-detected:</p>
+                {tourShowMatch.tourName && (
+                  <p className="text-xs text-blue-300">
+                    <strong>Tour:</strong> {tourShowMatch.tourName}
+                  </p>
+                )}
+                {tourShowMatch.showDate && tourShowMatch.venueName && (
+                  <p className="text-xs text-blue-300">
+                    <strong>Show:</strong> {tourShowMatch.showDate} at {tourShowMatch.venueName}
+                  </p>
+                )}
+                {tourShowMatch.matchReasoning.length > 0 && (
+                  <details className="mt-2">
+                    <summary className="text-xs text-blue-400 cursor-pointer">Match reasoning</summary>
+                    <ul className="list-disc list-inside mt-1 text-xs text-blue-300/80">
+                      {tourShowMatch.matchReasoning.map((reason, i) => (
+                        <li key={i}>{reason}</li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+              </div>
+            )}
+
             <div className="flex gap-2">
               <button
                 onClick={() => {
@@ -335,6 +378,7 @@ export function FileDropzone({
                     URL.revokeObjectURL(pdfPreview);
                   }
                   setClassification(null);
+                  setTourShowMatch(null);
                   setPdfPreview(null);
                   setDetectedType(null);
                   setCurrentFile(null);

@@ -59,6 +59,15 @@ interface ClassificationResult {
   indicators: string[];
 }
 
+interface TourShowMatch {
+  tourId: string | null;
+  tourName: string | null;
+  showId: string | null;
+  showDate: string | null;
+  venueName: string | null;
+  matchReasoning: string[];
+}
+
 export default function UploadPortal({ searchParams }: UploadPortalProps) {
   const initialDocType = (searchParams.docType as DocType) ?? 'po';
   const [docType, setDocType] = useState<DocType>(initialDocType);
@@ -225,11 +234,23 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
           showId={showId || undefined}
           fileType={autoDetectEnabled ? undefined : docType}
           autoDetect={autoDetectEnabled}
-          onTypeDetected={(type, classification) => {
+          onTypeDetected={(type, classification, tourShowMatch) => {
             setDetectedType(type);
             setDetectedClassification(classification);
             setDocType(type); // Set the doc type for show requirement checking
+
+            // Auto-select tour and show if matched
+            if (tourShowMatch?.tourId) {
+              setTourId(tourShowMatch.tourId);
+              console.log('Auto-selected tour:', tourShowMatch.tourName);
+            }
+            if (tourShowMatch?.showId) {
+              setShowId(tourShowMatch.showId);
+              console.log('Auto-selected show:', tourShowMatch.venueName, 'on', tourShowMatch.showDate);
+            }
+
             console.log('Detected document type:', classification);
+            console.log('Tour/Show match:', tourShowMatch);
           }}
           onParseComplete={handleParseComplete}
           autoRedirect={false}
