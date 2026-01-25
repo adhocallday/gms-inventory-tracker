@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --g-bg: #f5f6fb;
+  --g-bg: #f5f0eb;
   --g-surface: #ffffff;
-  --g-surface-2: #edf0f7;
+  --g-surface-2: #f0f4fb;
   --g-text: #0f172a;
-  --g-text-dim: rgba(15, 23, 42, 0.72);
-  --g-text-muted: rgba(15, 23, 42, 0.58);
-  --g-border: rgba(15, 23, 42, 0.12);
+  --g-text-dim: rgba(15, 23, 42, 0.85);
+  --g-text-muted: rgba(15, 23, 42, 0.6);
+  --g-border: rgba(15, 23, 42, 0.08);
   --g-accent: #e10614;
   --g-accent-2: #ff2a2a;
   --g-focus: rgba(225, 6, 20, 0.35);
@@ -72,7 +72,7 @@ a {
   background: var(--g-surface);
   border: 1px solid var(--g-border);
   border-radius: var(--g-radius-2);
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.08);
 }
 
 .g-card-muted {
@@ -135,10 +135,13 @@ a {
   font-size: 0.8rem;
   letter-spacing: var(--g-tracking-wide);
   text-transform: uppercase;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .g-table td {
   color: var(--g-text-dim);
+  padding: 0.8rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
 }
 
 .g-panel {

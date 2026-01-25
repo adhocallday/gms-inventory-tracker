@@ -16,11 +16,11 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <div className="min-h-screen">
-          <nav className="border-b border-white/10 bg-black/40 backdrop-blur">
+          <nav className="bg-gradient-to-r from-[#0f172a] via-[#111a38] to-[#0f172a] shadow-lg">
             <div className="g-container">
               <div className="flex justify-between h-16 items-center">
                 <div className="flex items-center">
-                  <h1 className="text-lg font-semibold g-title tracking-wide">
+                  <h1 className="text-lg font-semibold g-title tracking-wide text-white">
                     Global Merch Services
                   </h1>
                 </div>
