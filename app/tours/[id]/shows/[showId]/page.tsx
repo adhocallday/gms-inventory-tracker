@@ -58,6 +58,9 @@ type ReceiptRow = {
   vendor: string | null;
 };
 
+// Force dynamic rendering to always fetch fresh data
+export const revalidate = 0;
+
 export default async function ShowDetailPage({ params }: ShowDetailParams) {
   const supabase = createServiceClient();
 

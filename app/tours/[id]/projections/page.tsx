@@ -7,6 +7,9 @@ type ProjectionParams = {
   params: { id: string };
 };
 
+// Force dynamic rendering to always fetch fresh data
+export const revalidate = 0;
+
 export default async function ProjectionPage({ params }: ProjectionParams) {
   const supabase = createServiceClient();
 

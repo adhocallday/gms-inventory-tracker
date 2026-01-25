@@ -103,6 +103,9 @@ type ForecastOverrideRow = {
   override_units: number | null;
 };
 
+// Force dynamic rendering to always fetch fresh data
+export const revalidate = 0;
+
 export default async function TourDetailPage({ params }: TourDetailParams) {
   const supabase = createServiceClient();
 
