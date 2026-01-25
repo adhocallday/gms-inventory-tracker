@@ -36,15 +36,28 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { data: existing, error: existingError } = await supabase
+  // Build query with proper null handling
+  let query = supabase
     .from('forecast_overrides')
     .select('id')
     .eq('scenario_id', scenario_id)
     .eq('tour_id', tour_id)
-    .eq('sku', sku)
-    .is('size', size ?? null)
-    .is('bucket', bucket ?? null)
-    .maybeSingle();
+    .eq('sku', sku);
+
+  // Use .is() for null, .eq() for values
+  if (size === null || size === undefined) {
+    query = query.is('size', null);
+  } else {
+    query = query.eq('size', size);
+  }
+
+  if (bucket === null || bucket === undefined) {
+    query = query.is('bucket', null);
+  } else {
+    query = query.eq('bucket', bucket);
+  }
+
+  const { data: existing, error: existingError } = await query.maybeSingle();
 
   if (existingError) {
     return NextResponse.json({ error: existingError.message }, { status: 500 });
