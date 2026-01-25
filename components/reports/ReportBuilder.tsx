@@ -197,7 +197,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
         disabled={loading || !title}
         className="w-full px-6 py-3 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition disabled:opacity-50 font-semibold"
       >
-        {loading ? 'Generating Report...' : 'Generate PDF Report'}
+        {loading ? 'Generating Report...' : 'Generate Report'}
       </button>
 
       {/* Status Messages */}

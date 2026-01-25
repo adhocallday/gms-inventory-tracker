@@ -63,7 +63,7 @@ export async function POST(
 
     const supabase = createServiceClient();
 
-    // Create report record
+    // Create report record (status = completed since report is viewable immediately in UI)
     const { data: report, error: createError } = await supabase
       .from('tour_reports')
       .insert({
@@ -74,7 +74,8 @@ export async function POST(
         config: config || {},
         report_start_date: startDate || null,
         report_end_date: endDate || null,
-        status: 'pending'
+        status: 'completed',
+        generated_at: new Date().toISOString()
       })
       .select()
       .single();
@@ -84,9 +85,9 @@ export async function POST(
       return NextResponse.json({ error: createError.message }, { status: 500 });
     }
 
-    // Trigger async report generation
-    // TODO: Queue background job to generate PDF
-    console.log(`Report ${report.id} queued for generation`);
+    // Report is immediately viewable in UI
+    // PDF export can be added later as a separate feature
+    console.log(`Report ${report.id} created and ready to view`);
 
     return NextResponse.json({ report });
   } catch (error: any) {

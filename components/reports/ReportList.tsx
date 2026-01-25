@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import Link from 'next/link';
 
 interface Report {
   id: string;
@@ -126,10 +127,16 @@ export function ReportList({ tourId, reports }: ReportListProps) {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <Link
+                    href={`/tours/${tourId}/reports/${report.id}`}
+                    className="px-3 py-1.5 text-sm bg-[var(--g-accent)] text-white rounded hover:bg-[var(--g-accent-2)] transition"
+                  >
+                    View Report
+                  </Link>
                   {report.status === 'completed' && report.pdf_url && (
                     <button
                       onClick={() => handleDownload(report)}
-                      className="px-3 py-1.5 text-sm bg-[var(--g-accent)] text-white rounded hover:bg-[var(--g-accent-2)] transition"
+                      className="px-3 py-1.5 text-sm border border-[var(--g-border)] rounded hover:bg-[var(--g-bg-muted)] transition"
                     >
                       Download PDF
                     </button>
