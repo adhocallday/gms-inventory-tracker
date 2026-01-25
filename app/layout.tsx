@@ -38,6 +38,12 @@ export default function RootLayout({
                     Documents
                   </Link>
                   <Link
+                    href="/admin/tours/new"
+                    className="px-4 py-2 rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition"
+                  >
+                    Admin
+                  </Link>
+                  <Link
                     href="/upload"
                     className="ml-2 px-4 py-2 rounded-lg bg-[var(--g-accent)] text-white hover:bg-[var(--g-accent-2)] transition font-medium"
                   >
