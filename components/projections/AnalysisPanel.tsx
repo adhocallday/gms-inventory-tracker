@@ -13,7 +13,7 @@ export function AnalysisPanel({ analysis, loading }: AnalysisPanelProps) {
   if (!analysis) {
     return (
       <div className="text-center py-8 text-[var(--g-text-muted)]">
-        No analysis available. Click "Get AI Recommendations" to generate.
+        No analysis available. Click "Generate AI Projections" to generate.
       </div>
     );
   }
