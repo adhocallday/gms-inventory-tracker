@@ -38,10 +38,10 @@ export default async function ProductDetailPage({ params }: ProductDetailParams)
     .eq('product_id', productId)
     .order('show_date', { ascending: false, foreignTable: 'shows' });
 
-  // Get inventory balance by size
+  // Get inventory balance by size from materialized view
   const { data: inventoryBySize } = await supabase
-    .from('inventory')
-    .select('size, balance, tour_id, tours(name)')
+    .from('inventory_balances')
+    .select('size, balance, tour_id')
     .eq('product_id', productId);
 
   // Aggregate sales by size
