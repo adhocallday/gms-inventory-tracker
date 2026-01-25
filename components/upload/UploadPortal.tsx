@@ -130,7 +130,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
               setDetectedType(null);
               setDetectedClassification(null);
             }}
-            variant={autoDetectEnabled ? 'default' : 'outline'}
+            variant={autoDetectEnabled ? 'primary' : 'outline'}
           >
             {autoDetectEnabled ? 'Enabled' : 'Disabled'}
           </Button>
@@ -153,7 +153,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
                     setShowId('');
                   }
                 }}
-                variant={docType === entry.id ? 'default' : 'outline'}
+                variant={docType === entry.id ? 'primary' : 'outline'}
               >
                 {entry.label}
               </Button>
