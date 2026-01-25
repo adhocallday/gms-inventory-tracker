@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { AIAgentPanel } from './AIAgentPanel';
 
 type Scenario = {
   id: string;
@@ -692,6 +693,18 @@ export function ProjectionSheet({
           </table>
         )}
       </div>
+
+      <AIAgentPanel
+        tourId={tourId}
+        scenarioId={selectedScenarioId}
+        onApplyRecommendation={(sku, size, bucket, units) => {
+          saveOverride(sku, size, bucket, units.toString());
+        }}
+        currentInputs={{
+          expectedAttendance,
+          expectedPerHead
+        }}
+      />
     </section>
   );
 }
