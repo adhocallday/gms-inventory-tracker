@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createServiceClient } from '@/lib/supabase/client';
+import { SalesLinesTable } from '@/components/shows/SalesLinesTable';
+import { CompsTable } from '@/components/shows/CompsTable';
+import { InventoryImpactTable } from '@/components/shows/InventoryImpactTable';
+import { ReceivingContextTable } from '@/components/shows/ReceivingContextTable';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
