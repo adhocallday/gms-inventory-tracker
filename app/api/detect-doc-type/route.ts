@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     };
 
     try {
-      await firstPage.render(renderContext).promise;
+      await firstPage.render(renderContext as any).promise;
     } catch (renderError) {
       console.warn('PDF render warning:', renderError);
       // Continue even if render fails - we have the text
