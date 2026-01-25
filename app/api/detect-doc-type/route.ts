@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { classifyDocument } from '@/lib/ai/document-classifier';
-import * as pdfjs from 'pdfjs-dist/legacy/build/pdf';
 
-// Configure PDF.js worker for Node.js environment
-// Disable worker in server environment
-pdfjs.GlobalWorkerOptions.workerSrc = '';
+// Dynamic import for pdfjs to avoid bundling issues
+const getPdfJs = async () => {
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  return pdfjs;
+};
 
 /**
  * POST /api/detect-doc-type
@@ -27,6 +28,8 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Extract text from first page
+    const pdfjs = await getPdfJs();
+
     const uint8Array = new Uint8Array(buffer);
     const loadingTask = pdfjs.getDocument({
       data: uint8Array,
