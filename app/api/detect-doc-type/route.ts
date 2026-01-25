@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { classifyDocument } from '@/lib/ai/document-classifier';
-import * as pdfjs from 'pdfjs-dist';
+import * as pdfjs from 'pdfjs-dist/legacy/build/pdf';
 
-// Configure PDF.js worker
-if (typeof window === 'undefined') {
-  const pdfjsWorker = require('pdfjs-dist/build/pdf.worker.entry');
-  pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-}
+// Configure PDF.js worker for Node.js environment
+// Disable worker in server environment
+pdfjs.GlobalWorkerOptions.workerSrc = '';
 
 /**
  * POST /api/detect-doc-type
@@ -30,7 +28,12 @@ export async function POST(request: NextRequest) {
 
     // Extract text from first page
     const uint8Array = new Uint8Array(buffer);
-    const loadingTask = pdfjs.getDocument({ data: uint8Array });
+    const loadingTask = pdfjs.getDocument({
+      data: uint8Array,
+      standardFontDataUrl: undefined,
+      useSystemFonts: true,
+      disableFontFace: true,
+    });
     const pdfDocument = await loadingTask.promise;
 
     const firstPage = await pdfDocument.getPage(1);
@@ -40,19 +43,25 @@ export async function POST(request: NextRequest) {
       .join(' ');
 
     // Generate PDF preview (data URL for first page)
-    const viewport = firstPage.getViewport({ scale: 1.5 });
+    const viewport = firstPage.getViewport({ scale: 1.0 });
 
     // Create canvas in node environment
     const { createCanvas } = require('canvas');
     const canvas = createCanvas(viewport.width, viewport.height);
     const context = canvas.getContext('2d');
 
+    // Render PDF page to canvas
     const renderContext = {
       canvasContext: context,
       viewport: viewport,
     };
 
-    await firstPage.render(renderContext).promise;
+    try {
+      await firstPage.render(renderContext).promise;
+    } catch (renderError) {
+      console.warn('PDF render warning:', renderError);
+      // Continue even if render fails - we have the text
+    }
 
     // Convert canvas to data URL
     const dataUrl = canvas.toDataURL('image/png');
