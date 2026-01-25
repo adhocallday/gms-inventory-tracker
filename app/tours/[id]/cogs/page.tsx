@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { ProductCogsTable, type ProductCogsRow } from '@/components/cogs/ProductCogsTable';
+import { ShowCogsTable, type ShowCogsRow } from '@/components/cogs/ShowCogsTable';
+import { Button } from '@/components/ui/Button';
 
 interface Tour {
   id: string;
@@ -18,29 +21,8 @@ interface CogsData {
     margin_percentage: number;
     total_units_sold: number;
   };
-  products: Array<{
-    sku: string;
-    description: string;
-    size: string;
-    total_sold: number;
-    total_gross: number;
-    full_package_cost: number;
-    total_cogs: number;
-    gross_margin: number;
-  }>;
-  shows: Array<{
-    show_id: string;
-    show_date: string;
-    venue_name: string;
-    city: string;
-    state: string;
-    total_gross: number;
-    attendance: number;
-    per_head: number;
-    cogs: number;
-    margin: number;
-    margin_percentage: number;
-  }>;
+  products: ProductCogsRow[];
+  shows: ShowCogsRow[];
 }
 
 export default function CogsReportPage() {
@@ -256,22 +238,18 @@ export default function CogsReportPage() {
 
       {/* View Toggle */}
       <div className="flex items-center gap-3 mt-8 mb-6">
-        <button
-          className={`g-button ${
-            view === 'products' ? '' : 'g-button-outline'
-          } text-sm`}
+        <Button
+          variant={view === 'products' ? 'primary' : 'outline'}
           onClick={() => setView('products')}
         >
           By Product
-        </button>
-        <button
-          className={`g-button ${
-            view === 'shows' ? '' : 'g-button-outline'
-          } text-sm`}
+        </Button>
+        <Button
+          variant={view === 'shows' ? 'primary' : 'outline'}
           onClick={() => setView('shows')}
         >
           By Show
-        </button>
+        </Button>
       </div>
 
       {/* Product COGS Table */}
@@ -280,87 +258,7 @@ export default function CogsReportPage() {
           <h3 className="text-lg font-semibold g-title mb-4">
             Product COGS Breakdown
           </h3>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm g-table">
-              <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-2 pr-4">SKU</th>
-                  <th className="text-left py-2 pr-4">Description</th>
-                  <th className="text-left py-2 pr-4">Size</th>
-                  <th className="text-right py-2 pr-4">Units Sold</th>
-                  <th className="text-right py-2 pr-4">Revenue</th>
-                  <th className="text-right py-2 pr-4">Unit Cost</th>
-                  <th className="text-right py-2 pr-4">Total COGS</th>
-                  <th className="text-right py-2 pr-4">Margin</th>
-                  <th className="text-right py-2 pr-4">Margin %</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cogsData.products.map((product, index) => {
-                  const marginPct =
-                    product.total_gross > 0
-                      ? (product.gross_margin / product.total_gross) * 100
-                      : 0;
-                  return (
-                    <tr key={`${product.sku}-${product.size}-${index}`} className="border-b border-white/10">
-                      <td className="py-2 pr-4 font-semibold">{product.sku}</td>
-                      <td className="py-2 pr-4">{product.description}</td>
-                      <td className="py-2 pr-4">{product.size}</td>
-                      <td className="py-2 pr-4 text-right">
-                        {product.total_sold || 0}
-                      </td>
-                      <td className="py-2 pr-4 text-right">
-                        {formatCurrency(product.total_gross || 0)}
-                      </td>
-                      <td className="py-2 pr-4 text-right">
-                        {formatCurrency(product.full_package_cost || 0)}
-                      </td>
-                      <td className="py-2 pr-4 text-right text-red-300">
-                        {formatCurrency(product.total_cogs || 0)}
-                      </td>
-                      <td className="py-2 pr-4 text-right text-green-300">
-                        {formatCurrency(product.gross_margin || 0)}
-                      </td>
-                      <td
-                        className={`py-2 pr-4 text-right font-semibold ${
-                          marginPct >= 50
-                            ? 'text-green-300'
-                            : marginPct >= 30
-                            ? 'text-yellow-300'
-                            : 'text-red-300'
-                        }`}
-                      >
-                        {formatPercent(marginPct)}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-              <tfoot>
-                <tr className="border-t border-white/10 font-semibold">
-                  <td className="py-3 pr-4" colSpan={3}>
-                    Totals
-                  </td>
-                  <td className="py-3 pr-4 text-right">
-                    {cogsData.totals.total_units_sold}
-                  </td>
-                  <td className="py-3 pr-4 text-right">
-                    {formatCurrency(cogsData.totals.total_revenue)}
-                  </td>
-                  <td className="py-3 pr-4" />
-                  <td className="py-3 pr-4 text-right text-red-300">
-                    {formatCurrency(cogsData.totals.total_cogs)}
-                  </td>
-                  <td className="py-3 pr-4 text-right text-green-300">
-                    {formatCurrency(cogsData.totals.total_margin)}
-                  </td>
-                  <td className="py-3 pr-4 text-right text-green-300">
-                    {formatPercent(cogsData.totals.margin_percentage)}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
+          <ProductCogsTable data={cogsData.products} totals={cogsData.totals} />
         </div>
       )}
 
@@ -370,65 +268,7 @@ export default function CogsReportPage() {
           <h3 className="text-lg font-semibold g-title mb-4">
             Show COGS Breakdown
           </h3>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm g-table">
-              <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-2 pr-4">Date</th>
-                  <th className="text-left py-2 pr-4">Venue</th>
-                  <th className="text-left py-2 pr-4">City</th>
-                  <th className="text-right py-2 pr-4">Attendance</th>
-                  <th className="text-right py-2 pr-4">Revenue</th>
-                  <th className="text-right py-2 pr-4">COGS</th>
-                  <th className="text-right py-2 pr-4">Margin</th>
-                  <th className="text-right py-2 pr-4">Margin %</th>
-                  <th className="text-right py-2 pr-4">Per Head</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cogsData.shows.map((show) => (
-                  <tr key={show.show_id} className="border-b border-white/10">
-                    <td className="py-2 pr-4">
-                      {new Date(show.show_date).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </td>
-                    <td className="py-2 pr-4">{show.venue_name}</td>
-                    <td className="py-2 pr-4">
-                      {show.city}, {show.state}
-                    </td>
-                    <td className="py-2 pr-4 text-right">
-                      {show.attendance || 0}
-                    </td>
-                    <td className="py-2 pr-4 text-right">
-                      {formatCurrency(show.total_gross || 0)}
-                    </td>
-                    <td className="py-2 pr-4 text-right text-red-300">
-                      {formatCurrency(show.cogs)}
-                    </td>
-                    <td className="py-2 pr-4 text-right text-green-300">
-                      {formatCurrency(show.margin)}
-                    </td>
-                    <td
-                      className={`py-2 pr-4 text-right font-semibold ${
-                        show.margin_percentage >= 50
-                          ? 'text-green-300'
-                          : show.margin_percentage >= 30
-                          ? 'text-yellow-300'
-                          : 'text-red-300'
-                      }`}
-                    >
-                      {formatPercent(show.margin_percentage)}
-                    </td>
-                    <td className="py-2 pr-4 text-right">
-                      {formatCurrency(show.per_head || 0)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ShowCogsTable data={cogsData.shows} />
         </div>
       )}
     </div>

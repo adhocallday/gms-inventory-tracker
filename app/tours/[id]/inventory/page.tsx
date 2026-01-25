@@ -3,34 +3,14 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { InventoryBalanceTable, type InventoryBalanceRow } from '@/components/inventory/InventoryBalanceTable';
+import { StockMovementsTable, type StockMovementRow } from '@/components/inventory/StockMovementsTable';
+import { Button } from '@/components/ui/Button';
 
 interface Tour {
   id: string;
   name: string;
   artist: string;
-}
-
-interface InventoryItem {
-  product_id: string;
-  sku: string;
-  description: string;
-  size: string;
-  product_type: string;
-  total_received: number;
-  total_sold: number;
-  total_comps: number;
-  balance: number;
-  full_package_cost: number;
-  suggested_retail: number;
-}
-
-interface StockMovement {
-  received_date: string;
-  delivery_number: string;
-  sku: string;
-  size: string;
-  quantity_received: number;
-  vendor: string;
 }
 
 interface InventoryData {
@@ -43,8 +23,8 @@ interface InventoryData {
     low_stock_items: number;
     out_of_stock_items: number;
   };
-  inventory: InventoryItem[];
-  movements: StockMovement[];
+  inventory: InventoryBalanceRow[];
+  movements: StockMovementRow[];
   openPOs: any[];
 }
 
@@ -213,12 +193,9 @@ export default function InventoryTrackerPage() {
           <h1 className="text-3xl font-semibold g-title mt-2">{tour.name}</h1>
           <p className="text-sm text-[var(--g-text-dim)]">{tour.artist}</p>
         </div>
-        <button
-          className="g-button g-button-outline text-sm"
-          onClick={exportCsv}
-        >
+        <Button variant="outline" onClick={exportCsv}>
           Export CSV
-        </button>
+        </Button>
       </div>
 
       {/* Summary Cards */}
@@ -366,119 +343,7 @@ export default function InventoryTrackerPage() {
           <h3 className="text-lg font-semibold g-title mb-4">
             Inventory Balance ({filteredInventory.length} items)
           </h3>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm g-table">
-              <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-2 pr-4">SKU</th>
-                  <th className="text-left py-2 pr-4">Description</th>
-                  <th className="text-left py-2 pr-4">Size</th>
-                  <th className="text-left py-2 pr-4">Type</th>
-                  <th className="text-right py-2 pr-4">Received</th>
-                  <th className="text-right py-2 pr-4">Sold</th>
-                  <th className="text-right py-2 pr-4">Comps</th>
-                  <th className="text-right py-2 pr-4">Balance</th>
-                  <th className="text-right py-2 pr-4">Unit Cost</th>
-                  <th className="text-right py-2 pr-4">Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredInventory.map((item, index) => {
-                  const inventoryValue = item.balance * item.full_package_cost;
-                  const isLowStock = item.balance > 0 && item.balance < 10;
-                  const isOutOfStock = item.balance === 0;
-
-                  return (
-                    <tr
-                      key={`${item.sku}-${item.size}-${index}`}
-                      className="border-b border-white/10"
-                    >
-                      <td className="py-2 pr-4">
-                        <div className="font-semibold">{item.sku}</div>
-                        {(isLowStock || isOutOfStock) && (
-                          <div
-                            className={`text-xs ${
-                              isOutOfStock ? 'text-red-400' : 'text-yellow-400'
-                            }`}
-                          >
-                            {isOutOfStock ? '🚫 Out of stock' : '⚠️ Low stock'}
-                          </div>
-                        )}
-                      </td>
-                      <td className="py-2 pr-4">{item.description}</td>
-                      <td className="py-2 pr-4">{item.size}</td>
-                      <td className="py-2 pr-4">
-                        {item.product_type.charAt(0).toUpperCase() +
-                          item.product_type.slice(1)}
-                      </td>
-                      <td className="py-2 pr-4 text-right">
-                        {formatNumber(item.total_received)}
-                      </td>
-                      <td className="py-2 pr-4 text-right">
-                        {formatNumber(item.total_sold)}
-                      </td>
-                      <td className="py-2 pr-4 text-right">
-                        {formatNumber(item.total_comps)}
-                      </td>
-                      <td
-                        className={`py-2 pr-4 text-right font-semibold ${
-                          isOutOfStock
-                            ? 'text-red-300'
-                            : isLowStock
-                            ? 'text-yellow-300'
-                            : 'text-green-300'
-                        }`}
-                      >
-                        {formatNumber(item.balance)}
-                      </td>
-                      <td className="py-2 pr-4 text-right">
-                        {formatCurrency(item.full_package_cost)}
-                      </td>
-                      <td className="py-2 pr-4 text-right">
-                        {formatCurrency(inventoryValue)}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-              <tfoot>
-                <tr className="border-t border-white/10 font-semibold">
-                  <td className="py-3 pr-4" colSpan={4}>
-                    Totals
-                  </td>
-                  <td className="py-3 pr-4 text-right">
-                    {formatNumber(
-                      filteredInventory.reduce((sum, i) => sum + i.total_received, 0)
-                    )}
-                  </td>
-                  <td className="py-3 pr-4 text-right">
-                    {formatNumber(
-                      filteredInventory.reduce((sum, i) => sum + i.total_sold, 0)
-                    )}
-                  </td>
-                  <td className="py-3 pr-4 text-right">
-                    {formatNumber(
-                      filteredInventory.reduce((sum, i) => sum + i.total_comps, 0)
-                    )}
-                  </td>
-                  <td className="py-3 pr-4 text-right text-green-300">
-                    {formatNumber(
-                      filteredInventory.reduce((sum, i) => sum + i.balance, 0)
-                    )}
-                  </td>
-                  <td className="py-3 pr-4" />
-                  <td className="py-3 pr-4 text-right">
-                    {formatCurrency(
-                      filteredInventory.reduce(
-                        (sum, i) => sum + i.balance * i.full_package_cost,
-                        0
-                      )
-                    )}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
+          <InventoryBalanceTable data={filteredInventory} />
         </div>
       )}
 
@@ -488,40 +353,7 @@ export default function InventoryTrackerPage() {
           <h3 className="text-lg font-semibold g-title mb-4">
             Stock Movements ({filteredMovements.length} records)
           </h3>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm g-table">
-              <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-2 pr-4">Date</th>
-                  <th className="text-left py-2 pr-4">Delivery #</th>
-                  <th className="text-left py-2 pr-4">SKU</th>
-                  <th className="text-left py-2 pr-4">Size</th>
-                  <th className="text-right py-2 pr-4">Qty Received</th>
-                  <th className="text-left py-2 pr-4">Vendor</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredMovements.map((movement, index) => (
-                  <tr key={index} className="border-b border-white/10">
-                    <td className="py-2 pr-4">
-                      {new Date(movement.received_date).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
-                    </td>
-                    <td className="py-2 pr-4">{movement.delivery_number}</td>
-                    <td className="py-2 pr-4 font-semibold">{movement.sku}</td>
-                    <td className="py-2 pr-4">{movement.size}</td>
-                    <td className="py-2 pr-4 text-right text-green-300">
-                      +{formatNumber(movement.quantity_received)}
-                    </td>
-                    <td className="py-2 pr-4">{movement.vendor}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <StockMovementsTable data={filteredMovements} />
         </div>
       )}
     </div>
