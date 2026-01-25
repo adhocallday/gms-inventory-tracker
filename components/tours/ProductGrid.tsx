@@ -55,7 +55,11 @@ export default function ProductGrid({ tourId, products }: ProductGridProps) {
       <div className="g-card">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {visibleProducts.map((product) => (
-            <article key={`${product.product_id}:${product.size ?? 'os'}`} className="space-y-2 bg-white/5 p-4 rounded-lg border border-white/10 hover:border-[var(--g-accent-2)] transition">
+            <Link
+              key={`${product.product_id}:${product.size ?? 'os'}`}
+              href={`/products/${product.product_id}`}
+              className="block space-y-2 bg-white/5 p-4 rounded-lg border border-white/10 hover:border-[var(--g-accent-2)] transition"
+            >
               <div className="text-xs text-[var(--g-text-muted)]">{product.size ?? 'One-Size'}</div>
               <div className="font-mono text-sm text-[var(--g-accent)]">{product.sku}</div>
               <p className="text-sm text-[var(--g-text)]">{product.description}</p>
@@ -73,7 +77,7 @@ export default function ProductGrid({ tourId, products }: ProductGridProps) {
                   Balance: {product.balance?.toLocaleString() ?? '0'}
                 </span>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
 

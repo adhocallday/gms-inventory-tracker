@@ -40,6 +40,8 @@ function formatDate(value?: string | null) {
   return dateFormatter.format(new Date(value));
 }
 
+const INITIAL_COUNT = 5;
+
 export function PurchaseOrdersPanel({
   purchaseOrders,
   openQuantities
@@ -51,6 +53,7 @@ export function PurchaseOrdersPanel({
   const [vendorFilter, setVendorFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
 
   const vendors = Array.from(
     new Set(purchaseOrders.map((po) => po.vendor).filter(Boolean))
@@ -77,6 +80,17 @@ export function PurchaseOrdersPanel({
     });
     return map;
   }, [openQuantities]);
+
+  const visibleOrders = useMemo(
+    () => filteredOrders.slice(0, visibleCount),
+    [filteredOrders, visibleCount]
+  );
+
+  const canLoadMore = visibleCount < filteredOrders.length;
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => Math.min(filteredOrders.length, prev + INITIAL_COUNT));
+  };
 
   return (
     <section className="g-card p-6">
@@ -125,7 +139,7 @@ export function PurchaseOrdersPanel({
             No purchase orders match the current filters.
           </div>
         ) : (
-          filteredOrders.map((po) => {
+          visibleOrders.map((po) => {
             const rows = openByPo.get(po.id) ?? [];
             const isOpen = expanded[po.id];
             return (
@@ -194,6 +208,18 @@ export function PurchaseOrdersPanel({
               </div>
             );
           })
+        )}
+
+        {canLoadMore && (
+          <div className="flex justify-center pt-2">
+            <button
+              type="button"
+              onClick={handleLoadMore}
+              className="px-4 py-2 rounded-full border border-white/30 text-sm hover:bg-white/5 transition"
+            >
+              Load more ({filteredOrders.length - visibleCount} remaining)
+            </button>
+          </div>
         )}
       </div>
     </section>

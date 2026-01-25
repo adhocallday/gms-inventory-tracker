@@ -6,6 +6,7 @@ import { StockMovementPanel } from '@/components/tours/StockMovementPanel';
 import { NeedsReviewPanel } from '@/components/tours/NeedsReviewPanel';
 import ProductGrid, { ProductCardData } from '@/components/tours/ProductGrid';
 import ShowsTable, { ShowSummaryRow } from '@/components/tours/ShowsTable';
+import TopSellersPanel from '@/components/tours/TopSellersPanel';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -271,8 +272,6 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
     (a, b) => Number(b.balance ?? 0) - Number(a.balance ?? 0)
   );
 
-  const topSellers = cogsSorted.slice(0, 5);
-
   const forecastUnits = (forecastOverrides ?? []).reduce((sum, row) => {
     if (row.bucket) return sum;
     return sum + Number(row.override_units ?? 0);
@@ -360,47 +359,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       <ProductGrid tourId={tour.id} products={productCards} />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-10">
-        <section className="g-card p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold g-title">Top sellers</h2>
-            <Link
-              href={`/upload?docType=sales-report&tourId=${tour.id}`}
-              className="text-sm font-medium g-link"
-            >
-              Upload document
-            </Link>
-          </div>
-          <div className="mt-4 space-y-4">
-            {topSellers.length === 0 ? (
-              <p className="text-sm text-[var(--g-text-muted)]">
-                No sales data yet. Upload a sales report to populate insights.
-              </p>
-            ) : (
-              topSellers.map((row) => {
-                const product = productMap.get(row.product_id);
-                return (
-                  <div
-                    key={`${row.product_id}-${row.size}`}
-                    className="border border-white/10 rounded-md p-3"
-                  >
-                    <p className="text-sm font-semibold">
-                      {product?.sku ?? 'SKU'} · {row.size}
-                    </p>
-                    <p className="text-xs text-[var(--g-text-muted)]">
-                      {product?.description ?? 'Description pending'}
-                    </p>
-                    <div className="flex items-center justify-between text-sm text-[var(--g-text-dim)] mt-2">
-                      <span>{formatNumber(Number(row.total_sold ?? 0))} sold</span>
-                      <span className="font-medium text-white">
-                        {currencyFormatter.format(Number(row.total_gross ?? 0))}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </section>
+        <TopSellersPanel tourId={tour.id} topSellers={cogsSorted} productMap={productMap} />
 
         <section className="g-card p-6">
           <div className="flex items-center justify-between">

@@ -22,10 +22,13 @@ function formatDate(value?: string | null) {
   return dateFormatter.format(new Date(value));
 }
 
+const INITIAL_COUNT = 10;
+
 export function StockMovementPanel({ rows }: { rows: StockMovementRow[] }) {
   const [skuFilter, setSkuFilter] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
+  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
 
   const filteredRows = useMemo(() => {
     const needle = skuFilter.trim().toLowerCase();
@@ -36,6 +39,17 @@ export function StockMovementPanel({ rows }: { rows: StockMovementRow[] }) {
       return true;
     });
   }, [rows, skuFilter, fromDate, toDate]);
+
+  const visibleRows = useMemo(
+    () => filteredRows.slice(0, visibleCount),
+    [filteredRows, visibleCount]
+  );
+
+  const canLoadMore = visibleCount < filteredRows.length;
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => Math.min(filteredRows.length, prev + INITIAL_COUNT));
+  };
 
   return (
     <section className="g-card p-6">
@@ -88,7 +102,7 @@ export function StockMovementPanel({ rows }: { rows: StockMovementRow[] }) {
                 </td>
               </tr>
             ) : (
-              filteredRows.map((row, index) => (
+              visibleRows.map((row, index) => (
                 <tr key={`${row.delivery_number ?? 'delivery'}-${index}`} className="border-b border-white/10">
                   <td className="py-3 pr-4">{formatDate(row.received_date)}</td>
                   <td className="py-3 pr-4">{row.delivery_number ?? '—'}</td>
@@ -101,6 +115,18 @@ export function StockMovementPanel({ rows }: { rows: StockMovementRow[] }) {
             )}
           </tbody>
         </table>
+
+        {canLoadMore && (
+          <div className="flex justify-center mt-4">
+            <button
+              type="button"
+              onClick={handleLoadMore}
+              className="px-4 py-2 rounded-full border border-white/30 text-sm hover:bg-white/5 transition"
+            >
+              Load more ({filteredRows.length - visibleCount} remaining)
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
