@@ -88,6 +88,14 @@ export default async function AdminDashboard() {
       hoverColor: 'hover:bg-white/20'
     },
     {
+      title: 'Product Catalog',
+      description: 'Manage global products and SKUs',
+      icon: '🏷️',
+      href: '/admin/products',
+      color: 'bg-white/10',
+      hoverColor: 'hover:bg-white/20'
+    },
+    {
       title: 'View Inventory',
       description: 'Check stock levels and warehouse allocation',
       icon: '📦',
