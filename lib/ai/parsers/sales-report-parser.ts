@@ -34,7 +34,7 @@ You are parsing an AtVenu sales report PDF. Extract the following and return ONL
   "totalGross": number,
   "lineItems": [
     {
-      "sku": "string",
+      "sku": "string (base SKU WITHOUT size suffix like _SM, _MD, _LG, etc.)",
       "description": "string",
       "size": "string (S, M, L, XL, 2XL, 3XL, or One-Size)",
       "sold": number (quantity sold),
@@ -46,8 +46,10 @@ You are parsing an AtVenu sales report PDF. Extract the following and return ONL
 
 Important:
 - Extract ALL products that were sold
+- SKU should be the BASE product code (e.g., "GHOSRX203729BK" not "GHOSRX203729BK_SM")
+- If the SKU in the PDF includes a size suffix like _SM, _MD, _LG, _XL, _2XL, _3XL, remove it
+- Size should be extracted separately as a standardized value (S, M, L, XL, 2XL, 3XL, One-Size)
 - Look for subtotals per product style (e.g., "Subtotal: SKELETOR ITIN TEE")
-- Sizes should be standardized (S, M, L, XL, 2XL, 3XL, One-Size)
 - totalGross is the overall gross sales for the show
 - Return ONLY the JSON object
 `;

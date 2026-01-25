@@ -72,7 +72,7 @@ function normalizeSalesReport(
   showId?: string | null
 ) {
   const lineItems = (parsed?.lineItems ?? []).map((item: any) => ({
-    sku: item?.sku ?? '',
+    sku: extractBaseSku(item?.sku ?? ''),  // Strip size suffix from SKU
     description: item?.description ?? '',
     size: item?.size ?? '',
     qty_sold: toNumber(item?.sold),
@@ -102,7 +102,7 @@ function normalizeSettlement(
     comp_category: 'global',  // Default to global - user can change in UI
     comp_source: 'show',      // Default to show - user can change in UI
     comp_type: 'other',
-    sku: item?.sku ?? '',
+    sku: extractBaseSku(item?.sku ?? ''),  // Strip size suffix from SKU
     description: item?.description ?? '',
     size: item?.size ?? '',
     quantity: toNumber(item?.quantity)
