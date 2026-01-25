@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createServiceClient } from '@/lib/supabase/client';
+import { supabase } from '@/lib/supabase/client';
 
 interface TourData {
   name: string;
@@ -24,7 +24,6 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
 
   useEffect(() => {
     async function fetchArtists() {
-      const supabase = createServiceClient();
       const { data: tours } = await supabase
         .from('tours')
         .select('artist')
