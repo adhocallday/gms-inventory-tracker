@@ -60,6 +60,14 @@ export async function POST(request: NextRequest) {
   const { data: existing, error: existingError } = await query.maybeSingle();
 
   if (existingError) {
+    console.error('Query error:', {
+      scenario_id,
+      tour_id,
+      sku,
+      size,
+      bucket,
+      error: existingError.message
+    });
     return NextResponse.json({ error: existingError.message }, { status: 500 });
   }
 
@@ -72,6 +80,16 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
+      console.error('Update error:', {
+        operation: 'update',
+        scenario_id,
+        tour_id,
+        sku,
+        size,
+        bucket,
+        override_units,
+        error: error.message
+      });
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -92,6 +110,16 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
+    console.error('Insert error:', {
+      operation: 'insert',
+      scenario_id,
+      tour_id,
+      sku,
+      size,
+      bucket,
+      override_units,
+      error: error.message
+    });
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 

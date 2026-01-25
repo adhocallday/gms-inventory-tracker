@@ -61,7 +61,7 @@ type ForecastOverrideRow = {
 };
 
 const sizeOrder = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
-const buckets = ['TOUR', 'CITY_A', 'CITY_B', 'MEXICO', 'WEB', 'ANAHEIM'];
+// Note: buckets will be loaded dynamically per tour
 
 const defaultSizeCurve: Record<string, number> = {
   S: 0.12,
@@ -119,6 +119,29 @@ export function ProjectionSheet({
   });
   const [aiGenerated, setAiGenerated] = useState(false);
   const [projectionData, setProjectionData] = useState<any[]>([]);
+  const [buckets, setBuckets] = useState<string[]>(['TOUR', 'WEB']); // Default until loaded
+  const [citiesLoaded, setCitiesLoaded] = useState(false);
+
+  // Fetch tour cities to build dynamic buckets
+  useEffect(() => {
+    async function loadTourCities() {
+      try {
+        const response = await fetch(`/api/tours/${tourId}/cities`);
+        if (response.ok) {
+          const data = await response.json();
+          setBuckets(data.buckets || ['TOUR', 'WEB']);
+          setCitiesLoaded(true);
+          console.log('📍 Loaded dynamic buckets for tour:', data.buckets);
+        }
+      } catch (error) {
+        console.error('Failed to load tour cities:', error);
+        // Fallback to default buckets
+        setBuckets(['TOUR', 'CITY_A', 'CITY_B', 'WEB']);
+        setCitiesLoaded(true);
+      }
+    }
+    loadTourCities();
+  }, [tourId]);
 
   useEffect(() => {
     if (scenarioList.length > 0 || isCreating) return;
@@ -465,35 +488,105 @@ export function ProjectionSheet({
   }
 
   async function applyAllRecommendations(projections: any[]) {
+    console.log('🚀 Applying recommendations for', projections.length, 'products');
+    console.log('First projection:', projections[0]);
+
     setIsLoadingOverrides(true);
 
+    // Build all overrides in a single array for bulk upsert
+    const allOverrides: Array<{
+      sku: string;
+      size?: string | null;
+      bucket?: string | null;
+      override_units: number;
+    }> = [];
+
     for (const proj of projections) {
-      // Apply price override
-      await saveOverride(proj.sku, 'PRICE', null, proj.retailPrice.toString());
+      console.log(`📦 Processing ${proj.sku}:`, {
+        price: proj.retailPrice,
+        units: proj.baselineUnits,
+        sizes: Object.keys(proj.sizeBreakdown || {}),
+        buckets: Object.keys(proj.bucketAllocation || {})
+      });
 
-      // Apply baseline units
-      await saveOverride(proj.sku, null, null, proj.baselineUnits.toString());
+      // Add price override
+      allOverrides.push({
+        sku: proj.sku,
+        size: 'PRICE',
+        bucket: null,
+        override_units: Math.round(proj.retailPrice)
+      });
 
-      // Apply size breakdowns
+      // Add baseline units override
+      allOverrides.push({
+        sku: proj.sku,
+        size: null,
+        bucket: null,
+        override_units: Math.round(proj.baselineUnits)
+      });
+
+      // Add size breakdowns
       for (const [size, units] of Object.entries(proj.sizeBreakdown)) {
         if (sizeOrder.includes(size)) {
-          await saveOverride(proj.sku, size, null, (units as number).toString());
+          allOverrides.push({
+            sku: proj.sku,
+            size,
+            bucket: null,
+            override_units: Math.round(units as number)
+          });
         }
       }
 
-      // Apply bucket allocations
+      // Add bucket allocations
       for (const [bucket, units] of Object.entries(proj.bucketAllocation)) {
         if (buckets.includes(bucket)) {
-          await saveOverride(proj.sku, null, bucket, (units as number).toString());
+          allOverrides.push({
+            sku: proj.sku,
+            size: null,
+            bucket,
+            override_units: Math.round(units as number)
+          });
         }
       }
     }
 
+    console.log(`📤 Sending ${allOverrides.length} overrides in bulk request...`);
+
+    try {
+      const response = await fetch('/api/forecast-overrides/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scenario_id: selectedScenarioId,
+          tour_id: tourId,
+          overrides: allOverrides
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        console.log(`✅ Bulk save complete: ${result.successCount}/${result.total} succeeded`);
+        if (result.errorCount > 0) {
+          console.warn(`⚠️ ${result.errorCount} overrides failed to save`);
+        }
+      } else {
+        console.error('Bulk save failed:', result.error);
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Failed to apply recommendations:', error);
+      alert('Failed to save projections. Please check console for details.');
+      setIsLoadingOverrides(false);
+      return;
+    }
+
+    console.log('✅ All recommendations applied, reloading page...');
     setAiGenerated(true);
     setIsLoadingOverrides(false);
 
     // Refresh page to show updated data
-    window.location.reload();
+    setTimeout(() => window.location.reload(), 500);
   }
 
   return (
@@ -510,7 +603,8 @@ export function ProjectionSheet({
               tourId,
               scenarioId: selectedScenarioId,
               expectedAttendance,
-              expectedPerHead
+              expectedPerHead,
+              buckets // Pass dynamic buckets to AI
             })
           });
           const data = await response.json();
