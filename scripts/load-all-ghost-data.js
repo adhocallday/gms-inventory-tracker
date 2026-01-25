@@ -113,16 +113,20 @@ async function loadSalesData() {
     const sheet = workbook.Sheets[sheetName];
     const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-    // Find SKU in the sheet (usually in first few rows)
+    // Find SKU in the sheet (usually in row 0, after 'Code' label)
     let sku = null;
     for (let i = 0; i < Math.min(10, data.length); i++) {
       const row = data[i];
       if (row && row.length > 1) {
-        const cellValue = row[1];
-        if (cellValue && typeof cellValue === 'string' && cellValue.startsWith('GHOS')) {
-          sku = cellValue;
-          break;
+        // Look for the rightmost cell that starts with "GHOS" and has the full SKU format
+        for (let j = row.length - 1; j >= 0; j--) {
+          const cellValue = row[j];
+          if (cellValue && typeof cellValue === 'string' && cellValue.startsWith('GHOS') && cellValue.length > 10) {
+            sku = cellValue;
+            break;
+          }
         }
+        if (sku) break;
       }
     }
 
@@ -275,16 +279,108 @@ async function loadProjections() {
 
   if (!projectionSheet) {
     console.log('⚠️  Projection Sheet not found');
-    return;
+    return { projectionsLoaded: 0, scenariosCreated: 0 };
   }
 
-  const data = XLSX.utils.sheet_to_json(projectionSheet, { defval: null });
+  const data = XLSX.utils.sheet_to_json(projectionSheet, { header: 1, defval: null });
   console.log(`Found ${data.length} rows in Projection Sheet`);
 
-  // TODO: Parse and insert projection data
-  // This typically includes forecasted sales by product/show
+  // Create forecast scenarios for different price points
+  // Based on row 12, the price points are: $25, $27, $29, $31
+  const pricePoints = [
+    { name: 'Conservative ($25/head)', per_head: 25, column: 4 },
+    { name: 'Baseline ($27/head)', per_head: 27, column: 5 },
+    { name: 'Optimistic ($29/head)', per_head: 29, column: 6 },
+    { name: 'Aggressive ($31/head)', per_head: 31, column: 7 }
+  ];
 
-  return { projectionsLoaded: 0 };
+  const scenarios = [];
+  for (const pricePoint of pricePoints) {
+    const scenarioId = crypto.randomUUID();
+    scenarios.push({
+      id: scenarioId,
+      tour_id: TOUR_ID,
+      scenario_name: pricePoint.name,
+      description: `Projected sales at ${pricePoint.per_head} per head`,
+      default_per_head: pricePoint.per_head,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    });
+  }
+
+  // Insert scenarios
+  if (scenarios.length > 0) {
+    const { error: scenarioError } = await supabase
+      .from('forecast_scenarios')
+      .insert(scenarios);
+
+    if (scenarioError) {
+      console.error(`❌ Error inserting scenarios: ${scenarioError.message}`);
+      return { projectionsLoaded: 0, scenariosCreated: 0 };
+    }
+    console.log(`✅ Created ${scenarios.length} forecast scenarios`);
+  }
+
+  // Extract product projection data (starts around row 14)
+  let projectionsLoaded = 0;
+  const overrides = [];
+
+  for (let i = 14; i < data.length; i++) {
+    const row = data[i];
+    if (!row || !row[0] || !row[1]) continue;
+
+    const sku = row[0];
+    if (typeof sku !== 'string' || !sku.startsWith('GHOS')) continue;
+
+    const salesPercent = row[2]; // % of gross column
+    if (!salesPercent || salesPercent === 0) continue;
+
+    // Get product_id from database
+    const { data: product } = await supabase
+      .from('products')
+      .select('id')
+      .eq('sku', sku)
+      .maybeSingle();
+
+    if (!product) {
+      console.log(`  ⚠️  Product not found for SKU: ${sku}`);
+      continue;
+    }
+
+    // Create overrides for each scenario based on sales percentage
+    for (let j = 0; j < scenarios.length; j++) {
+      const scenario = scenarios[j];
+      const pricePoint = pricePoints[j];
+
+      overrides.push({
+        id: crypto.randomUUID(),
+        scenario_id: scenario.id,
+        tour_product_id: product.id, // We'll need to handle this per size
+        sales_percentage_override: salesPercent,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
+    }
+
+    projectionsLoaded++;
+  }
+
+  // Insert overrides in batches
+  if (overrides.length > 0) {
+    for (let i = 0; i < overrides.length; i += 100) {
+      const batch = overrides.slice(i, i + 100);
+      const { error } = await supabase
+        .from('forecast_overrides')
+        .insert(batch);
+
+      if (error) {
+        console.error(`  ❌ Error inserting overrides batch: ${error.message}`);
+      }
+    }
+    console.log(`✅ Loaded ${projectionsLoaded} product projections with ${overrides.length} scenario overrides`);
+  }
+
+  return { projectionsLoaded, scenariosCreated: scenarios.length };
 }
 
 async function main() {
