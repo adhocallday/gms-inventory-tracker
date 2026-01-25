@@ -12,13 +12,20 @@ interface EnhancedAIAgentPanelProps {
     expectedAttendance: number;
     expectedPerHead: number;
   };
+  warehouseLocations?: Array<{
+    id: string;
+    name: string;
+    location_type: string;
+    display_order: number;
+  }>;
 }
 
 export function EnhancedAIAgentPanel({
   tourId,
   scenarioId,
   onGenerateProjections,
-  currentInputs
+  currentInputs,
+  warehouseLocations
 }: EnhancedAIAgentPanelProps) {
   const [activeTab, setActiveTab] = useState<'analysis' | 'chat'>('analysis');
   const [analysis, setAnalysis] = useState<any>(null);

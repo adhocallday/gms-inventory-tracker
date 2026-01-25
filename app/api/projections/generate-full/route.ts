@@ -4,17 +4,18 @@ import { generateComprehensiveProjections } from '@/lib/ai/projection-agent';
 
 export async function POST(request: NextRequest) {
   try {
-    const { tourId, scenarioId, expectedAttendance, expectedPerHead, comparableTourId, buckets } = await request.json();
+    const { tourId, scenarioId, expectedAttendance, expectedPerHead, comparableTourId, warehouseLocations } = await request.json();
 
     const supabase = createServiceClient();
 
-    // Fetch all context data
-    const [tour, productSummary, showSummary, inventoryBalances, poOpenQuantities] = await Promise.all([
+    // Fetch all context data including warehouse locations
+    const [tour, productSummary, showSummary, inventoryBalances, poOpenQuantities, dbWarehouseLocations] = await Promise.all([
       supabase.from('tours').select('*').eq('id', tourId).single(),
       supabase.from('product_summary_view').select('*').eq('tour_id', tourId),
       supabase.from('show_summary_view').select('*').eq('tour_id', tourId),
       supabase.from('inventory_balances').select('*').eq('tour_id', tourId),
-      supabase.from('po_open_qty_view').select('*').eq('tour_id', tourId)
+      supabase.from('po_open_qty_view').select('*').eq('tour_id', tourId),
+      supabase.from('warehouse_locations').select('*').eq('tour_id', tourId).eq('is_active', true).order('display_order', { ascending: true })
     ]);
 
     // Check if tour has historical data
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
       poOpenQuantities: poOpenQuantities.data || [],
       expectedAttendance,
       expectedPerHead,
-      buckets: buckets || ['TOUR', 'WEB'] // Pass dynamic buckets to AI
+      warehouseLocations: warehouseLocations || dbWarehouseLocations.data || []
     });
 
     return NextResponse.json({ projections, usedComparableTour: !!comparableTourId });

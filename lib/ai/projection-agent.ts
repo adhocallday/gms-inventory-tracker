@@ -14,7 +14,12 @@ export interface ProjectionContext {
   poOpenQuantities: any[];
   expectedAttendance: number;
   expectedPerHead: number;
-  buckets?: string[]; // Dynamic buckets based on tour cities
+  warehouseLocations?: Array<{
+    id: string;
+    name: string;
+    location_type: string;
+    display_order: number;
+  }>; // Warehouse locations for allocation
 }
 
 export interface AIRecommendation {
@@ -55,7 +60,7 @@ export interface ComprehensiveProjection {
   baselineUnits: number;
   retailPrice: number;
   sizeBreakdown: Record<string, number>; // {S: 50, M: 100, L: 120, ...}
-  bucketAllocation: Record<string, number>; // {TOUR: 200, CITY_A: 50, ...}
+  warehouseAllocations: Record<string, number>; // {Road: 500, Warehouse: 200, Web: 100, ...}
   confidence: number;
   reasoning: string;
 }
@@ -259,26 +264,21 @@ Answer questions conversationally using data to support your responses. Suggest 
 }
 
 function buildComprehensiveProjectionPrompt(context: ProjectionContext): string {
-  // Get buckets (cities) for this tour
-  const buckets = context.buckets || ['TOUR', 'WEB'];
-  const cityBuckets = buckets.filter(b => b !== 'TOUR' && b !== 'WEB');
+  // Get warehouse locations for this tour
+  const warehouseLocations = context.warehouseLocations || [];
+  const locationNames = warehouseLocations.map(loc => loc.name);
 
-  // Build allocation instructions based on actual cities
-  let allocationInstructions = '';
-  let exampleAllocation = '';
+  // Build allocation instructions based on warehouse locations
+  const allocationInstructions = `   - Distribute baseline units across warehouse locations: ${locationNames.join(', ')}
+   - Typical distribution:
+     * Road: 50-60% (touring stock that travels)
+     * Warehouse: 20-30% (backup inventory)
+     * Web: 5-10% (online store)
+     * Custom locations: Remaining based on regional demand`;
 
-  if (cityBuckets.length === 0) {
-    allocationInstructions = `   - Distribute baseline units across ${buckets.join('/')}
-   - Typical distribution: TOUR 95%, WEB 5%`;
-    exampleAllocation = buckets.map(b => `"${b}": number`).join(', ');
-  } else {
-    const cityPercentage = Math.floor(90 / (cityBuckets.length + 1));
-    const tourPercentage = 90 - (cityPercentage * cityBuckets.length);
-    allocationInstructions = `   - Distribute baseline units across ${buckets.join('/')}
-   - Suggested distribution: TOUR ${tourPercentage}%, ${cityBuckets.map(c => `${c} ${cityPercentage}%`).join(', ')}, WEB 10%
-   - Adjust based on show data if certain cities had stronger sales`;
-    exampleAllocation = buckets.map(b => `"${b}": number`).join(', ');
-  }
+  const exampleAllocation = locationNames.length > 0
+    ? locationNames.map((name: string) => `"${name}": number`).join(', ')
+    : '"Road": number, "Warehouse": number, "Web": number';
 
   return `You are generating complete projection data for ${context.tourName}.
 
@@ -324,7 +324,7 @@ For EACH UNIQUE SKU (aggregating across all sizes):
      - Apply this % to baseline units to get units per size
    - Example: If S was 20% historically, and baseline is 100 units, then S gets 20 units
 
-4. **Estimate Location/Bucket Allocation**:
+4. **Estimate Warehouse Allocation**:
 ${allocationInstructions}
 
 Return ONLY valid JSON array with ONE object per unique SKU:
@@ -333,17 +333,18 @@ Return ONLY valid JSON array with ONE object per unique SKU:
   "baselineUnits": number,
   "retailPrice": number,
   "sizeBreakdown": {"S": number, "M": number, "L": number, "XL": number, "2XL": number, "3XL": number},
-  "bucketAllocation": {${exampleAllocation}},
+  "warehouseAllocations": {${exampleAllocation}},
   "confidence": 0.0-1.0,
   "reasoning": "brief 1-2 sentence explanation of this SKU's forecast"
 }]
 
 CRITICAL VALIDATION:
 - Size breakdown units MUST sum to baselineUnits
-- Bucket allocation units MUST sum to baselineUnits
-- Include all bucket locations: ${buckets.join(', ')}
+- Warehouse allocation units MUST sum to baselineUnits
+- Include all warehouse locations: ${locationNames.join(', ')}
 - Include all sizes even if 0 units
-- Confidence: 0.9+ for SKUs with strong historical data, lower for sparse data`;
+- Confidence: 0.9+ for SKUs with strong historical data, lower for sparse data
+- CRITICAL: warehouseAllocations must use the exact location names listed above`;
 }
 
 // Response parsers
@@ -397,14 +398,14 @@ function parseComprehensiveProjectionsResponse(content: string): ComprehensivePr
         console.warn(`Size breakdown mismatch for ${proj.sku}: ${sizeTotal} vs ${proj.baselineUnits}`);
       }
 
-      // Check bucket allocation sums to baseline
-      const bucketTotal = Object.values(proj.bucketAllocation || {}).reduce((sum: number, val: any) => sum + (val || 0), 0);
-      if (Math.abs(bucketTotal - proj.baselineUnits) > 1) {
-        console.warn(`Bucket allocation mismatch for ${proj.sku}: ${bucketTotal} vs ${proj.baselineUnits}`);
+      // Check warehouse allocation sums to baseline
+      const warehouseTotal = Object.values(proj.warehouseAllocations || {}).reduce((sum: number, val: any) => sum + (val || 0), 0);
+      if (Math.abs(warehouseTotal - proj.baselineUnits) > 1) {
+        console.warn(`Warehouse allocation mismatch for ${proj.sku}: ${warehouseTotal} vs ${proj.baselineUnits}`);
       }
 
       // Ensure all required fields exist
-      if (!proj.sku || !proj.baselineUnits || !proj.retailPrice || !proj.sizeBreakdown || !proj.bucketAllocation) {
+      if (!proj.sku || !proj.baselineUnits || !proj.retailPrice || !proj.sizeBreakdown || !proj.warehouseAllocations) {
         console.error(`Missing required fields for projection:`, proj);
       }
     }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { EnhancedAIAgentPanel } from './AIAgentPanel';
 import { ProjectionVisualizations } from './ProjectionVisualizations';
 
@@ -61,7 +62,7 @@ type ForecastOverrideRow = {
 };
 
 const sizeOrder = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
-// Note: buckets will be loaded dynamically per tour
+// Note: warehouse locations will be loaded dynamically per tour
 
 const defaultSizeCurve: Record<string, number> = {
   S: 0.12,
@@ -119,28 +120,31 @@ export function ProjectionSheet({
   });
   const [aiGenerated, setAiGenerated] = useState(false);
   const [projectionData, setProjectionData] = useState<any[]>([]);
-  const [buckets, setBuckets] = useState<string[]>(['TOUR', 'WEB']); // Default until loaded
-  const [citiesLoaded, setCitiesLoaded] = useState(false);
+  const [warehouseLocations, setWarehouseLocations] = useState<Array<{
+    id: string;
+    name: string;
+    location_type: string;
+    display_order: number;
+  }>>([]);
+  const [locationsLoaded, setLocationsLoaded] = useState(false);
 
-  // Fetch tour cities to build dynamic buckets
+  // Fetch warehouse locations for this tour
   useEffect(() => {
-    async function loadTourCities() {
+    async function loadWarehouseLocations() {
       try {
-        const response = await fetch(`/api/tours/${tourId}/cities`);
+        const response = await fetch(`/api/tours/${tourId}/warehouse-locations`);
         if (response.ok) {
           const data = await response.json();
-          setBuckets(data.buckets || ['TOUR', 'WEB']);
-          setCitiesLoaded(true);
-          console.log('📍 Loaded dynamic buckets for tour:', data.buckets);
+          setWarehouseLocations(data.locations || []);
+          setLocationsLoaded(true);
+          console.log('📍 Loaded warehouse locations for tour:', data.locations);
         }
       } catch (error) {
-        console.error('Failed to load tour cities:', error);
-        // Fallback to default buckets
-        setBuckets(['TOUR', 'CITY_A', 'CITY_B', 'WEB']);
-        setCitiesLoaded(true);
+        console.error('Failed to load warehouse locations:', error);
+        setLocationsLoaded(true);
       }
     }
-    loadTourCities();
+    loadWarehouseLocations();
   }, [tourId]);
 
   useEffect(() => {
@@ -307,10 +311,10 @@ export function ProjectionSheet({
         }
       });
 
-      const bucketAllocations: Record<string, number> = {};
-      buckets.forEach((bucket) => {
-        const override = overrideMap[`${sku}::::${bucket}`];
-        bucketAllocations[bucket] = override ? Number(override) : 0;
+      const warehouseAllocations: Record<string, number> = {};
+      warehouseLocations.forEach((location) => {
+        const override = overrideMap[`${sku}::::${location.id}`];
+        warehouseAllocations[location.id] = override ? Number(override) : 0;
       });
 
       const onHand = onHandBySku.get(sku) ?? 0;
@@ -327,7 +331,7 @@ export function ProjectionSheet({
         share: productShare,
         forecastUnits,
         sizeBreakdown,
-        bucketAllocations,
+        warehouseAllocations,
         onHand,
         onOrder,
         unitCost,
@@ -451,7 +455,7 @@ export function ProjectionSheet({
       'Price',
       'Forecast Units',
       ...sizeOrder,
-      ...buckets,
+      ...warehouseLocations.map(loc => loc.name),
       'On Hand',
       'On Order',
       'Forecast Gross',
@@ -461,15 +465,15 @@ export function ProjectionSheet({
     const lines = [header.join(',')];
     rows.forEach((row) => {
       const sizes = sizeOrder.map((size) => row.sizeBreakdown[size] ?? 0);
-      const bucketValues = buckets.map((bucket) => row.bucketAllocations[bucket] ?? 0);
+      const warehouseValues = warehouseLocations.map((loc) => row.warehouseAllocations[loc.id] ?? 0);
       lines.push(
         [
           row.sku,
           `"${row.description.replace(/"/g, '""')}"`,
           row.price.toFixed(2),
           row.forecastUnits.toFixed(0),
-          ...sizes.map((value) => value.toFixed(0)),
-          ...bucketValues.map((value) => value.toFixed(0)),
+          ...sizes.map((value: number) => value.toFixed(0)),
+          ...warehouseValues.map((value: number) => value.toFixed(0)),
           row.onHand.toFixed(0),
           row.onOrder.toFixed(0),
           row.forecastGross.toFixed(2),
@@ -506,7 +510,7 @@ export function ProjectionSheet({
         price: proj.retailPrice,
         units: proj.baselineUnits,
         sizes: Object.keys(proj.sizeBreakdown || {}),
-        buckets: Object.keys(proj.bucketAllocation || {})
+        warehouses: Object.keys(proj.warehouseAllocations || {})
       });
 
       // Add price override
@@ -537,13 +541,14 @@ export function ProjectionSheet({
         }
       }
 
-      // Add bucket allocations
-      for (const [bucket, units] of Object.entries(proj.bucketAllocation)) {
-        if (buckets.includes(bucket)) {
+      // Add warehouse allocations
+      for (const [locationName, units] of Object.entries(proj.warehouseAllocations || {})) {
+        const location = warehouseLocations.find(loc => loc.name === locationName);
+        if (location) {
           allOverrides.push({
             sku: proj.sku,
             size: null,
-            bucket,
+            bucket: location.id,
             override_units: Math.round(units as number)
           });
         }
@@ -604,7 +609,7 @@ export function ProjectionSheet({
               scenarioId: selectedScenarioId,
               expectedAttendance,
               expectedPerHead,
-              buckets // Pass dynamic buckets to AI
+              warehouseLocations // Pass dynamic warehouse locations to AI
             })
           });
           const data = await response.json();
@@ -612,6 +617,7 @@ export function ProjectionSheet({
           await applyAllRecommendations(data.projections);
         }}
         currentInputs={{ expectedAttendance, expectedPerHead }}
+        warehouseLocations={warehouseLocations}
       />
 
       {/* 2. VISUALIZATIONS IN MIDDLE */}
@@ -658,6 +664,12 @@ export function ProjectionSheet({
           </button>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Link
+            href={`/tours/${tourId}/projections/compare`}
+            className="g-button g-button-outline text-xs"
+          >
+            Compare Scenarios
+          </Link>
           <button type="button" className="g-button g-button-outline text-xs" onClick={exportCsv}>
             Export CSV
           </button>
@@ -714,9 +726,9 @@ export function ProjectionSheet({
                     {size}
                   </th>
                 ))}
-                {buckets.map((bucket) => (
-                  <th key={bucket} className="py-2 pr-4 text-right">
-                    {bucket}
+                {warehouseLocations.map((location) => (
+                  <th key={location.id} className="py-2 pr-4 text-right">
+                    {location.name}
                   </th>
                 ))}
                 <th className="py-2 pr-4 text-right">Gross</th>
@@ -783,20 +795,20 @@ export function ProjectionSheet({
                         />
                       </td>
                     ))}
-                    {buckets.map((bucket) => (
-                      <td key={`${row.sku}-${bucket}`} className="py-3 pr-4 text-right">
+                    {warehouseLocations.map((location) => (
+                      <td key={`${row.sku}-${location.id}`} className="py-3 pr-4 text-right">
                         <input
                           className="g-input w-16 text-right"
                           type="number"
                           value={
-                            overrideMap[`${row.sku}::::${bucket}`] ??
-                            row.bucketAllocations[bucket]
+                            overrideMap[`${row.sku}::::${location.id}`] ??
+                            row.warehouseAllocations[location.id]
                           }
                           onChange={(event) =>
-                            updateOverride(row.sku, null, bucket, event.target.value)
+                            updateOverride(row.sku, null, location.id, event.target.value)
                           }
                           onBlur={(event) =>
-                            saveOverride(row.sku, null, bucket, event.target.value)
+                            saveOverride(row.sku, null, location.id, event.target.value)
                           }
                         />
                       </td>
@@ -832,7 +844,7 @@ export function ProjectionSheet({
                   Totals
                 </td>
                 <td className="py-3 pr-4 text-right">{totals.units.toFixed(0)}</td>
-                <td className="py-3 pr-4" colSpan={sizeOrder.length + buckets.length} />
+                <td className="py-3 pr-4" colSpan={sizeOrder.length + warehouseLocations.length} />
                 <td className="py-3 pr-4 text-right">
                   {totals.gross.toLocaleString('en-US', {
                     style: 'currency',
