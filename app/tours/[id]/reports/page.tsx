@@ -66,6 +66,23 @@ export default async function TourReportsPage({ params }: TourReportsPageProps) 
         </p>
       </header>
 
+      {/* Info Box */}
+      <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+        <h3 className="text-sm font-semibold text-blue-400 mb-2">💡 About Product Images</h3>
+        <p className="text-xs text-blue-400/80 mb-2">
+          Product images (grab sheets) will automatically appear in reports once uploaded. To add images:
+        </p>
+        <ol className="text-xs text-blue-400/80 space-y-1 list-decimal list-inside">
+          <li>Images can be uploaded through the product management interface (coming soon)</li>
+          <li>Supported formats: PNG, JPG, GIF, WebP (max 10MB)</li>
+          <li>Set one image as "primary" to display in reports</li>
+          <li>Images are stored securely in Supabase Storage and delivered via CDN</li>
+        </ol>
+        <p className="text-xs text-blue-400/80 mt-3">
+          <strong>Note:</strong> Reports currently display product data without images. Upload grab sheets to see them in the Product Breakdown section.
+        </p>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Report Builder */}
         <div className="lg:col-span-2">

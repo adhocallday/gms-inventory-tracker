@@ -327,6 +327,40 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         </div>
       </div>
 
+      {/* Navigation Tabs */}
+      <nav className="flex gap-2 mt-8 border-b border-white/10 pb-0">
+        <Link
+          href={`/tours/${tour.id}/projections`}
+          className="px-4 py-2 text-sm font-medium text-[var(--g-text-dim)] hover:text-[var(--g-text)] hover:border-b-2 hover:border-[var(--g-accent)] transition"
+        >
+          📊 Projections
+        </Link>
+        <Link
+          href={`/tours/${tour.id}/reports`}
+          className="px-4 py-2 text-sm font-medium text-[var(--g-text-dim)] hover:text-[var(--g-text)] hover:border-b-2 hover:border-[var(--g-accent)] transition"
+        >
+          📈 Reports
+        </Link>
+        <Link
+          href={`/tours/${tour.id}/inventory`}
+          className="px-4 py-2 text-sm font-medium text-[var(--g-text-dim)] hover:text-[var(--g-text)] hover:border-b-2 hover:border-[var(--g-accent)] transition"
+        >
+          📦 Inventory
+        </Link>
+        <Link
+          href={`/tours/${tour.id}/cogs`}
+          className="px-4 py-2 text-sm font-medium text-[var(--g-text-dim)] hover:text-[var(--g-text)] hover:border-b-2 hover:border-[var(--g-accent)] transition"
+        >
+          💰 COGS
+        </Link>
+        <Link
+          href={`/tours/${tour.id}/settings/warehouses`}
+          className="px-4 py-2 text-sm font-medium text-[var(--g-text-dim)] hover:text-[var(--g-text)] hover:border-b-2 hover:border-[var(--g-accent)] transition"
+        >
+          ⚙️ Warehouse Settings
+        </Link>
+      </nav>
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
         <div className="g-card p-4">
           <p className="text-xs text-[var(--g-text-muted)]">Total gross</p>
