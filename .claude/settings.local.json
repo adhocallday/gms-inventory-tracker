@@ -18,7 +18,23 @@
       "Bash(export DATABASE_URL:*)",
       "Bash(export PGPASSWORD=\"gms_tour_2026\")",
       "Bash(npm install:*)",
-      "Bash(node scripts/examine-product-sheet.js:*)"
+      "Bash(node scripts/examine-product-sheet.js:*)",
+      "Bash(npm run db:check-migrations)",
+      "Bash(ping:*)",
+      "Bash(supabase db push --project-ref mtfmckqbpykxblgpgnpo)",
+      "Bash(cd:*)",
+      "Bash(host:*)",
+      "Bash(ls:*)",
+      "Bash(head:*)",
+      "Bash(git -C /Users/andrew/Desktop/GMS Tour Data/gms-inventory-tracker log --oneline --all -- \"*parser*\" \"*claude*\" \"*parse*\")",
+      "Bash(git -C /Users/andrew/Desktop/GMS Tour Data/gms-inventory-tracker diff HEAD~5 HEAD -- lib/ai/)",
+      "Bash(git -C /Users/andrew/Desktop/GMS Tour Data/gms-inventory-tracker show 68c4b85 --stat)",
+      "Bash(git -C /Users/andrew/Desktop/GMS Tour Data/gms-inventory-tracker show 68c4b85:lib/ai/claude-client.ts)",
+      "Bash(git -C /Users/andrew/Desktop/GMS Tour Data/gms-inventory-tracker log --all --oneline)",
+      "Bash(git -C /Users/andrew/Desktop/GMS Tour Data/gms-inventory-tracker diff HEAD~1 HEAD -- \"*.ts\" \"*.tsx\")",
+      "Bash(lsof:*)",
+      "Bash(curl:*)",
+      "Bash(node scripts/test-pdf-parse-local.js:*)"
     ]
   }
 }

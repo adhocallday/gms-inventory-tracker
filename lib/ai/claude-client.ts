@@ -16,7 +16,7 @@ export async function parseDocument(
   try {
     const response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
+      max_tokens: 16384,
       messages: [
         {
           role: 'user',
@@ -64,9 +64,33 @@ export async function parseDocument(
     try {
       return JSON.parse(jsonMatch[0]);
     } catch (parseError) {
-      console.error('Failed to parse JSON:', jsonMatch[0].substring(0, 500));
-      console.error('Parse error:', parseError);
-      throw new Error('Invalid JSON in response: ' + (parseError as Error).message);
+      const errorMsg = (parseError as Error).message;
+      console.error('Failed to parse JSON. Parse error:', errorMsg);
+      console.error('JSON length:', jsonMatch[0].length);
+      console.error('First 500 chars:', jsonMatch[0].substring(0, 500));
+      console.error('Last 500 chars:', jsonMatch[0].substring(jsonMatch[0].length - 500));
+
+      // Try to extract position from error message
+      const posMatch = errorMsg.match(/position (\d+)/);
+      if (posMatch) {
+        const pos = parseInt(posMatch[1]);
+        const start = Math.max(0, pos - 200);
+        const end = Math.min(jsonMatch[0].length, pos + 200);
+        console.error(`Context around position ${pos}:`);
+        console.error(jsonMatch[0].substring(start, end));
+      }
+
+      // Write to temp file for debugging
+      try {
+        const fs = require('fs');
+        const tempFile = '/tmp/claude-json-error.json';
+        fs.writeFileSync(tempFile, jsonMatch[0]);
+        console.error(`Full response written to: ${tempFile}`);
+      } catch (fsError) {
+        console.error('Failed to write debug file:', fsError);
+      }
+
+      throw new Error('Invalid JSON in response: ' + errorMsg);
     }
   } catch (error) {
     console.error('Claude API Error:', error);

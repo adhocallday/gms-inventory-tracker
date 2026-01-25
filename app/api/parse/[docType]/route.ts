@@ -291,12 +291,13 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { docType: DocType } }
 ) {
-  const docType = params.docType;
-  if (!['po', 'packing-list', 'sales-report', 'settlement'].includes(docType)) {
-    return NextResponse.json({ error: 'Unsupported doc type' }, { status: 400 });
-  }
+  try {
+    const docType = params.docType;
+    if (!['po', 'packing-list', 'sales-report', 'settlement'].includes(docType)) {
+      return NextResponse.json({ error: 'Unsupported doc type' }, { status: 400 });
+    }
 
-  const formData = await request.formData();
+    const formData = await request.formData();
   const file = formData.get('file');
   const tourId = formData.get('tourId')?.toString() ?? null;
   const showId = formData.get('showId')?.toString() ?? null;
@@ -427,4 +428,17 @@ export async function POST(
     validation: parsedDoc.validation,
     matching
   });
+  } catch (unexpectedError: any) {
+    console.error('[Unexpected Error] Uncaught error in POST handler:', unexpectedError);
+    console.error('[Unexpected Error] Stack:', unexpectedError?.stack);
+
+    return NextResponse.json(
+      {
+        error: 'Unexpected server error',
+        details: unexpectedError?.message || 'Unknown error',
+        type: unexpectedError?.name || 'Error'
+      },
+      { status: 500 }
+    );
+  }
 }
