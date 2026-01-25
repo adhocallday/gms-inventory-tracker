@@ -171,7 +171,37 @@ async function loadSalesData() {
     });
 
     const hasSizes = Object.keys(sizeColumns).length > 0;
-    console.log(`  ${hasSizes ? `Found ${Object.keys(sizeColumns).length} sizes: ${Object.keys(sizeColumns).join(', ')}` : 'No size columns (one-size product)'}`);
+    console.log(`  ${hasSizes ? `Product has sizes` : 'One-size product'}`);
+
+    // Get all tour products for this SKU to get size distribution
+    const { data: product } = await supabase
+      .from('products')
+      .select('id')
+      .eq('sku', sku)
+      .maybeSingle();
+
+    if (!product) {
+      console.log(`  ⚠️  Product not found for SKU: ${sku}`);
+      continue;
+    }
+
+    const { data: tourProducts } = await supabase
+      .from('tour_products')
+      .select('id, size')
+      .eq('tour_id', TOUR_ID)
+      .eq('product_id', product.id)
+      .order('size');
+
+    if (!tourProducts || tourProducts.length === 0) {
+      console.log(`  ⚠️  No tour products found for SKU: ${sku}`);
+      continue;
+    }
+
+    console.log(`  Found ${tourProducts.length} tour products (sizes: ${tourProducts.map(tp => tp.size).join(', ')})`);
+
+    // For sized products, we'll distribute total sales equally across sizes
+    // since the Excel doesn't have per-size sales breakdown per show
+    const totalSizes = tourProducts.length;
 
     // Extract sales data from rows
     const salesRecords = [];
@@ -198,46 +228,25 @@ async function loadSalesData() {
         continue;
       }
 
-      if (hasSizes) {
-        // Create sales records per size
-        for (const [size, colIdx] of Object.entries(sizeColumns)) {
-          const quantity = row[colIdx];
-          if (!quantity || quantity === 0) continue;
+      // Distribute sales equally across all sizes
+      const salesPerSize = Math.floor(salesTotal / totalSizes);
+      const remainder = salesTotal % totalSizes;
 
-          const tourProductId = await getTourProductId(sku, size);
-          if (!tourProductId) {
-            console.log(`  ⚠️  Could not find tour_product for ${sku} size ${size}`);
-            continue;
-          }
-
-          salesRecords.push({
-            id: crypto.randomUUID(),
-            tour_id: TOUR_ID,
-            show_id: showId,
-            tour_product_id: tourProductId,
-            quantity_sold: Number(quantity),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
-        }
-      } else {
-        // One-size product
-        const tourProductId = await getTourProductId(sku, 'OS');
-        if (!tourProductId) {
-          console.log(`  ⚠️  Could not find tour_product for ${sku} OS`);
-          continue;
-        }
+      tourProducts.forEach((tp, idx) => {
+        const quantity = salesPerSize + (idx < remainder ? 1 : 0);
 
         salesRecords.push({
           id: crypto.randomUUID(),
-          tour_id: TOUR_ID,
           show_id: showId,
-          tour_product_id: tourProductId,
-          quantity_sold: Number(salesTotal),
+          tour_product_id: tp.id,
+          qty_sold: quantity,
+          unit_price: 0, // Pricing data not in sales sheets
+          gross_sales: 0, // Will be calculated when prices are loaded
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          source_doc_id: null
         });
-      }
+      });
     }
 
     if (salesRecords.length > 0) {
@@ -285,43 +294,28 @@ async function loadProjections() {
   const data = XLSX.utils.sheet_to_json(projectionSheet, { header: 1, defval: null });
   console.log(`Found ${data.length} rows in Projection Sheet`);
 
-  // Create forecast scenarios for different price points
-  // Based on row 12, the price points are: $25, $27, $29, $31
-  const pricePoints = [
-    { name: 'Conservative ($25/head)', per_head: 25, column: 4 },
-    { name: 'Baseline ($27/head)', per_head: 27, column: 5 },
-    { name: 'Optimistic ($29/head)', per_head: 29, column: 6 },
-    { name: 'Aggressive ($31/head)', per_head: 31, column: 7 }
-  ];
+  // Create a baseline forecast scenario
+  const baselineScenario = {
+    id: crypto.randomUUID(),
+    tour_id: TOUR_ID,
+    name: 'Excel Projection Baseline',
+    is_baseline: true,
+    created_at: new Date().toISOString()
+  };
 
-  const scenarios = [];
-  for (const pricePoint of pricePoints) {
-    const scenarioId = crypto.randomUUID();
-    scenarios.push({
-      id: scenarioId,
-      tour_id: TOUR_ID,
-      scenario_name: pricePoint.name,
-      description: `Projected sales at ${pricePoint.per_head} per head`,
-      default_per_head: pricePoint.per_head,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    });
+  const { error: scenarioError } = await supabase
+    .from('forecast_scenarios')
+    .insert(baselineScenario);
+
+  if (scenarioError) {
+    console.error(`❌ Error inserting scenario: ${scenarioError.message}`);
+    return { projectionsLoaded: 0, scenariosCreated: 0 };
   }
 
-  // Insert scenarios
-  if (scenarios.length > 0) {
-    const { error: scenarioError } = await supabase
-      .from('forecast_scenarios')
-      .insert(scenarios);
-
-    if (scenarioError) {
-      console.error(`❌ Error inserting scenarios: ${scenarioError.message}`);
-      return { projectionsLoaded: 0, scenariosCreated: 0 };
-    }
-    console.log(`✅ Created ${scenarios.length} forecast scenarios`);
-  }
+  console.log(`✅ Created baseline forecast scenario`);
 
   // Extract product projection data (starts around row 14)
+  // Row structure: [SKU, Description, %, Price, ExpectedGross, ...]
   let projectionsLoaded = 0;
   const overrides = [];
 
@@ -332,33 +326,32 @@ async function loadProjections() {
     const sku = row[0];
     if (typeof sku !== 'string' || !sku.startsWith('GHOS')) continue;
 
-    const salesPercent = row[2]; // % of gross column
-    if (!salesPercent || salesPercent === 0) continue;
+    // Column 27 appears to have "TOTAL" stock/order quantity
+    const orderQty = row[27];
+    if (!orderQty || orderQty === 0) continue;
 
-    // Get product_id from database
-    const { data: product } = await supabase
-      .from('products')
-      .select('id')
-      .eq('sku', sku)
-      .maybeSingle();
+    // Size columns: 21-26 (SM, MED, LG, XL, 2X, 3X)
+    const sizeData = [
+      { size: 'S', qty: row[21] },
+      { size: 'M', qty: row[22] },
+      { size: 'L', qty: row[23] },
+      { size: 'XL', qty: row[24] },
+      { size: '2XL', qty: row[25] },
+      { size: '3XL', qty: row[26] }
+    ];
 
-    if (!product) {
-      console.log(`  ⚠️  Product not found for SKU: ${sku}`);
-      continue;
-    }
-
-    // Create overrides for each scenario based on sales percentage
-    for (let j = 0; j < scenarios.length; j++) {
-      const scenario = scenarios[j];
-      const pricePoint = pricePoints[j];
+    for (const { size, qty } of sizeData) {
+      if (!qty || qty === 0) continue;
 
       overrides.push({
         id: crypto.randomUUID(),
-        scenario_id: scenario.id,
-        tour_product_id: product.id, // We'll need to handle this per size
-        sales_percentage_override: salesPercent,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        scenario_id: baselineScenario.id,
+        tour_id: TOUR_ID,
+        show_id: null,
+        sku: sku,
+        size: size,
+        override_units: Number(qty),
+        created_at: new Date().toISOString()
       });
     }
 
@@ -375,12 +368,15 @@ async function loadProjections() {
 
       if (error) {
         console.error(`  ❌ Error inserting overrides batch: ${error.message}`);
+        break;
       }
     }
-    console.log(`✅ Loaded ${projectionsLoaded} product projections with ${overrides.length} scenario overrides`);
+    console.log(`✅ Loaded ${projectionsLoaded} products with ${overrides.length} size-level projections`);
+  } else {
+    console.log(`⚠️  No projection overrides found`);
   }
 
-  return { projectionsLoaded, scenariosCreated: scenarios.length };
+  return { projectionsLoaded, scenariosCreated: 1 };
 }
 
 async function main() {

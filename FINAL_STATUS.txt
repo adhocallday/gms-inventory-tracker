@@ -1,0 +1,164 @@
+================================================================================
+GMS INVENTORY TRACKER - FINAL DATABASE & APP STATUS
+================================================================================
+
+RUN THIS TO SEE FULL DETAILS:
+  npm run db:check-all
+
+================================================================================
+✅ DATABASE DATA - ALL LOADED
+================================================================================
+
+Ghost 2025 Tour Data:
+  ✅ 1 tour (SKELETOUR NORTH AMERICA 2025)
+  ✅ 27 shows (July-August 2025)
+  ✅ 43 products (apparel, accessories, media)
+  ✅ 140 tour products (product x size combinations)
+  ✅ 1,757 sales records (12,297 units sold across 22 shows)
+  ✅ 1 forecast scenario (baseline projections)
+  ✅ 61 forecast overrides (projected quantities by product/size)
+
+Verification: npm run ghost:verify
+
+================================================================================
+❌ DATABASE VIEWS - NOT CREATED (DASHBOARDS WON'T WORK)
+================================================================================
+
+Missing Views (Required for Dashboards):
+  ❌ product_summary_view  → Needed for COGS report (product-level)
+  ❌ show_summary_view     → Needed for COGS report (show-level)
+  ❌ po_open_qty_view      → Needed for inventory tracker (open POs)
+  ❌ stock_movement_view   → Needed for inventory tracker (movements)
+
+Existing Views:
+  ✅ inventory_balances    → Works (shows 0 balances - no POs loaded)
+
+Verification: npm run db:check-migrations
+
+================================================================================
+🎯 APP DASHBOARD STATUS (BEFORE MIGRATION)
+================================================================================
+
+📊 COGS REPORT - /tours/123e4567.../cogs
+Status: ❌ WILL NOT WORK
+Error:  "Could not find table 'product_summary_view'"
+Fix:    Apply migration from APPLY_MIGRATION.md
+
+📦 INVENTORY TRACKER - /tours/123e4567.../inventory
+Status: ⚠️  PARTIALLY WORKS
+Works:  - Summary statistics
+        - Inventory balances (shows 0s)
+Broken: - Open PO tracking (missing po_open_qty_view)
+        - Stock movements (missing stock_movement_view)
+Fix:    Apply migration from APPLY_MIGRATION.md
+
+📈 PROJECTIONS - /tours/123e4567.../projections
+Status: ✅ SHOULD WORK
+Data:   - 1 forecast scenario loaded
+        - 61 product projections loaded
+Note:   Doesn't depend on missing views
+
+📝 DOCUMENT REVIEW - /dashboard/parsed-documents
+Status: ✅ FULLY FUNCTIONAL
+Works:  - Upload PDFs
+        - AI parsing
+        - Review interface
+        - Post to database
+
+================================================================================
+⚠️  DATA QUALITY NOTES
+================================================================================
+
+1. Sales Pricing = $0
+   - All sales have unit_price = 0, gross_sales = 0
+   - Excel sheets don't include pricing data
+   - COGS report will show negative margins (cost but no revenue)
+   - Fix: Load pricing from "Selling Prices" sheet or manual update
+
+2. Inventory Balances = 0
+   - No purchase orders loaded (Excel doesn't have PO data)
+   - Inventory tracker will show empty until POs uploaded via app
+   - This is expected and correct
+
+3. Size Distribution
+   - Sales distributed equally across sizes
+   - Excel only shows total sales, not per-size breakdown
+   - Total quantities are correct
+
+================================================================================
+🔧 FIX: APPLY MIGRATION (5 MINUTES)
+================================================================================
+
+1. Go to: https://supabase.com/dashboard
+2. Click: SQL Editor (left sidebar)
+3. Copy SQL from: APPLY_MIGRATION.md
+4. Paste and click: Run
+5. Verify: npm run db:check-migrations
+
+Expected result:
+  ✅ product_summary_view: Exists
+  ✅ show_summary_view: Exists
+  ✅ po_open_qty_view: Exists
+  ✅ stock_movement_view: Exists
+
+================================================================================
+✅ AFTER MIGRATION APPLIED
+================================================================================
+
+All Dashboards Will Work:
+
+📊 COGS REPORT
+  ✅ Product-level sales aggregation
+  ✅ Show-level performance
+  ⚠️  Revenue will show $0 (need to load pricing)
+  ✅ COGS calculations correct
+  ⚠️  Margins negative (no revenue)
+
+📦 INVENTORY TRACKER
+  ✅ Inventory balances (shows 0 - no POs yet)
+  ✅ Summary statistics
+  ✅ Open PO tracking (empty - no POs yet)
+  ✅ Stock movements (empty - no receipts yet)
+
+📈 PROJECTIONS
+  ✅ Forecast scenarios
+  ✅ Product projections
+  ✅ Adjustable forecasts
+
+📝 DOCUMENT REVIEW
+  ✅ Already works (no views needed)
+
+================================================================================
+📚 DOCUMENTATION
+================================================================================
+
+Complete Guides:
+  - README.md              → Full setup & connection guide
+  - APPLY_MIGRATION.md     → Migration SQL & instructions  
+  - DATABASE_STATUS.md     → Detailed database report
+  - SETUP_COMPLETE.md      → Setup status & verification
+
+Quick Commands:
+  npm run db:check-all          → Full database report
+  npm run db:check-migrations   → Check if migration applied
+  npm run ghost:verify          → Verify Ghost data loaded
+  npm run db:verify             → Test API queries
+
+================================================================================
+🎉 READY TO COMPLETE SETUP
+================================================================================
+
+Current State:
+  ✅ All data loaded and verified
+  ✅ All app code ready and tested
+  ❌ 4 database views need creation
+
+Time to Complete:
+  5 minutes (copy/paste SQL in Supabase Dashboard)
+
+After Migration:
+  ✅ All dashboards functional
+  ✅ App ready for production
+  ⚠️  Note: COGS will need pricing data for realistic margins
+
+================================================================================
