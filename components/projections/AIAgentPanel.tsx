@@ -1,39 +1,35 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { RecommendationCard } from './RecommendationCard';
+import { useState } from 'react';
 import { ChatInterface } from './ChatInterface';
 import { AnalysisPanel } from './AnalysisPanel';
 
-interface AIAgentPanelProps {
+interface EnhancedAIAgentPanelProps {
   tourId: string;
   scenarioId: string;
-  onApplyRecommendation: (sku: string, size: string | null, bucket: string | null, units: number) => void;
+  onGenerateProjections: () => Promise<void>;
   currentInputs: {
     expectedAttendance: number;
     expectedPerHead: number;
   };
 }
 
-export function AIAgentPanel({
+export function EnhancedAIAgentPanel({
   tourId,
   scenarioId,
-  onApplyRecommendation,
+  onGenerateProjections,
   currentInputs
-}: AIAgentPanelProps) {
-  const [activeTab, setActiveTab] = useState<'recommendations' | 'analysis' | 'chat'>('recommendations');
-  const [recommendations, setRecommendations] = useState<any[]>([]);
+}: EnhancedAIAgentPanelProps) {
+  const [activeTab, setActiveTab] = useState<'analysis' | 'chat'>('analysis');
   const [analysis, setAnalysis] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [generated, setGenerated] = useState(false);
 
-  // Load analysis on mount
-  useEffect(() => {
-    loadAnalysis();
-  }, [tourId]);
-
-  async function loadAnalysis() {
+  async function handleGenerate() {
     setLoading(true);
+    setGenerated(false);
     try {
+      // Load analysis first
       const response = await fetch('/api/projections/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -43,60 +39,44 @@ export function AIAgentPanel({
           expectedPerHead: currentInputs.expectedPerHead
         })
       });
-
       const data = await response.json();
       setAnalysis(data.analysis);
-    } catch (error) {
-      console.error('Failed to load analysis:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
 
-  async function generateRecommendations() {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/projections/recommend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tourId,
-          scenarioId,
-          expectedAttendance: currentInputs.expectedAttendance,
-          expectedPerHead: currentInputs.expectedPerHead
-        })
-      });
-
-      const data = await response.json();
-      setRecommendations(data.recommendations);
-      setActiveTab('recommendations');
+      // Generate and apply projections
+      await onGenerateProjections();
+      setGenerated(true);
     } catch (error) {
-      console.error('Failed to generate recommendations:', error);
+      console.error('Failed to generate:', error);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="g-card p-6 mt-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold g-title">AI Projection Assistant</h2>
+    <div className="g-card p-6">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <div>
+          <h2 className="text-2xl font-bold g-title">AI Projection Assistant</h2>
+          <p className="text-sm text-[var(--g-text-muted)] mt-1">
+            Generate complete projections from historical data with one click
+          </p>
+        </div>
         <button
-          onClick={generateRecommendations}
+          onClick={handleGenerate}
           disabled={loading}
-          className="px-4 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition disabled:opacity-50"
+          className="px-6 py-3 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition disabled:opacity-50 font-semibold text-lg whitespace-nowrap"
         >
-          {loading ? 'Analyzing...' : 'Get AI Recommendations'}
+          {loading ? 'Generating...' : 'Generate AI Projections'}
         </button>
       </div>
 
+      {generated && (
+        <div className="mb-4 p-4 bg-green-500/10 border border-green-500/20 rounded-lg text-sm text-green-500">
+          ✓ Projections generated and applied successfully! All data has been populated in the spreadsheet below.
+        </div>
+      )}
+
       <div className="flex gap-2 mb-4 border-b border-[var(--g-border)]">
-        <button
-          onClick={() => setActiveTab('recommendations')}
-          className={`px-4 py-2 ${activeTab === 'recommendations' ? 'border-b-2 border-[var(--g-accent)] text-[var(--g-text)]' : 'text-[var(--g-text-muted)]'}`}
-        >
-          Recommendations ({recommendations.length})
-        </button>
         <button
           onClick={() => setActiveTab('analysis')}
           className={`px-4 py-2 ${activeTab === 'analysis' ? 'border-b-2 border-[var(--g-accent)] text-[var(--g-text)]' : 'text-[var(--g-text-muted)]'}`}
@@ -112,29 +92,9 @@ export function AIAgentPanel({
       </div>
 
       <div className="mt-4">
-        {activeTab === 'recommendations' && (
-          <div className="space-y-3">
-            {recommendations.length === 0 ? (
-              <p className="text-sm text-[var(--g-text-muted)]">
-                Click "Get AI Recommendations" to generate projections based on historical data.
-              </p>
-            ) : (
-              recommendations.map(rec => (
-                <RecommendationCard
-                  key={rec.id}
-                  recommendation={rec}
-                  onAccept={() => onApplyRecommendation(rec.target_sku, rec.target_size, rec.target_bucket, rec.recommended_units)}
-                  onReject={() => {/* Mark as rejected */}}
-                />
-              ))
-            )}
-          </div>
-        )}
-
         {activeTab === 'analysis' && (
           <AnalysisPanel analysis={analysis} loading={loading} />
         )}
-
         {activeTab === 'chat' && (
           <ChatInterface tourId={tourId} scenarioId={scenarioId} />
         )}
@@ -142,3 +102,6 @@ export function AIAgentPanel({
     </div>
   );
 }
+
+// Export with both names for compatibility during transition
+export { EnhancedAIAgentPanel as AIAgentPanel };

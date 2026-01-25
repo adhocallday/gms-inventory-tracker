@@ -49,6 +49,16 @@ export interface ProjectionAnalysis {
   }[];
 }
 
+export interface ComprehensiveProjection {
+  sku: string;
+  baselineUnits: number;
+  retailPrice: number;
+  sizeBreakdown: Record<string, number>; // {S: 50, M: 100, L: 120, ...}
+  bucketAllocation: Record<string, number>; // {TOUR: 200, CITY_A: 50, ...}
+  confidence: number;
+  reasoning: string;
+}
+
 // Main analysis function
 export async function analyzeProjectionData(
   context: ProjectionContext
@@ -118,6 +128,28 @@ export async function chatWithAgent(
   return response.content[0].type === 'text'
     ? response.content[0].text
     : '';
+}
+
+// Generate comprehensive projections (prices, units, sizes, buckets)
+export async function generateComprehensiveProjections(
+  context: ProjectionContext
+): Promise<ComprehensiveProjection[]> {
+  const prompt = buildComprehensiveProjectionPrompt(context);
+
+  const response = await anthropic.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 16384,
+    messages: [{
+      role: 'user',
+      content: prompt
+    }]
+  });
+
+  const content = response.content[0].type === 'text'
+    ? response.content[0].text
+    : '';
+
+  return parseComprehensiveProjectionsResponse(content);
 }
 
 // Prompt builders
@@ -225,6 +257,51 @@ You have access to:
 Answer questions conversationally using data to support your responses. Suggest actionable next steps when appropriate.`;
 }
 
+function buildComprehensiveProjectionPrompt(context: ProjectionContext): string {
+  return `You are generating complete projection data for ${context.tourName}.
+
+HISTORICAL SALES DATA:
+${JSON.stringify(context.productSummary, null, 2)}
+
+SHOW PERFORMANCE:
+${JSON.stringify(context.showSummary, null, 2)}
+
+CURRENT INVENTORY:
+${JSON.stringify(context.inventoryBalances, null, 2)}
+
+OPEN PURCHASE ORDERS:
+${JSON.stringify(context.poOpenQuantities, null, 2)}
+
+PROJECTION INPUTS:
+- Expected attendance: ${context.expectedAttendance.toLocaleString()}
+- Expected per-head: $${context.expectedPerHead.toFixed(2)}
+- Expected gross: $${(context.expectedAttendance * context.expectedPerHead).toLocaleString()}
+
+For EACH product in the historical data, provide complete projection data:
+
+1. **Baseline total units**: Calculate based on historical % of gross sales
+2. **Recommended retail price**: Use historical average selling price
+3. **Size breakdown**: Provide specific units per size (S/M/L/XL/2XL/3XL) based on historical size curves
+4. **Bucket allocation**: Distribute units across channels (TOUR/CITY_A/CITY_B/MEXICO/WEB/ANAHEIM) based on typical distribution patterns
+
+Return ONLY valid JSON array:
+[{
+  "sku": "string",
+  "baselineUnits": number,
+  "retailPrice": number,
+  "sizeBreakdown": {"S": number, "M": number, "L": number, "XL": number, "2XL": number, "3XL": number},
+  "bucketAllocation": {"TOUR": number, "CITY_A": number, "CITY_B": number, "MEXICO": number, "WEB": number, "ANAHEIM": number},
+  "confidence": 0.0-1.0,
+  "reasoning": "brief 1-2 sentence explanation of this product's forecast"
+}]
+
+Important:
+- Size breakdown units should sum to baselineUnits
+- Bucket allocation units should sum to baselineUnits
+- Use historical data to inform distributions
+- Confidence reflects data quality (0.9+ for products with strong historical data, lower for new/sparse data)`;
+}
+
 // Response parsers
 function parseAnalysisResponse(content: string): ProjectionAnalysis {
   // Extract JSON from markdown code blocks if present
@@ -254,6 +331,22 @@ function parseRecommendationsResponse(content: string): AIRecommendation[] {
     return JSON.parse(jsonText);
   } catch (error) {
     console.error('Failed to parse recommendations response:', error);
+    throw new Error('Invalid AI response format');
+  }
+}
+
+function parseComprehensiveProjectionsResponse(content: string): ComprehensiveProjection[] {
+  let jsonText = content;
+  if (content.includes('```')) {
+    const match = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (match) jsonText = match[1];
+  }
+
+  try {
+    return JSON.parse(jsonText);
+  } catch (error) {
+    console.error('Failed to parse comprehensive projections response:', error);
+    console.error('Content:', content);
     throw new Error('Invalid AI response format');
   }
 }

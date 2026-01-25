@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { AIAgentPanel } from './AIAgentPanel';
+import { EnhancedAIAgentPanel } from './AIAgentPanel';
+import { ProjectionVisualizations } from './ProjectionVisualizations';
 
 type Scenario = {
   id: string;
@@ -116,6 +117,8 @@ export function ProjectionSheet({
     );
     return totalAttendance ? totalGross / totalAttendance : 0;
   });
+  const [aiGenerated, setAiGenerated] = useState(false);
+  const [projectionData, setProjectionData] = useState<any[]>([]);
 
   useEffect(() => {
     if (scenarioList.length > 0 || isCreating) return;
@@ -461,8 +464,77 @@ export function ProjectionSheet({
     URL.revokeObjectURL(url);
   }
 
+  async function applyAllRecommendations(projections: any[]) {
+    setIsLoadingOverrides(true);
+
+    for (const proj of projections) {
+      // Apply price override
+      await saveOverride(proj.sku, 'PRICE', null, proj.retailPrice.toString());
+
+      // Apply baseline units
+      await saveOverride(proj.sku, null, null, proj.baselineUnits.toString());
+
+      // Apply size breakdowns
+      for (const [size, units] of Object.entries(proj.sizeBreakdown)) {
+        if (sizeOrder.includes(size)) {
+          await saveOverride(proj.sku, size, null, (units as number).toString());
+        }
+      }
+
+      // Apply bucket allocations
+      for (const [bucket, units] of Object.entries(proj.bucketAllocation)) {
+        if (buckets.includes(bucket)) {
+          await saveOverride(proj.sku, null, bucket, (units as number).toString());
+        }
+      }
+    }
+
+    setAiGenerated(true);
+    setIsLoadingOverrides(false);
+
+    // Refresh page to show updated data
+    window.location.reload();
+  }
+
   return (
-    <section className="g-card p-6 mt-8">
+    <section className="g-container py-8">
+      {/* 1. AI AGENT PANEL AT TOP */}
+      <EnhancedAIAgentPanel
+        tourId={tourId}
+        scenarioId={selectedScenarioId}
+        onGenerateProjections={async () => {
+          const response = await fetch('/api/projections/generate-full', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tourId,
+              scenarioId: selectedScenarioId,
+              expectedAttendance,
+              expectedPerHead
+            })
+          });
+          const data = await response.json();
+          setProjectionData(data.projections);
+          await applyAllRecommendations(data.projections);
+        }}
+        currentInputs={{ expectedAttendance, expectedPerHead }}
+      />
+
+      {/* 2. VISUALIZATIONS IN MIDDLE */}
+      {aiGenerated && projectionData.length > 0 && (
+        <div className="mt-6">
+          <ProjectionVisualizations
+            projectionData={projectionData}
+            historicalData={productSummary}
+            showData={showSummary}
+            inventoryData={inventoryBalances}
+            poData={poOpenQuantities}
+          />
+        </div>
+      )}
+
+      {/* 3. SPREADSHEET AT BOTTOM */}
+      <div className="mt-6 g-card p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-3">
           <label className="text-xs text-[var(--g-text-muted)]">Scenario</label>
@@ -693,18 +765,7 @@ export function ProjectionSheet({
           </table>
         )}
       </div>
-
-      <AIAgentPanel
-        tourId={tourId}
-        scenarioId={selectedScenarioId}
-        onApplyRecommendation={(sku, size, bucket, units) => {
-          saveOverride(sku, size, bucket, units.toString());
-        }}
-        currentInputs={{
-          expectedAttendance,
-          expectedPerHead
-        }}
-      />
+      </div>
     </section>
   );
 }
