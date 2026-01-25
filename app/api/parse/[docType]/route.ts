@@ -99,6 +99,8 @@ function normalizeSettlement(
   showId?: string | null
 ) {
   const comps = (parsed?.comps ?? []).map((item: any) => ({
+    comp_category: 'global',  // Default to global - user can change in UI
+    comp_source: 'show',      // Default to show - user can change in UI
     comp_type: 'other',
     sku: item?.sku ?? '',
     description: item?.description ?? '',
