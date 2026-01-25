@@ -47,6 +47,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevent event from bubbling to parent form
 
     if (!input.trim()) {
       setError('Please enter some tour dates');

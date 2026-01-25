@@ -40,8 +40,8 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!tourData.name || !tourData.artist || !tourData.startDate || !tourData.endDate) {
-      alert('Please fill in all required fields');
+    if (!tourData.name || !tourData.artist) {
+      alert('Please fill in tour name and artist');
       return;
     }
     onNext();
@@ -132,34 +132,30 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
-            Start Date <span className="text-[var(--g-accent)]">*</span>
+            Start Date <span className="text-xs text-[var(--g-text-muted)]">(Optional - auto-fills from shows)</span>
           </label>
           <input
             type="date"
             className="g-input w-full"
             value={tourData.startDate}
             onChange={(e) => onUpdate({ ...tourData, startDate: e.target.value })}
-            required
           />
         </div>
         <div>
           <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
-            End Date <span className="text-[var(--g-accent)]">*</span>
+            End Date <span className="text-xs text-[var(--g-text-muted)]">(Optional - auto-fills from shows)</span>
           </label>
           <input
             type="date"
             className="g-input w-full"
             value={tourData.endDate}
             onChange={(e) => onUpdate({ ...tourData, endDate: e.target.value })}
-            required
           />
         </div>
       </div>
-      {tourData.startDate && tourData.endDate && (
-        <p className="text-xs text-[var(--g-text-muted)] -mt-2">
-          💡 Dates will auto-update based on show schedule in the next step
-        </p>
-      )}
+      <p className="text-xs text-[var(--g-text-muted)] -mt-2">
+        💡 Leave dates blank - they'll automatically populate based on show schedule in the next step
+      </p>
 
       {/* Description */}
       <div>
