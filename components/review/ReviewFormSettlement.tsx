@@ -5,7 +5,7 @@ import LineItemsTable from './LineItemsTable';
 interface CompLineItem {
   comp_category: 'band' | 'global';
   comp_source: 'show' | 'trailer';
-  comp_type?: string;
+  comp_type: string;
   sku: string;
   description: string;
   size: string;
