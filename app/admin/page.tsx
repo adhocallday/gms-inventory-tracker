@@ -5,7 +5,6 @@ import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { StatCard } from '@/components/dashboard/StatCard';
-import { Music, Sparkles, Mic, Package } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,25 +39,25 @@ export default async function AdminDashboard() {
     {
       label: 'Total Tours',
       value: totalTours || 0,
-      icon: Music,
+      iconName: 'music' as const,
       color: 'purple' as const
     },
     {
       label: 'Active Tours',
       value: activeTours || 0,
-      icon: Sparkles,
+      iconName: 'sparkles' as const,
       color: 'green' as const
     },
     {
       label: 'Total Shows',
       value: totalShows || 0,
-      icon: Mic,
+      iconName: 'mic' as const,
       color: 'blue' as const
     },
     {
       label: 'Total Products',
       value: totalProducts || 0,
-      icon: Package,
+      iconName: 'package' as const,
       color: 'orange' as const
     }
   ];
@@ -114,7 +113,7 @@ export default async function AdminDashboard() {
             key={index}
             label={stat.label}
             value={stat.value}
-            icon={stat.icon}
+            iconName={stat.iconName}
             color={stat.color}
           />
         ))}

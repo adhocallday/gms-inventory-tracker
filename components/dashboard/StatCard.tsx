@@ -1,12 +1,35 @@
 'use client';
 
-import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
+import { LucideIcon, TrendingUp, TrendingDown, Music, Sparkles, Mic, Package, DollarSign, ShoppingCart, Users, Calendar, FileText, AlertTriangle, CheckCircle, Clock, Truck, Gift, BarChart3, TrendingUp as TrendingUpIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+// Icon name mapping for server component compatibility
+const iconMap: Record<string, LucideIcon> = {
+  music: Music,
+  sparkles: Sparkles,
+  mic: Mic,
+  package: Package,
+  'dollar-sign': DollarSign,
+  'shopping-cart': ShoppingCart,
+  users: Users,
+  calendar: Calendar,
+  'file-text': FileText,
+  'alert-triangle': AlertTriangle,
+  'check-circle': CheckCircle,
+  clock: Clock,
+  truck: Truck,
+  gift: Gift,
+  'bar-chart': BarChart3,
+  'trending-up': TrendingUpIcon,
+};
 
 interface StatCardProps {
   label: string;
   value: string | number;
+  /** @deprecated Use iconName instead for server component compatibility */
   icon?: LucideIcon;
+  /** Icon name string - use this when calling from server components */
+  iconName?: keyof typeof iconMap;
   trend?: {
     value: number;
     label: string;
@@ -43,8 +66,10 @@ const colorVariants = {
   },
 };
 
-export function StatCard({ label, value, icon: Icon, trend, color = 'default', className }: StatCardProps) {
+export function StatCard({ label, value, icon: IconProp, iconName, trend, color = 'default', className }: StatCardProps) {
   const colors = colorVariants[color];
+  // Resolve icon: prefer iconName (server-safe) over direct icon prop
+  const Icon = iconName ? iconMap[iconName] : IconProp;
 
   return (
     <div
