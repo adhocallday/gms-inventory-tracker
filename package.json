@@ -24,6 +24,7 @@
     "date-fns": "^4.1.0",
     "next": "14.2.35",
     "pdf-parse": "^2.4.5",
+    "pdf.js-extract": "^0.2.1",
     "pdfjs-dist": "^5.4.530",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

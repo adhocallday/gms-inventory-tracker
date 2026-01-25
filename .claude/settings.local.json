@@ -37,7 +37,8 @@
       "Bash(node scripts/test-pdf-parse-local.js:*)",
       "Bash(npm run build:*)",
       "Bash(open \"http://localhost:3002/upload\")",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

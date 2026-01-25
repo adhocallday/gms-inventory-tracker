@@ -1,30 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
-
-type DocType = 'po' | 'packing-list' | 'sales-report' | 'settlement';
-
-interface ClassificationResult {
-  detectedType: DocType;
-  typeName: string;
-  confidence: 'high' | 'medium' | 'low';
-  reasoning: string;
-  indicators: string[];
-}
-
-const DOC_TYPE_DESCRIPTIONS = {
-  'po': 'Purchase Order',
-  'packing-list': 'Packing List',
-  'sales-report': 'Sales Report',
-  'settlement': 'Settlement'
-};
+import { classifyDocument } from '@/lib/ai/document-classifier';
 
 /**
  * POST /api/detect-doc-type
- * Detect document type using AI classification with native PDF support
+ * Detect document type using AI classification
  */
 export async function POST(request: NextRequest) {
   try {
@@ -38,81 +17,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert file to base64 for Claude API
+    // Convert file to buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const base64Pdf = buffer.toString('base64');
 
-    console.log(`[Detect Doc Type] Analyzing ${file.name} (${(file.size / 1024).toFixed(1)} KB) with Claude`);
+    console.log(`[Detect Doc Type] Parsing ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
 
-    // Use Claude's native PDF reading to classify directly
-    const prompt = `You are analyzing a PDF document to determine its type.
+    // Extract text from PDF using pdf.js-extract (Node.js compatible)
+    const PDFExtract = require('pdf.js-extract').PDFExtract;
+    const pdfExtract = new PDFExtract();
 
-Possible document types:
-1. Purchase Order (PO) - Contains vendor information, order details, SKUs, quantities, pricing
-2. Packing List - Contains shipment details, received quantities, tracking information
-3. Sales Report - Contains sales data, quantities sold, revenue by product
-4. Settlement - Contains financial settlement information, fees, net amounts
+    // pdf.js-extract needs a file path or buffer, we'll use buffer
+    const data = await pdfExtract.extractBuffer(buffer);
 
-Analyze this PDF and return ONLY a JSON object (no markdown formatting) with:
-{
-  "detectedType": "po" | "packing-list" | "sales-report" | "settlement",
-  "confidence": "high" | "medium" | "low",
-  "reasoning": "brief explanation of why this type was chosen",
-  "indicators": ["indicator 1", "indicator 2", "indicator 3"]
-}`;
+    // Combine all text from all pages
+    const pageText = data.pages
+      .map((page: any) =>
+        page.content
+          .map((item: any) => item.str)
+          .join(' ')
+      )
+      .join(' ');
 
-    const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
-      max_tokens: 1024,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'document',
-              source: {
-                type: 'base64',
-                media_type: 'application/pdf',
-                data: base64Pdf,
-              },
-            },
-            {
-              type: 'text',
-              text: prompt,
-            },
-          ],
-        },
-      ],
-    });
+    console.log(`[Detect Doc Type] Extracted ${pageText.length} characters from ${data.pages.length} pages`);
 
-    const responseText = response.content[0].type === 'text' ? response.content[0].text : '';
-
-    // Parse Claude's response
-    let parsedResponse;
-    try {
-      // Remove markdown code blocks if present
-      const jsonText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      parsedResponse = JSON.parse(jsonText);
-    } catch (parseError) {
-      console.error('[Detect Doc Type] Failed to parse Claude response:', responseText);
-      throw new Error('Failed to parse AI response');
-    }
-
-    const classification: ClassificationResult = {
-      detectedType: parsedResponse.detectedType,
-      typeName: DOC_TYPE_DESCRIPTIONS[parsedResponse.detectedType as DocType] || 'Unknown',
-      confidence: parsedResponse.confidence || 'low',
-      reasoning: parsedResponse.reasoning || 'No reasoning provided',
-      indicators: parsedResponse.indicators || [],
-    };
+    // Classify the document using AI
+    const classification = await classifyDocument(pageText);
 
     console.log(`[Detect Doc Type] Result: ${classification.typeName} (${classification.confidence} confidence)`);
 
     return NextResponse.json({
       classification,
       preview: {
-        pageCount: null, // We don't extract page count without parsing
+        pageCount: data.pages.length,
       },
     });
   } catch (error: any) {
