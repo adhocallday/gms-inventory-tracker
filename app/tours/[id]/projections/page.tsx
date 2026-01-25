@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
+import { createServiceClient } from '@/lib/supabase/client';
 import { ProjectionSheet } from '@/components/projections/ProjectionSheet';
 
 type ProjectionParams = {
@@ -8,6 +8,8 @@ type ProjectionParams = {
 };
 
 export default async function ProjectionPage({ params }: ProjectionParams) {
+  const supabase = createServiceClient();
+
   const { data: tour } = await supabase
     .from('tours')
     .select('id, name, artist')

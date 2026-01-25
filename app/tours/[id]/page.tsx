@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
+import { createServiceClient } from '@/lib/supabase/client';
 import { PurchaseOrdersPanel } from '@/components/tours/PurchaseOrdersPanel';
 import { StockMovementPanel } from '@/components/tours/StockMovementPanel';
 import { NeedsReviewPanel } from '@/components/tours/NeedsReviewPanel';
@@ -104,6 +104,8 @@ type ForecastOverrideRow = {
 };
 
 export default async function TourDetailPage({ params }: TourDetailParams) {
+  const supabase = createServiceClient();
+
   const { data: tour } = await supabase
     .from('tours')
     .select('id, name, artist, start_date, end_date, status')

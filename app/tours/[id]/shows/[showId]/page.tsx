@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
+import { createServiceClient } from '@/lib/supabase/client';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -59,6 +59,8 @@ type ReceiptRow = {
 };
 
 export default async function ShowDetailPage({ params }: ShowDetailParams) {
+  const supabase = createServiceClient();
+
   const { data: tour } = await supabase
     .from('tours')
     .select('id, name, artist')
