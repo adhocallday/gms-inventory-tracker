@@ -33,10 +33,31 @@ export default async function ReportViewPage({ params }: ReportViewPageProps) {
     .single();
 
   // Fetch product summary (historical sales data)
-  const { data: productSummary } = await supabase
+  const { data: productSummaryRaw } = await supabase
     .from('product_summary_view')
     .select('*')
     .eq('tour_id', tourId);
+
+  // Aggregate size-level data into SKU-level totals
+  const productSummary = productSummaryRaw?.reduce((acc: any[], row: any) => {
+    const existingProduct = acc.find(p => p.product_id === row.product_id);
+
+    if (existingProduct) {
+      // Aggregate: sum up units and gross
+      existingProduct.total_sold = (existingProduct.total_sold || 0) + (row.total_sold || 0);
+      existingProduct.total_gross = (existingProduct.total_gross || 0) + (row.total_gross || 0);
+    } else {
+      // First time seeing this product_id, add it
+      acc.push({
+        ...row,
+        total_sold: row.total_sold || 0,
+        total_gross: row.total_gross || 0,
+        size: undefined // Remove size since this is now aggregated
+      });
+    }
+
+    return acc;
+  }, []).sort((a: any, b: any) => (b.total_sold || 0) - (a.total_sold || 0)); // Sort by sales descending
 
   // Fetch show summary
   const { data: showSummary } = await supabase
