@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import ScheduleChatAssistant from './ScheduleChatAssistant';
 
 interface TourData {
   name: string;
@@ -30,6 +31,7 @@ interface TourScheduleStepProps {
 export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, onPrev }: TourScheduleStepProps) {
   const [parsing, setParsing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [inputMode, setInputMode] = useState<'chat' | 'upload'>('chat');
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) return;
@@ -116,49 +118,88 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
       <div>
         <h2 className="text-xl font-semibold g-title mb-4">Tour Schedule & Shows</h2>
         <p className="text-sm text-[var(--g-text-dim)]">
-          Upload a tour schedule PDF/CSV or add shows manually. AI will extract show dates, venues, and cities.
+          Paste tour dates as text, upload a PDF/CSV, or add shows manually. AI will extract show dates, venues, and cities.
         </p>
       </div>
 
-      {/* AI Upload Area */}
-      <div className="p-6 border border-white/10 rounded-lg bg-[var(--g-surface-2)]">
-        <h3 className="text-sm font-semibold text-[var(--g-text)] mb-3">
-          AI-Assisted Upload
-        </h3>
-        <div
-          {...getRootProps()}
-          className={`
-            border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition
-            ${isDragActive ? 'border-[var(--g-accent)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
-            ${parsing ? 'pointer-events-none opacity-50' : ''}
-          `}
+      {/* AI Input Mode Toggle */}
+      <div className="flex gap-2 p-1 bg-[var(--g-surface)] border border-white/10 rounded-lg w-fit">
+        <button
+          type="button"
+          onClick={() => setInputMode('chat')}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition ${
+            inputMode === 'chat'
+              ? 'bg-[var(--g-accent)] text-white'
+              : 'text-[var(--g-text-dim)] hover:text-[var(--g-text)]'
+          }`}
         >
-          <input {...getInputProps()} />
-          {parsing ? (
-            <div className="space-y-2">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--g-accent)] mx-auto"></div>
-              <p className="text-sm text-[var(--g-text-dim)]">Parsing schedule with AI...</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <svg className="mx-auto h-10 w-10 text-[var(--g-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-              <p className="text-sm text-[var(--g-text-dim)]">
-                {isDragActive ? 'Drop the file here' : 'Drag & drop tour schedule PDF/CSV, or click to select'}
-              </p>
-              <p className="text-xs text-[var(--g-text-muted)]">
-                Supports PDF, CSV, XLS, XLSX
-              </p>
+          Paste Text
+        </button>
+        <button
+          type="button"
+          onClick={() => setInputMode('upload')}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition ${
+            inputMode === 'upload'
+              ? 'bg-[var(--g-accent)] text-white'
+              : 'text-[var(--g-text-dim)] hover:text-[var(--g-text)]'
+          }`}
+        >
+          Upload File
+        </button>
+      </div>
+
+      {/* AI Chat Assistant */}
+      {inputMode === 'chat' && (
+        <ScheduleChatAssistant
+          tourName={tourData.name}
+          artist={tourData.artist}
+          onShowsExtracted={(extractedShows) => {
+            onUpdate([...shows, ...extractedShows]);
+          }}
+        />
+      )}
+
+      {/* AI File Upload */}
+      {inputMode === 'upload' && (
+        <div className="p-6 border border-white/10 rounded-lg bg-[var(--g-surface-2)]">
+          <h3 className="text-sm font-semibold text-[var(--g-text)] mb-3">
+            AI-Assisted File Upload
+          </h3>
+          <div
+            {...getRootProps()}
+            className={`
+              border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition
+              ${isDragActive ? 'border-[var(--g-accent)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
+              ${parsing ? 'pointer-events-none opacity-50' : ''}
+            `}
+          >
+            <input {...getInputProps()} />
+            {parsing ? (
+              <div className="space-y-2">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--g-accent)] mx-auto"></div>
+                <p className="text-sm text-[var(--g-text-dim)]">Parsing schedule with AI...</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <svg className="mx-auto h-10 w-10 text-[var(--g-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <p className="text-sm text-[var(--g-text-dim)]">
+                  {isDragActive ? 'Drop the file here' : 'Drag & drop tour schedule PDF/CSV, or click to select'}
+                </p>
+                <p className="text-xs text-[var(--g-text-muted)]">
+                  Supports PDF, CSV, XLS, XLSX
+                </p>
+              </div>
+            )}
+          </div>
+          {error && (
+            <div className="mt-3 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <p className="text-sm text-red-400">{error}</p>
             </div>
           )}
         </div>
-        {error && (
-          <div className="mt-3 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-            <p className="text-sm text-red-400">{error}</p>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Shows Table */}
       <div>
