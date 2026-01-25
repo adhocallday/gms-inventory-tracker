@@ -7,6 +7,9 @@ import { NeedsReviewPanel } from '@/components/tours/NeedsReviewPanel';
 import ProductGrid, { ProductCardData } from '@/components/tours/ProductGrid';
 import ShowsTable, { ShowSummaryRow } from '@/components/tours/ShowsTable';
 import TopSellersPanel from '@/components/tours/TopSellersPanel';
+import { CogsTable, type CogsRow } from '@/components/tours/CogsTable';
+import { InventoryTable } from '@/components/tours/InventoryTable';
+import { Button } from '@/components/ui/Button';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -493,149 +496,42 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         <NeedsReviewPanel documents={(needsReview ?? []) as ParsedDocumentRow[]} />
       </div>
 
-      <section className="g-card p-6 mt-10">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold g-title">COGS report</h2>
-            <Link
-              href={`/upload?docType=po&tourId=${tour.id}`}
-              className="text-sm font-medium g-link"
-            >
+      <section className="mt-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold g-title">COGS Report</h2>
+          <Link href={`/upload?docType=po&tourId=${tour.id}`}>
+            <Button variant="outline" size="sm">
               Upload document
-            </Link>
-        </div>
-        <div className="overflow-x-auto mt-4">
-          <table className="min-w-full text-sm g-table">
-            <thead className="text-left border-b border-white/10">
-              <tr>
-                <th className="py-2 pr-4">SKU</th>
-                <th className="py-2 pr-4">Size</th>
-                <th className="py-2 pr-4">Units sold</th>
-                <th className="py-2 pr-4">Gross</th>
-                <th className="py-2 pr-4">COGS</th>
-                <th className="py-2 pr-4">Margin</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cogsSorted.length === 0 ? (
-                <tr>
-                  <td className="py-3" colSpan={6}>
-                    No COGS data yet. Upload sales and cost data.
-                  </td>
-                </tr>
-              ) : (
-                (cogsSorted as ProductSummaryRow[]).slice(0, 20).map((row) => {
-                  const product = productMap.get(row.product_id);
-                  return (
-                    <tr
-                      key={`${row.product_id}-${row.size}`}
-                      className="border-b border-white/10"
-                    >
-                      <td className="py-3 pr-4">
-                        <div className="font-semibold">
-                          {row.sku ?? product?.sku ?? 'SKU'}
-                        </div>
-                        <div className="text-xs text-[var(--g-text-muted)]">
-                          {row.description ?? product?.description ?? 'Description pending'}
-                        </div>
-                      </td>
-                      <td className="py-3 pr-4">{row.size}</td>
-                      <td className="py-3 pr-4">
-                        {formatNumber(Number(row.total_sold ?? 0))}
-                      </td>
-                      <td className="py-3 pr-4">
-                        {currencyFormatter.format(Number(row.total_gross ?? 0))}
-                      </td>
-                      <td className="py-3 pr-4">
-                        {currencyFormatter.format(Number(row.total_cogs ?? 0))}
-                      </td>
-                      <td className="py-3 pr-4">
-                        {currencyFormatter.format(Number(row.gross_margin ?? 0))}
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="g-card p-6 mt-10">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold g-title">Inventory balances</h2>
-          <Link
-            href={`/upload?docType=packing-list&tourId=${tour.id}`}
-            className="text-sm font-medium g-link"
-          >
-            Upload document
+            </Button>
           </Link>
         </div>
-        <div className="overflow-x-auto mt-4">
-          <table className="min-w-full text-sm g-table">
-            <thead className="text-left border-b border-white/10">
-              <tr>
-                <th className="py-2 pr-4">SKU</th>
-                <th className="py-2 pr-4">Size</th>
-                <th className="py-2 pr-4">Received</th>
-                <th className="py-2 pr-4">Sold</th>
-                <th className="py-2 pr-4">Comps</th>
-                <th className="py-2 pr-4">Balance</th>
-                <th className="py-2 pr-4">Unit cost</th>
-                <th className="py-2 pr-4">Inventory value</th>
-              </tr>
-            </thead>
-            <tbody>
-              {inventorySorted.length === 0 ? (
-                <tr>
-                  <td className="py-3" colSpan={8}>
-                    No inventory data yet.
-                  </td>
-                </tr>
-              ) : (
-                inventorySorted.slice(0, 20).map((row) => {
-                  const product = productMap.get(row.product_id);
-                  const costKey = `${row.product_id}:${row.size ?? ''}`;
-                  const unitCost = costByKey.get(costKey) ?? 0;
-                  const inventoryValue = Number(row.balance ?? 0) * unitCost;
-                  return (
-                    <tr
-                      key={`${row.product_id}-${row.size}`}
-                      className="border-b border-white/10"
-                    >
-                      <td className="py-3 pr-4">
-                        <div className="font-semibold">
-                          {product?.sku ?? 'SKU'}
-                        </div>
-                        <div className="text-xs text-[var(--g-text-muted)]">
-                          {product?.description ?? 'Description pending'}
-                        </div>
-                      </td>
-                      <td className="py-3 pr-4">{row.size}</td>
-                      <td className="py-3 pr-4">
-                        {formatNumber(Number(row.total_received ?? 0))}
-                      </td>
-                      <td className="py-3 pr-4">
-                        {formatNumber(Number(row.total_sold ?? 0))}
-                      </td>
-                      <td className="py-3 pr-4">
-                        {formatNumber(Number(row.total_comps ?? 0))}
-                      </td>
-                      <td className="py-3 pr-4 font-semibold">
-                        {formatNumber(Number(row.balance ?? 0))}
-                      </td>
-                      <td className="py-3 pr-4">
-                        {unitCost ? currencyFormatter.format(unitCost) : '—'}
-                      </td>
-                      <td className="py-3 pr-4">
-                        {unitCost ? currencyFormatter.format(inventoryValue) : '—'}
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+        <CogsTable data={cogsSorted.slice(0, 20) as CogsRow[]} />
+      </section>
+
+      <section className="mt-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold g-title">Inventory Balances</h2>
+          <Link href={`/upload?docType=packing-list&tourId=${tour.id}`}>
+            <Button variant="outline" size="sm">
+              Upload document
+            </Button>
+          </Link>
         </div>
+        <InventoryTable
+          data={inventorySorted.slice(0, 20).map((row) => {
+            const product = productMap.get(row.product_id);
+            const costKey = `${row.product_id}:${row.size ?? ''}`;
+            const unitCost = costByKey.get(costKey) ?? 0;
+            const inventoryValue = Number(row.balance ?? 0) * unitCost;
+            return {
+              ...row,
+              sku: product?.sku ?? 'SKU',
+              description: product?.description ?? 'Description pending',
+              unit_cost: unitCost,
+              inventory_value: inventoryValue,
+            };
+          })}
+        />
       </section>
     </div>
   );
