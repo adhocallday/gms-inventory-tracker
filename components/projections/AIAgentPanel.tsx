@@ -24,10 +24,12 @@ export function EnhancedAIAgentPanel({
   const [analysis, setAnalysis] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [generated, setGenerated] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleGenerate() {
     setLoading(true);
     setGenerated(false);
+    setError(null);
     try {
       // Load analysis first
       const response = await fetch('/api/projections/analyze', {
@@ -39,14 +41,21 @@ export function EnhancedAIAgentPanel({
           expectedPerHead: currentInputs.expectedPerHead
         })
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `API error: ${response.status}`);
+      }
+
       const data = await response.json();
       setAnalysis(data.analysis);
 
       // Generate and apply projections
       await onGenerateProjections();
       setGenerated(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to generate:', error);
+      setError(error.message || 'Failed to generate projections. Please check console for details.');
     } finally {
       setLoading(false);
     }
@@ -73,6 +82,12 @@ export function EnhancedAIAgentPanel({
       {generated && (
         <div className="mb-4 p-4 bg-green-500/10 border border-green-500/20 rounded-lg text-sm text-green-500">
           ✓ Projections generated and applied successfully! All data has been populated in the spreadsheet below.
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-500">
+          ✗ Error: {error}
         </div>
       )}
 
