@@ -200,10 +200,26 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
         {loading ? 'Generating Report...' : 'Generate Report'}
       </button>
 
+      {/* Loading Progress */}
+      {loading && (
+        <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400"></div>
+            <span className="text-sm font-medium text-blue-400">Generating your report...</span>
+          </div>
+          <div className="w-full bg-blue-500/20 rounded-full h-2 overflow-hidden">
+            <div className="h-full bg-blue-400 rounded-full animate-pulse" style={{ width: '70%' }}></div>
+          </div>
+          <p className="text-xs text-blue-400/70 mt-2">
+            This may take a few moments while we compile all your sales data, product images, and charts.
+          </p>
+        </div>
+      )}
+
       {/* Status Messages */}
       {success && (
         <div className="mt-4 p-4 bg-green-500/10 border border-green-500/20 rounded-lg text-sm text-green-500">
-          ✓ Report generated successfully! Refreshing...
+          ✓ Report generated successfully! Refreshing page to show new report...
         </div>
       )}
 

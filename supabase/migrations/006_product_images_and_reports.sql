@@ -234,11 +234,10 @@ SELECT
   t.name AS tour_name,
   t.start_date AS tour_start_date,
   t.end_date AS tour_end_date,
-  COUNT(DISTINCT s.id) AS show_count
+  (SELECT COUNT(*) FROM shows s WHERE s.tour_id = t.id) AS show_count,
+  COALESCE(jsonb_array_length(tr.config->'sections'), 0) AS section_count
 FROM tour_reports tr
-LEFT JOIN tours t ON tr.tour_id = t.id
-LEFT JOIN shows s ON t.id = s.tour_id
-GROUP BY tr.id, t.id;
+LEFT JOIN tours t ON tr.tour_id = t.id;
 
 -- ============================================================================
 -- Seed default product categories for tours

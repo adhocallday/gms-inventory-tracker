@@ -92,25 +92,22 @@ export function ReportList({ tourId, reports }: ReportListProps) {
 
   if (reports.length === 0) {
     return (
-      <div className="lg:col-span-2">
-        <div className="g-card p-8 text-center">
-          <div className="text-4xl mb-4">📊</div>
-          <h3 className="text-lg font-semibold g-title mb-2">No Reports Yet</h3>
-          <p className="text-sm text-[var(--g-text-muted)]">
-            Create your first report to get started
-          </p>
-        </div>
+      <div className="g-card p-8 text-center">
+        <div className="text-4xl mb-4">📊</div>
+        <h3 className="text-lg font-semibold g-title mb-2">No Reports Yet</h3>
+        <p className="text-sm text-[var(--g-text-muted)]">
+          Create your first report to get started
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="lg:col-span-2">
-      <div className="g-card p-6">
-        <h2 className="text-xl font-semibold g-title mb-4">Generated Reports</h2>
+    <div className="g-card p-6">
+      <h2 className="text-xl font-semibold g-title mb-4">Generated Reports</h2>
 
-        <div className="space-y-4">
-          {reports.map((report) => (
+      <div className="space-y-4">
+        {reports.map((report) => (
             <div
               key={report.id}
               className="border border-[var(--g-border)] rounded-lg p-4 hover:border-[var(--g-accent)] transition"
@@ -159,7 +156,7 @@ export function ReportList({ tourId, reports }: ReportListProps) {
 
               <div className="flex items-center gap-4 text-xs text-[var(--g-text-muted)] mt-3 pt-3 border-t border-[var(--g-border)]">
                 <span>
-                  {report.section_count} {report.section_count === 1 ? 'section' : 'sections'}
+                  {report.section_count || 0} {report.section_count === 1 ? 'section' : 'sections'}
                 </span>
                 <span>•</span>
                 <span>
@@ -183,7 +180,6 @@ export function ReportList({ tourId, reports }: ReportListProps) {
             </div>
           ))}
         </div>
-      </div>
     </div>
   );
 }
