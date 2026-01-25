@@ -43,6 +43,25 @@
   --g-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --g-fast: 160ms;
   --g-med: 240ms;
+
+  /* Semantic Colors */
+  --g-success: #10b981;
+  --g-warning: #f59e0b;
+  --g-error: #ef4444;
+  --g-info: #3b82f6;
+
+  /* Background variants for muted states */
+  --g-bg-muted: rgba(15, 23, 42, 0.03);
+
+  /* Semantic status colors with opacity */
+  --g-success-bg: rgba(16, 185, 129, 0.1);
+  --g-success-border: rgba(16, 185, 129, 0.2);
+  --g-warning-bg: rgba(245, 158, 11, 0.1);
+  --g-warning-border: rgba(245, 158, 11, 0.2);
+  --g-error-bg: rgba(239, 68, 68, 0.1);
+  --g-error-border: rgba(239, 68, 68, 0.2);
+  --g-info-bg: rgba(59, 130, 246, 0.1);
+  --g-info-border: rgba(59, 130, 246, 0.2);
 }
 
 html,
