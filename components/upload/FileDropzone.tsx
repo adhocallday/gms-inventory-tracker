@@ -6,10 +6,18 @@ import { useRouter } from 'next/navigation';
 
 type DocType = 'po' | 'packing-list' | 'sales-report' | 'settlement';
 
+interface ClassificationResult {
+  detectedType: DocType;
+  typeName: string;
+  confidence: 'high' | 'medium' | 'low';
+  reasoning: string;
+  indicators: string[];
+}
+
 interface FileDropzoneProps {
   tourId?: string;
   showId?: string;
-  fileType: DocType;
+  fileType?: DocType; // Optional when autoDetect is true
   onParseComplete?: (
     data: any,
     parsedDocumentId?: string | null,
@@ -17,6 +25,8 @@ interface FileDropzoneProps {
     matching?: string[]
   ) => void;
   autoRedirect?: boolean; // If true, redirects to review page after parse
+  autoDetect?: boolean; // If true, uses AI to detect document type
+  onTypeDetected?: (type: DocType, classification: ClassificationResult) => void;
 }
 
 export function FileDropzone({
@@ -24,33 +34,70 @@ export function FileDropzone({
   showId,
   fileType,
   onParseComplete,
-  autoRedirect = true
+  autoRedirect = true,
+  autoDetect = false,
+  onTypeDetected
 }: FileDropzoneProps) {
   const router = useRouter();
   const [uploading, setUploading] = useState(false);
   const [parsing, setParsing] = useState(false);
+  const [detecting, setDetecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [parsedData, setParsedData] = useState<any>(null);
+  const [detectedType, setDetectedType] = useState<DocType | null>(null);
+  const [classification, setClassification] = useState<ClassificationResult | null>(null);
+  const [pdfPreview, setPdfPreview] = useState<string | null>(null);
+  const [currentFile, setCurrentFile] = useState<File | null>(null);
   
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    if (acceptedFiles.length === 0) return;
-
-    const file = acceptedFiles[0];
+  // Function to detect document type
+  const detectDocumentType = useCallback(async (file: File) => {
+    setDetecting(true);
     setError(null);
-    setParsedData(null);
 
     try {
-      setUploading(true);
+      const formData = new FormData();
+      formData.append('file', file);
 
+      const response = await fetch('/api/detect-doc-type', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Detection failed');
+      }
+
+      const result = await response.json();
+      setDetectedType(result.classification.detectedType);
+      setClassification(result.classification);
+      setPdfPreview(result.preview.dataUrl);
+
+      // Call callback if provided
+      if (onTypeDetected) {
+        onTypeDetected(result.classification.detectedType, result.classification);
+      }
+    } catch (err: any) {
+      setError(err.message);
+      console.error('Detection error:', err);
+    } finally {
+      setDetecting(false);
+    }
+  }, [onTypeDetected]);
+
+  // Function to parse document
+  const parseDocument = useCallback(async (file: File, type: DocType) => {
+    setUploading(true);
+    setParsing(true);
+    setError(null);
+
+    try {
       const formData = new FormData();
       formData.append('file', file);
       if (tourId) formData.append('tourId', tourId);
       if (showId) formData.append('showId', showId);
 
-      setUploading(false);
-      setParsing(true);
-
-      const response = await fetch(`/api/parse/${fileType}`, {
+      const response = await fetch(`/api/parse/${type}`, {
         method: 'POST',
         body: formData
       });
@@ -80,15 +127,38 @@ export function FileDropzone({
           router.push(`/dashboard/parsed-documents/${result.parsedDocumentId}`);
         }, 1500);
       }
-
     } catch (err: any) {
       setError(err.message);
-      console.error('Upload/Parse error:', err);
+      console.error('Parse error:', err);
     } finally {
       setUploading(false);
       setParsing(false);
     }
-  }, [fileType, tourId, showId, onParseComplete, autoRedirect, router]);
+  }, [tourId, showId, onParseComplete, autoRedirect, router]);
+
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    if (acceptedFiles.length === 0) return;
+
+    const file = acceptedFiles[0];
+    setCurrentFile(file);
+    setError(null);
+    setParsedData(null);
+    setClassification(null);
+    setPdfPreview(null);
+
+    // If auto-detect is enabled, detect first
+    if (autoDetect) {
+      await detectDocumentType(file);
+      return; // Don't parse yet, wait for user confirmation
+    }
+
+    // Otherwise, parse directly with provided fileType
+    if (!fileType) {
+      setError('No document type specified');
+      return;
+    }
+    await parseDocument(file, fileType);
+  }, [autoDetect, fileType, detectDocumentType, parseDocument]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -121,6 +191,14 @@ export function FileDropzone({
       >
         <input {...getInputProps()} />
         
+        {detecting && (
+          <div className="space-y-2">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--g-accent)] mx-auto"></div>
+            <p className="text-sm text-[var(--g-text-dim)]">Detecting document type...</p>
+            <p className="text-xs text-[var(--g-text-muted)] mt-1">Analyzing PDF with AI...</p>
+          </div>
+        )}
+
         {uploading && (
           <div className="space-y-2">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--g-accent)] mx-auto"></div>
@@ -141,8 +219,8 @@ export function FileDropzone({
             </div>
           </div>
         )}
-        
-        {!uploading && !parsing && (
+
+        {!uploading && !parsing && !detecting && !classification && (
           <div className="space-y-2">
             <svg
               className="mx-auto h-12 w-12 text-[var(--g-text-muted)]"
@@ -170,6 +248,78 @@ export function FileDropzone({
           </div>
         )}
       </div>
+
+      {/* Detection Results with PDF Preview */}
+      {classification && pdfPreview && !parsing && (
+        <div className="mt-6 space-y-4">
+          {/* PDF Preview */}
+          <div className="border border-white/10 rounded-lg overflow-hidden bg-black/40">
+            <img
+              src={pdfPreview}
+              alt="PDF Preview"
+              className="w-full h-auto"
+            />
+          </div>
+
+          {/* Detection Results */}
+          <div className="p-4 border border-white/10 rounded-lg bg-[var(--g-surface)]">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-sm font-semibold text-[var(--g-text)]">
+                  Detected: {classification.typeName}
+                </p>
+                <p className="text-xs text-[var(--g-text-muted)]">
+                  Confidence: {classification.confidence}
+                </p>
+              </div>
+              <span className={`px-2 py-1 rounded text-xs font-medium ${
+                classification.confidence === 'high' ? 'bg-green-500/20 text-green-400' :
+                classification.confidence === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                'bg-red-500/20 text-red-400'
+              }`}>
+                {classification.confidence.toUpperCase()}
+              </span>
+            </div>
+
+            <p className="text-xs text-[var(--g-text-dim)] mb-2">
+              {classification.reasoning}
+            </p>
+
+            <div className="text-xs text-[var(--g-text-muted)] mb-4">
+              <strong>Indicators found:</strong>
+              <ul className="list-disc list-inside mt-1">
+                {classification.indicators.map((indicator, i) => (
+                  <li key={i}>{indicator}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  if (currentFile && detectedType) {
+                    parseDocument(currentFile, detectedType);
+                  }
+                }}
+                className="flex-1 px-4 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold"
+              >
+                Confirm & Parse
+              </button>
+              <button
+                onClick={() => {
+                  setClassification(null);
+                  setPdfPreview(null);
+                  setDetectedType(null);
+                  setCurrentFile(null);
+                }}
+                className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition text-[var(--g-text)]"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="mt-4 p-4 border border-[rgba(225,6,20,0.35)] rounded-lg bg-[rgba(225,6,20,0.08)]">

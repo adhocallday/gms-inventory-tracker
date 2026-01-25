@@ -51,6 +51,14 @@ type UploadPortalProps = {
   };
 };
 
+interface ClassificationResult {
+  detectedType: DocType;
+  typeName: string;
+  confidence: 'high' | 'medium' | 'low';
+  reasoning: string;
+  indicators: string[];
+}
+
 export default function UploadPortal({ searchParams }: UploadPortalProps) {
   const initialDocType = (searchParams.docType as DocType) ?? 'po';
   const [docType, setDocType] = useState<DocType>(initialDocType);
@@ -59,6 +67,9 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
   const [parsedId, setParsedId] = useState<string | null>(null);
   const [validation, setValidation] = useState<any>(null);
   const [matchingSteps, setMatchingSteps] = useState<string[]>([]);
+  const [autoDetectEnabled, setAutoDetectEnabled] = useState(true);
+  const [detectedType, setDetectedType] = useState<DocType | null>(null);
+  const [detectedClassification, setDetectedClassification] = useState<ClassificationResult | null>(null);
 
   const { tours } = useTours();
   const { shows } = useShows(tourId || undefined);
@@ -90,29 +101,83 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
           validate the content, and approve to post into the database without
           ever storing the PDF.
         </p>
-        <div className="flex flex-wrap gap-3">
-          {DOC_TYPES.map((entry) => (
+
+        {/* Auto-Detect Toggle */}
+        <div className="p-4 border border-white/10 rounded-lg bg-[var(--g-surface)]">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--g-text)]">
+                AI Auto-Detect
+              </h3>
+              <p className="text-xs text-[var(--g-text-muted)] mt-1">
+                Automatically detect document type from PDF content
+              </p>
+            </div>
             <button
-              key={entry.id}
-              type="button"
               onClick={() => {
-                setDocType(entry.id);
-                if (!requiresShow[entry.id]) {
-                  setShowId('');
-                }
+                setAutoDetectEnabled(!autoDetectEnabled);
+                setDetectedType(null);
+                setDetectedClassification(null);
               }}
-              className={`px-4 py-2 rounded-full text-sm font-semibold border transition ${
-                docType === entry.id
-                  ? 'border-[var(--g-accent)] bg-[rgba(225,6,20,0.12)] text-[var(--g-text)]'
-                  : 'border-white/10 text-[var(--g-text-dim)] hover:border-white/30'
+              className={`px-4 py-2 rounded-lg transition font-semibold text-sm ${
+                autoDetectEnabled
+                  ? 'bg-[var(--g-accent)] text-white'
+                  : 'bg-white/10 text-[var(--g-text-dim)]'
               }`}
             >
-              {entry.label}
+              {autoDetectEnabled ? 'Enabled' : 'Disabled'}
             </button>
-          ))}
+          </div>
         </div>
-        {docInfo && (
-          <p className="text-xs text-[var(--g-text-muted)]">{docInfo.description}</p>
+
+        {/* Manual Type Selection (only when auto-detect is off) */}
+        {!autoDetectEnabled && (
+          <div>
+            <h3 className="text-xs uppercase tracking-[0.3em] text-[var(--g-text-muted)] mb-3">
+              Select Document Type
+            </h3>
+            <div className="flex flex-wrap gap-3">
+              {DOC_TYPES.map((entry) => (
+                <button
+                  key={entry.id}
+                  type="button"
+                  onClick={() => {
+                    setDocType(entry.id);
+                    if (!requiresShow[entry.id]) {
+                      setShowId('');
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold border transition ${
+                    docType === entry.id
+                      ? 'border-[var(--g-accent)] bg-[rgba(225,6,20,0.12)] text-[var(--g-text)]'
+                      : 'border-white/10 text-[var(--g-text-dim)] hover:border-white/30'
+                  }`}
+                >
+                  {entry.label}
+                </button>
+              ))}
+            </div>
+            {docInfo && (
+              <p className="text-xs text-[var(--g-text-muted)] mt-2">{docInfo.description}</p>
+            )}
+          </div>
+        )}
+
+        {/* Detected Type Badge (when auto-detect is on and type is detected) */}
+        {autoDetectEnabled && detectedType && detectedClassification && (
+          <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+            <div className="flex items-center gap-2">
+              <span className="text-green-400 text-sm">✓</span>
+              <div className="flex-1">
+                <p className="text-sm text-green-400 font-semibold">
+                  Detected: {detectedClassification.typeName}
+                </p>
+                <p className="text-xs text-green-400/80 mt-0.5">
+                  Confidence: {detectedClassification.confidence} · {detectedClassification.reasoning}
+                </p>
+              </div>
+            </div>
+          </div>
         )}
       </header>
 
@@ -158,7 +223,14 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
         <FileDropzone
           tourId={tourId || undefined}
           showId={showId || undefined}
-          fileType={docType}
+          fileType={autoDetectEnabled ? undefined : docType}
+          autoDetect={autoDetectEnabled}
+          onTypeDetected={(type, classification) => {
+            setDetectedType(type);
+            setDetectedClassification(classification);
+            setDocType(type); // Set the doc type for show requirement checking
+            console.log('Detected document type:', classification);
+          }}
           onParseComplete={handleParseComplete}
           autoRedirect={false}
         />
