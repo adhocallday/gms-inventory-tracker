@@ -1,0 +1,86 @@
+import { Suspense } from 'react';
+import { createServiceClient } from '@/lib/supabase/client';
+import { ReportBuilder } from '@/components/reports/ReportBuilder';
+import { ReportList } from '@/components/reports/ReportList';
+
+export const dynamic = 'force-dynamic';
+
+interface TourReportsPageProps {
+  params: { id: string };
+}
+
+export default async function TourReportsPage({ params }: TourReportsPageProps) {
+  const { id: tourId } = params;
+  const supabase = createServiceClient();
+
+  // Fetch tour details
+  const { data: tour } = await supabase
+    .from('tours')
+    .select('*')
+    .eq('id', tourId)
+    .single();
+
+  if (!tour) {
+    return (
+      <div className="g-container py-8">
+        <div className="g-card p-8 text-center">
+          <p className="text-[var(--g-text-muted)]">Tour not found</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Fetch existing reports
+  const { data: reports } = await supabase
+    .from('tour_reports_summary')
+    .select('*')
+    .eq('tour_id', tourId)
+    .order('created_at', { ascending: false });
+
+  // Fetch show count for context
+  const { count: showCount } = await supabase
+    .from('shows')
+    .select('*', { count: 'exact', head: true })
+    .eq('tour_id', tourId);
+
+  // Fetch product count
+  const { count: productCount } = await supabase
+    .from('products')
+    .select('*', { count: 'exact', head: true })
+    .eq('tour_id', tourId);
+
+  return (
+    <div className="g-container py-8">
+      <header className="mb-8">
+        <div className="flex items-center gap-3 mb-3">
+          <a
+            href={`/tours/${tourId}`}
+            className="text-sm text-[var(--g-text-muted)] hover:text-[var(--g-accent)] transition"
+          >
+            ← Back to Tour
+          </a>
+        </div>
+        <h1 className="text-3xl font-bold g-title mb-2">Tour Reports</h1>
+        <p className="text-[var(--g-text-muted)]">
+          {tour.name} • {showCount || 0} shows • {productCount || 0} products
+        </p>
+      </header>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Report Builder */}
+        <div className="lg:col-span-2">
+          <Suspense fallback={<div className="g-card p-8">Loading...</div>}>
+            <ReportBuilder tourId={tourId} tour={tour} />
+          </Suspense>
+        </div>
+
+        {/* Existing Reports List */}
+        <div className="lg:col-span-1">
+          <Suspense fallback={<div className="g-card p-8">Loading...</div>}>
+            <ReportList tourId={tourId} reports={reports || []} />
+          </Suspense>
+        </div>
+      </div>
+    </div>
+  );
+}
