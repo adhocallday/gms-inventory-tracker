@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useRouter } from 'next/navigation';
 
@@ -48,11 +48,24 @@ export function FileDropzone({
   const [classification, setClassification] = useState<ClassificationResult | null>(null);
   const [pdfPreview, setPdfPreview] = useState<string | null>(null);
   const [currentFile, setCurrentFile] = useState<File | null>(null);
-  
+
+  // Clean up preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (pdfPreview) {
+        URL.revokeObjectURL(pdfPreview);
+      }
+    };
+  }, [pdfPreview]);
+
   // Function to detect document type
   const detectDocumentType = useCallback(async (file: File) => {
     setDetecting(true);
     setError(null);
+
+    // Create client-side preview URL for the PDF
+    const previewUrl = URL.createObjectURL(file);
+    setPdfPreview(previewUrl);
 
     try {
       const formData = new FormData();
@@ -71,7 +84,6 @@ export function FileDropzone({
       const result = await response.json();
       setDetectedType(result.classification.detectedType);
       setClassification(result.classification);
-      setPdfPreview(result.preview?.dataUrl || null);
 
       // Call callback if provided
       if (onTypeDetected) {
@@ -80,6 +92,11 @@ export function FileDropzone({
     } catch (err: any) {
       setError(err.message);
       console.error('Detection error:', err);
+      // Clean up preview URL on error
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPdfPreview(null);
+      }
     } finally {
       setDetecting(false);
     }
@@ -255,10 +272,10 @@ export function FileDropzone({
           {/* PDF Preview (if available) */}
           {pdfPreview && (
             <div className="border border-white/10 rounded-lg overflow-hidden bg-black/40">
-              <img
+              <iframe
                 src={pdfPreview}
-                alt="PDF Preview"
-                className="w-full h-auto"
+                className="w-full h-96"
+                title="PDF Preview"
               />
             </div>
           )}
@@ -300,6 +317,10 @@ export function FileDropzone({
               <button
                 onClick={() => {
                   if (currentFile && detectedType) {
+                    // Clean up preview URL before parsing
+                    if (pdfPreview) {
+                      URL.revokeObjectURL(pdfPreview);
+                    }
                     parseDocument(currentFile, detectedType);
                   }
                 }}
@@ -309,6 +330,10 @@ export function FileDropzone({
               </button>
               <button
                 onClick={() => {
+                  // Clean up preview URL when canceling
+                  if (pdfPreview) {
+                    URL.revokeObjectURL(pdfPreview);
+                  }
                   setClassification(null);
                   setPdfPreview(null);
                   setDetectedType(null);
