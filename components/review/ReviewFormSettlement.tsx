@@ -3,7 +3,9 @@
 import LineItemsTable from './LineItemsTable';
 
 interface CompLineItem {
-  comp_type: string;
+  comp_category: 'band' | 'global';
+  comp_source: 'show' | 'trailer';
+  comp_type?: string;
   sku: string;
   description: string;
   size: string;
@@ -66,7 +68,7 @@ export default function ReviewFormSettlement({
       <div className="g-panel space-y-4">
         <h3 className="text-lg font-semibold g-title">Settlement Details</h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="g-label block mb-1">
               Show Date <span className="text-[var(--g-accent)]">*</span>
@@ -233,6 +235,8 @@ export default function ReviewFormSettlement({
             <table className="min-w-full text-sm g-table">
               <thead>
                 <tr className="border-b border-white/10">
+                  <th className="text-left py-2 pr-2">Category</th>
+                  <th className="text-left py-2 pr-2">Source</th>
                   <th className="text-left py-2 pr-2">Comp Type</th>
                   <th className="text-left py-2 pr-2">SKU</th>
                   <th className="text-left py-2 pr-2">Description</th>
@@ -243,6 +247,8 @@ export default function ReviewFormSettlement({
               <tbody>
                 {data.comps.map((item, index) => (
                   <tr key={index} className="border-b border-white/10">
+                    <td className="py-2 pr-2">{item.comp_category}</td>
+                    <td className="py-2 pr-2">{item.comp_source}</td>
                     <td className="py-2 pr-2">{item.comp_type}</td>
                     <td className="py-2 pr-2">{item.sku}</td>
                     <td className="py-2 pr-2">{item.description}</td>

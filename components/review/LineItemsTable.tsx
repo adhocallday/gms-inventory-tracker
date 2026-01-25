@@ -26,6 +26,8 @@ interface SalesLineItem {
 }
 
 interface CompLineItem {
+  comp_category: 'band' | 'global';
+  comp_source: 'show' | 'trailer';
   comp_type: string;
   sku: string;
   description: string;
@@ -97,7 +99,9 @@ export default function LineItemsTable({
         break;
       case 'settlement':
         newItem = {
-          comp_type: 'other',
+          comp_category: 'band',
+          comp_source: 'show',
+          comp_type: '',
           sku: '',
           description: '',
           size: 'One-Size',
@@ -141,7 +145,13 @@ export default function LineItemsTable({
         <table className="min-w-full text-sm g-table">
           <thead>
             <tr className="border-b border-white/10">
-              {docType === 'settlement' && <th className="text-left py-2 pr-2">Comp Type</th>}
+              {docType === 'settlement' && (
+                <>
+                  <th className="text-left py-2 pr-2">Category</th>
+                  <th className="text-left py-2 pr-2">Source</th>
+                  <th className="text-left py-2 pr-2">Comp Type</th>
+                </>
+              )}
               <th className="text-left py-2 pr-2">SKU</th>
               <th className="text-left py-2 pr-2">Description</th>
               <th className="text-left py-2 pr-2">Size</th>
@@ -178,21 +188,43 @@ export default function LineItemsTable({
               <tr key={index} className="border-b border-white/10">
                 {/* Comp Type (Settlement only) */}
                 {docType === 'settlement' && (
-                  <td className="py-2 pr-2">
-                    <select
-                      className="w-32 g-input text-sm"
-                      value={(item as CompLineItem).comp_type}
-                      onChange={(e) =>
-                        updateLineItem(index, 'comp_type', e.target.value)
-                      }
-                    >
-                      <option value="band">Band</option>
-                      <option value="global">Global</option>
-                      <option value="show">Show</option>
-                      <option value="trailer">Trailer</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </td>
+                  <>
+                    <td className="py-2 pr-2">
+                      <select
+                        className="w-24 g-input text-sm"
+                        value={(item as CompLineItem).comp_category}
+                        onChange={(e) =>
+                          updateLineItem(index, 'comp_category', e.target.value)
+                        }
+                      >
+                        <option value="band">Band</option>
+                        <option value="global">Global</option>
+                      </select>
+                    </td>
+                    <td className="py-2 pr-2">
+                      <select
+                        className="w-24 g-input text-sm"
+                        value={(item as CompLineItem).comp_source}
+                        onChange={(e) =>
+                          updateLineItem(index, 'comp_source', e.target.value)
+                        }
+                      >
+                        <option value="show">Show</option>
+                        <option value="trailer">Trailer</option>
+                      </select>
+                    </td>
+                    <td className="py-2 pr-2">
+                      <input
+                        type="text"
+                        className="g-input text-sm"
+                        value={(item as CompLineItem).comp_type}
+                        onChange={(e) =>
+                          updateLineItem(index, 'comp_type', e.target.value)
+                        }
+                        placeholder="Other/Promo"
+                      />
+                    </td>
+                  </>
                 )}
 
                 {/* SKU */}
