@@ -43,16 +43,39 @@ export async function parseDocument(
     if (!textContent || textContent.type !== 'text') {
       throw new Error('No text response from Claude');
     }
-    
-    // Parse JSON response
-    const jsonMatch = textContent.text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in response: ' + textContent.text);
+
+    let responseText = textContent.text;
+
+    // Remove markdown code blocks if present
+    if (responseText.includes('```')) {
+      const codeBlockMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (codeBlockMatch) {
+        responseText = codeBlockMatch[1];
+      }
     }
-    
-    return JSON.parse(jsonMatch[0]);
+
+    // Extract JSON object (greedy match from first { to last })
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error('Failed to extract JSON from Claude response:', responseText.substring(0, 500));
+      throw new Error('No JSON found in response');
+    }
+
+    try {
+      return JSON.parse(jsonMatch[0]);
+    } catch (parseError) {
+      console.error('Failed to parse JSON:', jsonMatch[0].substring(0, 500));
+      console.error('Parse error:', parseError);
+      throw new Error('Invalid JSON in response: ' + (parseError as Error).message);
+    }
   } catch (error) {
     console.error('Claude API Error:', error);
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack
+      });
+    }
     throw error;
   }
 }

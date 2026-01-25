@@ -345,14 +345,35 @@ export async function POST(
   try {
     parsed = await parseByType(docType, base64);
   } catch (error: any) {
+    console.error(`[Parse Error] Doc type: ${docType}, File: ${file.name}`);
+    console.error('[Parse Error] Error:', error);
+    console.error('[Parse Error] Stack:', error.stack);
+
+    const errorMessage = error.message || 'Unknown parsing error';
+    const errorDetails = {
+      docType,
+      fileName: file.name,
+      error: errorMessage,
+      timestamp: new Date().toISOString()
+    };
+
     if (logEntry?.id) {
       await supabase
         .from('ai_processing_logs')
-        .update({ status: 'error', error_message: error.message })
+        .update({
+          status: 'error',
+          error_message: JSON.stringify(errorDetails)
+        })
         .eq('id', logEntry.id);
     }
+
     return NextResponse.json(
-      { error: 'Failed to parse document', details: error.message },
+      {
+        error: 'Failed to parse document',
+        details: errorMessage,
+        docType,
+        fileName: file.name
+      },
       { status: 500 }
     );
   }
