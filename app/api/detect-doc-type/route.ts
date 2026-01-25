@@ -45,37 +45,17 @@ export async function POST(request: NextRequest) {
       .map((item: any) => item.str)
       .join(' ');
 
-    // Generate PDF preview (data URL for first page)
-    const viewport = firstPage.getViewport({ scale: 1.0 });
+    console.log(`[Detect Doc Type] Classifying ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
+    console.log(`[Detect Doc Type] Extracted ${pageText.length} characters from first page`);
 
-    // Create canvas in node environment
-    const { createCanvas } = require('canvas');
-    const canvas = createCanvas(viewport.width, viewport.height);
-    const context = canvas.getContext('2d');
-
-    // Render PDF page to canvas
-    const renderContext = {
-      canvasContext: context,
-      viewport: viewport,
-    };
-
-    try {
-      await firstPage.render(renderContext as any).promise;
-    } catch (renderError) {
-      console.warn('PDF render warning:', renderError);
-      // Continue even if render fails - we have the text
-    }
-
-    // Convert canvas to data URL
-    const dataUrl = canvas.toDataURL('image/png');
-
-    // Classify the document
+    // Classify the document using AI
     const classification = await classifyDocument(pageText);
+
+    console.log(`[Detect Doc Type] Result: ${classification.typeName} (${classification.confidence} confidence)`);
 
     return NextResponse.json({
       classification,
       preview: {
-        dataUrl,
         pageCount: pdfDocument.numPages,
       },
     });

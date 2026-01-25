@@ -71,7 +71,7 @@ export function FileDropzone({
       const result = await response.json();
       setDetectedType(result.classification.detectedType);
       setClassification(result.classification);
-      setPdfPreview(result.preview.dataUrl);
+      setPdfPreview(result.preview?.dataUrl || null);
 
       // Call callback if provided
       if (onTypeDetected) {
@@ -250,16 +250,18 @@ export function FileDropzone({
       </div>
 
       {/* Detection Results with PDF Preview */}
-      {classification && pdfPreview && !parsing && (
+      {classification && !parsing && (
         <div className="mt-6 space-y-4">
-          {/* PDF Preview */}
-          <div className="border border-white/10 rounded-lg overflow-hidden bg-black/40">
-            <img
-              src={pdfPreview}
-              alt="PDF Preview"
-              className="w-full h-auto"
-            />
-          </div>
+          {/* PDF Preview (if available) */}
+          {pdfPreview && (
+            <div className="border border-white/10 rounded-lg overflow-hidden bg-black/40">
+              <img
+                src={pdfPreview}
+                alt="PDF Preview"
+                className="w-full h-auto"
+              />
+            </div>
+          )}
 
           {/* Detection Results */}
           <div className="p-4 border border-white/10 rounded-lg bg-[var(--g-surface)]">

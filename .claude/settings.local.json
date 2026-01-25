@@ -34,7 +34,10 @@
       "Bash(git -C /Users/andrew/Desktop/GMS Tour Data/gms-inventory-tracker diff HEAD~1 HEAD -- \"*.ts\" \"*.tsx\")",
       "Bash(lsof:*)",
       "Bash(curl:*)",
-      "Bash(node scripts/test-pdf-parse-local.js:*)"
+      "Bash(node scripts/test-pdf-parse-local.js:*)",
+      "Bash(npm run build:*)",
+      "Bash(open \"http://localhost:3002/upload\")",
+      "Bash(python3:*)"
     ]
   }
 }
