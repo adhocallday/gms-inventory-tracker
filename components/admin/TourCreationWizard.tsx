@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TourBasicInfoStep from './wizard/TourBasicInfoStep';
 import TourScheduleStep from './wizard/TourScheduleStep';
 import ProductCatalogStep from './wizard/ProductCatalogStep';
@@ -63,6 +63,23 @@ export default function TourCreationWizard() {
   ];
 
   const currentStepIndex = steps.findIndex(s => s.id === currentStep);
+
+  // Auto-populate start/end dates from shows
+  useEffect(() => {
+    if (shows.length === 0) return;
+
+    const dates = shows.map(s => s.showDate).filter(Boolean).sort();
+    if (dates.length > 0) {
+      const earliestDate = dates[0];
+      const latestDate = dates[dates.length - 1];
+
+      setTourData(prev => ({
+        ...prev,
+        startDate: earliestDate,
+        endDate: latestDate
+      }));
+    }
+  }, [shows]);
 
   const goToStep = (stepId: WizardStep) => {
     setCurrentStep(stepId);

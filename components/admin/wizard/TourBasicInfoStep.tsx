@@ -155,6 +155,11 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
           />
         </div>
       </div>
+      {tourData.startDate && tourData.endDate && (
+        <p className="text-xs text-[var(--g-text-muted)] -mt-2">
+          💡 Dates will auto-update based on show schedule in the next step
+        </p>
+      )}
 
       {/* Description */}
       <div>
