@@ -2,7 +2,23 @@
   "permissions": {
     "allow": [
       "Bash(brew install:*)",
-      "Bash(brew link:*)"
+      "Bash(brew link:*)",
+      "Bash(git diff app/api/parsed-documents/[id]/post/route.ts app/api/parsed-documents/[id]/route.ts)",
+      "Bash(git show HEAD:app/api/parsed-documents/[id]/post/route.ts)",
+      "Bash(wc -l app/api/parse/[docType]/route.ts app/api/post/[parsedDocId]/route.ts app/api/reject/[parsedDocId]/route.ts lib/posting/post-parsed-document.ts)",
+      "Bash(git diff app/api/parsed-documents/[id]/route.ts)",
+      "Bash(cd /Users/andrew/Desktop/GMS\\\\ Tour\\\\ Data/gms-inventory-tracker:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd document review system, COGS reports, and inventory tracker\n\n- Document review UI with forms for PO, packing lists, sales reports, and settlements\n- COGS analysis with product and show profitability views\n- Inventory tracker with balance and movements views\n- Parse, post, and reject API endpoints for document workflow\n- Tour-related APIs for shows, POs, COGS, and inventory data\n- Auto-redirect from upload to review page\n- Ghost 2025 tour seed data\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(/opt/homebrew/opt/postgresql@15/bin/psql:*)",
+      "Bash(brew list:*)",
+      "Bash(chmod:*)",
+      "Bash(export DATABASE_URL:*)",
+      "Bash(export PGPASSWORD=\"gms_tour_2026\")",
+      "Bash(npm install:*)",
+      "Bash(node scripts/examine-product-sheet.js:*)"
     ]
   }
 }

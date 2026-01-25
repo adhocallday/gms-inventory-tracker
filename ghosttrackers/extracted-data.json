@@ -1,0 +1,163 @@
+{
+  "shows": [
+    {
+      "date": "2025-07-09",
+      "city": "Baltimore",
+      "state": "MD",
+      "venue": "CFG Bank Arena",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-11",
+      "city": "Atlanta",
+      "state": "GA",
+      "venue": "State Farm Arena",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-12",
+      "city": "Tampa",
+      "state": "FL",
+      "venue": "Amalie Arena",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-13",
+      "city": "Miami",
+      "state": "FL",
+      "venue": "Kaseya Center",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-15",
+      "city": "Raleigh",
+      "state": "NC",
+      "venue": "Lenovo Center",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-17",
+      "city": "Cleveland",
+      "state": "OH",
+      "venue": "Rocket Mortgage FieldHouse",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-18",
+      "city": "Pittsburgh",
+      "state": "PA",
+      "venue": "PPG Paints Arena",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-19",
+      "city": "Philadelphia",
+      "state": "PA",
+      "venue": "Wells Fargo Center",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-21",
+      "city": "Boston",
+      "state": "MA",
+      "venue": "TD Garden",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-22",
+      "city": "New York",
+      "state": "NY",
+      "venue": "Madison Square Garden",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-24",
+      "city": "Detroit",
+      "state": "MI",
+      "venue": "Little Caesars Arena",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-25",
+      "city": "Louisville",
+      "state": "KY",
+      "venue": "KFC Yum! Center",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-26",
+      "city": "Nashville",
+      "state": "TN",
+      "venue": "Bridgestone Arena",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-28",
+      "city": "Grand Rapids",
+      "state": "MI",
+      "venue": "Van Andel Arena",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-29",
+      "city": "Milwaukee",
+      "state": "WI",
+      "venue": "Fiserv Forum",
+      "country": "USA"
+    },
+    {
+      "date": "2025-07-30",
+      "city": "St. Louis",
+      "state": "MO",
+      "venue": "Enterprise Center",
+      "country": "USA"
+    },
+    {
+      "date": "2025-08-01",
+      "city": "Rosemont",
+      "state": "IL",
+      "venue": "Allstate Arena",
+      "country": "USA"
+    },
+    {
+      "date": "2025-08-02",
+      "city": "Saint Paul",
+      "state": "MN",
+      "venue": "Xcel Energy Center",
+      "country": "USA"
+    },
+    {
+      "date": "2025-08-03",
+      "city": "Omaha",
+      "state": "NE",
+      "venue": "CHI Health Center",
+      "country": "USA"
+    },
+    {
+      "date": "2025-08-05",
+      "city": "Kansas City",
+      "state": "MO",
+      "venue": "T-Mobile Center",
+      "country": "USA"
+    },
+    {
+      "date": "2025-08-07",
+      "city": "Denver",
+      "state": "CO",
+      "venue": "Ball Arena",
+      "country": "USA"
+    },
+    {
+      "date": "2025-08-09",
+      "city": "Las Vegas",
+      "state": "NV",
+      "venue": "MGM Grand Garden Arena",
+      "country": "USA"
+    }
+  ],
+  "meta": {
+    "totalShows": 22,
+    "firstShow": "2025-07-09",
+    "lastShow": "2025-08-09"
+  }
+}
