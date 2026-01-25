@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { classifyDocument } from '@/lib/ai/document-classifier';
-import pdfParse from 'pdf-parse';
 
 /**
  * POST /api/detect-doc-type
@@ -24,7 +23,8 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Detect Doc Type] Parsing ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
 
-    // Extract text from PDF using pdf-parse
+    // Extract text from PDF using pdf-parse (CommonJS module)
+    const pdfParse = require('pdf-parse');
     const pdfData = await pdfParse(buffer);
     const pageText = pdfData.text;
 
