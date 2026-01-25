@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --g-bg: #0b0b0c;
-  --g-surface: #121214;
-  --g-surface-2: #18181b;
-  --g-text: #ffffff;
-  --g-text-dim: rgba(255, 255, 255, 0.72);
-  --g-text-muted: rgba(255, 255, 255, 0.58);
-  --g-border: rgba(255, 255, 255, 0.12);
+  --g-bg: #f5f6fb;
+  --g-surface: #ffffff;
+  --g-surface-2: #edf0f7;
+  --g-text: #0f172a;
+  --g-text-dim: rgba(15, 23, 42, 0.72);
+  --g-text-muted: rgba(15, 23, 42, 0.58);
+  --g-border: rgba(15, 23, 42, 0.12);
   --g-accent: #e10614;
   --g-accent-2: #ff2a2a;
   --g-focus: rgba(225, 6, 20, 0.35);
@@ -72,7 +72,7 @@ a {
   background: var(--g-surface);
   border: 1px solid var(--g-border);
   border-radius: var(--g-radius-2);
-  box-shadow: var(--g-shadow-1);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
 }
 
 .g-card-muted {
@@ -156,8 +156,8 @@ a {
 
 .g-input {
   border-radius: var(--g-radius-1);
-  border: 1px solid var(--g-border);
-  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  background: #ffffff;
   color: var(--g-text);
   padding: 0.45rem 0.6rem;
   width: 100%;

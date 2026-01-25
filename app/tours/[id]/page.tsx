@@ -4,6 +4,7 @@ import { createServiceClient } from '@/lib/supabase/client';
 import { PurchaseOrdersPanel } from '@/components/tours/PurchaseOrdersPanel';
 import { StockMovementPanel } from '@/components/tours/StockMovementPanel';
 import { NeedsReviewPanel } from '@/components/tours/NeedsReviewPanel';
+import ProductGrid, { ProductCardData } from '@/components/tours/ProductGrid';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -192,6 +193,30 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         retailByProduct.set(row.product_id, Number(row.suggested_retail));
       }
     }
+  });
+
+  const inventoryMap = new Map<string, number>();
+  (inventory ?? []).forEach((row) => {
+    const key = `${row.product_id}:${row.size ?? ''}`;
+    inventoryMap.set(key, Number(row.balance ?? 0));
+  });
+
+  const productCards: ProductCardData[] = (cogs ?? []).map((row) => {
+    const key = `${row.product_id}:${row.size ?? ''}`;
+    const balance = inventoryMap.get(key) ?? 0;
+    const unitValue = row.full_package_cost ? Number(row.full_package_cost) : null;
+    return {
+      product_id: row.product_id,
+      sku: row.sku,
+      description: row.description,
+      size: row.size,
+      total_sold: Number(row.total_sold ?? 0),
+      total_gross: Number(row.total_gross ?? 0),
+      gross_margin: row.gross_margin ?? null,
+      full_package_cost: row.full_package_cost ?? null,
+      balance,
+      unit_value: unitValue
+    };
   });
 
   const { data: purchaseOrders } = await supabase
@@ -402,6 +427,8 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
           </table>
         </div>
       </section>
+
+      <ProductGrid tourId={tour.id} products={productCards} />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-10">
         <section className="g-card p-6">
