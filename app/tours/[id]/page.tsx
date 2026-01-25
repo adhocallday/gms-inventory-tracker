@@ -5,6 +5,7 @@ import { PurchaseOrdersPanel } from '@/components/tours/PurchaseOrdersPanel';
 import { StockMovementPanel } from '@/components/tours/StockMovementPanel';
 import { NeedsReviewPanel } from '@/components/tours/NeedsReviewPanel';
 import ProductGrid, { ProductCardData } from '@/components/tours/ProductGrid';
+import ShowsTable, { ShowSummaryRow } from '@/components/tours/ShowsTable';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -33,18 +34,6 @@ type ProductRow = {
   id: string;
   sku: string;
   description: string;
-};
-
-type ShowSummaryRow = {
-  show_id: string;
-  show_date: string | null;
-  venue_name: string | null;
-  city: string | null;
-  state: string | null;
-  total_gross: number | null;
-  attendance: number | null;
-  per_head: number | null;
-  total_comps: number | null;
 };
 
 type ProductSummaryRow = {
@@ -366,67 +355,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         </div>
       </div>
 
-      <section className="g-card p-6 mt-10">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold g-title">Shows</h2>
-          <Link
-            href={`/upload?docType=sales-report&tourId=${tour.id}`}
-            className="text-sm font-medium g-link"
-          >
-            Upload document
-          </Link>
-        </div>
-        <div className="overflow-x-auto mt-4">
-          <table className="min-w-full text-sm g-table">
-            <thead className="text-left border-b border-white/10">
-              <tr>
-                <th className="py-2 pr-4">Date</th>
-                <th className="py-2 pr-4">Venue</th>
-                <th className="py-2 pr-4">City</th>
-                <th className="py-2 pr-4 text-right">Gross</th>
-                <th className="py-2 pr-4 text-right">Per-head</th>
-                <th className="py-2 pr-4 text-right">Comps</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(showSummary ?? []).length === 0 ? (
-                <tr>
-                  <td className="py-3" colSpan={6}>
-                    No shows logged yet.
-                  </td>
-                </tr>
-              ) : (
-                (showSummary as ShowSummaryRow[]).map((show) => (
-                  <tr key={show.show_id} className="border-b border-white/10">
-                    <td className="py-3 pr-4">
-                      <Link
-                        className="g-link"
-                        href={`/tours/${tour.id}/shows/${show.show_id}`}
-                      >
-                        {formatDate(show.show_date)}
-                      </Link>
-                    </td>
-                    <td className="py-3 pr-4">{show.venue_name ?? 'TBD'}</td>
-                    <td className="py-3 pr-4">
-                      {show.city ?? '—'}
-                      {show.state ? `, ${show.state}` : ''}
-                    </td>
-                    <td className="py-3 pr-4 text-right">
-                      {currencyFormatter.format(Number(show.total_gross ?? 0))}
-                    </td>
-                    <td className="py-3 pr-4 text-right">
-                      {currencyFormatter.format(Number(show.per_head ?? 0))}
-                    </td>
-                    <td className="py-3 pr-4 text-right">
-                      {formatNumber(Number(show.total_comps ?? 0))}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
+      <ShowsTable tourId={tour.id} shows={showSummary as ShowSummaryRow[]} />
 
       <ProductGrid tourId={tour.id} products={productCards} />
 

@@ -24,15 +24,24 @@ export default function RootLayout({
                     Global Merch Services
                   </h1>
                 </div>
-                <div className="flex items-center space-x-4 text-sm">
-                  <Link href="/" className="g-link">
-                    Dashboard
+                <div className="flex items-center space-x-1 text-sm">
+                  <Link
+                    href="/"
+                    className="px-4 py-2 rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition"
+                  >
+                    Tours
                   </Link>
-                  <Link href="/dashboard/parsed-documents" className="g-link">
-                    Parsed Documents
+                  <Link
+                    href="/dashboard/parsed-documents"
+                    className="px-4 py-2 rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition"
+                  >
+                    Documents
                   </Link>
-                  <Link href="/upload" className="g-link">
-                    Upload document
+                  <Link
+                    href="/upload"
+                    className="ml-2 px-4 py-2 rounded-lg bg-[var(--g-accent)] text-white hover:bg-[var(--g-accent-2)] transition font-medium"
+                  >
+                    Upload
                   </Link>
                 </div>
               </div>
