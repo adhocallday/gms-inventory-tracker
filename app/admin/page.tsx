@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { StatCard } from '@/components/dashboard/StatCard';
 import { Music, Sparkles, Mic, Package } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -40,29 +41,25 @@ export default async function AdminDashboard() {
       label: 'Total Tours',
       value: totalTours || 0,
       icon: Music,
-      color: 'from-purple-500/20 to-pink-500/20',
-      textColor: 'text-purple-400'
+      color: 'purple' as const
     },
     {
       label: 'Active Tours',
       value: activeTours || 0,
       icon: Sparkles,
-      color: 'from-green-500/20 to-emerald-500/20',
-      textColor: 'text-green-400'
+      color: 'green' as const
     },
     {
       label: 'Total Shows',
       value: totalShows || 0,
       icon: Mic,
-      color: 'from-blue-500/20 to-cyan-500/20',
-      textColor: 'text-blue-400'
+      color: 'blue' as const
     },
     {
       label: 'Total Products',
       value: totalProducts || 0,
       icon: Package,
-      color: 'from-orange-500/20 to-red-500/20',
-      textColor: 'text-orange-400'
+      color: 'orange' as const
     }
   ];
 
@@ -112,25 +109,15 @@ export default async function AdminDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={index}
-              className={`relative overflow-hidden rounded-xl border border-white/10 p-6 bg-gradient-to-br ${stat.color}`}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <Icon className={`w-10 h-10 ${stat.textColor}`} />
-                <div className={`text-3xl font-bold ${stat.textColor}`}>
-                  {stat.value}
-                </div>
-              </div>
-              <div className="text-sm font-medium text-[var(--g-text)]">
-                {stat.label}
-              </div>
-            </div>
-          );
-        })}
+        {stats.map((stat, index) => (
+          <StatCard
+            key={index}
+            label={stat.label}
+            value={stat.value}
+            icon={stat.icon}
+            color={stat.color}
+          />
+        ))}
       </div>
 
       {/* Quick Actions */}
