@@ -26,7 +26,7 @@ export default async function DashboardPage() {
 
   const tourList = (tours ?? []) as TourRow[];
 
-  const { data: shows } = await supabase.from('shows').select('id, tour_id');
+  const { data: shows } = await supabase.from('shows').select('id, tour_id, show_date');
   const { data: tourProducts } = await supabase
     .from('tour_products')
     .select('id, tour_id');
@@ -35,8 +35,16 @@ export default async function DashboardPage() {
     .select('tour_id, total_gross');
 
   const showsByTour = new Map<string, number>();
+  const completedShowsByTour = new Map<string, number>();
+  const today = new Date();
+
   for (const show of shows ?? []) {
     showsByTour.set(show.tour_id, (showsByTour.get(show.tour_id) ?? 0) + 1);
+
+    // Check if show is in the past
+    if (show.show_date && new Date(show.show_date) < today) {
+      completedShowsByTour.set(show.tour_id, (completedShowsByTour.get(show.tour_id) ?? 0) + 1);
+    }
   }
 
   const productsByTour = new Map<string, number>();
@@ -59,6 +67,7 @@ export default async function DashboardPage() {
   const toursWithStats: TourWithStats[] = tourList.map((tour) => ({
     ...tour,
     showCount: showsByTour.get(tour.id) ?? 0,
+    completedShowCount: completedShowsByTour.get(tour.id) ?? 0,
     productCount: productsByTour.get(tour.id) ?? 0,
     gross: grossByTour.get(tour.id) ?? 0,
   }));

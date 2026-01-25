@@ -6,6 +6,7 @@ import { Music } from 'lucide-react';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { Badge } from '@/components/ui/Badge';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { Progress } from '@/components/ui/Progress';
 import { useFuzzySearch } from '@/hooks/useFuzzySearch';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
@@ -38,6 +39,7 @@ export interface TourWithStats {
   end_date: string | null;
   status: string;
   showCount: number;
+  completedShowCount: number;
   productCount: number;
   gross: number;
 }
@@ -169,6 +171,26 @@ export function ToursGrid({ tours }: ToursGridProps) {
               <p className="text-sm text-[var(--g-text-dim)] mt-3">
                 {formatDateRange(tour.start_date, tour.end_date)}
               </p>
+
+              {/* Progress Indicator */}
+              {tour.showCount > 0 && (
+                <div className="mt-3">
+                  <Progress
+                    value={(tour.completedShowCount / tour.showCount) * 100}
+                    variant={
+                      tour.status === 'completed' ? 'success' :
+                      tour.status === 'active' ? 'default' :
+                      'info'
+                    }
+                    size="sm"
+                    label="Tour Progress"
+                    showValue={false}
+                  />
+                  <p className="text-xs text-[var(--g-text-muted)] mt-1">
+                    {tour.completedShowCount} of {tour.showCount} shows completed
+                  </p>
+                </div>
+              )}
 
               <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
                 <div>
