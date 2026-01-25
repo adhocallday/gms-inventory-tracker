@@ -262,7 +262,25 @@ async function buildValidation(
     const skus = (normalized?.line_items ?? []).map((item: any) => item?.sku);
     const missingSkus = await findMissingSkus(supabase, skus);
     if (missingSkus.length) {
-      warnings.push(`Unknown SKUs: ${missingSkus.join(', ')}`);
+      // Group by base SKU for clearer presentation
+      const missingByBase = new Map<string, string[]>();
+      missingSkus.forEach(sku => {
+        const base = extractBaseSku(sku);
+        if (!missingByBase.has(base)) {
+          missingByBase.set(base, []);
+        }
+        missingByBase.get(base)!.push(sku);
+      });
+
+      const baseCount = missingByBase.size;
+      const totalCount = missingSkus.length;
+      const baseList = Array.from(missingByBase.keys()).slice(0, 10).join(', ');
+      const more = baseCount > 10 ? ` and ${baseCount - 10} more` : '';
+
+      warnings.push(
+        `${baseCount} unknown product${baseCount > 1 ? 's' : ''} (${totalCount} SKU variants): ${baseList}${more}. ` +
+        `These products need to be added to your catalog before posting.`
+      );
     }
   }
 
@@ -270,7 +288,24 @@ async function buildValidation(
     const skus = (normalized?.comps ?? []).map((item: any) => item?.sku);
     const missingSkus = await findMissingSkus(supabase, skus);
     if (missingSkus.length) {
-      warnings.push(`Unknown comp SKUs: ${missingSkus.join(', ')}`);
+      const missingByBase = new Map<string, string[]>();
+      missingSkus.forEach(sku => {
+        const base = extractBaseSku(sku);
+        if (!missingByBase.has(base)) {
+          missingByBase.set(base, []);
+        }
+        missingByBase.get(base)!.push(sku);
+      });
+
+      const baseCount = missingByBase.size;
+      const totalCount = missingSkus.length;
+      const baseList = Array.from(missingByBase.keys()).slice(0, 10).join(', ');
+      const more = baseCount > 10 ? ` and ${baseCount - 10} more` : '';
+
+      warnings.push(
+        `${baseCount} unknown comp product${baseCount > 1 ? 's' : ''} (${totalCount} SKU variants): ${baseList}${more}. ` +
+        `These products need to be added to your catalog before posting.`
+      );
     }
   }
 
