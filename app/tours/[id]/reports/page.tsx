@@ -33,7 +33,7 @@ export default async function TourReportsPage({ params }: TourReportsPageProps) 
   // Fetch existing reports
   const { data: reports } = await supabase
     .from('tour_reports_summary')
-    .select('*')
+    .select('*, section_count')
     .eq('tour_id', tourId)
     .order('created_at', { ascending: false });
 
