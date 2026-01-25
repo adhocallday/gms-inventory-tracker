@@ -83,17 +83,8 @@ export default async function DashboardPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link
-            href="/upload/po"
-            className="g-button"
-          >
-            Upload Purchase Order
-          </Link>
-          <Link
-            href="/upload/packing-list"
-            className="g-button g-button-outline"
-          >
-            Upload Packing List
+          <Link href="/upload" className="g-button">
+            Upload document
           </Link>
         </div>
       </div>
@@ -126,10 +117,10 @@ export default async function DashboardPage() {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold g-title">Available Tours</h2>
           <Link
-            href="/upload/sales-report"
+            href="/upload"
             className="text-sm font-medium g-link"
           >
-            Upload Sales Report
+            Upload document
           </Link>
         </div>
 

@@ -76,7 +76,7 @@ export function NeedsReviewPanel({ documents }: { documents: ParsedDocumentRow[]
             Drafts and documents with parsing errors.
           </p>
         </div>
-        <Link href="/upload/po" className="text-sm font-medium g-link">
+        <Link href="/upload" className="text-sm font-medium g-link">
           Add document
         </Link>
       </div>

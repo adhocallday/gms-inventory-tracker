@@ -339,8 +339,11 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       <section className="g-card p-6 mt-10">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold g-title">Shows</h2>
-          <Link href="/upload/sales-report" className="text-sm font-medium g-link">
-            Add show sales
+          <Link
+            href={`/upload?docType=sales-report&tourId=${tour.id}`}
+            className="text-sm font-medium g-link"
+          >
+            Upload document
           </Link>
         </div>
         <div className="overflow-x-auto mt-4">
@@ -400,10 +403,10 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold g-title">Top sellers</h2>
             <Link
-              href="/upload/sales-report"
+              href={`/upload?docType=sales-report&tourId=${tour.id}`}
               className="text-sm font-medium g-link"
             >
-              Add sales
+              Upload document
             </Link>
           </div>
           <div className="mt-4 space-y-4">
@@ -539,12 +542,12 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       <section className="g-card p-6 mt-10">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold g-title">COGS report</h2>
-          <Link
-            href="/upload/po"
-            className="text-sm font-medium g-link"
-          >
-            Upload PO
-          </Link>
+            <Link
+              href={`/upload?docType=po&tourId=${tour.id}`}
+              className="text-sm font-medium g-link"
+            >
+              Upload document
+            </Link>
         </div>
         <div className="overflow-x-auto mt-4">
           <table className="min-w-full text-sm g-table">
@@ -607,10 +610,10 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold g-title">Inventory balances</h2>
           <Link
-            href="/upload/packing-list"
+            href={`/upload?docType=packing-list&tourId=${tour.id}`}
             className="text-sm font-medium g-link"
           >
-            Upload packing list
+            Upload document
           </Link>
         </div>
         <div className="overflow-x-auto mt-4">

@@ -1,13 +1,6 @@
 import { redirect } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 
-const docTypeToRoute: Record<string, string> = {
-  po: '/upload/po',
-  'packing-list': '/upload/packing-list',
-  'sales-report': '/upload/sales-report',
-  settlement: '/upload/settlement'
-};
-
 export default async function ReviewDocumentPage({
   params
 }: {
@@ -15,7 +8,7 @@ export default async function ReviewDocumentPage({
 }) {
   const { data: doc } = await supabase
     .from('parsed_documents')
-    .select('id, doc_type')
+    .select('id')
     .eq('id', params.docId)
     .maybeSingle();
 
@@ -23,6 +16,5 @@ export default async function ReviewDocumentPage({
     redirect('/');
   }
 
-  const target = docTypeToRoute[doc.doc_type] ?? '/';
-  redirect(`${target}?docId=${doc.id}`);
+  redirect(`/upload?docId=${doc.id}`);
 }

@@ -114,7 +114,7 @@ gms-inventory-tracker/
 
 ## 🧪 Testing the AI Parsers
 
-1. Go to [http://localhost:3000/upload/po](http://localhost:3000/upload/po)
+1. Go to [http://localhost:3000/upload](http://localhost:3000/upload)
 2. Drag and drop a PO PDF
 3. Watch it upload and parse!
 4. See the extracted JSON data
