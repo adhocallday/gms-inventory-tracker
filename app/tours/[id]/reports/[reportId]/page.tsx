@@ -52,6 +52,13 @@ export default async function ReportViewPage({ params }: ReportViewPageProps) {
     .eq('tour_id', tourId)
     .eq('is_primary', true);
 
+  // Debug: Log image data
+  console.log(`[Report Page] Fetched ${productImages?.length || 0} product images`);
+  if (productImages && productImages.length > 0) {
+    const firstImage = productImages[0];
+    console.log(`[Report Page] Sample image - SKU: ${firstImage.sku}, has file_url: ${!!firstImage.file_url}, URL length: ${firstImage.file_url?.length || 0}`);
+  }
+
   // Fetch product categories
   const { data: categories } = await supabase
     .from('product_categories')

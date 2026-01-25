@@ -13,6 +13,23 @@ export function ProductBreakdownSection({
   productImages,
   categories
 }: ProductBreakdownSectionProps) {
+  // Debug: Log image data received
+  console.log(`[ProductBreakdown] Received ${productImages?.length || 0} product images`);
+  if (productImages && productImages.length > 0) {
+    console.log(`[ProductBreakdown] First image:`, {
+      product_id: productImages[0].product_id,
+      sku: productImages[0].sku,
+      has_file_url: !!productImages[0].file_url,
+      url_length: productImages[0].file_url?.length || 0
+    });
+  }
+  if (products && products.length > 0) {
+    console.log(`[ProductBreakdown] First product:`, {
+      product_id: products[0].product_id,
+      sku: products[0].sku
+    });
+  }
+
   // Group products by category
   const productsByCategory = categories.map(category => {
     const categoryProducts = products.filter(p => p.category_id === category.id);
