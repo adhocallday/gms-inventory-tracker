@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { LucideIcon, AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -12,6 +13,10 @@ interface InsightCardProps {
     label: string;
     onClick: () => void;
   };
+  /** Link text for navigation (alternative to action) */
+  linkText?: string;
+  /** Link href for navigation (alternative to action) */
+  linkHref?: string;
   className?: string;
 }
 
@@ -52,6 +57,8 @@ export function InsightCard({
   type = 'info',
   icon: CustomIcon,
   action,
+  linkText,
+  linkHref,
   className,
 }: InsightCardProps) {
   const config = typeConfig[type];
@@ -85,6 +92,17 @@ export function InsightCard({
             >
               {action.label} →
             </button>
+          )}
+          {linkText && linkHref && (
+            <Link
+              href={linkHref}
+              className={cn(
+                'mt-2 inline-block text-xs font-semibold underline-offset-2 hover:underline',
+                config.textColor
+              )}
+            >
+              {linkText} →
+            </Link>
           )}
         </div>
       </div>
