@@ -132,6 +132,49 @@ export default function AdminProductsPage() {
     }
   };
 
+  // Handle batch submission from AI upload
+  const handleBatchSubmit = async (products: ProductFormData[]) => {
+    setIsSubmitting(true);
+    const errors: string[] = [];
+    let successCount = 0;
+
+    try {
+      for (const product of products) {
+        try {
+          const res = await fetch('/api/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product),
+          });
+
+          if (!res.ok) {
+            const error = await res.json();
+            errors.push(`${product.sku}: ${error.error || 'Failed to create'}`);
+          } else {
+            successCount++;
+          }
+        } catch (err: any) {
+          errors.push(`${product.sku}: ${err.message || 'Failed to create'}`);
+        }
+      }
+
+      if (errors.length > 0) {
+        if (successCount > 0) {
+          alert(`Added ${successCount} products. ${errors.length} failed:\n${errors.join('\n')}`);
+        } else {
+          throw new Error(`Failed to add products:\n${errors.join('\n')}`);
+        }
+      }
+
+      setShowForm(false);
+      fetchProducts();
+    } catch (err: any) {
+      throw err;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // Handle delete
   const handleDelete = async (product: ProductRow) => {
     if (!confirm(`Are you sure you want to delete "${product.sku}"?`)) {
@@ -264,6 +307,7 @@ export default function AdminProductsPage() {
               : undefined
           }
           onSubmit={handleFormSubmit}
+          onBatchSubmit={handleBatchSubmit}
           onCancel={() => {
             setShowForm(false);
             setEditingProduct(null);

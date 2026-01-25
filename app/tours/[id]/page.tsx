@@ -357,6 +357,12 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
           💰 COGS
         </Link>
         <Link
+          href={`/admin/tours/${tour.id}/products`}
+          className="px-4 py-2 text-sm font-medium text-[var(--g-text-dim)] hover:text-[var(--g-text)] hover:border-b-2 hover:border-[var(--g-accent)] transition"
+        >
+          🏷️ Product Costs
+        </Link>
+        <Link
           href={`/tours/${tour.id}/settings/warehouses`}
           className="px-4 py-2 text-sm font-medium text-[var(--g-text-dim)] hover:text-[var(--g-text)] hover:border-b-2 hover:border-[var(--g-accent)] transition"
         >
