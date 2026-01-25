@@ -25,6 +25,7 @@ interface Product {
   basePrice: number;
   sizes: string[];
   imageUrl?: string;
+  imageDataUrl?: string; // Base64 data URL from PDF extraction
 }
 
 interface InventoryItem {
@@ -155,6 +156,39 @@ export async function POST(request: NextRequest) {
         }
       } else {
         console.log(`[Create Tour] Created ${createdProducts?.length || 0} products`);
+
+        // Step 3.5: Save product images if they exist
+        const productsWithImages = products.filter(p => p.imageDataUrl);
+        if (productsWithImages.length > 0 && createdProducts) {
+          console.log(`[Create Tour] Saving ${productsWithImages.length} product images...`);
+
+          for (const product of productsWithImages) {
+            // Find the created product by SKU
+            const createdProduct = createdProducts.find(cp => cp.sku === product.sku);
+            if (!createdProduct || !product.imageDataUrl) continue;
+
+            try {
+              const { error: imageError } = await supabase
+                .from('product_images')
+                .insert({
+                  product_id: createdProduct.id,
+                  tour_id: tourId,
+                  image_type: 'grab_sheet',
+                  file_url: product.imageDataUrl, // Store base64 data URL
+                  is_primary: true,
+                  display_order: 0
+                });
+
+              if (imageError) {
+                console.error(`[Create Tour] Failed to save image for ${product.sku}:`, imageError);
+              }
+            } catch (imageError) {
+              console.error(`[Create Tour] Error saving image for ${product.sku}:`, imageError);
+            }
+          }
+
+          console.log('[Create Tour] Finished saving product images');
+        }
       }
     }
 

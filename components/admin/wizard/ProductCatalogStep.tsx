@@ -15,6 +15,7 @@ interface Product {
   basePrice: number;
   sizes: string[];
   imageUrl?: string;
+  imageDataUrl?: string; // Base64 data URL for product image from PDF
 }
 
 interface ProductCatalogStepProps {

@@ -45,10 +45,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
     setPendingShows(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    e.stopPropagation(); // Prevent event from bubbling to parent form
-
+  const handleParseClick = async () => {
     if (!input.trim()) {
       setError('Please enter some tour dates');
       return;
@@ -106,7 +103,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
 
       {!pendingShows ? (
         <>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-4">
             <div>
               <textarea
                 value={input}
@@ -124,7 +121,8 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
             )}
 
             <button
-              type="submit"
+              type="button"
+              onClick={handleParseClick}
               disabled={processing || !input.trim()}
               className="w-full px-4 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -137,7 +135,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
                 'Parse Schedule'
               )}
             </button>
-          </form>
+          </div>
 
           <div className="mt-4 pt-4 border-t border-white/10">
             <p className="text-xs text-[var(--g-text-muted)]">

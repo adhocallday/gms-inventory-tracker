@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parseDocument } from '@/lib/ai/claude-client';
+import { createServiceClient } from '@/lib/supabase/client';
+import * as pdfjsLib from 'pdfjs-dist';
+import { createCanvas } from 'canvas';
+
+// Configure pdf.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 interface Product {
   sku: string;
@@ -8,6 +14,50 @@ interface Product {
   basePrice: number;
   sizes: string[];
   imageUrl?: string;
+}
+
+interface ProductWithImage extends Product {
+  imageDataUrl?: string;
+}
+
+/**
+ * Extract images from PDF pages
+ */
+async function extractProductImagesFromPDF(buffer: Buffer): Promise<string[]> {
+  try {
+    const pdfData = new Uint8Array(buffer);
+    const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+    const images: string[] = [];
+
+    // Extract first 50 pages (or all pages if less than 50)
+    const numPages = Math.min(pdf.numPages, 50);
+
+    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+      try {
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 1.5 });
+
+        const canvas = createCanvas(viewport.width, viewport.height);
+        const context = canvas.getContext('2d');
+
+        await page.render({
+          canvasContext: context as any,
+          viewport: viewport
+        }).promise;
+
+        // Convert canvas to data URL
+        const dataUrl = canvas.toDataURL('image/png');
+        images.push(dataUrl);
+      } catch (pageError) {
+        console.warn(`[Extract Images] Failed to render page ${pageNum}:`, pageError);
+      }
+    }
+
+    return images;
+  } catch (error) {
+    console.error('[Extract Images] Error:', error);
+    return [];
+  }
 }
 
 /**
@@ -123,11 +173,27 @@ If no products are found, return: {"products": []}`;
 
     console.log(`[Parse Products] Returning ${newProducts.length} new products (${validProducts.length - newProducts.length} duplicates filtered)`);
 
+    // Extract product images from PDF if it's a PDF file
+    let productImages: string[] = [];
+    if (mediaType === 'application/pdf' && buffer) {
+      console.log('[Parse Products] Extracting images from PDF...');
+      productImages = await extractProductImagesFromPDF(buffer);
+      console.log(`[Parse Products] Extracted ${productImages.length} page images`);
+    }
+
+    // Return products with images for client-side storage
+    const productsWithImages = newProducts.map((product, index) => ({
+      ...product,
+      // Assign first N images to first N products (client can match better)
+      imageDataUrl: productImages[index] || null
+    }));
+
     return NextResponse.json({
-      products: newProducts,
+      products: productsWithImages,
       totalExtracted: parsedResponse.products.length,
       validProducts: validProducts.length,
-      duplicatesFiltered: validProducts.length - newProducts.length
+      duplicatesFiltered: validProducts.length - newProducts.length,
+      imagesExtracted: productImages.length
     });
   } catch (error: any) {
     console.error('[Parse Products] Error:', error);
