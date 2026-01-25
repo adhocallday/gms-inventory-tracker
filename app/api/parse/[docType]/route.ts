@@ -186,6 +186,11 @@ async function inferTourAndShow(
   return reasoning.filter(Boolean);
 }
 
+function extractBaseSku(sku: string): string {
+  // Remove size suffixes like _SM, _MD, _LG, _XL, _2XL, _3XL, _2X, _3X
+  return sku.replace(/_(SM|MD|LG|XL|2XL|3XL|2X|3X)$/i, '');
+}
+
 async function findMissingSkus(
   supabase: ReturnType<typeof createServiceClient>,
   skus: string[]
@@ -194,14 +199,21 @@ async function findMissingSkus(
   const uniqueSkus = Array.from(new Set(skus.filter(Boolean)));
   if (uniqueSkus.length === 0) return [];
 
+  // Extract base SKUs (without size suffixes) for product lookup
+  const baseSkus = uniqueSkus.map(extractBaseSku);
+  const uniqueBaseSkus = Array.from(new Set(baseSkus));
+
   const { data, error } = await supabase
     .from('products')
     .select('sku')
-    .in('sku', uniqueSkus);
+    .in('sku', uniqueBaseSkus);
 
   if (error) return uniqueSkus;
-  const known = new Set((data ?? []).map((row) => row.sku));
-  return uniqueSkus.filter((sku) => !known.has(sku));
+
+  const knownBaseSkus = new Set((data ?? []).map((row) => row.sku));
+
+  // Return full SKUs (with size) whose base SKU is not found
+  return uniqueSkus.filter((sku) => !knownBaseSkus.has(extractBaseSku(sku)));
 }
 
 async function buildValidation(
