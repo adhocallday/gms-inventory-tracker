@@ -3,6 +3,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { FileText } from 'lucide-react';
 
 interface Tour {
   id: string;
@@ -37,14 +44,6 @@ const DOC_TYPE_LABELS: Record<string, string> = {
   'packing-list': 'Packing List',
   'sales-report': 'Sales Report',
   settlement: 'Settlement',
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  draft: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
-  approved: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-  posted: 'bg-green-500/20 text-green-300 border-green-500/30',
-  rejected: 'bg-red-500/20 text-red-300 border-red-500/30',
-  error: 'bg-red-500/20 text-red-300 border-red-500/30',
 };
 
 export default function ParsedDocumentsPage() {
@@ -138,20 +137,19 @@ export default function ParsedDocumentsPage() {
     });
   };
 
+  const breadcrumbs = generateBreadcrumbs([
+    { label: 'Dashboard', href: '/' },
+    { label: 'Parsed Documents' },
+  ]);
+
   return (
     <div className="g-container py-12">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-semibold g-title">Parsed Documents</h1>
-          <p className="text-sm text-[var(--g-text-muted)] mt-2">
-            Review and manage AI-parsed documents before posting
-          </p>
-        </div>
-        <div className="text-sm text-[var(--g-text-dim)]">
-          {count} {count === 1 ? 'document' : 'documents'}
-        </div>
-      </div>
+      <PageHeader
+        title="Parsed Documents"
+        subtitle={`Review and manage AI-parsed documents before posting • ${count} ${count === 1 ? 'document' : 'documents'}`}
+        kicker="Document Review"
+        breadcrumbs={breadcrumbs}
+      />
 
       {/* Filters */}
       <div className="g-card p-6 mb-6">
@@ -234,16 +232,20 @@ export default function ParsedDocumentsPage() {
 
       {/* Document List */}
       {loading ? (
-        <div className="text-center py-12 text-[var(--g-text-dim)]">
-          Loading documents...
+        <div className="space-y-3">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="g-card p-6">
+              <Skeleton className="h-4 w-1/3 mb-2" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+          ))}
         </div>
       ) : documents.length === 0 ? (
-        <div className="g-card p-12 text-center">
-          <p className="text-[var(--g-text-muted)]">No documents found</p>
-          <p className="text-sm text-[var(--g-text-muted)] mt-2">
-            Upload a PDF to get started
-          </p>
-        </div>
+        <EmptyState
+          icon={<FileText className="w-12 h-12 text-[var(--g-text-muted)]" />}
+          title="No documents found"
+          description="Upload a PDF to get started"
+        />
       ) : (
         <div className="space-y-3">
           {documents.map((doc) => (
@@ -259,13 +261,7 @@ export default function ParsedDocumentsPage() {
                     <span className="g-kicker text-xs">
                       {DOC_TYPE_LABELS[doc.doc_type] || doc.doc_type}
                     </span>
-                    <span
-                      className={`g-kicker text-xs border ${
-                        STATUS_COLORS[doc.status] || ''
-                      }`}
-                    >
-                      {doc.status}
-                    </span>
+                    <Badge variant={doc.status}>{doc.status}</Badge>
                   </div>
                   <p className="text-sm font-semibold mb-1">
                     {doc.source_filename || 'Untitled Document'}
@@ -292,15 +288,15 @@ export default function ParsedDocumentsPage() {
                   <div className="text-xs text-[var(--g-text-muted)]">
                     {formatDate(doc.created_at)}
                   </div>
-                  <button
-                    className="g-button text-xs px-3 py-2"
+                  <Button
+                    size="sm"
                     onClick={(e) => {
                       e.stopPropagation();
                       router.push(`/dashboard/parsed-documents/${doc.id}`);
                     }}
                   >
                     Review
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -311,23 +307,23 @@ export default function ParsedDocumentsPage() {
       {/* Pagination */}
       {count > limit && (
         <div className="flex items-center justify-between mt-6 pt-6 border-t border-white/10">
-          <button
-            className="g-button g-button-outline text-sm"
+          <Button
+            variant="outline"
             onClick={handlePrevPage}
             disabled={offset === 0}
           >
             ← Previous
-          </button>
+          </Button>
           <span className="text-sm text-[var(--g-text-dim)]">
             Page {currentPage} of {totalPages}
           </span>
-          <button
-            className="g-button g-button-outline text-sm"
+          <Button
+            variant="outline"
             onClick={handleNextPage}
             disabled={offset + limit >= count}
           >
             Next →
-          </button>
+          </Button>
         </div>
       )}
     </div>

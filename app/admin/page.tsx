@@ -1,5 +1,10 @@
 import Link from 'next/link';
 import { createServiceClient } from '@/lib/supabase/client';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Music, Sparkles, Mic, Package } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,32 +30,37 @@ export default async function AdminDashboard() {
       .limit(5)
   ]);
 
+  const breadcrumbs = generateBreadcrumbs([
+    { label: 'Admin' },
+    { label: 'Dashboard' },
+  ]);
+
   const stats = [
     {
       label: 'Total Tours',
       value: totalTours || 0,
-      icon: '🎸',
+      icon: Music,
       color: 'from-purple-500/20 to-pink-500/20',
       textColor: 'text-purple-400'
     },
     {
       label: 'Active Tours',
       value: activeTours || 0,
-      icon: '✨',
+      icon: Sparkles,
       color: 'from-green-500/20 to-emerald-500/20',
       textColor: 'text-green-400'
     },
     {
       label: 'Total Shows',
       value: totalShows || 0,
-      icon: '🎤',
+      icon: Mic,
       color: 'from-blue-500/20 to-cyan-500/20',
       textColor: 'text-blue-400'
     },
     {
       label: 'Total Products',
       value: totalProducts || 0,
-      icon: '👕',
+      icon: Package,
       color: 'from-orange-500/20 to-red-500/20',
       textColor: 'text-orange-400'
     }
@@ -93,34 +103,34 @@ export default async function AdminDashboard() {
 
   return (
     <div className="g-container py-12">
-      <header className="mb-12">
-        <p className="text-xs uppercase tracking-[0.3em] text-[var(--g-text-muted)]">
-          Admin Portal
-        </p>
-        <h1 className="text-4xl font-bold g-title mt-2">Dashboard</h1>
-        <p className="text-sm text-[var(--g-text-dim)] mt-3 max-w-3xl">
-          Central hub for managing tours, shows, products, and inventory. Use AI-powered tools to streamline data entry and tour management.
-        </p>
-      </header>
+      <PageHeader
+        title="Dashboard"
+        subtitle="Central hub for managing tours, shows, products, and inventory. Use AI-powered tools to streamline data entry and tour management."
+        kicker="Admin Portal"
+        breadcrumbs={breadcrumbs}
+      />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        {stats.map((stat, index) => (
-          <div
-            key={index}
-            className={`relative overflow-hidden rounded-xl border border-white/10 p-6 bg-gradient-to-br ${stat.color}`}
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="text-4xl">{stat.icon}</div>
-              <div className={`text-3xl font-bold ${stat.textColor}`}>
-                {stat.value}
+        {stats.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <div
+              key={index}
+              className={`relative overflow-hidden rounded-xl border border-white/10 p-6 bg-gradient-to-br ${stat.color}`}
+            >
+              <div className="flex items-start justify-between mb-4">
+                <Icon className={`w-10 h-10 ${stat.textColor}`} />
+                <div className={`text-3xl font-bold ${stat.textColor}`}>
+                  {stat.value}
+                </div>
+              </div>
+              <div className="text-sm font-medium text-[var(--g-text)]">
+                {stat.label}
               </div>
             </div>
-            <div className="text-sm font-medium text-[var(--g-text)]">
-              {stat.label}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Quick Actions */}
@@ -174,13 +184,7 @@ export default async function AdminDashboard() {
                     <h3 className="text-sm font-semibold text-[var(--g-text)] group-hover:text-[var(--g-accent)] transition">
                       {tour.name}
                     </h3>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                      tour.status === 'active'
-                        ? 'bg-green-500/10 text-green-400'
-                        : 'bg-gray-500/10 text-gray-400'
-                    }`}>
-                      {tour.status}
-                    </span>
+                    <Badge variant={tour.status}>{tour.status}</Badge>
                   </div>
                   <div className="flex items-center gap-4 text-xs text-[var(--g-text-muted)]">
                     <span>🎸 {tour.artist}</span>
@@ -204,11 +208,8 @@ export default async function AdminDashboard() {
             <p className="text-[var(--g-text-dim)] mb-4">
               No tours yet. Create your first tour to get started.
             </p>
-            <Link
-              href="/admin/tours/new"
-              className="inline-flex px-6 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold"
-            >
-              + Create New Tour
+            <Link href="/admin/tours/new">
+              <Button>+ Create New Tour</Button>
             </Link>
           </div>
         )}

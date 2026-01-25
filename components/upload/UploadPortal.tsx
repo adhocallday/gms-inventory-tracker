@@ -5,6 +5,9 @@ import { useMemo, useState } from 'react';
 import { FileDropzone } from '@/components/upload/FileDropzone';
 import { useShows } from '@/hooks/useShows';
 import { useTours } from '@/hooks/useTours';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
+import { Button } from '@/components/ui/Button';
 
 type DocType = 'po' | 'packing-list' | 'sales-report' | 'settlement';
 
@@ -97,98 +100,87 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
     setValidation(validationPayload ?? null);
   };
 
+  const breadcrumbs = generateBreadcrumbs([
+    { label: 'Upload Document' },
+  ]);
+
   return (
     <div className="g-container py-12 space-y-10">
-      <header className="space-y-3">
-        <p className="text-xs uppercase tracking-[0.3em] text-[var(--g-text-muted)]">
-          Document center
-        </p>
-        <h1 className="text-3xl font-semibold g-title">Upload Document</h1>
-        <p className="text-sm text-[var(--g-text-dim)] max-w-3xl">
-          Drop a single PDF and the AI parser will identify if it is a Purchase Order,
-          Packing List, Sales Report, or Settlement. You can edit the prefills,
-          validate the content, and approve to post into the database without
-          ever storing the PDF.
-        </p>
+      <PageHeader
+        title="Upload Document"
+        subtitle="Drop a single PDF and the AI parser will identify if it is a Purchase Order, Packing List, Sales Report, or Settlement. You can edit the prefills, validate the content, and approve to post into the database without ever storing the PDF."
+        kicker="Document Center"
+        breadcrumbs={breadcrumbs}
+      />
 
-        {/* Auto-Detect Toggle */}
-        <div className="p-4 border border-white/10 rounded-lg bg-[var(--g-surface)]">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--g-text)]">
-                AI Auto-Detect
-              </h3>
-              <p className="text-xs text-[var(--g-text-muted)] mt-1">
-                Automatically detect document type from PDF content
+      {/* Auto-Detect Toggle */}
+      <div className="p-4 border border-white/10 rounded-lg bg-[var(--g-surface)]">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-[var(--g-text)]">
+              AI Auto-Detect
+            </h3>
+            <p className="text-xs text-[var(--g-text-muted)] mt-1">
+              Automatically detect document type from PDF content
+            </p>
+          </div>
+          <Button
+            onClick={() => {
+              setAutoDetectEnabled(!autoDetectEnabled);
+              setDetectedType(null);
+              setDetectedClassification(null);
+            }}
+            variant={autoDetectEnabled ? 'default' : 'outline'}
+          >
+            {autoDetectEnabled ? 'Enabled' : 'Disabled'}
+          </Button>
+        </div>
+      </div>
+
+      {/* Manual Type Selection (only when auto-detect is off) */}
+      {!autoDetectEnabled && (
+        <div>
+          <h3 className="text-xs uppercase tracking-[0.3em] text-[var(--g-text-muted)] mb-3">
+            Select Document Type
+          </h3>
+          <div className="flex flex-wrap gap-3">
+            {DOC_TYPES.map((entry) => (
+              <Button
+                key={entry.id}
+                onClick={() => {
+                  setDocType(entry.id);
+                  if (!requiresShow[entry.id]) {
+                    setShowId('');
+                  }
+                }}
+                variant={docType === entry.id ? 'default' : 'outline'}
+              >
+                {entry.label}
+              </Button>
+            ))}
+          </div>
+          {docInfo && (
+            <p className="text-xs text-[var(--g-text-muted)] mt-2">{docInfo.description}</p>
+          )}
+        </div>
+      )}
+
+      {/* Detected Type Badge (when auto-detect is on and type is detected) */}
+      {autoDetectEnabled && detectedType && detectedClassification && (
+        <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+          <div className="flex items-center gap-2">
+            <span className="text-green-400 text-sm">✓</span>
+            <div className="flex-1">
+              <p className="text-sm text-green-400 font-semibold">
+                Detected: {detectedClassification.typeName}
+              </p>
+              <p className="text-xs text-green-400/80 mt-0.5">
+                Confidence: {detectedClassification.confidence} · {detectedClassification.reasoning}
               </p>
             </div>
-            <button
-              onClick={() => {
-                setAutoDetectEnabled(!autoDetectEnabled);
-                setDetectedType(null);
-                setDetectedClassification(null);
-              }}
-              className={`px-4 py-2 rounded-lg transition font-semibold text-sm ${
-                autoDetectEnabled
-                  ? 'bg-[var(--g-accent)] text-white'
-                  : 'bg-white/10 text-[var(--g-text-dim)]'
-              }`}
-            >
-              {autoDetectEnabled ? 'Enabled' : 'Disabled'}
-            </button>
           </div>
         </div>
-
-        {/* Manual Type Selection (only when auto-detect is off) */}
-        {!autoDetectEnabled && (
-          <div>
-            <h3 className="text-xs uppercase tracking-[0.3em] text-[var(--g-text-muted)] mb-3">
-              Select Document Type
-            </h3>
-            <div className="flex flex-wrap gap-3">
-              {DOC_TYPES.map((entry) => (
-                <button
-                  key={entry.id}
-                  type="button"
-                  onClick={() => {
-                    setDocType(entry.id);
-                    if (!requiresShow[entry.id]) {
-                      setShowId('');
-                    }
-                  }}
-                  className={`px-4 py-2 rounded-full text-sm font-semibold border transition ${
-                    docType === entry.id
-                      ? 'border-[var(--g-accent)] bg-[rgba(225,6,20,0.12)] text-[var(--g-text)]'
-                      : 'border-white/10 text-[var(--g-text-dim)] hover:border-white/30'
-                  }`}
-                >
-                  {entry.label}
-                </button>
-              ))}
-            </div>
-            {docInfo && (
-              <p className="text-xs text-[var(--g-text-muted)] mt-2">{docInfo.description}</p>
-            )}
-          </div>
-        )}
-
-        {/* Detected Type Badge (when auto-detect is on and type is detected) */}
-        {autoDetectEnabled && detectedType && detectedClassification && (
-          <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-            <div className="flex items-center gap-2">
-              <span className="text-green-400 text-sm">✓</span>
-              <div className="flex-1">
-                <p className="text-sm text-green-400 font-semibold">
-                  Detected: {detectedClassification.typeName}
-                </p>
-                <p className="text-xs text-green-400/80 mt-0.5">
-                  Confidence: {detectedClassification.confidence} · {detectedClassification.reasoning}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
+      )}
 
       <div className="g-card p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

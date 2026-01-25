@@ -2,6 +2,8 @@ import { Suspense } from 'react';
 import { createServiceClient } from '@/lib/supabase/client';
 import { ReportBuilder } from '@/components/reports/ReportBuilder';
 import { ReportList } from '@/components/reports/ReportList';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,25 +51,23 @@ export default async function TourReportsPage({ params }: TourReportsPageProps) 
     .select('*', { count: 'exact', head: true })
     .eq('tour_id', tourId);
 
+  const breadcrumbs = generateBreadcrumbs([
+    { label: 'Tours', href: '/' },
+    { label: tour.name, href: `/tours/${tourId}` },
+    { label: 'Reports' },
+  ]);
+
   return (
-    <div className="g-container py-8">
-      <header className="mb-8">
-        <div className="flex items-center gap-3 mb-3">
-          <a
-            href={`/tours/${tourId}`}
-            className="text-sm text-[var(--g-text-muted)] hover:text-[var(--g-accent)] transition"
-          >
-            ← Back to Tour
-          </a>
-        </div>
-        <h1 className="text-3xl font-bold g-title mb-2">Tour Reports</h1>
-        <p className="text-[var(--g-text-muted)]">
-          {tour.name} • {showCount || 0} shows • {productCount || 0} products
-        </p>
-      </header>
+    <div className="g-container py-12">
+      <PageHeader
+        title="Tour Reports"
+        subtitle={`${tour.name} • ${showCount || 0} shows • ${productCount || 0} products`}
+        kicker="Reporting"
+        breadcrumbs={breadcrumbs}
+      />
 
       {/* Info Box */}
-      <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+      <div className="mb-8 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
         <h3 className="text-sm font-semibold text-blue-400 mb-2">💡 About Product Images</h3>
         <p className="text-xs text-blue-400/80 mb-2">
           Product images (grab sheets) will automatically appear in reports once uploaded. To add images:
@@ -83,7 +83,7 @@ export default async function TourReportsPage({ params }: TourReportsPageProps) 
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Report Builder */}
         <div className="lg:col-span-2">
           <Suspense fallback={<div className="g-card p-8">Loading...</div>}>
