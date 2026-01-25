@@ -395,8 +395,11 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
 
       <ProductGrid tourId={tour.id} products={productCards} />
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-10">
-        <TopSellersPanel tourId={tour.id} topSellers={cogsSorted} productMap={productMap} />
+      {/* Business Insights Section */}
+      <section className="mt-12">
+        <h2 className="text-xl font-semibold g-title mb-6">Business Insights</h2>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <TopSellersPanel tourId={tour.id} topSellers={cogsSorted} productMap={productMap} />
 
         <section className="g-card p-6">
           <div className="flex items-center justify-between">
@@ -485,53 +488,59 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
             )}
           </div>
         </section>
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-10">
-        <PurchaseOrdersPanel
-          purchaseOrders={(purchaseOrders ?? []) as PurchaseOrderRow[]}
-          openQuantities={(openQuantities ?? []) as OpenQtyRow[]}
-        />
-        <StockMovementPanel rows={(stockMovement ?? []) as StockMovementRow[]} />
-        <NeedsReviewPanel documents={(needsReview ?? []) as ParsedDocumentRow[]} />
-      </div>
-
-      <section className="mt-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold g-title">COGS Report</h2>
-          <Link href={`/upload?docType=po&tourId=${tour.id}`}>
-            <Button variant="outline" size="sm">
-              Upload document
-            </Button>
-          </Link>
         </div>
-        <CogsTable data={cogsSorted.slice(0, 20) as CogsRow[]} />
       </section>
 
+      {/* Detailed Data Section */}
       <section className="mt-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold g-title">Inventory Balances</h2>
-          <Link href={`/upload?docType=packing-list&tourId=${tour.id}`}>
-            <Button variant="outline" size="sm">
-              Upload document
-            </Button>
-          </Link>
+        <h2 className="text-xl font-semibold g-title mb-6">Detailed Data</h2>
+
+        <div className="g-card p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold g-title">COGS Report</h3>
+            <Link href={`/tours/${tour.id}/cogs`} className="text-sm font-medium g-link">
+              View full report →
+            </Link>
+          </div>
+          <CogsTable data={cogsSorted.slice(0, 10) as CogsRow[]} />
         </div>
-        <InventoryTable
-          data={inventorySorted.slice(0, 20).map((row) => {
-            const product = productMap.get(row.product_id);
-            const costKey = `${row.product_id}:${row.size ?? ''}`;
-            const unitCost = costByKey.get(costKey) ?? 0;
-            const inventoryValue = Number(row.balance ?? 0) * unitCost;
-            return {
-              ...row,
-              sku: product?.sku ?? 'SKU',
-              description: product?.description ?? 'Description pending',
-              unit_cost: unitCost,
-              inventory_value: inventoryValue,
-            };
-          })}
-        />
+
+        <div className="g-card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold g-title">Inventory Balances</h3>
+            <Link href={`/tours/${tour.id}/inventory`} className="text-sm font-medium g-link">
+              View full report →
+            </Link>
+          </div>
+          <InventoryTable
+            data={inventorySorted.slice(0, 10).map((row) => {
+              const product = productMap.get(row.product_id);
+              const costKey = `${row.product_id}:${row.size ?? ''}`;
+              const unitCost = costByKey.get(costKey) ?? 0;
+              const inventoryValue = Number(row.balance ?? 0) * unitCost;
+              return {
+                ...row,
+                sku: product?.sku ?? 'SKU',
+                description: product?.description ?? 'Description pending',
+                unit_cost: unitCost,
+                inventory_value: inventoryValue,
+              };
+            })}
+          />
+        </div>
+      </section>
+
+      {/* Operations Section */}
+      <section className="mt-12">
+        <h2 className="text-xl font-semibold g-title mb-6">Operations</h2>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <PurchaseOrdersPanel
+            purchaseOrders={(purchaseOrders ?? []) as PurchaseOrderRow[]}
+            openQuantities={(openQuantities ?? []) as OpenQtyRow[]}
+          />
+          <StockMovementPanel rows={(stockMovement ?? []) as StockMovementRow[]} />
+          <NeedsReviewPanel documents={(needsReview ?? []) as ParsedDocumentRow[]} />
+        </div>
       </section>
     </div>
   );
