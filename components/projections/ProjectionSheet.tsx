@@ -2,8 +2,16 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { LayoutGrid, Calendar, Copy } from 'lucide-react';
 import { EnhancedAIAgentPanel } from './AIAgentPanel';
 import { ProjectionVisualizations } from './ProjectionVisualizations';
+import { ShowProjectionGrid } from './ShowProjectionGrid';
+import { ReorderAlertBanner } from './ReorderAlertBanner';
+import { DeliveryEditor } from './DeliveryEditor';
+import { CompBreakdownPanel } from './CompBreakdownPanel';
+import { CopyFromTourModal } from './CopyFromTourModal';
+
+type ViewMode = 'aggregate' | 'by-show';
 
 type Scenario = {
   id: string;
@@ -127,6 +135,20 @@ export function ProjectionSheet({
     display_order: number;
   }>>([]);
   const [locationsLoaded, setLocationsLoaded] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('aggregate');
+  const [showCopyModal, setShowCopyModal] = useState(false);
+  const [deliveryModal, setDeliveryModal] = useState<{
+    showId: string;
+    showInfo: { date: string; venue: string; city: string };
+    sku: string;
+    size: string | null;
+  } | null>(null);
+  const [compModal, setCompModal] = useState<{
+    showId: string;
+    showInfo: { date: string; venue: string; city: string };
+    sku: string;
+    size: string | null;
+  } | null>(null);
 
   // Fetch warehouse locations for this tour
   useEffect(() => {
@@ -620,8 +642,52 @@ export function ProjectionSheet({
         warehouseLocations={warehouseLocations}
       />
 
-      {/* 2. VISUALIZATIONS IN MIDDLE */}
-      {aiGenerated && projectionData.length > 0 && (
+      {/* 2. REORDER ALERTS */}
+      {selectedScenarioId && (
+        <div className="mt-6">
+          <ReorderAlertBanner tourId={tourId} scenarioId={selectedScenarioId} />
+        </div>
+      )}
+
+      {/* 3. VIEW TOGGLE */}
+      <div className="mt-6 flex items-center justify-between">
+        <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-lg">
+          <button
+            onClick={() => setViewMode('aggregate')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition ${
+              viewMode === 'aggregate'
+                ? 'bg-white shadow-sm text-[var(--g-text)]'
+                : 'text-[var(--g-text-muted)] hover:text-[var(--g-text)]'
+            }`}
+          >
+            <LayoutGrid className="w-4 h-4" />
+            Tour Summary
+          </button>
+          <button
+            onClick={() => setViewMode('by-show')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition ${
+              viewMode === 'by-show'
+                ? 'bg-white shadow-sm text-[var(--g-text)]'
+                : 'text-[var(--g-text-muted)] hover:text-[var(--g-text)]'
+            }`}
+          >
+            <Calendar className="w-4 h-4" />
+            By Show
+          </button>
+        </div>
+        {viewMode === 'by-show' && (
+          <button
+            onClick={() => setShowCopyModal(true)}
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--g-text-muted)] hover:text-[var(--g-text)] hover:bg-slate-100 rounded-lg transition"
+          >
+            <Copy className="w-4 h-4" />
+            Copy from Tour
+          </button>
+        )}
+      </div>
+
+      {/* 4. VISUALIZATIONS (only in aggregate view) */}
+      {viewMode === 'aggregate' && aiGenerated && projectionData.length > 0 && (
         <div className="mt-6">
           <ProjectionVisualizations
             projectionData={projectionData}
@@ -633,7 +699,41 @@ export function ProjectionSheet({
         </div>
       )}
 
-      {/* 3. SPREADSHEET AT BOTTOM */}
+      {/* 5. BY-SHOW GRID */}
+      {viewMode === 'by-show' && selectedScenarioId && (
+        <div className="mt-6 g-card p-6">
+          <ShowProjectionGrid
+            tourId={tourId}
+            scenarioId={selectedScenarioId}
+            products={products.map((p) => ({
+              sku: p.sku,
+              description: p.description,
+              sizes: sizeMap.get(p.sku) ?? [],
+            }))}
+            onDeliveryClick={(showId, sku, size) => {
+              // TODO: Get show info for modal
+              setDeliveryModal({
+                showId,
+                showInfo: { date: '', venue: '', city: '' },
+                sku,
+                size,
+              });
+            }}
+            onCompClick={(showId, sku, size) => {
+              // TODO: Get show info for modal
+              setCompModal({
+                showId,
+                showInfo: { date: '', venue: '', city: '' },
+                sku,
+                size,
+              });
+            }}
+          />
+        </div>
+      )}
+
+      {/* 6. AGGREGATE SPREADSHEET */}
+      {viewMode === 'aggregate' && (
       <div className="mt-6 g-card p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-3">
@@ -872,6 +972,51 @@ export function ProjectionSheet({
         )}
       </div>
       </div>
+      )}
+
+      {/* Modals */}
+      {deliveryModal && (
+        <DeliveryEditor
+          tourId={tourId}
+          showId={deliveryModal.showId}
+          showInfo={deliveryModal.showInfo}
+          sku={deliveryModal.sku}
+          size={deliveryModal.size}
+          onClose={() => setDeliveryModal(null)}
+          onSave={() => {
+            setDeliveryModal(null);
+            // Trigger refresh of show data
+          }}
+        />
+      )}
+
+      {compModal && (
+        <CompBreakdownPanel
+          tourId={tourId}
+          showId={compModal.showId}
+          showInfo={compModal.showInfo}
+          sku={compModal.sku}
+          size={compModal.size}
+          onClose={() => setCompModal(null)}
+          onSave={() => {
+            setCompModal(null);
+            // Trigger refresh of show data
+          }}
+        />
+      )}
+
+      {showCopyModal && selectedScenarioId && (
+        <CopyFromTourModal
+          tourId={tourId}
+          targetScenarioId={selectedScenarioId}
+          onClose={() => setShowCopyModal(false)}
+          onCopyComplete={() => {
+            setShowCopyModal(false);
+            // Trigger page refresh to show copied data
+            window.location.reload();
+          }}
+        />
+      )}
     </section>
   );
 }
