@@ -105,9 +105,9 @@ export default async function AdminDashboard() {
     },
     {
       title: 'View Inventory',
-      description: 'Check stock levels and warehouse allocation',
+      description: 'Check stock levels across all tours',
       icon: '📦',
-      href: '/tours',
+      href: '/admin/inventory',
       color: 'bg-slate-100',
       hoverColor: 'hover:bg-slate-200',
       textColor: 'text-[var(--g-text)]',
