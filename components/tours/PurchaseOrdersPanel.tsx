@@ -145,7 +145,7 @@ export function PurchaseOrdersPanel({
             return (
               <div
                 key={po.id}
-                className="border border-white/10 rounded-lg overflow-hidden"
+                className="border border-slate-200 rounded-lg overflow-hidden"
               >
                 <button
                   type="button"
@@ -175,7 +175,7 @@ export function PurchaseOrdersPanel({
                   </div>
                 </button>
                 {isOpen && (
-                  <div className="border-t border-white/10 px-4 pb-4">
+                  <div className="border-t border-slate-200 px-4 pb-4">
                     <table className="min-w-full text-sm g-table mt-3">
                       <thead>
                         <tr>
@@ -188,7 +188,7 @@ export function PurchaseOrdersPanel({
                       </thead>
                       <tbody>
                         {rows.map((row) => (
-                          <tr key={row.po_line_item_id} className="border-t border-white/10">
+                          <tr key={row.po_line_item_id} className="border-t border-slate-200">
                             <td className="py-2">
                               <div className="font-semibold">{row.sku}</div>
                               <div className="text-xs text-[var(--g-text-muted)]">
@@ -215,7 +215,7 @@ export function PurchaseOrdersPanel({
             <button
               type="button"
               onClick={handleLoadMore}
-              className="px-4 py-2 rounded-full border border-white/30 text-sm hover:bg-white/5 transition"
+              className="px-4 py-2 rounded-full border border-slate-300 text-sm hover:bg-slate-50 transition"
             >
               Load more ({filteredOrders.length - visibleCount} remaining)
             </button>

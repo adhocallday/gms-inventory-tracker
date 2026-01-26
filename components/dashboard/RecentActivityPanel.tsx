@@ -54,7 +54,7 @@ export function RecentActivityPanel({ documents }: RecentActivityPanelProps) {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold g-title">Recent Activity</h2>
         <Link
-          href="/reports/parsed-documents"
+          href="/dashboard/parsed-documents"
           className="text-sm font-medium g-link"
         >
           View all
@@ -74,8 +74,8 @@ export function RecentActivityPanel({ documents }: RecentActivityPanelProps) {
           {documents.map((doc) => (
             <Link
               key={doc.id}
-              href={`/reports/parsed-documents/${doc.id}`}
-              className="flex items-start gap-3 p-3 rounded-lg border border-white/5 hover:border-white/10 hover:bg-white/5 transition group"
+              href={`/dashboard/parsed-documents/${doc.id}`}
+              className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition group"
             >
               <div className="mt-0.5">
                 {statusIcons[doc.status] || <FileText className="w-4 h-4 text-[var(--g-text-muted)]" />}

@@ -84,7 +84,7 @@ export function StockMovementPanel({ rows }: { rows: StockMovementRow[] }) {
 
       <div className="overflow-x-auto mt-4">
         <table className="min-w-full text-sm g-table">
-          <thead className="text-left border-b border-white/10">
+          <thead className="text-left border-b border-slate-200">
             <tr>
               <th className="py-2 pr-4">Date</th>
               <th className="py-2 pr-4">Delivery</th>
@@ -103,7 +103,7 @@ export function StockMovementPanel({ rows }: { rows: StockMovementRow[] }) {
               </tr>
             ) : (
               visibleRows.map((row, index) => (
-                <tr key={`${row.delivery_number ?? 'delivery'}-${index}`} className="border-b border-white/10">
+                <tr key={`${row.delivery_number ?? 'delivery'}-${index}`} className="border-b border-slate-200">
                   <td className="py-3 pr-4">{formatDate(row.received_date)}</td>
                   <td className="py-3 pr-4">{row.delivery_number ?? '—'}</td>
                   <td className="py-3 pr-4 font-semibold">{row.sku}</td>
@@ -121,7 +121,7 @@ export function StockMovementPanel({ rows }: { rows: StockMovementRow[] }) {
             <button
               type="button"
               onClick={handleLoadMore}
-              className="px-4 py-2 rounded-full border border-white/30 text-sm hover:bg-white/5 transition"
+              className="px-4 py-2 rounded-full border border-slate-300 text-sm hover:bg-slate-50 transition"
             >
               Load more ({filteredRows.length - visibleCount} remaining)
             </button>

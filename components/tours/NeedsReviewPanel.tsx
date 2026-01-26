@@ -90,7 +90,7 @@ export function NeedsReviewPanel({ documents }: { documents: ParsedDocumentRow[]
           visibleDocs.map((doc) => (
             <div
               key={doc.id}
-              className="border border-white/10 rounded-lg p-4 flex flex-col gap-3"
+              className="border border-slate-200 rounded-lg p-4 flex flex-col gap-3"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>

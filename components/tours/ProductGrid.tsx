@@ -39,13 +39,13 @@ export default function ProductGrid({ tourId, products }: ProductGridProps) {
         <div className="flex gap-3 text-xs uppercase tracking-[0.3em] text-[var(--g-text-muted)]">
           <Link
             href={`/tours/${tourId}/inventory`}
-            className="g-link px-3 py-1 border border-white/20 rounded-full"
+            className="g-link px-3 py-1 border border-slate-300 rounded-full hover:border-slate-400"
           >
             Inventory
           </Link>
           <Link
             href={`/tours/${tourId}/cogs`}
-            className="g-link px-3 py-1 border border-white/20 rounded-full"
+            className="g-link px-3 py-1 border border-slate-300 rounded-full hover:border-slate-400"
           >
             COGS
           </Link>
@@ -58,7 +58,7 @@ export default function ProductGrid({ tourId, products }: ProductGridProps) {
             <Link
               key={`${product.product_id}:${product.size ?? 'os'}`}
               href={`/products/${product.product_id}`}
-              className="block space-y-2 bg-white/5 p-4 rounded-lg border border-white/10 hover:border-[var(--g-accent-2)] transition"
+              className="block space-y-2 bg-slate-50 p-4 rounded-lg border border-slate-200 hover:border-[var(--g-accent-2)] transition"
             >
               <div className="text-xs text-[var(--g-text-muted)]">{product.size ?? 'One-Size'}</div>
               <div className="font-mono text-sm text-[var(--g-accent)]">{product.sku}</div>
@@ -84,7 +84,7 @@ export default function ProductGrid({ tourId, products }: ProductGridProps) {
         {canLoadMore && (
           <div className="flex justify-center mt-6">
             <button
-              className="px-4 py-2 rounded-full border border-white/30 text-sm"
+              className="px-4 py-2 rounded-full border border-slate-300 text-sm hover:border-slate-400 hover:bg-slate-50 transition"
               onClick={handleLoadMore}
             >
               Load more products
