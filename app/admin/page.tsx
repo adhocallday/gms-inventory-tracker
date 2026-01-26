@@ -69,39 +69,49 @@ export default async function AdminDashboard() {
       icon: '➕',
       href: '/admin/tours/new',
       color: 'bg-[var(--g-accent)]',
-      hoverColor: 'hover:bg-[var(--g-accent-2)]'
+      hoverColor: 'hover:bg-[var(--g-accent-2)]',
+      textColor: 'text-white',
+      descColor: 'text-white/80'
     },
     {
       title: 'Manage Tours',
       description: 'Edit existing tours, add shows, extend dates',
       icon: '📋',
       href: '/admin/tours',
-      color: 'bg-white/10',
-      hoverColor: 'hover:bg-white/20'
+      color: 'bg-slate-100',
+      hoverColor: 'hover:bg-slate-200',
+      textColor: 'text-[var(--g-text)]',
+      descColor: 'text-[var(--g-text-muted)]'
     },
     {
       title: 'Upload Documents',
       description: 'Parse PDFs, CSVs, and sales reports',
       icon: '📄',
       href: '/upload',
-      color: 'bg-white/10',
-      hoverColor: 'hover:bg-white/20'
+      color: 'bg-slate-100',
+      hoverColor: 'hover:bg-slate-200',
+      textColor: 'text-[var(--g-text)]',
+      descColor: 'text-[var(--g-text-muted)]'
     },
     {
       title: 'Product Catalog',
       description: 'Manage global products and SKUs',
       icon: '🏷️',
       href: '/admin/products',
-      color: 'bg-white/10',
-      hoverColor: 'hover:bg-white/20'
+      color: 'bg-slate-100',
+      hoverColor: 'hover:bg-slate-200',
+      textColor: 'text-[var(--g-text)]',
+      descColor: 'text-[var(--g-text-muted)]'
     },
     {
       title: 'View Inventory',
       description: 'Check stock levels and warehouse allocation',
       icon: '📦',
       href: '/tours',
-      color: 'bg-white/10',
-      hoverColor: 'hover:bg-white/20'
+      color: 'bg-slate-100',
+      hoverColor: 'hover:bg-slate-200',
+      textColor: 'text-[var(--g-text)]',
+      descColor: 'text-[var(--g-text-muted)]'
     }
   ];
 
@@ -137,13 +147,13 @@ export default async function AdminDashboard() {
             <Link
               key={index}
               href={action.href}
-              className={`group p-6 rounded-xl border border-white/10 ${action.color} ${action.hoverColor} transition-all duration-200 hover:scale-105`}
+              className={`group p-6 rounded-xl border border-[var(--g-border-default)] ${action.color} ${action.hoverColor} transition-all duration-200 hover:scale-105`}
             >
               <div className="text-3xl mb-3">{action.icon}</div>
-              <h3 className="text-sm font-semibold text-[var(--g-text)] mb-2">
+              <h3 className={`text-sm font-semibold mb-2 ${action.textColor}`}>
                 {action.title}
               </h3>
-              <p className="text-xs text-[var(--g-text-muted)] leading-relaxed">
+              <p className={`text-xs leading-relaxed ${action.descColor}`}>
                 {action.description}
               </p>
             </Link>

@@ -123,7 +123,7 @@ export function ToursGrid({ tours }: ToursGridProps) {
               <span
                 className={`
                   px-2 py-0.5 rounded-full text-xs
-                  ${isActive ? 'bg-white/20' : 'bg-[var(--g-border)]'}
+                  ${isActive ? 'bg-white/30' : 'bg-slate-200'}
                 `}
               >
                 {count}

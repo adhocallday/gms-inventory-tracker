@@ -53,6 +53,25 @@
   /* Background variants for muted states */
   --g-bg-muted: rgba(15, 23, 42, 0.03);
 
+  /* Interactive surface colors (light theme appropriate) */
+  --g-surface-hover: rgba(15, 23, 42, 0.04);
+  --g-surface-active: rgba(15, 23, 42, 0.08);
+  --g-surface-selected: rgba(15, 23, 42, 0.06);
+  --g-surface-disabled: rgba(15, 23, 42, 0.02);
+
+  /* Border variants */
+  --g-border-subtle: rgba(15, 23, 42, 0.06);
+  --g-border-default: rgba(15, 23, 42, 0.12);
+  --g-border-strong: rgba(15, 23, 42, 0.2);
+
+  /* Filter/tab button colors */
+  --g-tab-bg: rgba(15, 23, 42, 0.05);
+  --g-tab-bg-hover: rgba(15, 23, 42, 0.08);
+  --g-tab-bg-active: var(--g-accent);
+  --g-tab-text: rgba(15, 23, 42, 0.6);
+  --g-tab-text-hover: rgba(15, 23, 42, 0.8);
+  --g-tab-text-active: #ffffff;
+
   /* Semantic status colors with opacity */
   --g-success-bg: rgba(16, 185, 129, 0.1);
   --g-success-border: rgba(16, 185, 129, 0.2);

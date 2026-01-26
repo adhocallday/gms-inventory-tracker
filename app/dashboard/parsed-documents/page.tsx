@@ -295,10 +295,10 @@ export default function ParsedDocumentsPage() {
                   setOffset(0);
                 }}
                 className={cn(
-                  'px-3 py-1.5 text-sm font-medium rounded-lg transition-all',
+                  'px-3 py-1.5 text-sm font-medium rounded-lg transition-all border',
                   isActive
-                    ? 'bg-[var(--g-accent)] text-white'
-                    : 'bg-white/5 text-[var(--g-text-muted)] hover:bg-white/10 hover:text-[var(--g-text)]'
+                    ? 'bg-[var(--g-accent)] text-white border-[var(--g-accent)]'
+                    : 'bg-slate-100 text-[var(--g-text-muted)] border-slate-200 hover:bg-slate-200 hover:text-[var(--g-text)]'
                 )}
               >
                 {option.label}
@@ -306,7 +306,7 @@ export default function ParsedDocumentsPage() {
                   <span
                     className={cn(
                       'ml-2 px-1.5 py-0.5 text-xs rounded',
-                      isActive ? 'bg-white/20' : 'bg-white/10'
+                      isActive ? 'bg-white/20' : 'bg-slate-200'
                     )}
                   >
                     {count}
@@ -323,7 +323,7 @@ export default function ParsedDocumentsPage() {
           <div className="flex items-center gap-2">
             <SortAsc className="w-4 h-4 text-[var(--g-text-muted)]" />
             <select
-              className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-[var(--g-text)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)]"
+              className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-[var(--g-text)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)]"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >
@@ -361,10 +361,10 @@ export default function ParsedDocumentsPage() {
                 setOffset(0);
               }}
               className={cn(
-                'px-3 py-1.5 text-sm font-medium rounded-lg transition-all',
+                'px-3 py-1.5 text-sm font-medium rounded-lg transition-all border',
                 isActive
-                  ? 'bg-white/20 text-[var(--g-text)]'
-                  : 'bg-white/5 text-[var(--g-text-muted)] hover:bg-white/10 hover:text-[var(--g-text)]'
+                  ? 'bg-slate-200 text-[var(--g-text)] border-slate-300'
+                  : 'bg-slate-50 text-[var(--g-text-muted)] border-slate-200 hover:bg-slate-100 hover:text-[var(--g-text)]'
               )}
             >
               {option.label}
@@ -372,7 +372,7 @@ export default function ParsedDocumentsPage() {
                 <span
                   className={cn(
                     'ml-2 px-1.5 py-0.5 text-xs rounded',
-                    isActive ? 'bg-white/20' : 'bg-white/10'
+                    isActive ? 'bg-slate-300' : 'bg-slate-200'
                   )}
                 >
                   {count}
@@ -387,7 +387,7 @@ export default function ParsedDocumentsPage() {
       {tours.length > 0 && (
         <div className="mb-6">
           <select
-            className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-[var(--g-text)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)]"
+            className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-[var(--g-text)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)]"
             value={tourFilter}
             onChange={(e) => {
               setTourFilter(e.target.value);

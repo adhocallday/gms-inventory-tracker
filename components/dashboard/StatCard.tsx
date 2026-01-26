@@ -41,28 +41,34 @@ interface StatCardProps {
 
 const colorVariants = {
   purple: {
-    gradient: 'from-purple-500/20 to-pink-500/20',
-    iconColor: 'text-purple-400',
+    gradient: 'from-purple-100 to-pink-100',
+    iconColor: 'text-purple-600',
+    borderColor: 'border-purple-200',
   },
   green: {
-    gradient: 'from-green-500/20 to-emerald-500/20',
-    iconColor: 'text-green-400',
+    gradient: 'from-green-100 to-emerald-100',
+    iconColor: 'text-green-600',
+    borderColor: 'border-green-200',
   },
   blue: {
-    gradient: 'from-blue-500/20 to-cyan-500/20',
-    iconColor: 'text-blue-400',
+    gradient: 'from-blue-100 to-cyan-100',
+    iconColor: 'text-blue-600',
+    borderColor: 'border-blue-200',
   },
   orange: {
-    gradient: 'from-orange-500/20 to-red-500/20',
-    iconColor: 'text-orange-400',
+    gradient: 'from-orange-100 to-amber-100',
+    iconColor: 'text-orange-600',
+    borderColor: 'border-orange-200',
   },
   red: {
-    gradient: 'from-red-500/20 to-pink-500/20',
-    iconColor: 'text-red-400',
+    gradient: 'from-red-100 to-pink-100',
+    iconColor: 'text-red-600',
+    borderColor: 'border-red-200',
   },
   default: {
-    gradient: 'from-white/5 to-white/10',
+    gradient: 'from-slate-100 to-slate-50',
     iconColor: 'text-[var(--g-text)]',
+    borderColor: 'border-slate-200',
   },
 };
 
@@ -74,8 +80,9 @@ export function StatCard({ label, value, icon: IconProp, iconName, trend, color 
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl border border-white/10 p-6 bg-gradient-to-br',
+        'relative overflow-hidden rounded-xl border p-6 bg-gradient-to-br',
         colors.gradient,
+        colors.borderColor,
         className
       )}
     >

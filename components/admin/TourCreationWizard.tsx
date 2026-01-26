@@ -125,10 +125,10 @@ export default function TourCreationWizard() {
                   onClick={() => goToStep(step.id)}
                   className={`
                     w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm
-                    transition-all duration-200
+                    transition-all duration-200 border
                     ${index <= currentStepIndex
-                      ? 'bg-[var(--g-accent)] text-white'
-                      : 'bg-white/10 text-[var(--g-text-muted)]'
+                      ? 'bg-[var(--g-accent)] text-white border-[var(--g-accent)]'
+                      : 'bg-slate-100 text-[var(--g-text-muted)] border-slate-200'
                     }
                     ${index < currentStepIndex ? 'cursor-pointer hover:opacity-80' : ''}
                   `}
@@ -151,7 +151,7 @@ export default function TourCreationWizard() {
                   flex-1 h-0.5 mx-4 mb-8
                   ${index < currentStepIndex
                     ? 'bg-[var(--g-accent)]'
-                    : 'bg-white/10'
+                    : 'bg-slate-200'
                   }
                 `} />
               )}

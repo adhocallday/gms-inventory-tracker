@@ -40,10 +40,10 @@ export function ProductFilters({
             key={option.value}
             onClick={() => onFilterChange(option.value)}
             className={cn(
-              'px-3 py-1.5 text-sm font-medium rounded-lg transition-all',
+              'px-3 py-1.5 text-sm font-medium rounded-lg transition-all border',
               isActive
-                ? 'bg-[var(--g-accent)] text-white'
-                : 'bg-white/5 text-[var(--g-text-muted)] hover:bg-white/10 hover:text-[var(--g-text)]'
+                ? 'bg-[var(--g-accent)] text-white border-[var(--g-accent)]'
+                : 'bg-slate-100 text-[var(--g-text-muted)] border-slate-200 hover:bg-slate-200 hover:text-[var(--g-text)]'
             )}
           >
             {option.label}
@@ -51,7 +51,7 @@ export function ProductFilters({
               <span
                 className={cn(
                   'ml-2 px-1.5 py-0.5 text-xs rounded',
-                  isActive ? 'bg-white/20' : 'bg-white/10'
+                  isActive ? 'bg-white/20' : 'bg-slate-200'
                 )}
               >
                 {count}
