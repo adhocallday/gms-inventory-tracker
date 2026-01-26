@@ -179,7 +179,7 @@ export default async function DashboardPage() {
               title="Documents need review"
               description={`${pendingDocsCount} document${(pendingDocsCount ?? 0) !== 1 ? 's' : ''} waiting for approval or have errors`}
               linkText="Review documents"
-              linkHref="/reports/parsed-documents"
+              linkHref="/dashboard/parsed-documents"
             />
           )}
           {upcomingShows.length > 0 && (

@@ -22,32 +22,36 @@ interface InsightCardProps {
 
 const typeConfig = {
   info: {
-    bg: 'bg-blue-500/10',
-    border: 'border-blue-500/20',
+    border: 'border-blue-200',
+    bg: 'bg-gradient-to-br from-blue-50/80 to-white',
     icon: Info,
-    iconColor: 'text-blue-400',
-    textColor: 'text-blue-400',
+    iconColor: 'text-blue-600',
+    textColor: 'text-blue-800',
+    iconBg: 'bg-white shadow-inner',
   },
   success: {
-    bg: 'bg-green-500/10',
-    border: 'border-green-500/20',
+    border: 'border-emerald-200',
+    bg: 'bg-gradient-to-br from-emerald-50/80 to-white',
     icon: CheckCircle,
-    iconColor: 'text-green-400',
-    textColor: 'text-green-400',
+    iconColor: 'text-emerald-600',
+    textColor: 'text-emerald-800',
+    iconBg: 'bg-white shadow-inner',
   },
   warning: {
-    bg: 'bg-yellow-500/10',
-    border: 'border-yellow-500/20',
+    border: 'border-amber-200',
+    bg: 'bg-gradient-to-br from-amber-50/80 to-white',
     icon: AlertTriangle,
-    iconColor: 'text-yellow-400',
-    textColor: 'text-yellow-400',
+    iconColor: 'text-amber-600',
+    textColor: 'text-amber-800',
+    iconBg: 'bg-white shadow-inner',
   },
   error: {
-    bg: 'bg-red-500/10',
-    border: 'border-red-500/20',
+    border: 'border-red-200',
+    bg: 'bg-gradient-to-br from-red-50/80 to-white',
     icon: AlertCircle,
-    iconColor: 'text-red-400',
-    textColor: 'text-red-400',
+    iconColor: 'text-red-600',
+    textColor: 'text-red-800',
+    iconBg: 'bg-white shadow-inner',
   },
 };
 
@@ -67,45 +71,39 @@ export function InsightCard({
   return (
     <div
       className={cn(
-        'p-4 rounded-lg border',
+        'g-card border-2 p-5 rounded-2xl space-y-3 shadow-sm',
         config.bg,
         config.border,
         className
       )}
     >
-      <div className="flex items-start gap-3">
-        <Icon className={cn('w-5 h-5 flex-shrink-0 mt-0.5', config.iconColor)} />
-        <div className="flex-1 min-w-0">
-          <h3 className={cn('text-sm font-semibold mb-1', config.textColor)}>
-            {title}
-          </h3>
-          <p className="text-xs text-[var(--g-text-muted)] leading-relaxed">
-            {description}
-          </p>
-          {action && (
-            <button
-              onClick={action.onClick}
-              className={cn(
-                'mt-2 text-xs font-semibold underline-offset-2 hover:underline',
-                config.textColor
-              )}
-            >
-              {action.label} →
-            </button>
-          )}
-          {linkText && linkHref && (
-            <Link
-              href={linkHref}
-              className={cn(
-                'mt-2 inline-block text-xs font-semibold underline-offset-2 hover:underline',
-                config.textColor
-              )}
-            >
-              {linkText} →
-            </Link>
-          )}
+      <div className="flex items-center gap-3">
+        <div className={cn('p-2 rounded-xl', config.iconBg)}>
+          <Icon className={cn('w-5 h-5', config.iconColor)} />
         </div>
+        <h3 className={cn('text-lg font-semibold tracking-tight', config.textColor)}>
+          {title}
+        </h3>
       </div>
+      <p className="text-sm text-[var(--g-text-dim)] leading-relaxed">
+        {description}
+      </p>
+      {action && (
+        <button
+          onClick={action.onClick}
+          className="text-sm font-semibold text-[var(--g-accent)] underline-offset-2 hover:underline transition"
+        >
+          {action.label} →
+        </button>
+      )}
+      {linkText && linkHref && (
+        <Link
+          href={linkHref}
+          className="text-sm font-semibold text-[var(--g-accent)] underline-offset-2 hover:underline transition"
+        >
+          {linkText} →
+        </Link>
+      )}
     </div>
   );
 }
