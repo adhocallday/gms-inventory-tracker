@@ -59,8 +59,8 @@ export function SizeAnalysisPanel({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="flex items-center gap-3 text-slate-500">
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-600" />
+        <div className="flex items-center gap-3 text-[var(--g-text-muted)]">
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[var(--g-accent)]" />
           <span>Analyzing size distribution patterns...</span>
         </div>
       </div>
@@ -69,7 +69,7 @@ export function SizeAnalysisPanel({
 
   if (skus.length === 0) {
     return (
-      <div className="text-center p-8 text-slate-500">
+      <div className="text-center p-8 text-[var(--g-text-muted)]">
         <Sparkles className="w-8 h-8 mx-auto mb-2 opacity-50" />
         <p>No size analysis available yet.</p>
         <p className="text-sm">Click "Analyze Sizes" to generate recommendations.</p>
@@ -80,20 +80,20 @@ export function SizeAnalysisPanel({
   return (
     <div className="space-y-6">
       {/* Global Insights */}
-      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4 space-y-3">
+      <div className="g-card p-4 space-y-3">
         <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 text-purple-600" />
-          <h3 className="font-semibold text-purple-900">Audience Insights</h3>
+          <Users className="w-5 h-5 text-[var(--g-accent)]" />
+          <h3 className="font-semibold text-[var(--g-text)]">Audience Insights</h3>
         </div>
-        <p className="text-sm text-purple-800">{globalInsights.audienceDemographic}</p>
+        <p className="text-sm text-[var(--g-text-muted)]">{globalInsights.audienceDemographic}</p>
 
         {globalInsights.sizeTrends.length > 0 && (
           <div className="space-y-1">
-            <div className="flex items-center gap-1 text-sm font-medium text-purple-700">
+            <div className="flex items-center gap-1 text-sm font-medium text-[var(--g-text)]">
               <TrendingUp className="w-4 h-4" />
               Size Trends
             </div>
-            <ul className="text-sm text-purple-800 list-disc list-inside">
+            <ul className="text-sm text-[var(--g-text-muted)] list-disc list-inside">
               {globalInsights.sizeTrends.map((trend, i) => (
                 <li key={i}>{trend}</li>
               ))}
@@ -103,11 +103,11 @@ export function SizeAnalysisPanel({
 
         {globalInsights.recommendations.length > 0 && (
           <div className="space-y-1">
-            <div className="flex items-center gap-1 text-sm font-medium text-purple-700">
+            <div className="flex items-center gap-1 text-sm font-medium text-[var(--g-text)]">
               <AlertTriangle className="w-4 h-4" />
               Recommendations
             </div>
-            <ul className="text-sm text-purple-800 list-disc list-inside">
+            <ul className="text-sm text-[var(--g-text-muted)] list-disc list-inside">
               {globalInsights.recommendations.map((rec, i) => (
                 <li key={i}>{rec}</li>
               ))}
@@ -118,7 +118,7 @@ export function SizeAnalysisPanel({
 
       {/* Summary and Apply All */}
       <div className="flex items-center justify-between">
-        <div className="text-sm text-slate-600">
+        <div className="text-sm text-[var(--g-text-muted)]">
           <span className="font-medium">{skus.length}</span> products analyzed •
           <span className="font-medium text-green-600"> {highConfidenceCount}</span> high confidence
           {hasDifferences && (
@@ -128,7 +128,7 @@ export function SizeAnalysisPanel({
         {hasDifferences && appliedSkus.size < skus.length && (
           <button
             onClick={handleApplyAll}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition text-sm font-medium"
           >
             <Sparkles className="w-4 h-4" />
             Apply All Recommendations
@@ -150,13 +150,13 @@ export function SizeAnalysisPanel({
             <div
               key={sku}
               className={`border rounded-lg overflow-hidden ${
-                isApplied ? 'border-green-200 bg-green-50' : 'border-slate-200'
+                isApplied ? 'border-green-200 bg-green-50/50' : 'border-[var(--g-border)]'
               }`}
             >
               {/* Header */}
               <button
                 onClick={() => setExpandedSku(isExpanded ? null : sku)}
-                className="w-full flex items-center justify-between p-3 hover:bg-slate-50 transition"
+                className="w-full flex items-center justify-between p-3 hover:bg-[var(--g-bg-subtle)] transition"
               >
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-medium">
@@ -179,7 +179,7 @@ export function SizeAnalysisPanel({
                           : 'bg-red-500'
                       }`}
                     />
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-[var(--g-text-muted)]">
                       {(a.confidence * 100).toFixed(0)}% confidence
                     </span>
                   </div>
@@ -204,25 +204,25 @@ export function SizeAnalysisPanel({
 
               {/* Expanded Content */}
               {isExpanded && (
-                <div className="border-t border-slate-200 p-4 space-y-4">
+                <div className="border-t border-[var(--g-border)] p-4 space-y-4">
                   {/* Reasoning */}
-                  <p className="text-sm text-slate-600">{a.reasoning}</p>
+                  <p className="text-sm text-[var(--g-text-muted)]">{a.reasoning}</p>
 
                   {/* Size Comparison */}
                   <div className="grid grid-cols-8 gap-2 text-xs">
-                    <div className="font-medium text-slate-500">Size</div>
+                    <div className="font-medium text-[var(--g-text-muted)]">Size</div>
                     {Object.keys(a.historicalCurve).map((size) => (
                       <div key={size} className="font-medium text-center">{size}</div>
                     ))}
-                    
-                    <div className="text-slate-500">Historical</div>
+
+                    <div className="text-[var(--g-text-muted)]">Historical</div>
                     {Object.entries(a.historicalCurve).map(([size, pct]) => (
-                      <div key={size} className="text-center text-slate-600">
+                      <div key={size} className="text-center text-[var(--g-text-muted)]">
                         {((pct || 0) * 100).toFixed(0)}%
                       </div>
                     ))}
-                    
-                    <div className="text-purple-600">Recommended</div>
+
+                    <div className="text-[var(--g-accent)]">Recommended</div>
                     {Object.entries(a.recommendedCurve).map(([size, pct]) => {
                       const hist = a.historicalCurve[size] || 0;
                       const diff = (pct || 0) - hist;
@@ -234,7 +234,7 @@ export function SizeAnalysisPanel({
                               ? diff > 0
                                 ? 'text-green-600'
                                 : 'text-red-600'
-                              : 'text-slate-600'
+                              : 'text-[var(--g-text-muted)]'
                           }`}
                         >
                           {((pct || 0) * 100).toFixed(0)}%
@@ -251,8 +251,8 @@ export function SizeAnalysisPanel({
                   {/* Insights */}
                   {a.insights && a.insights.length > 0 && (
                     <div className="space-y-1">
-                      <div className="text-xs font-medium text-slate-500">Insights</div>
-                      <ul className="text-xs text-slate-600 list-disc list-inside">
+                      <div className="text-xs font-medium text-[var(--g-text-muted)]">Insights</div>
+                      <ul className="text-xs text-[var(--g-text-muted)] list-disc list-inside">
                         {a.insights.map((insight, i) => (
                           <li key={i}>{insight}</li>
                         ))}
@@ -265,7 +265,7 @@ export function SizeAnalysisPanel({
                     <div className="flex justify-end">
                       <button
                         onClick={() => handleApply(sku)}
-                        className="flex items-center gap-1 px-3 py-1.5 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+                        className="flex items-center gap-1 px-3 py-1.5 text-sm bg-[var(--g-accent)] text-white rounded hover:bg-[var(--g-accent-2)] transition"
                       >
                         <Sparkles className="w-3 h-3" />
                         Apply Recommendation

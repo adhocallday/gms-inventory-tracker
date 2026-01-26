@@ -189,13 +189,13 @@ export function EnhancedAIAgentPanel({
           <div className="space-y-4">
             {!sizeAnalysis && !sizeLoading && (
               <div className="text-center py-8">
-                <BarChart3 className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-                <p className="text-slate-600 mb-4">
+                <BarChart3 className="w-12 h-12 mx-auto mb-3 text-[var(--g-text-muted)] opacity-50" />
+                <p className="text-[var(--g-text-muted)] mb-4">
                   Analyze historical sales data to optimize size distribution for each product.
                 </p>
                 <button
                   onClick={handleAnalyzeSizes}
-                  className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium"
+                  className="px-6 py-3 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-medium"
                 >
                   Analyze Size Distribution
                 </button>

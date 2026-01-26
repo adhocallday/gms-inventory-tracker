@@ -55,7 +55,7 @@ export function UpcomingShowsPanel({ shows }: UpcomingShowsPanelProps) {
             <Link
               key={show.id}
               href={`/tours/${show.tour_id}/shows/${show.id}`}
-              className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition group"
+              className="flex items-start gap-3 p-3 rounded-lg border border-[var(--g-border)] hover:border-[var(--g-accent)]/50 hover:bg-[var(--g-bg-subtle)] transition group"
             >
               <div className="flex flex-col items-center justify-center w-12 h-12 rounded-lg bg-[var(--g-accent)]/10 text-[var(--g-accent)]">
                 <span className="text-xs font-medium uppercase">

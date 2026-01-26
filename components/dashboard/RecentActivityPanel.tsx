@@ -75,7 +75,7 @@ export function RecentActivityPanel({ documents }: RecentActivityPanelProps) {
             <Link
               key={doc.id}
               href={`/dashboard/parsed-documents/${doc.id}`}
-              className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition group"
+              className="flex items-start gap-3 p-3 rounded-lg border border-[var(--g-border)] hover:border-[var(--g-accent)]/50 hover:bg-[var(--g-bg-subtle)] transition group"
             >
               <div className="mt-0.5">
                 {statusIcons[doc.status] || <FileText className="w-4 h-4 text-[var(--g-text-muted)]" />}
