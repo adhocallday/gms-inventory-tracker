@@ -638,6 +638,69 @@ export function ProjectionSheet({
           setProjectionData(data.projections);
           await applyAllRecommendations(data.projections);
         }}
+        onApplySizeRecommendation={async (sku, curve) => {
+          // Apply size curve recommendation for a single SKU
+          const row = rows.find((r) => r.sku === sku);
+          if (!row) return;
+
+          // Calculate units for each size based on the curve
+          const sizeOverrides = Object.entries(curve).map(([size, pct]) => ({
+            sku,
+            size,
+            bucket: null,
+            override_units: Math.round(row.forecastUnits * pct)
+          }));
+
+          // Save to database
+          await fetch('/api/forecast-overrides/bulk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              scenario_id: selectedScenarioId,
+              tour_id: tourId,
+              overrides: sizeOverrides
+            })
+          });
+
+          // Update local state
+          const newMap = { ...overrideMap };
+          sizeOverrides.forEach((o) => {
+            newMap[`${o.sku}::${o.size}::`] = String(o.override_units);
+          });
+          setOverrideMap(newMap);
+        }}
+        onApplyAllSizeRecommendations={async (analysis) => {
+          // Apply all size curve recommendations at once
+          const allOverrides: Array<{ sku: string; size: string; bucket: null; override_units: number }> = [];
+
+          Object.entries(analysis).forEach(([sku, data]) => {
+            const row = rows.find((r) => r.sku === sku);
+            if (!row) return;
+
+            Object.entries(data.recommendedCurve).forEach(([size, pct]) => {
+              allOverrides.push({
+                sku,
+                size,
+                bucket: null,
+                override_units: Math.round(row.forecastUnits * pct)
+              });
+            });
+          });
+
+          // Save to database
+          await fetch('/api/forecast-overrides/bulk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              scenario_id: selectedScenarioId,
+              tour_id: tourId,
+              overrides: allOverrides
+            })
+          });
+
+          // Reload page to show updated data
+          window.location.reload();
+        }}
         currentInputs={{ expectedAttendance, expectedPerHead }}
         warehouseLocations={warehouseLocations}
       />

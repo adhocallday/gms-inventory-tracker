@@ -1,13 +1,33 @@
 'use client';
 
 import { useState } from 'react';
+import { BarChart3 } from 'lucide-react';
 import { ChatInterface } from './ChatInterface';
 import { AnalysisPanel } from './AnalysisPanel';
+import { SizeAnalysisPanel } from './SizeAnalysisPanel';
+
+interface SizeAnalysisData {
+  analysis: Record<string, {
+    historicalCurve: Record<string, number>;
+    recommendedCurve: Record<string, number>;
+    confidence: number;
+    reasoning: string;
+    insights: string[];
+  }>;
+  globalInsights: {
+    audienceDemographic: string;
+    sizeTrends: string[];
+    recommendations: string[];
+  };
+  productNames?: Record<string, string>; // SKU -> Product Name mapping
+}
 
 interface EnhancedAIAgentPanelProps {
   tourId: string;
   scenarioId: string;
   onGenerateProjections: () => Promise<void>;
+  onApplySizeRecommendation?: (sku: string, curve: Record<string, number>) => void;
+  onApplyAllSizeRecommendations?: (analysis: SizeAnalysisData['analysis']) => void;
   currentInputs: {
     expectedAttendance: number;
     expectedPerHead: number;
@@ -24,12 +44,16 @@ export function EnhancedAIAgentPanel({
   tourId,
   scenarioId,
   onGenerateProjections,
+  onApplySizeRecommendation,
+  onApplyAllSizeRecommendations,
   currentInputs,
   warehouseLocations
 }: EnhancedAIAgentPanelProps) {
-  const [activeTab, setActiveTab] = useState<'analysis' | 'chat'>('analysis');
+  const [activeTab, setActiveTab] = useState<'analysis' | 'sizes' | 'chat'>('analysis');
   const [analysis, setAnalysis] = useState<any>(null);
+  const [sizeAnalysis, setSizeAnalysis] = useState<SizeAnalysisData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sizeLoading, setSizeLoading] = useState(false);
   const [generated, setGenerated] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -65,6 +89,43 @@ export function EnhancedAIAgentPanel({
       setError(error.message || 'Failed to generate projections. Please check console for details.');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleAnalyzeSizes() {
+    setSizeLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('/api/projections/analyze-sizes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tourId, scenarioId })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setSizeAnalysis(data);
+    } catch (error: any) {
+      console.error('Failed to analyze sizes:', error);
+      setError(error.message || 'Failed to analyze size distribution.');
+    } finally {
+      setSizeLoading(false);
+    }
+  }
+
+  function handleApplySizeRecommendation(sku: string, curve: Record<string, number>) {
+    if (onApplySizeRecommendation) {
+      onApplySizeRecommendation(sku, curve);
+    }
+  }
+
+  function handleApplyAllSizeRecommendations() {
+    if (onApplyAllSizeRecommendations && sizeAnalysis) {
+      onApplyAllSizeRecommendations(sizeAnalysis.analysis);
     }
   }
 
@@ -106,6 +167,13 @@ export function EnhancedAIAgentPanel({
           Analysis
         </button>
         <button
+          onClick={() => setActiveTab('sizes')}
+          className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'sizes' ? 'border-b-2 border-[var(--g-accent)] text-[var(--g-text)]' : 'text-[var(--g-text-muted)]'}`}
+        >
+          <BarChart3 className="w-4 h-4" />
+          Size Analysis
+        </button>
+        <button
           onClick={() => setActiveTab('chat')}
           className={`px-4 py-2 ${activeTab === 'chat' ? 'border-b-2 border-[var(--g-accent)] text-[var(--g-text)]' : 'text-[var(--g-text-muted)]'}`}
         >
@@ -116,6 +184,34 @@ export function EnhancedAIAgentPanel({
       <div className="mt-4">
         {activeTab === 'analysis' && (
           <AnalysisPanel analysis={analysis} loading={loading} />
+        )}
+        {activeTab === 'sizes' && (
+          <div className="space-y-4">
+            {!sizeAnalysis && !sizeLoading && (
+              <div className="text-center py-8">
+                <BarChart3 className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                <p className="text-slate-600 mb-4">
+                  Analyze historical sales data to optimize size distribution for each product.
+                </p>
+                <button
+                  onClick={handleAnalyzeSizes}
+                  className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-medium"
+                >
+                  Analyze Size Distribution
+                </button>
+              </div>
+            )}
+            {(sizeAnalysis || sizeLoading) && (
+              <SizeAnalysisPanel
+                analysis={sizeAnalysis?.analysis || {}}
+                globalInsights={sizeAnalysis?.globalInsights || { audienceDemographic: '', sizeTrends: [], recommendations: [] }}
+                productNames={sizeAnalysis?.productNames || {}}
+                onApplyRecommendation={handleApplySizeRecommendation}
+                onApplyAll={handleApplyAllSizeRecommendations}
+                isLoading={sizeLoading}
+              />
+            )}
+          </div>
         )}
         {activeTab === 'chat' && (
           <ChatInterface tourId={tourId} scenarioId={scenarioId} />

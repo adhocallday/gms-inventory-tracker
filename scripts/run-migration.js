@@ -20,10 +20,11 @@ async function runMigration() {
     console.log('✅ Connected\n');
 
     // Read the migration file
-    const migrationPath = path.join(__dirname, '../supabase/migrations/002_tracker_views.sql');
+    const migrationFile = process.argv[2] || '007_show_projections_enhancement.sql';
+    const migrationPath = path.join(__dirname, '../supabase/migrations/', migrationFile);
     const sql = fs.readFileSync(migrationPath, 'utf8');
 
-    console.log('APPLYING MIGRATION: 002_tracker_views.sql');
+    console.log(`APPLYING MIGRATION: ${migrationFile}`);
     console.log('='.repeat(60));
 
     // Execute the entire SQL file
@@ -32,13 +33,36 @@ async function runMigration() {
 
     console.log('✅ Migration applied successfully!\n');
 
+    // Verify tables were created
+    console.log('Verifying tables...');
+    const tables = [
+      'show_comps',
+      'show_deliveries',
+      'initial_inventory',
+      'reorder_thresholds'
+    ];
+
+    for (const table of tables) {
+      const result = await client.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.tables
+          WHERE table_schema = 'public'
+          AND table_name = $1
+        ) as exists
+      `, [table]);
+
+      if (result.rows[0].exists) {
+        console.log(`  ✅ ${table} created`);
+      } else {
+        console.log(`  ❌ ${table} not found`);
+      }
+    }
+
     // Verify views were created
-    console.log('Verifying views...');
+    console.log('\nVerifying views...');
     const views = [
-      'show_summary_view',
-      'product_summary_view',
-      'po_open_qty_view',
-      'stock_movement_view'
+      'show_running_balances',
+      'reorder_alerts'
     ];
 
     for (const view of views) {
@@ -55,22 +79,6 @@ async function runMigration() {
       } else {
         console.log(`  ❌ ${view} not found`);
       }
-    }
-
-    // Check if bucket column was added
-    const bucketResult = await client.query(`
-      SELECT EXISTS (
-        SELECT FROM information_schema.columns
-        WHERE table_schema = 'public'
-        AND table_name = 'forecast_overrides'
-        AND column_name = 'bucket'
-      ) as exists
-    `);
-
-    if (bucketResult.rows[0].exists) {
-      console.log(`  ✅ forecast_overrides.bucket column added`);
-    } else {
-      console.log(`  ℹ️  forecast_overrides.bucket column not added (may already exist)`);
     }
 
     console.log('\n' + '='.repeat(60));
