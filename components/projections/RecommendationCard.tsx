@@ -57,7 +57,7 @@ export function RecommendationCard({ recommendation, onAccept, onReject }: Recom
       </div>
 
       {recommendation.status === 'pending' && (
-        <div className="flex gap-3 pt-2">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
           <button
             onClick={onAccept}
             className="flex-1 px-4 py-2.5 bg-[var(--g-accent)] text-white rounded-xl hover:bg-[var(--g-accent-2)] transition text-sm font-semibold shadow-md shadow-[var(--g-accent)]/20"

@@ -105,7 +105,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
   ]);
 
   return (
-    <div className="g-container py-12 space-y-10">
+    <div className="g-container py-6 md:py-12 space-y-6 md:space-y-10">
       <PageHeader
         title="Upload Document"
         subtitle="Drop a single PDF and the AI parser will identify if it is a Purchase Order, Packing List, Sales Report, or Settlement. You can edit the prefills, validate the content, and approve to post into the database without ever storing the PDF."
@@ -182,8 +182,8 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
         </div>
       )}
 
-      <div className="g-card p-6 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="g-card p-4 md:p-6 space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <div>
             <label className="text-xs text-[var(--g-text-muted)] block mb-2">Tour</label>
             <select

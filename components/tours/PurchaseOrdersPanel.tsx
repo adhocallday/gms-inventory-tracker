@@ -101,15 +101,15 @@ export function PurchaseOrdersPanel({
             Track ordered vs received inventory by SKU.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2 w-full lg:w-auto">
           <input
-            className="g-input w-44"
+            className="g-input w-full sm:w-44"
             placeholder="Search PO/Vendor"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
           <select
-            className="g-input w-40"
+            className="g-input w-full sm:w-40"
             value={vendorFilter}
             onChange={(event) => setVendorFilter(event.target.value)}
           >
@@ -121,7 +121,7 @@ export function PurchaseOrdersPanel({
             ))}
           </select>
           <select
-            className="g-input w-32"
+            className="g-input w-full sm:w-32"
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
           >
@@ -175,7 +175,7 @@ export function PurchaseOrdersPanel({
                   </div>
                 </button>
                 {isOpen && (
-                  <div className="border-t border-slate-200 px-4 pb-4">
+                  <div className="border-t border-slate-200 px-4 pb-4 overflow-x-auto">
                     <table className="min-w-full text-sm g-table mt-3">
                       <thead>
                         <tr>

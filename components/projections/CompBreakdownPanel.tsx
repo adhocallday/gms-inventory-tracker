@@ -107,8 +107,8 @@ export function CompBreakdownPanel({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-200">
           <div className="flex items-center gap-2">
@@ -142,7 +142,7 @@ export function CompBreakdownPanel({
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-1 p-1 bg-slate-100 rounded-lg">
+          <div className="flex gap-1 p-1 bg-slate-100 rounded-lg overflow-x-auto">
             {compTypes.map((type) => {
               const Icon = type.icon;
               const hasValue = compValues[type.value] > 0;
@@ -150,7 +150,7 @@ export function CompBreakdownPanel({
                 <button
                   key={type.value}
                   onClick={() => setActiveTab(type.value)}
-                  className={`flex-1 flex items-center justify-center gap-1 py-2 px-2 rounded-md text-xs font-medium transition ${
+                  className={`flex-1 min-w-0 flex items-center justify-center gap-1 py-2 px-1.5 sm:px-2 rounded-md text-xs font-medium transition ${
                     activeTab === type.value
                       ? 'bg-white shadow-sm text-[var(--g-text)]'
                       : hasValue
@@ -158,10 +158,10 @@ export function CompBreakdownPanel({
                         : 'text-[var(--g-text-muted)] hover:text-[var(--g-text)]'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{type.label}</span>
+                  <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                  <span className="hidden sm:inline truncate">{type.label}</span>
                   {hasValue && (
-                    <span className="ml-0.5 text-[10px] bg-purple-100 text-purple-700 px-1 rounded">
+                    <span className="ml-0.5 text-[10px] bg-purple-100 text-purple-700 px-1 rounded flex-shrink-0">
                       {compValues[type.value]}
                     </span>
                   )}
@@ -223,7 +223,7 @@ export function CompBreakdownPanel({
           {/* Summary */}
           <div className="bg-purple-50 rounded-lg p-3">
             <div className="text-xs font-medium text-purple-800 mb-2">Comp Summary</div>
-            <div className="grid grid-cols-5 gap-2 text-center">
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 text-center">
               {compTypes.map((type) => (
                 <div key={type.value}>
                   <div className="text-lg font-semibold text-purple-700">

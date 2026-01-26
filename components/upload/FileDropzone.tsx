@@ -216,7 +216,7 @@ export function FileDropzone({
       <div
         {...getRootProps()}
         className={`
-          border-2 border-dashed rounded-lg p-12 text-center cursor-pointer
+          border-2 border-dashed rounded-lg p-4 md:p-8 lg:p-12 text-center cursor-pointer
           transition-colors duration-200
           ${isDragActive ? 'border-[var(--g-accent)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
           ${uploading || parsing ? 'pointer-events-none opacity-50' : ''}
@@ -290,7 +290,7 @@ export function FileDropzone({
             <div className="border border-white/10 rounded-lg overflow-hidden bg-black/40">
               <iframe
                 src={pdfPreview}
-                className="w-full h-96"
+                className="w-full h-48 md:h-64 lg:h-96"
                 title="PDF Preview"
               />
             </div>
@@ -356,7 +356,7 @@ export function FileDropzone({
               </div>
             )}
 
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={() => {
                   if (currentFile && detectedType) {
@@ -367,7 +367,7 @@ export function FileDropzone({
                     parseDocument(currentFile, detectedType);
                   }
                 }}
-                className="flex-1 px-4 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold"
+                className="flex-1 px-3 py-2.5 md:px-4 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold text-sm md:text-base"
               >
                 Confirm & Parse
               </button>
@@ -383,7 +383,7 @@ export function FileDropzone({
                   setDetectedType(null);
                   setCurrentFile(null);
                 }}
-                className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition text-[var(--g-text)]"
+                className="px-3 py-2.5 md:px-4 border border-white/10 rounded-lg hover:bg-white/5 transition text-[var(--g-text)] text-sm md:text-base"
               >
                 Cancel
               </button>
@@ -401,11 +401,11 @@ export function FileDropzone({
       )}
 
       {parsedData && (
-        <div className="mt-4 p-4 border border-white/10 rounded-lg bg-[var(--g-surface)]">
+        <div className="mt-4 p-3 md:p-4 border border-white/10 rounded-lg bg-[var(--g-surface)]">
           <p className="text-sm text-[var(--g-text)] font-semibold mb-2">
             ✓ Document parsed successfully!
           </p>
-          <pre className="text-xs bg-black/40 p-3 rounded border border-white/10 overflow-auto max-h-96 text-[var(--g-text-dim)]">
+          <pre className="text-xs bg-black/40 p-2 md:p-3 rounded border border-white/10 overflow-auto max-h-48 md:max-h-64 lg:max-h-96 text-[var(--g-text-dim)]">
             {JSON.stringify(parsedData, null, 2)}
           </pre>
         </div>

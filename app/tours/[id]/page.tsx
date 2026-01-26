@@ -331,7 +331,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       </div>
 
       {/* Navigation Tabs */}
-      <nav className="flex gap-2 mt-8 border-b border-white/10 pb-0">
+      <nav className="flex gap-2 mt-8 border-b border-white/10 pb-0 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
         <Link
           href={`/tours/${tour.id}/projections`}
           className="px-4 py-2 text-sm font-medium text-[var(--g-text-dim)] hover:text-[var(--g-text)] hover:border-b-2 hover:border-[var(--g-accent)] transition"
@@ -422,7 +422,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
               <p className="text-[var(--g-text-muted)]">
                 Baseline scenario: <span className="text-white">{baselineScenario.name}</span>
               </p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="border border-white/10 rounded-md p-3">
                   <p className="text-xs text-[var(--g-text-muted)]">Forecast units</p>
                   <p className="text-lg font-semibold mt-1">{formatNumber(forecastUnits)}</p>
@@ -464,9 +464,9 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
           <p className="text-sm text-[var(--g-text-muted)] mt-2">
             Add design assets to quickly preview merch layouts for this tour.
           </p>
-          <div className="grid grid-cols-2 gap-3 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
             {designAssets.length === 0 ? (
-              <div className="col-span-2 text-sm text-[var(--g-text-muted)] border border-dashed border-white/10 rounded-md p-4">
+              <div className="sm:col-span-2 text-sm text-[var(--g-text-muted)] border border-dashed border-white/10 rounded-md p-4">
                 No design assets uploaded yet.
               </div>
             ) : (

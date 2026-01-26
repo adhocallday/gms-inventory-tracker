@@ -65,9 +65,9 @@ export function ReorderAlertBanner({ tourId, scenarioId }: ReorderAlertBannerPro
   return (
     <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 gap-3">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-100">
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 flex-shrink-0">
             <AlertTriangle className="w-4 h-4 text-amber-600" />
           </div>
           <div>
@@ -87,10 +87,10 @@ export function ReorderAlertBanner({ tourId, scenarioId }: ReorderAlertBannerPro
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-amber-700 hover:bg-amber-100 rounded-lg transition"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-1 px-3 py-1.5 text-sm font-medium text-amber-700 hover:bg-amber-100 rounded-lg transition"
           >
             {isExpanded ? 'Hide' : 'Show'} Details
             {isExpanded ? (
@@ -117,10 +117,10 @@ export function ReorderAlertBanner({ tourId, scenarioId }: ReorderAlertBannerPro
             {criticalAlerts.map((alert) => (
               <div
                 key={`${alert.sku}:${alert.size ?? ''}`}
-                className="flex items-center justify-between p-3 bg-red-50 border border-red-100 rounded-lg"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-red-50 border border-red-100 rounded-lg gap-2"
               >
                 <div className="flex items-center gap-3">
-                  <Package className="w-4 h-4 text-red-600" />
+                  <Package className="w-4 h-4 text-red-600 flex-shrink-0" />
                   <div>
                     <div className="font-mono text-sm font-medium text-red-900">
                       {alert.sku}
@@ -134,7 +134,7 @@ export function ReorderAlertBanner({ tourId, scenarioId }: ReorderAlertBannerPro
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right pl-7 sm:pl-0">
                   <div className="text-sm font-semibold text-red-700">
                     {alert.current_projected_balance} units
                   </div>
@@ -150,10 +150,10 @@ export function ReorderAlertBanner({ tourId, scenarioId }: ReorderAlertBannerPro
             {warningAlerts.map((alert) => (
               <div
                 key={`${alert.sku}:${alert.size ?? ''}`}
-                className="flex items-center justify-between p-3 bg-amber-50 border border-amber-100 rounded-lg"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-amber-50 border border-amber-100 rounded-lg gap-2"
               >
                 <div className="flex items-center gap-3">
-                  <Package className="w-4 h-4 text-amber-600" />
+                  <Package className="w-4 h-4 text-amber-600 flex-shrink-0" />
                   <div>
                     <div className="font-mono text-sm font-medium text-amber-900">
                       {alert.sku}
@@ -167,7 +167,7 @@ export function ReorderAlertBanner({ tourId, scenarioId }: ReorderAlertBannerPro
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-left sm:text-right pl-7 sm:pl-0">
                   <div className="text-sm font-semibold text-amber-700">
                     {alert.current_projected_balance} units
                   </div>
@@ -181,11 +181,11 @@ export function ReorderAlertBanner({ tourId, scenarioId }: ReorderAlertBannerPro
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-2 mt-4">
-            <button className="px-3 py-1.5 text-sm font-medium text-amber-700 hover:bg-amber-100 rounded-lg transition">
+          <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">
+            <button className="px-3 py-2 sm:py-1.5 text-sm font-medium text-amber-700 hover:bg-amber-100 rounded-lg transition">
               Configure Thresholds
             </button>
-            <button className="px-3 py-1.5 text-sm font-medium bg-amber-600 text-white hover:bg-amber-700 rounded-lg transition">
+            <button className="px-3 py-2 sm:py-1.5 text-sm font-medium bg-amber-600 text-white hover:bg-amber-700 rounded-lg transition">
               Create Reorder
             </button>
           </div>

@@ -245,3 +245,13 @@ img {
   background: var(--g-accent);
   color: #fff;
 }
+
+/* Utility to hide scrollbar while allowing scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
