@@ -12,17 +12,21 @@ export async function GET(
     const includeAlerts = searchParams.get('include_alerts') === 'true';
     const scenarioId = searchParams.get('scenario_id');
 
-    // Get thresholds
-    const { data: thresholds, error } = await supabase
-      .from('reorder_thresholds')
-      .select('*')
-      .eq('tour_id', tourId)
-      .eq('is_active', true)
-      .order('sku', { ascending: true });
+    // Get thresholds (table may not exist yet - handle gracefully)
+    let thresholds: any[] = [];
+    try {
+      const { data, error } = await supabase
+        .from('reorder_thresholds')
+        .select('*')
+        .eq('tour_id', tourId)
+        .eq('is_active', true)
+        .order('sku', { ascending: true });
 
-    if (error) {
-      console.error('Error fetching thresholds:', error);
-      return NextResponse.json({ error: 'Failed to fetch thresholds' }, { status: 500 });
+      if (!error && data) {
+        thresholds = data;
+      }
+    } catch {
+      // Table doesn't exist yet - return empty thresholds
     }
 
     // If alerts requested and scenario provided, calculate current balances

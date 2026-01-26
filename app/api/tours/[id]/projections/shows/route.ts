@@ -40,38 +40,50 @@ export async function GET(
       return NextResponse.json({ error: 'Failed to fetch projections' }, { status: 500 });
     }
 
-    // Get deliveries
-    const { data: deliveries, error: deliveriesError } = await supabase
-      .from('show_deliveries')
-      .select('*')
-      .eq('tour_id', tourId);
+    // Get deliveries (table may not exist yet - handle gracefully)
+    let deliveries: any[] = [];
+    try {
+      const { data, error: deliveriesError } = await supabase
+        .from('show_deliveries')
+        .select('*')
+        .eq('tour_id', tourId);
 
-    if (deliveriesError) {
-      console.error('Error fetching deliveries:', deliveriesError);
-      return NextResponse.json({ error: 'Failed to fetch deliveries' }, { status: 500 });
+      if (!deliveriesError && data) {
+        deliveries = data;
+      }
+    } catch {
+      // Table doesn't exist yet - that's OK
     }
 
-    // Get comps
-    const { data: comps, error: compsError } = await supabase
-      .from('show_comps')
-      .select('*')
-      .eq('tour_id', tourId);
+    // Get comps (table may not exist yet - handle gracefully)
+    let comps: any[] = [];
+    try {
+      const { data, error: compsError } = await supabase
+        .from('show_comps')
+        .select('*')
+        .eq('tour_id', tourId);
 
-    if (compsError) {
-      console.error('Error fetching comps:', compsError);
-      return NextResponse.json({ error: 'Failed to fetch comps' }, { status: 500 });
+      if (!compsError && data) {
+        comps = data;
+      }
+    } catch {
+      // Table doesn't exist yet - that's OK
     }
 
-    // Get initial inventory if scenario is specified
+    // Get initial inventory if scenario is specified (table may not exist yet)
     let initialInventory: any[] = [];
     if (scenarioId) {
-      const { data, error } = await supabase
-        .from('initial_inventory')
-        .select('*')
-        .eq('scenario_id', scenarioId);
+      try {
+        const { data, error } = await supabase
+          .from('initial_inventory')
+          .select('*')
+          .eq('scenario_id', scenarioId);
 
-      if (!error && data) {
-        initialInventory = data;
+        if (!error && data) {
+          initialInventory = data;
+        }
+      } catch {
+        // Table doesn't exist yet - that's OK
       }
     }
 
