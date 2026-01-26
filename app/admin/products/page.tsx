@@ -229,7 +229,7 @@ export default function AdminProductsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by SKU or description..."
-            className="w-full pl-10 pr-10 py-2 bg-white/5 border border-white/10 rounded-lg text-[var(--g-text)] placeholder-[var(--g-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
+            className="w-full pl-10 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[var(--g-text)] placeholder-[var(--g-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
           />
           {search && (
             <button

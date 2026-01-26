@@ -264,7 +264,7 @@ export default function ParsedDocumentsPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--g-text-muted)]" />
           <input
             type="text"
-            className="w-full pl-10 pr-10 py-2.5 bg-white/5 border border-white/10 rounded-lg text-[var(--g-text)] placeholder-[var(--g-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
+            className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[var(--g-text)] placeholder-[var(--g-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
             placeholder="Search by filename, tour name, venue..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -502,7 +502,7 @@ export default function ParsedDocumentsPage() {
 
       {/* Pagination */}
       {totalCount > limit && (
-        <div className="flex items-center justify-between mt-6 pt-6 border-t border-white/10">
+        <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-200">
           <Button variant="outline" onClick={handlePrevPage} disabled={offset === 0}>
             ← Previous
           </Button>

@@ -176,12 +176,12 @@ export default async function AdminDashboard() {
         </div>
 
         {recentTours && recentTours.length > 0 ? (
-          <div className="g-card divide-y divide-white/10">
+          <div className="g-card divide-y divide-slate-200">
             {recentTours.map((tour: any) => (
               <Link
                 key={tour.id}
                 href={`/admin/tours/${tour.id}/edit`}
-                className="flex items-center justify-between p-6 hover:bg-white/5 transition group"
+                className="flex items-center justify-between p-6 hover:bg-slate-50 transition group"
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -225,7 +225,7 @@ export default async function AdminDashboard() {
           Admin Tools
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-6 rounded-xl border border-white/10 bg-white/5 opacity-50">
+          <div className="p-6 rounded-xl border border-slate-200 bg-slate-50 opacity-50">
             <div className="text-3xl mb-3">⚙️</div>
             <h3 className="text-sm font-semibold text-[var(--g-text)] mb-2">
               User Management
@@ -235,7 +235,7 @@ export default async function AdminDashboard() {
             </p>
           </div>
 
-          <div className="p-6 rounded-xl border border-white/10 bg-white/5 opacity-50">
+          <div className="p-6 rounded-xl border border-slate-200 bg-slate-50 opacity-50">
             <div className="text-3xl mb-3">📊</div>
             <h3 className="text-sm font-semibold text-[var(--g-text)] mb-2">
               Reports & Analytics
@@ -245,7 +245,7 @@ export default async function AdminDashboard() {
             </p>
           </div>
 
-          <div className="p-6 rounded-xl border border-white/10 bg-white/5 opacity-50">
+          <div className="p-6 rounded-xl border border-slate-200 bg-slate-50 opacity-50">
             <div className="text-3xl mb-3">🔧</div>
             <h3 className="text-sm font-semibold text-[var(--g-text)] mb-2">
               System Settings

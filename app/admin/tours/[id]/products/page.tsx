@@ -227,7 +227,7 @@ export default function TourProductsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by SKU or description..."
-            className="w-full pl-10 pr-10 py-2 bg-white/5 border border-white/10 rounded-lg text-[var(--g-text)] placeholder-[var(--g-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
+            className="w-full pl-10 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[var(--g-text)] placeholder-[var(--g-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
           />
           {search && (
             <button
@@ -295,12 +295,12 @@ export default function TourProductsPage() {
             return (
               <div
                 key={product.product_id}
-                className="border border-white/10 rounded-lg bg-[var(--g-surface)] overflow-hidden"
+                className="border border-slate-200 rounded-lg bg-[var(--g-surface)] overflow-hidden"
               >
                 {/* Product Header */}
                 <button
                   onClick={() => toggleExpanded(product.product_id)}
-                  className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition"
+                  className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition"
                 >
                   <div className="flex items-center gap-4">
                     {isExpanded ? (
@@ -334,7 +334,7 @@ export default function TourProductsPage() {
 
                 {/* Expanded Content - Size Details */}
                 {isExpanded && (
-                  <div className="border-t border-white/10 p-4 bg-white/2">
+                  <div className="border-t border-slate-200 p-4 bg-slate-50/50">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="text-left text-[var(--g-text-muted)]">
