@@ -712,7 +712,7 @@ export function ProjectionSheet({
           <p className="text-sm text-[var(--g-text-muted)]">Loading overrides…</p>
         ) : (
           <table className="min-w-[1200px] text-sm g-table">
-            <thead className="text-left border-b border-white/10">
+            <thead className="text-left border-b border-slate-200">
               <tr>
                 <th className="py-2 pr-4">SKU</th>
                 <th className="py-2 pr-4">Design</th>
@@ -740,7 +740,7 @@ export function ProjectionSheet({
               {rows.map((row) => {
                 const warning = row.onHand + row.onOrder < row.forecastUnits;
                 return (
-                  <tr key={row.sku} className="border-b border-white/10">
+                  <tr key={row.sku} className="border-b border-slate-200">
                     <td className="py-3 pr-4">
                       <div className="font-semibold">{row.sku}</div>
                       {warning ? (
@@ -839,7 +839,7 @@ export function ProjectionSheet({
               })}
             </tbody>
             <tfoot>
-              <tr className="border-t border-white/10 font-semibold">
+              <tr className="border-t border-slate-200 font-semibold">
                 <td className="py-3 pr-4" colSpan={6}>
                   Totals
                 </td>

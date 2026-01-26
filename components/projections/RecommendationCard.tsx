@@ -65,7 +65,7 @@ export function RecommendationCard({ recommendation, onAccept, onReject }: Recom
           </button>
           <button
             onClick={onReject}
-            className="px-4 py-2 border border-[var(--g-border)] rounded-lg hover:bg-white/5 transition text-sm"
+            className="px-4 py-2 border border-slate-200 rounded-lg bg-slate-50 hover:bg-slate-100 transition text-sm text-[var(--g-text)]"
           >
             Reject
           </button>

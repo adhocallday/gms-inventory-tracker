@@ -72,7 +72,7 @@ export function ChatInterface({ tourId, scenarioId }: ChatInterfaceProps) {
             className={`p-3 rounded-lg ${
               msg.role === 'user'
                 ? 'bg-[var(--g-accent)]/10 ml-8'
-                : 'bg-white/5 mr-8'
+                : 'bg-slate-100 mr-8'
             }`}
           >
             <div className="text-xs text-[var(--g-text-muted)] mb-1">
@@ -83,7 +83,7 @@ export function ChatInterface({ tourId, scenarioId }: ChatInterfaceProps) {
         ))}
 
         {loading && (
-          <div className="p-3 rounded-lg bg-white/5 mr-8">
+          <div className="p-3 rounded-lg bg-slate-100 mr-8">
             <div className="text-xs text-[var(--g-text-muted)] mb-1">AI Assistant</div>
             <div className="text-sm">Thinking...</div>
           </div>
