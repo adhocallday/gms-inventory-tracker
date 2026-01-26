@@ -148,14 +148,30 @@ export function EnhancedAIAgentPanel({
       </div>
 
       {generated && (
-        <div className="mb-4 p-4 bg-green-500/10 border border-green-500/20 rounded-lg text-sm text-green-500">
-          ✓ Projections generated and applied successfully! All data has been populated in the spreadsheet below.
+        <div className="mb-4 p-5 bg-gradient-to-br from-emerald-50/80 to-white border-2 border-emerald-200 rounded-2xl shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-white shadow-inner">
+              <span className="text-emerald-600 text-lg">✓</span>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-emerald-800">Projections Generated</p>
+              <p className="text-xs text-emerald-600">All data has been populated in the spreadsheet below.</p>
+            </div>
+          </div>
         </div>
       )}
 
       {error && (
-        <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-500">
-          ✗ Error: {error}
+        <div className="mb-4 p-5 bg-gradient-to-br from-red-50/80 to-white border-2 border-red-200 rounded-2xl shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-white shadow-inner">
+              <span className="text-red-600 text-lg">✗</span>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-red-800">Error</p>
+              <p className="text-xs text-red-600">{error}</p>
+            </div>
+          </div>
         </div>
       )}
 

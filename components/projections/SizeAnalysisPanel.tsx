@@ -80,20 +80,25 @@ export function SizeAnalysisPanel({
   return (
     <div className="space-y-6">
       {/* Global Insights */}
-      <div className="g-card p-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 text-[var(--g-accent)]" />
-          <h3 className="font-semibold text-[var(--g-text)]">Audience Insights</h3>
+      <div className="border border-amber-200 bg-gradient-to-br from-amber-50/80 to-white/70 rounded-[1.5rem] p-5 shadow-lg shadow-amber-100/60 space-y-4">
+        <div className="flex items-center gap-3">
+          <Users className="w-6 h-6 text-amber-600" />
+          <div>
+            <p className="text-sm font-semibold text-[var(--g-text)]">Audience Insights</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-[var(--g-text-muted)]">AI context</p>
+          </div>
         </div>
-        <p className="text-sm text-[var(--g-text-muted)]">{globalInsights.audienceDemographic}</p>
+        <p className="text-sm text-[var(--g-text)] leading-relaxed">
+          {globalInsights.audienceDemographic || 'Historical crowd data is being summarized for you.'}
+        </p>
 
         {globalInsights.sizeTrends.length > 0 && (
           <div className="space-y-1">
-            <div className="flex items-center gap-1 text-sm font-medium text-[var(--g-text)]">
-              <TrendingUp className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-sm font-semibold text-[var(--g-text)]">
+              <TrendingUp className="w-4 h-4 text-amber-500" />
               Size Trends
             </div>
-            <ul className="text-sm text-[var(--g-text-muted)] list-disc list-inside">
+            <ul className="text-sm text-[var(--g-text-muted)] list-disc list-inside space-y-1">
               {globalInsights.sizeTrends.map((trend, i) => (
                 <li key={i}>{trend}</li>
               ))}
@@ -103,11 +108,11 @@ export function SizeAnalysisPanel({
 
         {globalInsights.recommendations.length > 0 && (
           <div className="space-y-1">
-            <div className="flex items-center gap-1 text-sm font-medium text-[var(--g-text)]">
-              <AlertTriangle className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-sm font-semibold text-[var(--g-text)]">
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
               Recommendations
             </div>
-            <ul className="text-sm text-[var(--g-text-muted)] list-disc list-inside">
+            <ul className="text-sm text-[var(--g-text-muted)] list-disc list-inside space-y-1">
               {globalInsights.recommendations.map((rec, i) => (
                 <li key={i}>{rec}</li>
               ))}
@@ -117,10 +122,10 @@ export function SizeAnalysisPanel({
       </div>
 
       {/* Summary and Apply All */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 border border-slate-200 bg-white/90 rounded-3xl p-4 shadow-sm md:flex-row md:items-center md:justify-between">
         <div className="text-sm text-[var(--g-text-muted)]">
-          <span className="font-medium">{skus.length}</span> products analyzed •
-          <span className="font-medium text-green-600"> {highConfidenceCount}</span> high confidence
+          <span className="font-semibold text-[var(--g-text)]">{skus.length}</span> products analyzed •
+          <span className="font-semibold text-green-600"> {highConfidenceCount}</span> high confidence
           {hasDifferences && (
             <span className="text-amber-600"> • Adjustments recommended</span>
           )}
@@ -128,7 +133,7 @@ export function SizeAnalysisPanel({
         {hasDifferences && appliedSkus.size < skus.length && (
           <button
             onClick={handleApplyAll}
-            className="flex items-center gap-2 px-4 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition text-sm font-medium"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--g-accent)] text-white rounded-2xl hover:bg-[var(--g-accent-2)] transition text-sm font-semibold shadow-md shadow-[var(--g-accent-2)]/30"
           >
             <Sparkles className="w-4 h-4" />
             Apply All Recommendations
@@ -149,14 +154,16 @@ export function SizeAnalysisPanel({
           return (
             <div
               key={sku}
-              className={`border rounded-lg overflow-hidden ${
-                isApplied ? 'border-green-200 bg-green-50/50' : 'border-[var(--g-border)]'
+              className={`rounded-[1.5rem] border overflow-hidden shadow-sm ${
+                isApplied
+                  ? 'border-green-200 bg-emerald-50/70'
+                  : 'border-[var(--g-border)] bg-white/80'
               }`}
             >
               {/* Header */}
               <button
                 onClick={() => setExpandedSku(isExpanded ? null : sku)}
-                className="w-full flex items-center justify-between p-3 hover:bg-[var(--g-bg-subtle)] transition"
+                className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-gradient-to-r from-slate-100 to-white transition hover:from-slate-200"
               >
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-medium">
@@ -196,15 +203,15 @@ export function SizeAnalysisPanel({
                   )}
                 </div>
                 {isExpanded ? (
-                  <ChevronUp className="w-4 h-4 text-slate-400" />
+                  <ChevronUp className="w-4 h-4 text-slate-500" />
                 ) : (
-                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                  <ChevronDown className="w-4 h-4 text-slate-500" />
                 )}
               </button>
 
               {/* Expanded Content */}
               {isExpanded && (
-                <div className="border-t border-[var(--g-border)] p-4 space-y-4">
+                <div className="border-t border-[var(--g-border)]/60 bg-white/70 p-4 space-y-4">
                   {/* Reasoning */}
                   <p className="text-sm text-[var(--g-text-muted)]">{a.reasoning}</p>
 
@@ -251,8 +258,8 @@ export function SizeAnalysisPanel({
                   {/* Insights */}
                   {a.insights && a.insights.length > 0 && (
                     <div className="space-y-1">
-                      <div className="text-xs font-medium text-[var(--g-text-muted)]">Insights</div>
-                      <ul className="text-xs text-[var(--g-text-muted)] list-disc list-inside">
+                      <div className="text-xs font-medium text-[var(--g-text)]">Insights</div>
+                      <ul className="text-xs text-[var(--g-text-muted)] list-disc list-inside space-y-1">
                         {a.insights.map((insight, i) => (
                           <li key={i}>{insight}</li>
                         ))}

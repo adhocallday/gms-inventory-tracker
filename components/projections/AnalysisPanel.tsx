@@ -5,6 +5,12 @@ interface AnalysisPanelProps {
   loading: boolean;
 }
 
+const sectionCard =
+  'bg-gradient-to-br from-white/80 to-slate-50 border border-[var(--g-border)] rounded-[1.5rem] shadow-sm p-6 space-y-4';
+
+const statisticCard =
+  'bg-white/80 border border-slate-200 rounded-2xl p-4 shadow-sm shadow-slate-200/60';
+
 export function AnalysisPanel({ analysis, loading }: AnalysisPanelProps) {
   if (loading) {
     return <div className="text-center py-8 text-[var(--g-text-muted)]">Analyzing...</div>;
@@ -21,40 +27,51 @@ export function AnalysisPanel({ analysis, loading }: AnalysisPanelProps) {
   return (
     <div className="space-y-6">
       {/* Product Performance */}
-      <section>
-        <h3 className="text-lg font-semibold mb-3">Product Performance</h3>
+      <section className={sectionCard}>
+        <div className="flex items-center justify-between gap-4">
+          <h3 className="text-xl font-semibold g-title text-[var(--g-text)]">
+            Product Performance
+          </h3>
+          <span className="text-xs uppercase tracking-[0.2em] text-[var(--g-text-muted)]">
+            Updated in real time
+          </span>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <h4 className="text-sm font-medium text-[var(--g-text-muted)] mb-2">Top Performers</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className={statisticCard}>
+            <p className="text-sm font-medium text-[var(--g-text-muted)] mb-3">Top Performers</p>
             <div className="space-y-2">
               {analysis.productPerformance?.topPerformers?.slice(0, 3).map((p: any) => (
-                <div key={p.sku} className="p-2 bg-green-500/10 rounded border border-green-500/20">
-                  <div className="text-sm font-semibold">{p.sku}</div>
-                  <div className="text-xs text-[var(--g-text-dim)]">{p.totalSold} sold · ${p.margin.toFixed(0)} margin</div>
+                <div key={p.sku} className="space-y-1">
+                  <div className="text-sm font-semibold text-[var(--g-text)]">{p.sku}</div>
+                  <div className="text-xs text-[var(--g-text-dim)]">
+                    {p.totalSold} sold · ${p.margin.toFixed(0)} margin
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div>
-            <h4 className="text-sm font-medium text-[var(--g-text-muted)] mb-2">Underperformers</h4>
+          <div className={statisticCard}>
+            <p className="text-sm font-medium text-[var(--g-text-muted)] mb-3">Underperformers</p>
             <div className="space-y-2">
               {analysis.productPerformance?.underperformers?.slice(0, 3).map((p: any) => (
-                <div key={p.sku} className="p-2 bg-red-500/10 rounded border border-red-500/20">
-                  <div className="text-sm font-semibold">{p.sku}</div>
-                  <div className="text-xs text-[var(--g-text-dim)]">{p.totalSold} sold · ${p.margin.toFixed(0)} margin</div>
+                <div key={p.sku} className="space-y-1">
+                  <div className="text-sm font-semibold text-[var(--g-text)]">{p.sku}</div>
+                  <div className="text-xs text-[var(--g-text-dim)]">
+                    {p.totalSold} sold · ${p.margin.toFixed(0)} margin
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div>
-            <h4 className="text-sm font-medium text-[var(--g-text-muted)] mb-2">Opportunities</h4>
+          <div className={statisticCard}>
+            <p className="text-sm font-medium text-[var(--g-text-muted)] mb-3">Opportunities</p>
             <div className="space-y-2">
               {analysis.productPerformance?.opportunities?.slice(0, 3).map((p: any) => (
-                <div key={p.sku} className="p-2 bg-blue-500/10 rounded border border-blue-500/20">
-                  <div className="text-sm font-semibold">{p.sku}</div>
+                <div key={p.sku} className="space-y-1">
+                  <div className="text-sm font-semibold text-[var(--g-text)]">{p.sku}</div>
                   <div className="text-xs text-[var(--g-text-dim)]">{p.reasoning}</div>
                 </div>
               ))}
@@ -65,30 +82,30 @@ export function AnalysisPanel({ analysis, loading }: AnalysisPanelProps) {
 
       {/* Stockout Risks */}
       {analysis.stockoutRisks?.length > 0 && (
-        <section>
-          <h3 className="text-lg font-semibold mb-3">Stockout Risks</h3>
-          <div className="space-y-2">
+        <section className={sectionCard}>
+          <h3 className="text-xl font-semibold g-title text-[var(--g-text)]">Stockout Risks</h3>
+          <div className="space-y-3">
             {analysis.stockoutRisks.map((risk: any, idx: number) => (
               <div
                 key={idx}
-                className={`p-3 rounded border ${
+                className={`rounded-2xl border p-4 shadow-sm ${
                   risk.riskLevel === 'critical'
-                    ? 'bg-red-500/10 border-red-500/20'
+                    ? 'bg-red-50/60 border-red-100 text-red-700'
                     : risk.riskLevel === 'high'
-                    ? 'bg-orange-500/10 border-orange-500/20'
-                    : 'bg-yellow-500/10 border-yellow-500/20'
+                    ? 'bg-orange-50/70 border-orange-100 text-orange-700'
+                    : 'bg-yellow-50/70 border-amber-100 text-amber-700'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-semibold">
-                    {risk.sku} {risk.size && `· ${risk.size}`}
+                  <span className="text-sm font-semibold">{risk.sku}{risk.size ? ` · ${risk.size}` : ''}</span>
+                  <span className="text-[0.65rem] uppercase tracking-[0.3em]">
+                    {risk.riskLevel} risk
                   </span>
-                  <span className="text-xs uppercase tracking-wide">{risk.riskLevel} risk</span>
                 </div>
                 <div className="text-xs text-[var(--g-text-dim)]">
                   Forecast demand: {risk.forecastDemand} · Current supply: {risk.currentSupply}
                 </div>
-                <div className="text-xs mt-1">{risk.recommendation}</div>
+                <div className="text-xs text-[var(--g-text)] mt-1">{risk.recommendation}</div>
               </div>
             ))}
           </div>
@@ -97,12 +114,22 @@ export function AnalysisPanel({ analysis, loading }: AnalysisPanelProps) {
 
       {/* Size Curves */}
       {analysis.sizeCurveRecommendations?.length > 0 && (
-        <section>
-          <h3 className="text-lg font-semibold mb-3">Size Distribution Recommendations</h3>
-          <div className="space-y-3">
+        <section className={sectionCard}>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-semibold g-title text-[var(--g-text)]">
+              Size Distribution Recommendations
+            </h3>
+            <span className="text-xs uppercase tracking-[0.2em] text-[var(--g-text-muted)]">
+              {analysis.sizeCurveRecommendations.length} SKUs
+            </span>
+          </div>
+          <div className="space-y-4">
             {analysis.sizeCurveRecommendations.slice(0, 5).map((curve: any) => (
-              <div key={curve.sku} className="p-3 border border-[var(--g-border)] rounded-lg">
-                <div className="text-sm font-semibold mb-2">{curve.sku}</div>
+              <div key={curve.sku} className="bg-white/90 border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm font-semibold text-[var(--g-text)]">{curve.sku}</div>
+                  <span className="text-xs text-[var(--g-text-muted)]">Confidence: {curve.confidence ? `${Math.round(curve.confidence * 100)}%` : 'n/a'}</span>
+                </div>
                 <div className="grid grid-cols-6 gap-2 text-xs mb-2">
                   {Object.entries(curve.recommendedCurve).map(([size, pct]: [string, any]) => (
                     <div key={size} className="text-center">

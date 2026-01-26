@@ -202,15 +202,15 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
 
       {/* Loading Progress */}
       {loading && (
-        <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+        <div className="mt-4 p-5 bg-gradient-to-br from-blue-50/80 to-white border-2 border-blue-200 rounded-2xl shadow-sm">
           <div className="flex items-center gap-3 mb-3">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400"></div>
-            <span className="text-sm font-medium text-blue-400">Generating your report...</span>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+            <span className="text-sm font-semibold text-blue-800">Generating your report...</span>
           </div>
-          <div className="w-full bg-blue-500/20 rounded-full h-2 overflow-hidden">
-            <div className="h-full bg-blue-400 rounded-full animate-pulse" style={{ width: '70%' }}></div>
+          <div className="w-full bg-blue-100 rounded-full h-2 overflow-hidden">
+            <div className="h-full bg-blue-500 rounded-full animate-pulse" style={{ width: '70%' }}></div>
           </div>
-          <p className="text-xs text-blue-400/70 mt-2">
+          <p className="text-xs text-blue-600 mt-2">
             This may take a few moments while we compile all your sales data, product images, and charts.
           </p>
         </div>
@@ -218,21 +218,37 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
 
       {/* Status Messages */}
       {success && (
-        <div className="mt-4 p-4 bg-green-500/10 border border-green-500/20 rounded-lg text-sm text-green-500">
-          ✓ Report generated successfully! Refreshing page to show new report...
+        <div className="mt-4 p-5 bg-gradient-to-br from-emerald-50/80 to-white border-2 border-emerald-200 rounded-2xl shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-white shadow-inner">
+              <span className="text-emerald-600 text-lg">✓</span>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-emerald-800">Report Generated</p>
+              <p className="text-xs text-emerald-600">Refreshing page to show new report...</p>
+            </div>
+          </div>
         </div>
       )}
 
       {error && (
-        <div className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-500">
-          ✗ Error: {error}
+        <div className="mt-4 p-5 bg-gradient-to-br from-red-50/80 to-white border-2 border-red-200 rounded-2xl shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-white shadow-inner">
+              <span className="text-red-600 text-lg">✗</span>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-red-800">Error</p>
+              <p className="text-xs text-red-600">{error}</p>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Info Box */}
-      <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg text-sm text-blue-400">
-        <p className="font-semibold mb-1">📊 What's Included:</p>
-        <ul className="list-disc list-inside space-y-1 text-xs">
+      <div className="mt-6 p-5 bg-gradient-to-br from-blue-50/80 to-white border-2 border-blue-200 rounded-2xl shadow-sm">
+        <p className="font-semibold text-blue-800 mb-2">📊 What's Included:</p>
+        <ul className="list-disc list-inside space-y-1 text-xs text-blue-700">
           <li>Product images (grab sheets) with sales data</li>
           <li>Sales charts by city and venue</li>
           <li>Per-head revenue analysis</li>
