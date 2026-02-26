@@ -1,29 +1,117 @@
 import Anthropic from '@anthropic-ai/sdk';
+import type { DocumentAgent } from './agents/types';
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!
-});
+// Lazily initialized client (allows dotenv to load first in scripts)
+let _client: Anthropic | null = null;
+
+function getClient(): Anthropic {
+  if (!_client) {
+    _client = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY!,
+      defaultHeaders: {
+        'anthropic-beta': 'prompt-caching-2024-07-31'
+      }
+    });
+  }
+  return _client;
+}
+
+// Model selection
+const HAIKU_MODEL = 'claude-3-haiku-20240307';  // Fast, good for structured extraction
+const SONNET_MODEL = 'claude-sonnet-4-20250514'; // Powerful, for complex/fallback
 
 export interface ParsedDocument {
   [key: string]: any;
 }
 
+export interface AgentParseResult {
+  data: ParsedDocument;
+  cacheHit: boolean;
+  parseTimeMs: number;
+}
+
+/**
+ * Parse extracted text using Claude (much faster than document parsing).
+ * Use this when you've already extracted text from a PDF.
+ * Uses Haiku for speed since text extraction is straightforward.
+ * @param text - The extracted text content
+ * @param instructions - Extraction instructions for Claude
+ */
+export async function parseText(
+  text: string,
+  instructions: string
+): Promise<ParsedDocument> {
+  // Use Sonnet for text parsing (Haiku requires separate API access)
+  const modelId = 'claude-sonnet-4-20250514';
+
+  try {
+    const response = await getClient().messages.create({
+      model: modelId,
+      max_tokens: 8192,
+      messages: [
+        {
+          role: 'user',
+          content: `${instructions}\n\n---\nDocument text:\n${text}`
+        }
+      ]
+    });
+
+    const textContent = response.content.find(c => c.type === 'text');
+    if (!textContent || textContent.type !== 'text') {
+      throw new Error('No text response from Claude');
+    }
+
+    let responseText = textContent.text;
+
+    // Remove markdown code blocks if present
+    if (responseText.includes('```')) {
+      const codeBlockMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (codeBlockMatch) {
+        responseText = codeBlockMatch[1];
+      }
+    }
+
+    // Extract JSON object
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error('Failed to extract JSON from Claude response:', responseText.substring(0, 500));
+      throw new Error('No JSON found in response');
+    }
+
+    return JSON.parse(jsonMatch[0]);
+  } catch (error) {
+    console.error('Claude API Error (text parsing):', error);
+    throw error;
+  }
+}
+
+/**
+ * Parse a document using Claude (slower, use for images or when text extraction fails).
+ * @param base64Data - Base64 encoded document data
+ * @param mediaType - MIME type of the document
+ * @param instructions - Extraction instructions for Claude
+ */
 export async function parseDocument(
   base64Data: string,
   mediaType: 'application/pdf' | 'image/jpeg' | 'image/png',
   instructions: string
 ): Promise<ParsedDocument> {
+  const modelId = 'claude-sonnet-4-20250514';
+
   try {
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
+    // Use 'document' for PDFs, 'image' for images
+    const contentType = mediaType === 'application/pdf' ? 'document' : 'image';
+
+    const response = await getClient().messages.create({
+      model: modelId,
       max_tokens: 16384,
       messages: [
         {
           role: 'user',
           content: [
             ({
-              // The SDK types lag behind the API; "document" is valid at runtime.
-              type: 'document',
+              // The SDK types lag behind the API; "document" and "image" are valid at runtime.
+              type: contentType,
               source: {
                 type: 'base64',
                 media_type: mediaType,
@@ -100,6 +188,91 @@ export async function parseDocument(
         stack: error.stack
       });
     }
+    throw error;
+  }
+}
+
+/**
+ * Parse text using a specialized document agent with cached system prompt.
+ *
+ * Uses Haiku for fast text extraction (~5s vs ~50s with Sonnet).
+ * Also uses cache_control for faster subsequent requests.
+ *
+ * @param agent - Document agent with specialized system prompt
+ * @param documentText - Extracted text from PDF
+ * @param useHaiku - Use Haiku (fast) or Sonnet (powerful). Default: true
+ * @returns Parsed document with cache metadata
+ */
+export async function parseWithAgent(
+  agent: DocumentAgent,
+  documentText: string,
+  useHaiku: boolean = true
+): Promise<AgentParseResult> {
+  const startTime = Date.now();
+  const modelId = useHaiku ? HAIKU_MODEL : SONNET_MODEL;
+  // Haiku supports max 4096 tokens, Sonnet supports 8192
+  const maxTokens = useHaiku ? 4096 : 8192;
+
+  try {
+    // SDK types lag behind API - cache_control is valid at runtime
+    const response = await getClient().messages.create({
+      model: modelId,
+      max_tokens: maxTokens,
+      system: [
+        {
+          type: 'text',
+          text: agent.systemPrompt,
+          cache_control: { type: 'ephemeral' }
+        } as any
+      ],
+      messages: [
+        {
+          role: 'user',
+          content: documentText
+        }
+      ]
+    });
+
+    const parseTimeMs = Date.now() - startTime;
+
+    // Check if cache was hit (cache_creation_input_tokens = 0 means cache hit)
+    const cacheCreationTokens = (response.usage as any)?.cache_creation_input_tokens ?? 0;
+    const cacheReadTokens = (response.usage as any)?.cache_read_input_tokens ?? 0;
+    const cacheHit = cacheCreationTokens === 0 && cacheReadTokens > 0;
+
+    console.log(`[${agent.name}] Model: ${modelId}`);
+    console.log(`[${agent.name}] Parse time: ${parseTimeMs}ms`);
+    console.log(`[${agent.name}] Cache: ${cacheHit ? 'HIT' : 'MISS'} (created: ${cacheCreationTokens}, read: ${cacheReadTokens})`);
+
+    const textContent = response.content.find(c => c.type === 'text');
+    if (!textContent || textContent.type !== 'text') {
+      throw new Error('No text response from Claude');
+    }
+
+    let responseText = textContent.text;
+
+    // Remove markdown code blocks if present
+    if (responseText.includes('```')) {
+      const codeBlockMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (codeBlockMatch) {
+        responseText = codeBlockMatch[1];
+      }
+    }
+
+    // Extract JSON object
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error('Failed to extract JSON from agent response:', responseText.substring(0, 500));
+      throw new Error('No JSON found in response');
+    }
+
+    return {
+      data: JSON.parse(jsonMatch[0]),
+      cacheHit,
+      parseTimeMs
+    };
+  } catch (error) {
+    console.error(`[${agent.name}] Error:`, error);
     throw error;
   }
 }

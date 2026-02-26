@@ -1,4 +1,6 @@
-import { parseDocument } from '../claude-client';
+import { parseWithAgent, parseDocument } from '../claude-client';
+import { extractTextFromBase64PDF } from '../pdf-utils';
+import { SALES_REPORT_AGENT } from '../agents';
 
 export interface SalesLineItem {
   sku: string;
@@ -19,40 +21,49 @@ export interface SalesReportData {
   lineItems: SalesLineItem[];
 }
 
+// Fallback instructions for document parsing (when text extraction fails)
+const FALLBACK_INSTRUCTIONS = `
+Parse this AtVenu sales report PDF. Extract:
+- showDate (YYYY-MM-DD)
+- venueName
+- city, state
+- totalGross
+- lineItems: [{sku (strip size suffix), description, size, sold, unitPrice, gross}]
+
+Return ONLY valid JSON.
+`;
+
 export async function parseSalesReport(
   pdfBase64: string
 ): Promise<SalesReportData> {
-  const instructions = `
-You are parsing an AtVenu sales report PDF. Extract the following and return ONLY valid JSON:
+  const startTime = Date.now();
 
-{
-  "showDate": "YYYY-MM-DD",
-  "venueName": "string",
-  "city": "string or null",
-  "state": "string or null",
-  "attendance": number or null,
-  "totalGross": number,
-  "lineItems": [
-    {
-      "sku": "string (base SKU WITHOUT size suffix like _SM, _MD, _LG, etc.)",
-      "description": "string",
-      "size": "string (S, M, L, XL, 2XL, 3XL, or One-Size)",
-      "sold": number (quantity sold),
-      "unitPrice": number,
-      "gross": number (total revenue for this item)
+  // Try text extraction + agent parsing (with caching)
+  try {
+    const textStartTime = Date.now();
+    const extractedText = await extractTextFromBase64PDF(pdfBase64);
+    console.log(`[SalesReportParser] Text extraction: ${Date.now() - textStartTime}ms (${extractedText?.length ?? 0} chars)`);
+
+    // Only use agent parsing if we got meaningful content
+    if (extractedText && extractedText.trim().length > 100) {
+      console.log('[SalesReportParser] Using agent with cached system prompt');
+
+      const result = await parseWithAgent(SALES_REPORT_AGENT, extractedText);
+
+      console.log(`[SalesReportParser] Agent parse: ${result.parseTimeMs}ms (cache ${result.cacheHit ? 'HIT' : 'MISS'})`);
+      console.log(`[SalesReportParser] TOTAL: ${Date.now() - startTime}ms`);
+
+      return result.data as SalesReportData;
     }
-  ]
-}
+  } catch (textError) {
+    console.log('[SalesReportParser] Agent parsing failed, falling back to document parsing:', textError);
+  }
 
-Important:
-- Extract ALL products that were sold
-- SKU should be the BASE product code (e.g., "GHOSRX203729BK" not "GHOSRX203729BK_SM")
-- If the SKU in the PDF includes a size suffix like _SM, _MD, _LG, _XL, _2XL, _3XL, remove it
-- Size should be extracted separately as a standardized value (S, M, L, XL, 2XL, 3XL, One-Size)
-- Look for subtotals per product style (e.g., "Subtotal: SKELETOR ITIN TEE")
-- totalGross is the overall gross sales for the show
-- Return ONLY the JSON object
-`;
-
-  return parseDocument(pdfBase64, 'application/pdf', instructions) as Promise<SalesReportData>;
+  // Fallback to full document parsing (slower but handles scanned PDFs)
+  console.log('[SalesReportParser] Using document-based parsing (slower)');
+  const aiStartTime = Date.now();
+  const result = await parseDocument(pdfBase64, 'application/pdf', FALLBACK_INSTRUCTIONS) as SalesReportData;
+  console.log(`[SalesReportParser] Document parsing: ${Date.now() - aiStartTime}ms`);
+  console.log(`[SalesReportParser] TOTAL: ${Date.now() - startTime}ms`);
+  return result;
 }
