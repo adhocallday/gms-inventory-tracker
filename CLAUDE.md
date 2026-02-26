@@ -132,6 +132,66 @@ grep -r "AKIA" --include="*.ts" --include="*.tsx" --include="*.js"
 
 ---
 
+## Vercel Deployment
+
+### Initial Setup (One-time)
+
+```bash
+# Install Vercel CLI globally
+npm install -g vercel
+
+# Login to Vercel
+vercel login
+
+# Link project (run in project root)
+vercel link
+```
+
+### Branch Deployments
+
+Vercel automatically deploys:
+- **`main` branch** → Production (gms-inventory-tracker.vercel.app)
+- **`staging` branch** → Preview (gms-inventory-tracker-staging.vercel.app)
+- **Other branches** → Preview URLs (auto-generated)
+
+### Useful Vercel Commands
+
+```bash
+# Check login status
+vercel whoami
+
+# Deploy to preview (staging)
+vercel
+
+# Deploy to production (requires explicit flag)
+vercel --prod
+
+# List deployments
+vercel ls
+
+# Check project info
+vercel inspect
+
+# Pull environment variables
+vercel env pull .env.local
+
+# View logs
+vercel logs [deployment-url]
+```
+
+### Environment Variables in Vercel
+
+Set these in Vercel Dashboard → Project → Settings → Environment Variables:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `ANTHROPIC_API_KEY`
+- `NEXT_PUBLIC_APP_URL`
+
+**Important:** Set different values for Production vs Preview environments.
+
+---
+
 ## Useful Commands
 
 ```bash
@@ -142,6 +202,10 @@ npm run lint         # Run ESLint
 
 # Database
 npx supabase status  # Check Supabase status (requires Docker)
+
+# Vercel
+vercel               # Deploy to preview
+vercel --prod        # Deploy to production
 
 # Testing
 npm run dev          # Manual testing on localhost:3000
@@ -171,9 +235,10 @@ scripts/             # Utility scripts
 
 | Service | Status | Notes |
 |---------|--------|-------|
-| Supabase | Connected | Database and auth |
-| Vercel | Not configured locally | Install `vercel` CLI if needed |
+| Supabase | Connected | Database and storage |
+| Vercel | CLI installed | Run `vercel login` to authenticate |
 | Anthropic | Connected | Claude API for document parsing |
+| GitHub | Connected | Repo: adhocallday/gms-inventory-tracker |
 
 ---
 
