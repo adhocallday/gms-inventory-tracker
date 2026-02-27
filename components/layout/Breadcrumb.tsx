@@ -16,7 +16,7 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
   return (
     <nav
       className={cn(
-        'flex items-center gap-2 text-sm text-[var(--g-text-muted)]',
+        'flex items-center gap-2 text-sm text-[var(--color-text-muted)]',
         className
       )}
       aria-label="Breadcrumb"
@@ -30,18 +30,18 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
               {item.href && !isLast ? (
                 <Link
                   href={item.href}
-                  className="hover:text-[var(--g-accent)] transition-colors"
+                  className="hover:text-[var(--color-red-primary)] transition-colors"
                 >
                   {item.label}
                 </Link>
               ) : (
-                <span className={isLast ? 'text-[var(--g-text)] font-medium' : ''}>
+                <span className={isLast ? 'text-[var(--color-text-primary)] font-medium' : ''}>
                   {item.label}
                 </span>
               )}
 
               {!isLast && (
-                <ChevronRight className="h-4 w-4 text-[var(--g-text-muted)] opacity-50" />
+                <ChevronRight className="h-4 w-4 text-[var(--color-text-muted)] opacity-50" />
               )}
             </li>
           );

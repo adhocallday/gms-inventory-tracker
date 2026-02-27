@@ -18,7 +18,7 @@ export function Skeleton({
   return (
     <div
       className={cn(
-        'animate-pulse bg-[var(--g-bg-muted)]',
+        'animate-pulse bg-[var(--color-bg-border)]',
         variantClasses[variant],
         className
       )}

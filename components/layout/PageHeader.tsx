@@ -28,15 +28,15 @@ export function PageHeader({
       <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-2">
           {kicker && (
-            <p className="g-kicker text-[var(--g-text-muted)]">{kicker}</p>
+            <p className="g-kicker text-[var(--color-text-muted)]">{kicker}</p>
           )}
 
-          <h1 className="text-3xl font-bold g-title lg:text-4xl">
+          <h1 className="text-3xl font-bold g-title text-[var(--color-text-primary)] lg:text-4xl">
             {title}
           </h1>
 
           {subtitle && (
-            <p className="text-sm text-[var(--g-text-muted)] lg:text-base">
+            <p className="text-sm text-[var(--color-text-secondary)] lg:text-base">
               {subtitle}
             </p>
           )}

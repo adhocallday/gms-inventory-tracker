@@ -41,34 +41,40 @@ interface StatCardProps {
 
 const colorVariants = {
   purple: {
-    gradient: 'from-purple-100 to-pink-100',
-    iconColor: 'text-purple-600',
-    borderColor: 'border-purple-200',
+    bg: 'bg-purple-500/10',
+    iconColor: 'text-purple-400',
+    valueColor: 'text-purple-400',
+    borderColor: 'border-purple-500/20',
   },
   green: {
-    gradient: 'from-green-100 to-emerald-100',
-    iconColor: 'text-green-600',
-    borderColor: 'border-green-200',
+    bg: 'bg-green-500/10',
+    iconColor: 'text-green-400',
+    valueColor: 'text-green-400',
+    borderColor: 'border-green-500/20',
   },
   blue: {
-    gradient: 'from-blue-100 to-cyan-100',
-    iconColor: 'text-blue-600',
-    borderColor: 'border-blue-200',
+    bg: 'bg-blue-500/10',
+    iconColor: 'text-blue-400',
+    valueColor: 'text-blue-400',
+    borderColor: 'border-blue-500/20',
   },
   orange: {
-    gradient: 'from-orange-100 to-amber-100',
-    iconColor: 'text-orange-600',
-    borderColor: 'border-orange-200',
+    bg: 'bg-orange-500/10',
+    iconColor: 'text-orange-400',
+    valueColor: 'text-orange-400',
+    borderColor: 'border-orange-500/20',
   },
   red: {
-    gradient: 'from-red-100 to-pink-100',
-    iconColor: 'text-red-600',
-    borderColor: 'border-red-200',
+    bg: 'bg-[var(--color-red-muted)]',
+    iconColor: 'text-[var(--color-red-primary)]',
+    valueColor: 'text-[var(--color-red-primary)]',
+    borderColor: 'border-[var(--color-red-primary)]/20',
   },
   default: {
-    gradient: 'from-slate-100 to-slate-50',
-    iconColor: 'text-[var(--g-text)]',
-    borderColor: 'border-slate-200',
+    bg: 'bg-[var(--color-bg-elevated)]',
+    iconColor: 'text-[var(--color-text-secondary)]',
+    valueColor: 'text-[var(--color-text-primary)]',
+    borderColor: 'border-[var(--color-bg-border)]',
   },
 };
 
@@ -80,20 +86,20 @@ export function StatCard({ label, value, icon: IconProp, iconName, trend, color 
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl border p-6 bg-gradient-to-br',
-        colors.gradient,
+        'relative overflow-hidden rounded-xl border p-6',
+        colors.bg,
         colors.borderColor,
         className
       )}
     >
       <div className="flex items-start justify-between mb-4">
-        {Icon && <Icon className={cn('w-10 h-10', colors.iconColor)} />}
-        <div className={cn('text-3xl font-bold', colors.iconColor)}>
+        {Icon && <Icon className={cn('w-8 h-8', colors.iconColor)} />}
+        <div className={cn('text-3xl font-bold', colors.valueColor)}>
           {value}
         </div>
       </div>
 
-      <div className="text-sm font-medium text-[var(--g-text)] mb-1">
+      <div className="text-sm font-medium text-[var(--color-text-primary)] mb-1">
         {label}
       </div>
 
@@ -107,7 +113,7 @@ export function StatCard({ label, value, icon: IconProp, iconName, trend, color 
           <span className={trend.isPositive !== false ? 'text-green-400' : 'text-red-400'}>
             {trend.value > 0 ? '+' : ''}{trend.value}%
           </span>
-          <span className="text-[var(--g-text-muted)]">
+          <span className="text-[var(--color-text-muted)]">
             {trend.label}
           </span>
         </div>

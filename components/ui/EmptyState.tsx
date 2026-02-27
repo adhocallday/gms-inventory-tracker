@@ -27,17 +27,17 @@ export function EmptyState({
   return (
     <div className={cn('flex flex-col items-center justify-center py-12 px-4 text-center', className)}>
       {icon && (
-        <div className="mb-4 text-[var(--g-text-muted)] opacity-50">
+        <div className="mb-4 text-[var(--color-text-muted)] opacity-50">
           {icon}
         </div>
       )}
 
-      <h3 className="text-lg font-semibold g-title mb-2 text-[var(--g-text)]">
+      <h3 className="text-lg font-semibold g-title mb-2 text-[var(--color-text-primary)]">
         {title}
       </h3>
 
       {description && (
-        <p className="text-sm text-[var(--g-text-muted)] mb-6 max-w-md">
+        <p className="text-sm text-[var(--color-text-muted)] mb-6 max-w-md">
           {description}
         </p>
       )}

@@ -5,26 +5,7 @@
 @tailwind utilities;
 
 :root {
-  /* Core palette */
-  --color-bg-base: #0A0A0A;
-  --color-bg-surface: #111111;
-  --color-bg-elevated: #1A1A1A;
-  --color-bg-border: #2A2A2A;
-  --color-red-primary: #E8003D;
-  --color-red-hover: #FF1A52;
-  --color-red-muted: #3D0012;
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: #A0A0A0;
-  --color-text-muted: #555555;
-  --color-status-active: #22C55E;
-  --color-status-warning: #F59E0B;
-  --color-status-error: #E8003D;
-  --color-status-complete: #6366F1;
-  --color-status-neutral: #3F3F46;
-  --color-data-positive: #22C55E;
-  --color-data-negative: #E8003D;
-  --color-data-neutral: #A0A0A0;
-
+  /* Shared tokens */
   --font-sans: 'Inter', 'DM Sans', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'SFMono-Regular', monospace;
   --g-container: 1400px;
@@ -32,6 +13,49 @@
   --g-padding-y: 24px;
   --g-radius-card: 8px;
   --g-ease: 0.15s ease;
+
+  /* Brand colors (shared) */
+  --color-red-primary: #E8003D;
+  --color-red-hover: #FF1A52;
+  --color-status-active: #22C55E;
+  --color-status-warning: #F59E0B;
+  --color-status-error: #E8003D;
+  --color-status-complete: #6366F1;
+  --color-data-positive: #22C55E;
+  --color-data-negative: #E8003D;
+}
+
+/* Dark theme (default) */
+:root,
+[data-theme="dark"] {
+  --color-bg-base: #0A0A0A;
+  --color-bg-surface: #111111;
+  --color-bg-elevated: #1A1A1A;
+  --color-bg-border: #2A2A2A;
+  --color-red-muted: #3D0012;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #A0A0A0;
+  --color-text-muted: #555555;
+  --color-status-neutral: #3F3F46;
+  --color-data-neutral: #A0A0A0;
+  --color-card-shadow: rgba(0, 0, 0, 0.55);
+  --color-card-shadow-hover: rgba(0, 0, 0, 0.75);
+}
+
+/* Light theme */
+[data-theme="light"] {
+  --color-bg-base: #F5F5F5;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-elevated: #FAFAFA;
+  --color-bg-border: #E5E5E5;
+  --color-red-muted: #FEE2E8;
+  --color-text-primary: #0A0A0A;
+  --color-text-secondary: #525252;
+  --color-text-muted: #A3A3A3;
+  --color-status-neutral: #D4D4D8;
+  --color-data-neutral: #525252;
+  --color-card-shadow: rgba(0, 0, 0, 0.08);
+  --color-card-shadow-hover: rgba(0, 0, 0, 0.12);
 }
 
 body {
@@ -68,13 +92,13 @@ a {
   background: var(--color-bg-surface);
   border: 1px solid var(--color-bg-border);
   border-radius: var(--g-radius-card);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 15px 30px var(--color-card-shadow);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .g-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.75);
+  box-shadow: 0 20px 40px var(--color-card-shadow-hover);
 }
 
 .g-kicker {

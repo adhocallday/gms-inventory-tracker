@@ -10,9 +10,9 @@ const spinnerVariants = cva('animate-spin rounded-full border-2 border-current b
       xl: 'h-12 w-12',
     },
     variant: {
-      primary: 'text-[var(--g-accent)]',
+      primary: 'text-[var(--color-red-primary)]',
       white: 'text-white',
-      muted: 'text-[var(--g-text-muted)]',
+      muted: 'text-[var(--color-text-muted)]',
     },
   },
   defaultVariants: {
@@ -32,7 +32,7 @@ export function Spinner({ size, variant, label, className, ...props }: SpinnerPr
     <div className="flex flex-col items-center gap-2" {...props}>
       <div className={cn(spinnerVariants({ size, variant }), className)} />
       {label && (
-        <p className="text-sm text-[var(--g-text-muted)]">{label}</p>
+        <p className="text-sm text-[var(--color-text-muted)]">{label}</p>
       )}
     </div>
   );
