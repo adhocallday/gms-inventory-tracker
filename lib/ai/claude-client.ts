@@ -19,7 +19,7 @@ function getClient(): Anthropic {
 // Model selection
 const HAIKU_MODEL = 'claude-3-5-haiku-20241022';  // Fast, good for structured extraction
 const SONNET_MODEL = 'claude-sonnet-4-20250514'; // Powerful, for complex/fallback
-const DEFAULT_MODEL = HAIKU_MODEL; // Use Haiku by default for 10x speed improvement
+const DEFAULT_MODEL = SONNET_MODEL; // Use Sonnet for reliable parsing (Haiku was inconsistent)
 
 export interface ParsedDocument {
   [key: string]: any;
