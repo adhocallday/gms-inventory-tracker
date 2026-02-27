@@ -338,6 +338,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { docType: DocType } }
 ) {
+  const totalStart = Date.now();
+
   try {
     const docType = params.docType;
     if (!['po', 'packing-list', 'sales-report', 'settlement'].includes(docType)) {
@@ -353,9 +355,11 @@ export async function POST(
     return NextResponse.json({ error: 'Missing PDF file' }, { status: 400 });
   }
 
+  const bufferStart = Date.now();
   const buffer = Buffer.from(await file.arrayBuffer());
   const sourceHash = crypto.createHash('sha256').update(buffer).digest('hex');
   const base64 = buffer.toString('base64');
+  console.log(`[Parse/${docType}] Buffer/hash: ${Date.now() - bufferStart}ms`);
 
   const supabase = createServiceClient();
 
@@ -391,7 +395,9 @@ export async function POST(
 
   let parsed: any;
   try {
+    const parseStart = Date.now();
     parsed = await parseByType(docType, base64);
+    console.log(`[Parse/${docType}] AI parsing: ${Date.now() - parseStart}ms`);
   } catch (error: any) {
     console.error(`[Parse Error] Doc type: ${docType}, File: ${file.name}`);
     console.error('[Parse Error] Error:', error);
@@ -469,6 +475,7 @@ export async function POST(
     );
   }
 
+  console.log(`[Parse/${docType}] TOTAL: ${Date.now() - totalStart}ms`);
   return NextResponse.json({
     parsedDocumentId: parsedDoc.id,
     normalized_json: parsedDoc.normalized_json,

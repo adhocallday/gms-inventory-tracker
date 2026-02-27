@@ -17,8 +17,9 @@ function getClient(): Anthropic {
 }
 
 // Model selection
-const HAIKU_MODEL = 'claude-3-haiku-20240307';  // Fast, good for structured extraction
+const HAIKU_MODEL = 'claude-3-5-haiku-20241022';  // Fast, good for structured extraction
 const SONNET_MODEL = 'claude-sonnet-4-20250514'; // Powerful, for complex/fallback
+const DEFAULT_MODEL = HAIKU_MODEL; // Use Haiku by default for 10x speed improvement
 
 export interface ParsedDocument {
   [key: string]: any;
@@ -33,18 +34,48 @@ export interface AgentParseResult {
 /**
  * Parse extracted text using Claude (much faster than document parsing).
  * Use this when you've already extracted text from a PDF.
- * Uses Haiku for speed since text extraction is straightforward.
+ * Uses Haiku with tool_choice for fast, reliable JSON output.
  * @param text - The extracted text content
  * @param instructions - Extraction instructions for Claude
+ * @param outputSchema - Optional JSON schema to enforce structured output (uses tool_choice)
  */
 export async function parseText(
   text: string,
-  instructions: string
+  instructions: string,
+  outputSchema?: object
 ): Promise<ParsedDocument> {
-  // Use Sonnet for text parsing (Haiku requires separate API access)
-  const modelId = 'claude-sonnet-4-20250514';
+  // Use Haiku with tool_choice for ~10x speed improvement
+  const modelId = DEFAULT_MODEL;
 
   try {
+    // If schema provided, use tool_choice for guaranteed valid JSON
+    if (outputSchema) {
+      const response = await getClient().messages.create({
+        model: modelId,
+        max_tokens: 8192,
+        tools: [{
+          name: 'extract_data',
+          description: 'Extract structured data from the document',
+          input_schema: outputSchema as Anthropic.Tool['input_schema']
+        }],
+        tool_choice: { type: 'tool', name: 'extract_data' },
+        messages: [
+          {
+            role: 'user',
+            content: `${instructions}\n\n---\nDocument text:\n${text}`
+          }
+        ]
+      });
+
+      // Extract tool use result
+      const toolUse = response.content.find(c => c.type === 'tool_use');
+      if (!toolUse || toolUse.type !== 'tool_use') {
+        throw new Error('No tool use response from Claude');
+      }
+      return toolUse.input as ParsedDocument;
+    }
+
+    // Fallback: no schema, parse JSON from text response
     const response = await getClient().messages.create({
       model: modelId,
       max_tokens: 8192,
@@ -90,18 +121,62 @@ export async function parseText(
  * @param base64Data - Base64 encoded document data
  * @param mediaType - MIME type of the document
  * @param instructions - Extraction instructions for Claude
+ * @param outputSchema - Optional JSON schema to enforce structured output (uses tool_choice)
  */
 export async function parseDocument(
   base64Data: string,
   mediaType: 'application/pdf' | 'image/jpeg' | 'image/png',
-  instructions: string
+  instructions: string,
+  outputSchema?: object
 ): Promise<ParsedDocument> {
-  const modelId = 'claude-sonnet-4-20250514';
+  // Use Haiku with schema for speed, Sonnet without for complex docs
+  const modelId = outputSchema ? DEFAULT_MODEL : SONNET_MODEL;
 
   try {
     // Use 'document' for PDFs, 'image' for images
     const contentType = mediaType === 'application/pdf' ? 'document' : 'image';
 
+    // If schema provided, use tool_choice for guaranteed valid JSON
+    if (outputSchema) {
+      const response = await getClient().messages.create({
+        model: modelId,
+        max_tokens: 16384,
+        tools: [{
+          name: 'extract_data',
+          description: 'Extract structured data from the document',
+          input_schema: outputSchema as Anthropic.Tool['input_schema']
+        }],
+        tool_choice: { type: 'tool', name: 'extract_data' },
+        messages: [
+          {
+            role: 'user',
+            content: [
+              ({
+                type: contentType,
+                source: {
+                  type: 'base64',
+                  media_type: mediaType,
+                  data: base64Data
+                }
+              } as any),
+              {
+                type: 'text',
+                text: instructions
+              }
+            ]
+          }
+        ]
+      } as any);
+
+      // Extract tool use result
+      const toolUse = response.content.find(c => c.type === 'tool_use');
+      if (!toolUse || toolUse.type !== 'tool_use') {
+        throw new Error('No tool use response from Claude');
+      }
+      return toolUse.input as ParsedDocument;
+    }
+
+    // Fallback: no schema, parse JSON from text response (uses Sonnet)
     const response = await getClient().messages.create({
       model: modelId,
       max_tokens: 16384,
@@ -126,7 +201,7 @@ export async function parseDocument(
         }
       ]
     } as any);
-    
+
     const textContent = response.content.find(c => c.type === 'text');
     if (!textContent || textContent.type !== 'text') {
       throw new Error('No text response from Claude');

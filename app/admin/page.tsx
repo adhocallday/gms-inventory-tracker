@@ -68,8 +68,8 @@ export default async function AdminDashboard() {
       description: 'Set up a new tour with AI-assisted data entry',
       icon: '➕',
       href: '/admin/tours/new',
-      color: 'bg-[var(--g-accent)]',
-      hoverColor: 'hover:bg-[var(--g-accent-2)]',
+      color: 'bg-[var(--color-red-primary)]',
+      hoverColor: 'hover:bg-[var(--color-red-hover)]',
       textColor: 'text-white',
       descColor: 'text-white/80'
     },
@@ -78,40 +78,40 @@ export default async function AdminDashboard() {
       description: 'Edit existing tours, add shows, extend dates',
       icon: '📋',
       href: '/admin/tours',
-      color: 'bg-slate-100',
-      hoverColor: 'hover:bg-slate-200',
-      textColor: 'text-[var(--g-text)]',
-      descColor: 'text-[var(--g-text-muted)]'
+      color: 'bg-[var(--color-bg-elevated)]',
+      hoverColor: 'hover:bg-[var(--color-bg-border)]',
+      textColor: 'text-[var(--color-text-primary)]',
+      descColor: 'text-[var(--color-text-secondary)]'
     },
     {
       title: 'Upload Documents',
       description: 'Parse PDFs, CSVs, and sales reports',
       icon: '📄',
       href: '/upload',
-      color: 'bg-slate-100',
-      hoverColor: 'hover:bg-slate-200',
-      textColor: 'text-[var(--g-text)]',
-      descColor: 'text-[var(--g-text-muted)]'
+      color: 'bg-[var(--color-bg-elevated)]',
+      hoverColor: 'hover:bg-[var(--color-bg-border)]',
+      textColor: 'text-[var(--color-text-primary)]',
+      descColor: 'text-[var(--color-text-secondary)]'
     },
     {
       title: 'Product Catalog',
       description: 'Manage global products and SKUs',
       icon: '🏷️',
       href: '/admin/products',
-      color: 'bg-slate-100',
-      hoverColor: 'hover:bg-slate-200',
-      textColor: 'text-[var(--g-text)]',
-      descColor: 'text-[var(--g-text-muted)]'
+      color: 'bg-[var(--color-bg-elevated)]',
+      hoverColor: 'hover:bg-[var(--color-bg-border)]',
+      textColor: 'text-[var(--color-text-primary)]',
+      descColor: 'text-[var(--color-text-secondary)]'
     },
     {
       title: 'View Inventory',
       description: 'Check stock levels across all tours',
       icon: '📦',
       href: '/admin/inventory',
-      color: 'bg-slate-100',
-      hoverColor: 'hover:bg-slate-200',
-      textColor: 'text-[var(--g-text)]',
-      descColor: 'text-[var(--g-text-muted)]'
+      color: 'bg-[var(--color-bg-elevated)]',
+      hoverColor: 'hover:bg-[var(--color-bg-border)]',
+      textColor: 'text-[var(--color-text-primary)]',
+      descColor: 'text-[var(--color-text-secondary)]'
     }
   ];
 
@@ -139,7 +139,7 @@ export default async function AdminDashboard() {
 
       {/* Quick Actions */}
       <section className="mb-12">
-        <h2 className="text-xl font-semibold text-[var(--g-text)] mb-6">
+        <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-6">
           Quick Actions
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -147,7 +147,7 @@ export default async function AdminDashboard() {
             <Link
               key={index}
               href={action.href}
-              className={`group p-6 rounded-xl border border-[var(--g-border-default)] ${action.color} ${action.hoverColor} transition-all duration-200 hover:scale-105`}
+              className={`group p-6 rounded-xl border border-[var(--color-bg-border)] ${action.color} ${action.hoverColor} transition-all duration-200 hover:scale-105`}
             >
               <div className="text-3xl mb-3">{action.icon}</div>
               <h3 className={`text-sm font-semibold mb-2 ${action.textColor}`}>
@@ -164,33 +164,33 @@ export default async function AdminDashboard() {
       {/* Recent Tours */}
       <section>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-[var(--g-text)]">
+          <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
             Recent Tours
           </h2>
           <Link
             href="/admin/tours"
-            className="text-sm text-[var(--g-accent)] hover:underline font-medium"
+            className="text-sm text-[var(--color-red-primary)] hover:underline font-medium"
           >
             View all →
           </Link>
         </div>
 
         {recentTours && recentTours.length > 0 ? (
-          <div className="g-card divide-y divide-slate-200">
+          <div className="g-card divide-y divide-[var(--color-bg-border)]">
             {recentTours.map((tour: any) => (
               <Link
                 key={tour.id}
                 href={`/admin/tours/${tour.id}/edit`}
-                className="flex items-center justify-between p-6 hover:bg-slate-50 transition group"
+                className="flex items-center justify-between p-6 hover:bg-[var(--color-bg-elevated)] transition group"
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-sm font-semibold text-[var(--g-text)] group-hover:text-[var(--g-accent)] transition">
+                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-red-primary)] transition">
                       {tour.name}
                     </h3>
                     <Badge variant={tour.status}>{tour.status}</Badge>
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-[var(--g-text-muted)]">
+                  <div className="flex items-center gap-4 text-xs text-[var(--color-text-secondary)]">
                     <span>🎸 {tour.artist}</span>
                     {tour.start_date && tour.end_date && (
                       <span>
@@ -201,7 +201,7 @@ export default async function AdminDashboard() {
                     )}
                   </div>
                 </div>
-                <div className="text-[var(--g-text-muted)] group-hover:text-[var(--g-text)] transition">
+                <div className="text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition">
                   →
                 </div>
               </Link>
@@ -209,7 +209,7 @@ export default async function AdminDashboard() {
           </div>
         ) : (
           <div className="g-card p-12 text-center">
-            <p className="text-[var(--g-text-dim)] mb-4">
+            <p className="text-[var(--color-text-secondary)] mb-4">
               No tours yet. Create your first tour to get started.
             </p>
             <Link href="/admin/tours/new">
@@ -219,38 +219,44 @@ export default async function AdminDashboard() {
         )}
       </section>
 
-      {/* Admin Tools (Placeholder for future expansion) */}
+      {/* Admin Tools */}
       <section className="mt-12">
-        <h2 className="text-xl font-semibold text-[var(--g-text)] mb-6">
+        <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-6">
           Admin Tools
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-6 rounded-xl border border-slate-200 bg-slate-50 opacity-50">
+          <Link
+            href="/admin/analytics"
+            className="group p-6 rounded-xl border border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-border)] transition-all duration-200 hover:scale-105"
+          >
+            <div className="text-3xl mb-3">📊</div>
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-2 group-hover:text-[var(--color-red-primary)]">
+              Analytics Dashboard
+            </h3>
+            <p className="text-xs text-[var(--color-text-secondary)]">
+              Cross-tour revenue, per-head metrics, and rankings
+            </p>
+          </Link>
+
+          <Link
+            href="/admin/documents"
+            className="group p-6 rounded-xl border border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-border)] transition-all duration-200 hover:scale-105"
+          >
+            <div className="text-3xl mb-3">📁</div>
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-2 group-hover:text-[var(--color-red-primary)]">
+              Document Management
+            </h3>
+            <p className="text-xs text-[var(--color-text-secondary)]">
+              View, manage, and re-parse uploaded documents
+            </p>
+          </Link>
+
+          <div className="p-6 rounded-xl border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] opacity-50">
             <div className="text-3xl mb-3">⚙️</div>
-            <h3 className="text-sm font-semibold text-[var(--g-text)] mb-2">
+            <h3 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-2">
               User Management
             </h3>
-            <p className="text-xs text-[var(--g-text-muted)]">
-              Coming soon
-            </p>
-          </div>
-
-          <div className="p-6 rounded-xl border border-slate-200 bg-slate-50 opacity-50">
-            <div className="text-3xl mb-3">📊</div>
-            <h3 className="text-sm font-semibold text-[var(--g-text)] mb-2">
-              Reports & Analytics
-            </h3>
-            <p className="text-xs text-[var(--g-text-muted)]">
-              Coming soon
-            </p>
-          </div>
-
-          <div className="p-6 rounded-xl border border-slate-200 bg-slate-50 opacity-50">
-            <div className="text-3xl mb-3">🔧</div>
-            <h3 className="text-sm font-semibold text-[var(--g-text)] mb-2">
-              System Settings
-            </h3>
-            <p className="text-xs text-[var(--g-text-muted)]">
+            <p className="text-xs text-[var(--color-text-muted)]">
               Coming soon
             </p>
           </div>

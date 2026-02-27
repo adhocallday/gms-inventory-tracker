@@ -7,33 +7,39 @@ import { parseSalesReport } from '@/lib/ai/parsers/sales-report-parser';
 import { parseSettlementReport } from '@/lib/ai/parsers/settlement-parser';
 
 export async function POST(request: NextRequest) {
+  const totalStart = Date.now();
+
   try {
     const { filePath, fileType, tourId } = await request.json();
-    
+
     if (!filePath || !fileType) {
       return NextResponse.json(
         { error: 'Missing required fields: filePath, fileType' },
         { status: 400 }
       );
     }
-    
+
     const supabase = createServiceClient();
-    
+
     // Download file from storage
+    const downloadStart = Date.now();
     const { data: fileData, error: downloadError } = await supabase.storage
       .from('documents')
       .download(filePath);
-    
+    console.log(`[ParseDocument] Supabase download: ${Date.now() - downloadStart}ms`);
+
     if (downloadError || !fileData) {
       return NextResponse.json(
         { error: 'File not found or download failed', details: downloadError },
         { status: 404 }
       );
     }
-    
+
     // Convert to base64 + hash for idempotency
+    const convertStart = Date.now();
     const buffer = Buffer.from(await fileData.arrayBuffer());
     const base64 = buffer.toString('base64');
+    console.log(`[ParseDocument] Buffer conversion: ${Date.now() - convertStart}ms`);
     const sourceHash = crypto.createHash('sha256').update(buffer).digest('hex');
     
     // Parse based on file type
@@ -55,6 +61,7 @@ export async function POST(request: NextRequest) {
     logId = logEntry?.id;
     
     try {
+      const parseStart = Date.now();
       switch (fileType) {
         case 'po':
           parsed = await parsePurchaseOrder(base64);
@@ -71,6 +78,7 @@ export async function POST(request: NextRequest) {
         default:
           throw new Error(`Unknown file type: ${fileType}`);
       }
+      console.log(`[ParseDocument] Parser (${fileType}): ${Date.now() - parseStart}ms`);
       
       // Upsert draft parsed document
       const { data: parsedDoc } = await supabase
@@ -101,6 +109,7 @@ export async function POST(request: NextRequest) {
           .eq('id', logId);
       }
       
+      console.log(`[ParseDocument] TOTAL TIME: ${Date.now() - totalStart}ms`);
       return NextResponse.json({
         success: true,
         data: parsed,

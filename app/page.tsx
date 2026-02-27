@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { RecentActivityPanel, type RecentDocument } from '@/components/dashboard/RecentActivityPanel';
 import { UpcomingShowsPanel, type UpcomingShow } from '@/components/dashboard/UpcomingShowsPanel';
 import { InsightCard } from '@/components/dashboard/InsightCard';
+import { cn } from '@/lib/utils';
 
 type TourRow = {
   id: string;
@@ -112,81 +113,97 @@ export default async function DashboardPage() {
     gross: grossByTour.get(tour.id) ?? 0,
   }));
 
+  const totalProductsCount = Array.from(productsByTour.values()).reduce(
+    (sum, value) => sum + value,
+    0
+  );
+  const pendingDocs = pendingDocsCount ?? 0;
+
+  const kpiCards = [
+    {
+      label: 'Tours tracked',
+      value: tourList.length,
+      trend: 'Live tours',
+    },
+    {
+      label: 'Total gross sales',
+      value: currencyFormatter.format(totalGross),
+      trend: 'Revenue across tours',
+      primary: true,
+    },
+    {
+      label: 'Active tour products',
+      value: totalProductsCount,
+      trend: 'Cataloged SKUs',
+    },
+    {
+      label: 'Pending documents',
+      value: pendingDocs,
+      trend: 'Needs approval',
+    },
+  ];
+
   return (
-    <div className="g-container py-12">
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="g-kicker">Tour operations</p>
-          <h1 className="text-3xl font-semibold g-title mt-3">
-            Tour Dashboard
-          </h1>
-          <p className="text-sm text-[var(--g-text-dim)] mt-2 max-w-2xl">
-            Live view of active tours, inventory status, and quick access to
-            document review workflows.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-3">
+    <div className="space-y-10 py-6">
+      <header className="space-y-3">
+        <p className="g-kicker">Tour operations</p>
+        <h1 className="text-4xl font-semibold g-title">Tour Dashboard</h1>
+        <p className="text-sm text-[var(--color-text-secondary)] max-w-3xl">
+          Live view of active tours, inventory status, and quick access to document review workflows.
+        </p>
+        <div className="pt-2">
           <Link href="/upload">
             <Button>Upload document</Button>
           </Link>
         </div>
+      </header>
+
+      <div className="kpi-grid">
+        {kpiCards.map((card) => (
+          <article
+            key={card.label}
+            className={cn('kpi-card', { 'kpi-primary': card.primary })}
+          >
+            <div className="kpi-label">{card.label}</div>
+            <div className="kpi-value font-mono">{card.value}</div>
+            <div className="kpi-trend flex items-center gap-2">
+              <span
+                className="w-2 h-2 rounded-full"
+                style={{
+                  background:
+                    card.label === 'Pending documents'
+                      ? 'var(--color-status-warning)'
+                      : 'var(--color-text-secondary)',
+                }}
+              />
+              <span>{card.trend}</span>
+            </div>
+          </article>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-        <div className="g-card p-6">
-          <p className="text-xs text-[var(--g-text-muted)] uppercase tracking-wide">
-            Tours tracked
-          </p>
-          <p className="text-3xl font-bold mt-2">
-            {tourList.length}
-          </p>
-        </div>
-        <div className="g-card p-6">
-          <p className="text-xs text-[var(--g-text-muted)] uppercase tracking-wide">
-            Total gross sales
-          </p>
-          <p className="text-3xl font-bold mt-2">
-            {currencyFormatter.format(totalGross)}
-          </p>
-        </div>
-        <div className="g-card p-6">
-          <p className="text-xs text-[var(--g-text-muted)] uppercase tracking-wide">
-            Active tour products
-          </p>
-          <p className="text-3xl font-bold mt-2">
-            {Array.from(productsByTour.values()).reduce(
-              (sum, value) => sum + value,
-              0
-            )}
-          </p>
-        </div>
-        <div className="g-card p-6">
-          <p className="text-xs text-[var(--g-text-muted)] uppercase tracking-wide">
-            Pending documents
-          </p>
-          <p className={`text-3xl font-bold mt-2 ${(pendingDocsCount ?? 0) > 0 ? 'text-yellow-400' : ''}`}>
-            {pendingDocsCount ?? 0}
-          </p>
-        </div>
-      </div>
-
-      {/* Alerts/Insights Row */}
-      {((pendingDocsCount ?? 0) > 0 || upcomingShows.length > 0) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-          {(pendingDocsCount ?? 0) > 0 && (
+      {(pendingDocs > 0 || upcomingShows.length > 0) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {pendingDocs > 0 && (
             <InsightCard
               type="warning"
               title="Documents need review"
-              description={`${pendingDocsCount} document${(pendingDocsCount ?? 0) !== 1 ? 's' : ''} waiting for approval or have errors`}
+              description={`${pendingDocs} document${pendingDocs !== 1 ? 's' : ''} waiting for approval or have errors`}
               linkText="Review documents"
               linkHref="/dashboard/parsed-documents"
+              className="insight-alert"
             />
           )}
           {upcomingShows.length > 0 && (
             <InsightCard
               type="info"
               title={`${upcomingShows.length} upcoming show${upcomingShows.length !== 1 ? 's' : ''}`}
-              description={`Next: ${upcomingShows[0].venue_name || 'TBD'} on ${new Date(upcomingShows[0].show_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+              description={`Next: ${upcomingShows[0].venue_name || 'TBD'} on ${new Date(
+                upcomingShows[0].show_date
+              ).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+              })}`}
               linkText="View show"
               linkHref={`/tours/${upcomingShows[0].tour_id}/shows/${upcomingShows[0].id}`}
             />
@@ -194,8 +211,7 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Activity & Shows Panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RecentActivityPanel documents={(recentDocs ?? []) as RecentDocument[]} />
         <UpcomingShowsPanel shows={upcomingShows} />
       </div>

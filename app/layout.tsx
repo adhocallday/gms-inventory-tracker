@@ -14,10 +14,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <div className="min-h-screen flex flex-col">
+      <body className="bg-[var(--color-bg-base)] text-[var(--color-text-primary)]">
+        <div className="min-h-screen flex bg-[var(--color-bg-base)]">
           <NavBar />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1">
+            <div className="g-container">{children}</div>
+          </main>
         </div>
       </body>
     </html>

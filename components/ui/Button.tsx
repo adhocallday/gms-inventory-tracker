@@ -3,22 +3,25 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/60 disabled:pointer-events-none disabled:opacity-60',
   {
     variants: {
       variant: {
-        primary: 'bg-[var(--g-accent)] text-white hover:bg-[var(--g-accent-2)] active:scale-[0.98] shadow-sm',
-        outline: 'border-2 border-[var(--g-border)] bg-transparent hover:bg-[var(--g-bg-muted)] active:scale-[0.98]',
-        ghost: 'bg-transparent hover:bg-[var(--g-bg-muted)] active:scale-[0.98]',
-        link: 'text-[var(--g-accent)] underline-offset-4 hover:underline',
-        danger: 'bg-red-600 text-white hover:bg-red-700 active:scale-[0.98] shadow-sm',
-        success: 'bg-green-600 text-white hover:bg-green-700 active:scale-[0.98] shadow-sm',
+        primary:
+          'bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] active:scale-95',
+        secondary:
+          'border border-[var(--color-bg-border)] text-[var(--color-text-secondary)] hover:border-white hover:text-white',
+        outline:
+          'border border-[var(--color-bg-border)] text-[var(--color-text-secondary)] hover:border-white hover:text-white',
+        ghost: 'bg-transparent text-[var(--color-text-secondary)] hover:text-white',
+        destructive:
+          'bg-[var(--color-red-muted)] text-[var(--color-red-primary)] hover:bg-[var(--color-red-primary)] hover:text-white active:scale-95',
       },
       size: {
-        sm: 'h-8 px-3 text-sm',
-        md: 'h-10 px-4 py-2',
-        lg: 'h-12 px-6 text-lg',
-        icon: 'h-10 w-10',
+        sm: 'h-8 px-3 text-xs',
+        md: 'h-10 px-4 text-sm',
+        lg: 'h-12 px-6 text-base',
+        icon: 'h-10 w-10 p-0',
       },
     },
     defaultVariants: {

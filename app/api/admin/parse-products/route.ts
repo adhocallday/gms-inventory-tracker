@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { parseDocument } from '@/lib/ai/claude-client';
+import { parseDocument, parseText } from '@/lib/ai/claude-client';
 import { createServiceClient } from '@/lib/supabase/client';
+import { parseSpreadsheet, spreadsheetToText, isSpreadsheetFile } from '@/lib/parsers/spreadsheet-parser';
+import { uploadProductImages } from '@/lib/storage/product-images';
 import * as pdfjsLib from 'pdfjs-dist';
 import { createCanvas } from 'canvas';
 
@@ -19,6 +21,32 @@ interface Product {
 interface ProductWithImage extends Product {
   imageDataUrl?: string;
 }
+
+// JSON Schema for product extraction (enables fast Haiku parsing)
+const PRODUCTS_SCHEMA = {
+  type: 'object',
+  properties: {
+    products: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          sku: { type: 'string', description: 'Product SKU/item code, uppercase' },
+          name: { type: 'string', description: 'Product name/description' },
+          category: { type: 'string', description: 'Category: T-Shirt, Long-Sleeve, Hoodie, Sweatshirt, Tank, Poster, Vinyl, CD, Accessory, Hat, Bag, or Other' },
+          basePrice: { type: 'number', description: 'Base retail price as number' },
+          sizes: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Available sizes: S, M, L, XL, 2XL, 3XL, or One-Size'
+          }
+        },
+        required: ['sku', 'name', 'category', 'basePrice', 'sizes']
+      }
+    }
+  },
+  required: ['products']
+};
 
 /**
  * Extract images from PDF pages
@@ -61,6 +89,87 @@ async function extractProductImagesFromPDF(buffer: Buffer): Promise<string[]> {
 }
 
 /**
+ * Handle spreadsheet files (CSV, Excel) - much faster than document parsing
+ */
+async function handleSpreadsheetFile(
+  buffer: Buffer,
+  filename: string,
+  tourName: string,
+  existingProducts: Product[]
+): Promise<NextResponse> {
+  const startTime = Date.now();
+
+  try {
+    // Parse spreadsheet to structured data
+    const rows = parseSpreadsheet(buffer, filename);
+
+    if (rows.length === 0) {
+      return NextResponse.json({
+        products: [],
+        totalExtracted: 0,
+        validProducts: 0,
+        duplicatesFiltered: 0,
+        imagesExtracted: 0
+      });
+    }
+
+    // Convert to text for Claude parsing
+    const spreadsheetText = spreadsheetToText(rows);
+    console.log(`[Parse Products] Spreadsheet has ${rows.length} rows`);
+
+    // Create instructions for Claude
+    const instructions = `You are analyzing spreadsheet data containing product catalog information for "${tourName}".
+
+The data is in tabular format with columns separated by " | ".
+
+Extract all merchandise products and return them as structured JSON.
+
+For each product, extract:
+- sku: Product SKU/item code (uppercase)
+- name: Product name/description
+- category: One of: T-Shirt, Long-Sleeve, Hoodie, Sweatshirt, Tank, Poster, Vinyl, CD, Accessory, Hat, Bag, Other
+- basePrice: Base retail price as a number
+- sizes: Array of sizes: S, M, L, XL, 2XL, 3XL, or One-Size
+
+${existingProducts.length > 0 ? `\nEXISTING PRODUCTS (avoid duplicates):\n${existingProducts.map(p => `- ${p.sku}`).join('\n')}` : ''}`;
+
+    // Use Haiku with schema for fast, reliable parsing
+    const parsedResponse = await parseText(spreadsheetText, instructions, PRODUCTS_SCHEMA);
+
+    console.log(`[Parse Products] Spreadsheet parsing: ${Date.now() - startTime}ms`);
+    console.log(`[Parse Products] Extracted ${parsedResponse.products?.length || 0} products`);
+
+    // Validate products
+    const validProducts = (parsedResponse.products || []).filter((product: any) =>
+      product.sku &&
+      product.name &&
+      product.category &&
+      typeof product.basePrice === 'number' &&
+      Array.isArray(product.sizes) &&
+      product.sizes.length > 0
+    );
+
+    // Filter duplicates
+    const existingSKUs = new Set(existingProducts.map(p => p.sku));
+    const newProducts = validProducts.filter((product: Product) => !existingSKUs.has(product.sku));
+
+    return NextResponse.json({
+      products: newProducts,
+      totalExtracted: parsedResponse.products?.length || 0,
+      validProducts: validProducts.length,
+      duplicatesFiltered: validProducts.length - newProducts.length,
+      imagesExtracted: 0 // No images from spreadsheets
+    });
+  } catch (error: any) {
+    console.error('[Parse Products] Spreadsheet parsing error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to parse spreadsheet' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
  * POST /api/admin/parse-products
  * Parse product catalog from PDF, CSV, Excel, or image
  */
@@ -70,6 +179,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File;
     const tourName = formData.get('tourName') as string;
     const productsJson = formData.get('products') as string;
+    const tourId = formData.get('tourId') as string; // Optional: for image storage
 
     if (!file) {
       return NextResponse.json(
@@ -88,12 +198,21 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Convert file to base64
+    // Convert file to buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+
+    console.log(`[Parse Products] Analyzing ${file.name} (${(file.size / 1024).toFixed(1)} KB) for ${tourName}`);
+
+    // Check if this is a spreadsheet file (CSV, Excel)
+    if (isSpreadsheetFile(file.type, file.name)) {
+      console.log('[Parse Products] Detected spreadsheet file, using fast parsing');
+      return handleSpreadsheetFile(buffer, file.name, tourName, existingProducts);
+    }
+
     const base64Data = buffer.toString('base64');
 
-    // Determine media type
+    // Determine media type for PDF/image files
     let mediaType: 'application/pdf' | 'image/jpeg' | 'image/png' = 'application/pdf';
     if (file.type.includes('image/jpeg') || file.type.includes('image/jpg')) {
       mediaType = 'image/jpeg';
@@ -101,7 +220,7 @@ export async function POST(request: NextRequest) {
       mediaType = 'image/png';
     }
 
-    console.log(`[Parse Products] Analyzing ${file.name} (${(file.size / 1024).toFixed(1)} KB) for ${tourName}`);
+    console.log(`[Parse Products] Using ${mediaType === 'application/pdf' ? 'PDF' : 'image'} parsing`);
 
     // Create instructions for Claude
     const instructions = `You are analyzing a document containing product catalog information for "${tourName}".
@@ -140,7 +259,8 @@ Return ONLY a valid JSON object (no markdown formatting):
 
 If no products are found, return: {"products": []}`;
 
-    const parsedResponse = await parseDocument(base64Data, mediaType, instructions);
+    // Use schema for fast Haiku parsing with guaranteed valid JSON
+    const parsedResponse = await parseDocument(base64Data, mediaType, instructions, PRODUCTS_SCHEMA);
 
     console.log(`[Parse Products] Successfully extracted ${parsedResponse.products?.length || 0} products`);
 
@@ -181,19 +301,42 @@ If no products are found, return: {"products": []}`;
       console.log(`[Parse Products] Extracted ${productImages.length} page images`);
     }
 
-    // Return products with images for client-side storage
+    // Map products with their extracted images
     const productsWithImages = newProducts.map((product, index) => ({
       ...product,
-      // Assign first N images to first N products (client can match better)
       imageDataUrl: productImages[index] || null
     }));
+
+    // If tourId provided, persist images to Supabase Storage
+    let persistedImageUrls: (string | null)[] = [];
+    if (tourId && productImages.length > 0) {
+      console.log(`[Parse Products] Persisting ${productImages.length} images to storage for tour ${tourId}`);
+      const imagesToUpload = productsWithImages
+        .filter(p => p.imageDataUrl)
+        .map(p => ({
+          dataUrl: p.imageDataUrl!,
+          sku: p.sku
+        }));
+
+      persistedImageUrls = await uploadProductImages(imagesToUpload, tourId);
+
+      // Update products with persisted URLs
+      let urlIndex = 0;
+      for (const product of productsWithImages) {
+        if (product.imageDataUrl) {
+          (product as any).persistedImageUrl = persistedImageUrls[urlIndex] || null;
+          urlIndex++;
+        }
+      }
+    }
 
     return NextResponse.json({
       products: productsWithImages,
       totalExtracted: parsedResponse.products.length,
       validProducts: validProducts.length,
       duplicatesFiltered: validProducts.length - newProducts.length,
-      imagesExtracted: productImages.length
+      imagesExtracted: productImages.length,
+      imagesPersisted: persistedImageUrls.filter(u => u !== null).length
     });
   } catch (error: any) {
     console.error('[Parse Products] Error:', error);

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { FileDropzone } from '@/components/upload/FileDropzone';
+import { InlineDraftReview } from '@/components/upload/InlineDraftReview';
 import { useShows } from '@/hooks/useShows';
 import { useTours } from '@/hooks/useTours';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -77,11 +78,13 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
   const [tourId, setTourId] = useState(searchParams.tourId ?? '');
   const [showId, setShowId] = useState(searchParams.showId ?? '');
   const [parsedId, setParsedId] = useState<string | null>(null);
+  const [normalizedJson, setNormalizedJson] = useState<any>(null);
   const [validation, setValidation] = useState<any>(null);
   const [matchingSteps, setMatchingSteps] = useState<string[]>([]);
   const [autoDetectEnabled, setAutoDetectEnabled] = useState(true);
   const [detectedType, setDetectedType] = useState<DocType | null>(null);
   const [detectedClassification, setDetectedClassification] = useState<ClassificationResult | null>(null);
+  const [showInlineReview, setShowInlineReview] = useState(false);
 
   const { tours } = useTours();
   const { shows } = useShows(tourId || undefined);
@@ -94,10 +97,22 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
     return shows;
   }, [docType, shows]);
 
-  const handleParseComplete = (data: any, parsedDocumentId?: string | null, validationPayload?: any) => {
+  const handleParseComplete = (data: any, parsedDocumentId?: string | null, validationPayload?: any, matching?: string[]) => {
     setParsedId(parsedDocumentId ?? null);
-    setMatchingSteps(validationPayload?.matching ?? []);
+    setNormalizedJson(data);
+    setMatchingSteps(matching ?? []);
     setValidation(validationPayload ?? null);
+    setShowInlineReview(true);
+  };
+
+  const handleResetUpload = () => {
+    setParsedId(null);
+    setNormalizedJson(null);
+    setValidation(null);
+    setMatchingSteps([]);
+    setShowInlineReview(false);
+    setDetectedType(null);
+    setDetectedClassification(null);
   };
 
   const breadcrumbs = generateBreadcrumbs([
@@ -221,32 +236,47 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
           )}
         </div>
 
-        <FileDropzone
-          tourId={tourId || undefined}
-          showId={showId || undefined}
-          fileType={autoDetectEnabled ? undefined : docType}
-          autoDetect={autoDetectEnabled}
-          onTypeDetected={(type, classification, tourShowMatch) => {
-            setDetectedType(type);
-            setDetectedClassification(classification);
-            setDocType(type); // Set the doc type for show requirement checking
+        {!showInlineReview && (
+          <FileDropzone
+            tourId={tourId || undefined}
+            showId={showId || undefined}
+            fileType={autoDetectEnabled ? undefined : docType}
+            autoDetect={autoDetectEnabled}
+            onTypeDetected={(type, classification, tourShowMatch) => {
+              setDetectedType(type);
+              setDetectedClassification(classification);
+              setDocType(type); // Set the doc type for show requirement checking
 
-            // Auto-select tour and show if matched
-            if (tourShowMatch?.tourId) {
-              setTourId(tourShowMatch.tourId);
-              console.log('Auto-selected tour:', tourShowMatch.tourName);
-            }
-            if (tourShowMatch?.showId) {
-              setShowId(tourShowMatch.showId);
-              console.log('Auto-selected show:', tourShowMatch.venueName, 'on', tourShowMatch.showDate);
-            }
+              // Auto-select tour and show if matched
+              if (tourShowMatch?.tourId) {
+                setTourId(tourShowMatch.tourId);
+                console.log('Auto-selected tour:', tourShowMatch.tourName);
+              }
+              if (tourShowMatch?.showId) {
+                setShowId(tourShowMatch.showId);
+                console.log('Auto-selected show:', tourShowMatch.venueName, 'on', tourShowMatch.showDate);
+              }
 
-            console.log('Detected document type:', classification);
-            console.log('Tour/Show match:', tourShowMatch);
-          }}
-          onParseComplete={handleParseComplete}
-          autoRedirect={false}
-        />
+              console.log('Detected document type:', classification);
+              console.log('Tour/Show match:', tourShowMatch);
+            }}
+            onParseComplete={handleParseComplete}
+            autoRedirect={false}
+          />
+        )}
+
+        {/* Inline Draft Review - shown after parsing */}
+        {showInlineReview && parsedId && normalizedJson && (
+          <InlineDraftReview
+            parsedDocumentId={parsedId}
+            docType={docType}
+            normalizedJson={normalizedJson}
+            validation={validation ?? { missing_fields: [], warnings: [] }}
+            matching={matchingSteps}
+            onClose={handleResetUpload}
+            onPosted={handleResetUpload}
+          />
+        )}
 
         <div className="space-y-3">
           <div className="text-xs uppercase tracking-[0.3em] text-[var(--g-text-muted)]">
