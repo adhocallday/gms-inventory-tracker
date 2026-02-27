@@ -37,6 +37,7 @@ interface EnhancedAIAgentPanelProps {
   onGenerateProjections: () => Promise<void>;
   onApplySizeRecommendation?: (sku: string, curve: Record<string, number>) => void;
   onApplyAllSizeRecommendations?: (analysis: SizeAnalysisData['analysis']) => void;
+  onOverridesApplied?: () => void;
   currentInputs: {
     expectedAttendance: number;
     expectedPerHead: number;
@@ -55,6 +56,7 @@ export function EnhancedAIAgentPanel({
   onGenerateProjections,
   onApplySizeRecommendation,
   onApplyAllSizeRecommendations,
+  onOverridesApplied,
   currentInputs,
   warehouseLocations
 }: EnhancedAIAgentPanelProps) {
@@ -333,7 +335,7 @@ export function EnhancedAIAgentPanel({
           </div>
         )}
         {activeTab === 'chat' && (
-          <ChatInterface tourId={tourId} scenarioId={scenarioId} useStreaming={true} />
+          <ChatInterface tourId={tourId} scenarioId={scenarioId} useStreaming={true} onOverridesApplied={onOverridesApplied} />
         )}
       </div>
     </div>

@@ -16,14 +16,28 @@ const anthropic = new Anthropic({
 });
 
 /**
+ * Suggested override from AI intervention
+ */
+export interface SuggestedOverride {
+  sku: string;
+  productName: string;
+  size?: string | null;
+  bucket: 'estimated_sellout' | 'minimum_stock' | 'opening_stock';
+  currentValue: number;
+  suggestedValue: number;
+  reason: string;
+}
+
+/**
  * Stream event types for UI consumption
  */
 export interface StreamEvent {
-  type: 'phase' | 'thinking' | 'content' | 'json' | 'complete' | 'error';
+  type: 'phase' | 'thinking' | 'content' | 'json' | 'override_suggestion' | 'complete' | 'error';
   phase?: string;
   content?: string;
   data?: any;
   progress?: number;
+  overrides?: SuggestedOverride[];
 }
 
 /**
@@ -184,6 +198,7 @@ export async function* streamComprehensiveProjections(
 
 /**
  * Stream chat responses token by token
+ * Parses override suggestions from <overrides> tags and emits them separately
  */
 export async function* streamChat(
   conversationHistory: { role: string; content: string }[],
@@ -205,9 +220,58 @@ export async function* streamChat(
       }))
     });
 
+    let accumulatedText = '';
+    let isInsideOverrides = false;
+    let overridesBuffer = '';
+
     for await (const event of stream) {
       if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-        yield { type: 'content', content: event.delta.text };
+        const text = event.delta.text;
+        accumulatedText += text;
+
+        // Check for <overrides> tag opening
+        if (text.includes('<overrides>')) {
+          isInsideOverrides = true;
+          // Emit any text before the tag
+          const beforeTag = text.split('<overrides>')[0];
+          if (beforeTag.trim()) {
+            yield { type: 'content', content: beforeTag };
+          }
+          overridesBuffer = '';
+          continue;
+        }
+
+        // Check for </overrides> tag closing
+        if (text.includes('</overrides>')) {
+          isInsideOverrides = false;
+          const parts = text.split('</overrides>');
+          overridesBuffer += parts[0];
+
+          // Parse and emit the overrides
+          try {
+            const overrides = parseOverrides(overridesBuffer);
+            if (overrides.length > 0) {
+              yield { type: 'override_suggestion', overrides };
+            }
+          } catch (parseError) {
+            console.warn('[StreamingAgent] Failed to parse overrides:', parseError);
+          }
+
+          // Emit any text after the closing tag
+          if (parts[1] && parts[1].trim()) {
+            yield { type: 'content', content: parts[1] };
+          }
+          continue;
+        }
+
+        // If inside overrides block, buffer the content
+        if (isInsideOverrides) {
+          overridesBuffer += text;
+          continue;
+        }
+
+        // Normal content - emit token by token
+        yield { type: 'content', content: text };
       }
 
       if (event.type === 'message_stop') {
@@ -217,6 +281,30 @@ export async function* streamChat(
   } catch (error: any) {
     console.error('[StreamingAgent] Chat stream error:', error);
     yield { type: 'error', content: error.message || 'Chat failed' };
+  }
+}
+
+/**
+ * Parse override suggestions from JSON string
+ */
+function parseOverrides(jsonString: string): SuggestedOverride[] {
+  try {
+    // Clean up the string
+    const cleaned = jsonString.trim();
+
+    // Try to find JSON array
+    const arrayMatch = cleaned.match(/\[[\s\S]*\]/);
+    if (arrayMatch) {
+      const parsed = JSON.parse(arrayMatch[0]);
+      return Array.isArray(parsed) ? parsed : [];
+    }
+
+    // Try parsing directly
+    const parsed = JSON.parse(cleaned);
+    return Array.isArray(parsed) ? parsed : [parsed];
+  } catch (error) {
+    console.error('[StreamingAgent] Override parse error:', error);
+    return [];
   }
 }
 
@@ -312,15 +400,72 @@ IMPORTANT: Return valid JSON only.`;
 }
 
 function buildChatSystemPrompt(context: ProjectionContext): string {
-  return `You are an AI assistant helping with merchandise projections for ${context.tourName}.
+  // Build product list for context
+  const productList = context.productSummary?.slice(0, 30).map(p => ({
+    sku: p.sku,
+    name: p.product_name,
+    totalSold: p.total_sold,
+    avgPrice: p.avg_price
+  })) || [];
 
-You have access to:
-- ${context.productSummary?.length || 0} products
-- ${context.showSummary?.length || 0} shows
+  return `You are an AI merchandise projection assistant for ${context.tourName}.
+
+## Context
+- Products: ${context.productSummary?.length || 0} SKUs
+- Shows: ${context.showSummary?.length || 0} completed
 - Expected attendance: ${context.expectedAttendance.toLocaleString()}
 - Expected per-head: $${context.expectedPerHead.toFixed(2)}
 
-Be concise but helpful. Reference specific data when answering questions.`;
+## Product Data (Top 30)
+${JSON.stringify(productList, null, 2)}
+
+## Your Role
+You help users analyze projections and make adjustments through natural conversation.
+
+## Intervention Recognition
+When users request projection adjustments, respond with:
+1. A clear explanation of what you'll change
+2. Structured override suggestions in <overrides> tags
+
+### Examples of Adjustment Requests:
+- "Increase hoodies by 20%" → Calculate +20% for all hoodie SKUs
+- "Double the XL quantities" → Apply 2x multiplier to XL size overrides
+- "We expect 50% more attendance" → Recalculate based on higher attendance
+- "Use smaller sizes" → Shift size curve toward S/M/L
+- "Cancel those changes" → Acknowledge and don't output overrides
+
+### Override Response Format
+When suggesting changes, include this JSON block:
+
+<overrides>
+[
+  {
+    "sku": "HOODIE-BLK",
+    "productName": "Black Hoodie",
+    "size": null,
+    "bucket": "estimated_sellout",
+    "currentValue": 500,
+    "suggestedValue": 600,
+    "reason": "+20% per user request"
+  }
+]
+</overrides>
+
+### Override Fields:
+- sku: Product SKU (required)
+- productName: Human-readable name (required)
+- size: Size code (S/M/L/XL/2XL/3XL) or null for total units
+- bucket: "estimated_sellout" | "minimum_stock" | "opening_stock"
+- currentValue: Current projection value
+- suggestedValue: Your recommended value
+- reason: Brief explanation
+
+## Important Guidelines
+1. Only output <overrides> when the user explicitly requests changes
+2. For questions or analysis, respond naturally without overrides
+3. Calculate specific values based on the product data provided
+4. Support multi-turn refinement ("Actually, make it 30% instead")
+5. Be concise but thorough in explanations`;
 }
 
 // Response parsers
