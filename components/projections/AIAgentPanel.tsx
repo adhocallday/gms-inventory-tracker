@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { BarChart3 } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { BarChart3, Brain, Sparkles } from 'lucide-react';
 import { ChatInterface } from './ChatInterface';
 import { AnalysisPanel } from './AnalysisPanel';
 import { SizeAnalysisPanel } from './SizeAnalysisPanel';
+import { ThinkingDisplay } from './ThinkingDisplay';
 
 interface SizeAnalysisData {
   analysis: Record<string, {
@@ -19,7 +20,15 @@ interface SizeAnalysisData {
     sizeTrends: string[];
     recommendations: string[];
   };
-  productNames?: Record<string, string>; // SKU -> Product Name mapping
+  productNames?: Record<string, string>;
+}
+
+interface StreamEvent {
+  type: 'phase' | 'thinking' | 'content' | 'json' | 'complete' | 'error';
+  phase?: string;
+  content?: string;
+  data?: any;
+  progress?: number;
 }
 
 interface EnhancedAIAgentPanelProps {
@@ -49,7 +58,7 @@ export function EnhancedAIAgentPanel({
   currentInputs,
   warehouseLocations
 }: EnhancedAIAgentPanelProps) {
-  const [activeTab, setActiveTab] = useState<'analysis' | 'sizes' | 'chat'>('analysis');
+  const [activeTab, setActiveTab] = useState<'thinking' | 'analysis' | 'sizes' | 'chat'>('thinking');
   const [analysis, setAnalysis] = useState<any>(null);
   const [sizeAnalysis, setSizeAnalysis] = useState<SizeAnalysisData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -57,39 +66,103 @@ export function EnhancedAIAgentPanel({
   const [generated, setGenerated] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleGenerate() {
+  // Streaming state
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamContent, setStreamContent] = useState('');
+  const [streamPhase, setStreamPhase] = useState('');
+  const [streamProgress, setStreamProgress] = useState(0);
+
+  // Stream-based generation with visible thought process
+  const handleGenerateWithStreaming = useCallback(async () => {
     setLoading(true);
+    setIsStreaming(true);
     setGenerated(false);
     setError(null);
+    setStreamContent('');
+    setStreamPhase('Initializing...');
+    setStreamProgress(0);
+    setActiveTab('thinking');
+
     try {
-      // Load analysis first
-      const response = await fetch('/api/projections/analyze', {
+      const response = await fetch('/api/projections/analyze-stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tourId,
           expectedAttendance: currentInputs.expectedAttendance,
-          expectedPerHead: currentInputs.expectedPerHead
+          expectedPerHead: currentInputs.expectedPerHead,
+          mode: 'analysis'
         })
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `API error: ${response.status}`);
+        throw new Error(`API error: ${response.status}`);
       }
 
-      const data = await response.json();
-      setAnalysis(data.analysis);
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('No response body');
+      }
 
-      // Generate and apply projections
-      await onGenerateProjections();
-      setGenerated(true);
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const text = decoder.decode(value);
+        const lines = text.split('\n').filter(line => line.startsWith('data: '));
+
+        for (const line of lines) {
+          try {
+            const event: StreamEvent = JSON.parse(line.replace('data: ', ''));
+
+            switch (event.type) {
+              case 'phase':
+                setStreamPhase(event.phase || '');
+                if (event.progress !== undefined) {
+                  setStreamProgress(event.progress);
+                }
+                break;
+
+              case 'thinking':
+              case 'content':
+                setStreamContent(prev => prev + (event.content || ''));
+                break;
+
+              case 'json':
+                setAnalysis(event.data);
+                break;
+
+              case 'complete':
+                setGenerated(true);
+                setStreamPhase('Complete');
+                setStreamProgress(100);
+                // Also generate projections
+                await onGenerateProjections();
+                break;
+
+              case 'error':
+                throw new Error(event.content || 'Stream error');
+            }
+          } catch (parseError) {
+            console.warn('Failed to parse SSE event:', line);
+          }
+        }
+      }
     } catch (error: any) {
-      console.error('Failed to generate:', error);
-      setError(error.message || 'Failed to generate projections. Please check console for details.');
+      console.error('Streaming failed:', error);
+      setError(error.message || 'Failed to generate projections');
     } finally {
       setLoading(false);
+      setIsStreaming(false);
     }
+  }, [tourId, currentInputs, onGenerateProjections]);
+
+  // Legacy non-streaming generation (fallback)
+  async function handleGenerate() {
+    // Use streaming by default
+    await handleGenerateWithStreaming();
   }
 
   async function handleAnalyzeSizes() {
@@ -133,21 +206,34 @@ export function EnhancedAIAgentPanel({
     <div className="g-card p-6">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-2xl font-bold g-title">AI Projection Assistant</h2>
+          <h2 className="text-2xl font-bold g-title flex items-center gap-2">
+            <Sparkles className="w-6 h-6 text-[var(--color-red-primary)]" />
+            AI Projection Assistant
+          </h2>
           <p className="text-sm text-[var(--color-text-muted)] mt-1">
-            Generate complete projections from historical data with one click
+            Generate complete projections with visible AI reasoning
           </p>
         </div>
         <button
           onClick={handleGenerate}
           disabled={loading}
-          className="px-6 py-3 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition disabled:opacity-50 font-semibold text-lg whitespace-nowrap"
+          className="px-6 py-3 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition disabled:opacity-50 font-semibold text-lg whitespace-nowrap flex items-center gap-2"
         >
-          {loading ? 'Generating...' : 'Generate AI Projections'}
+          {loading ? (
+            <>
+              <Brain className="w-5 h-5 animate-pulse" />
+              AI Thinking...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-5 h-5" />
+              Generate AI Projections
+            </>
+          )}
         </button>
       </div>
 
-      {generated && (
+      {generated && !isStreaming && (
         <div className="mb-4 p-5 bg-gradient-to-br from-emerald-50/80 to-white border-2 border-emerald-200 rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
@@ -177,6 +263,14 @@ export function EnhancedAIAgentPanel({
 
       <div className="flex gap-2 mb-4 border-b border-[var(--color-bg-border)]">
         <button
+          onClick={() => setActiveTab('thinking')}
+          className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'thinking' ? 'border-b-2 border-[var(--color-red-primary)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-muted)]'}`}
+        >
+          <Brain className="w-4 h-4" />
+          AI Thinking
+          {isStreaming && <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />}
+        </button>
+        <button
           onClick={() => setActiveTab('analysis')}
           className={`px-4 py-2 ${activeTab === 'analysis' ? 'border-b-2 border-[var(--color-red-primary)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-muted)]'}`}
         >
@@ -198,8 +292,17 @@ export function EnhancedAIAgentPanel({
       </div>
 
       <div className="mt-4">
+        {activeTab === 'thinking' && (
+          <ThinkingDisplay
+            content={streamContent}
+            phase={streamPhase}
+            progress={streamProgress}
+            isActive={isStreaming}
+            variant="dark"
+          />
+        )}
         {activeTab === 'analysis' && (
-          <AnalysisPanel analysis={analysis} loading={loading} />
+          <AnalysisPanel analysis={analysis} loading={loading && !isStreaming} />
         )}
         {activeTab === 'sizes' && (
           <div className="space-y-4">
@@ -230,7 +333,7 @@ export function EnhancedAIAgentPanel({
           </div>
         )}
         {activeTab === 'chat' && (
-          <ChatInterface tourId={tourId} scenarioId={scenarioId} />
+          <ChatInterface tourId={tourId} scenarioId={scenarioId} useStreaming={true} />
         )}
       </div>
     </div>
