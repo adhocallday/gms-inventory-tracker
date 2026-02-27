@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { getModelForTask, getModelName } from './models';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -70,9 +71,12 @@ export async function analyzeProjectionData(
   context: ProjectionContext
 ): Promise<ProjectionAnalysis> {
   const prompt = buildAnalysisPrompt(context);
+  const model = getModelForTask('projection-analysis');
+
+  console.log(`[ProjectionAgent] analyzeProjectionData using ${getModelName(model)}`);
 
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model,
     max_tokens: 16384,
     messages: [{
       role: 'user',
@@ -97,9 +101,12 @@ export async function generateRecommendations(
   }
 ): Promise<AIRecommendation[]> {
   const prompt = buildRecommendationPrompt(context, constraints);
+  const model = getModelForTask('recommendations');
+
+  console.log(`[ProjectionAgent] generateRecommendations using ${getModelName(model)}`);
 
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model,
     max_tokens: 16384,
     messages: [{
       role: 'user',
@@ -114,15 +121,18 @@ export async function generateRecommendations(
   return parseRecommendationsResponse(content);
 }
 
-// Chat interface
+// Chat interface (uses Sonnet for balanced conversational performance)
 export async function chatWithAgent(
   conversationHistory: { role: string; content: string }[],
   context: ProjectionContext
 ): Promise<string> {
   const systemPrompt = buildChatSystemPrompt(context);
+  const model = getModelForTask('chat');
+
+  console.log(`[ProjectionAgent] chatWithAgent using ${getModelName(model)}`);
 
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model,
     max_tokens: 4096,
     system: systemPrompt,
     messages: conversationHistory.map(m => ({
@@ -141,9 +151,12 @@ export async function generateComprehensiveProjections(
   context: ProjectionContext
 ): Promise<ComprehensiveProjection[]> {
   const prompt = buildComprehensiveProjectionPrompt(context);
+  const model = getModelForTask('comprehensive-projections');
+
+  console.log(`[ProjectionAgent] generateComprehensiveProjections using ${getModelName(model)}`);
 
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model,
     max_tokens: 16384,
     messages: [{
       role: 'user',
@@ -444,9 +457,12 @@ export async function analyzeSizeDistribution(
   context: ProjectionContext
 ): Promise<SizeAnalysisResult> {
   const prompt = buildSizeAnalysisPrompt(context);
+  const model = getModelForTask('size-distribution');
+
+  console.log(`[ProjectionAgent] analyzeSizeDistribution using ${getModelName(model)}`);
 
   const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
+    model,
     max_tokens: 16384,
     messages: [{
       role: 'user',

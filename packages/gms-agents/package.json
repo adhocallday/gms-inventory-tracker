@@ -1,0 +1,52 @@
+{
+  "name": "@gms/agents",
+  "version": "1.0.0",
+  "description": "Reusable AI agents for GMS merchandise management products",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src/",
+    "test": "jest"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "claude",
+    "anthropic",
+    "merchandise",
+    "gms"
+  ],
+  "author": "GMS",
+  "license": "MIT",
+  "peerDependencies": {
+    "@anthropic-ai/sdk": ">=0.30.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./parsers": {
+      "import": "./dist/parsers/index.js",
+      "types": "./dist/parsers/index.d.ts"
+    },
+    "./agents": {
+      "import": "./dist/agents/index.js",
+      "types": "./dist/agents/index.d.ts"
+    },
+    "./classifiers": {
+      "import": "./dist/classifiers/index.js",
+      "types": "./dist/classifiers/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}

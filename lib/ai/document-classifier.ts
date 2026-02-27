@@ -93,7 +93,7 @@ Be specific about which indicators you found (e.g., "PO Number: 12345", "Venue: 
 
   try {
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 1024,
       messages: [
         {
