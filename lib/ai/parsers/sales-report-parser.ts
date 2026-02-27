@@ -1,6 +1,4 @@
-import { parseWithAgent, parseDocument, parseText } from '../claude-client';
-import { extractTextFromBase64PDF } from '../pdf-utils';
-import { SALES_REPORT_AGENT } from '../agents';
+import { parseDocument } from '../claude-client';
 
 export interface SalesLineItem {
   sku: string;
@@ -21,79 +19,40 @@ export interface SalesReportData {
   lineItems: SalesLineItem[];
 }
 
-// JSON Schema for tool-based extraction (guarantees valid JSON with Haiku)
-const SALES_REPORT_SCHEMA = {
-  type: 'object',
-  properties: {
-    showDate: { type: 'string', description: 'Show date in YYYY-MM-DD format' },
-    venueName: { type: 'string', description: 'Venue name' },
-    city: { type: 'string', description: 'City name' },
-    state: { type: 'string', description: 'State abbreviation' },
-    attendance: { type: 'number', description: 'Attendance count' },
-    totalGross: { type: 'number', description: 'Total gross sales amount' },
-    lineItems: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          sku: { type: 'string', description: 'Product SKU (strip size suffix)' },
-          description: { type: 'string', description: 'Product description' },
-          size: { type: 'string', description: 'Size: S, M, L, XL, 2XL, 3XL, or One-Size' },
-          sold: { type: 'number', description: 'Quantity sold' },
-          unitPrice: { type: 'number', description: 'Unit price' },
-          gross: { type: 'number', description: 'Gross sales for this item' }
-        },
-        required: ['sku', 'description', 'size', 'sold', 'unitPrice', 'gross']
-      }
-    }
-  },
-  required: ['showDate', 'venueName', 'totalGross', 'lineItems']
-};
-
-// Fallback instructions for document parsing (when text extraction fails)
-const FALLBACK_INSTRUCTIONS = `
-Parse this AtVenu sales report PDF. Extract:
-- showDate (YYYY-MM-DD)
-- venueName
-- city, state
-- totalGross
-- lineItems: [{sku (strip size suffix), description, size, sold, unitPrice, gross}]
-
-Return ONLY valid JSON.
-`;
-
 export async function parseSalesReport(
   pdfBase64: string
 ): Promise<SalesReportData> {
-  const startTime = Date.now();
+  const instructions = `
+You are parsing an AtVenu sales report PDF. Extract the following and return ONLY valid JSON:
 
-  // Try text extraction + fast schema-based parsing (Haiku with tool_choice)
-  try {
-    const textStartTime = Date.now();
-    const extractedText = await extractTextFromBase64PDF(pdfBase64);
-    console.log(`[SalesReportParser] Text extraction: ${Date.now() - textStartTime}ms (${extractedText?.length ?? 0} chars)`);
-
-    // Only use schema parsing if we got meaningful content
-    if (extractedText && extractedText.trim().length > 100) {
-      console.log('[SalesReportParser] Using Haiku with schema (fast mode)');
-
-      const parseStartTime = Date.now();
-      const result = await parseText(extractedText, FALLBACK_INSTRUCTIONS, SALES_REPORT_SCHEMA);
-
-      console.log(`[SalesReportParser] Schema parse: ${Date.now() - parseStartTime}ms`);
-      console.log(`[SalesReportParser] TOTAL: ${Date.now() - startTime}ms`);
-
-      return result as SalesReportData;
+{
+  "showDate": "YYYY-MM-DD",
+  "venueName": "string",
+  "city": "string or null",
+  "state": "string or null",
+  "attendance": number or null,
+  "totalGross": number,
+  "lineItems": [
+    {
+      "sku": "string (base SKU WITHOUT size suffix like _SM, _MD, _LG, etc.)",
+      "description": "string",
+      "size": "string (S, M, L, XL, 2XL, 3XL, or One-Size)",
+      "sold": number (quantity sold),
+      "unitPrice": number,
+      "gross": number (total revenue for this item)
     }
-  } catch (textError) {
-    console.log('[SalesReportParser] Schema parsing failed, falling back to document parsing:', textError);
-  }
+  ]
+}
 
-  // Fallback to full document parsing with schema (handles scanned PDFs)
-  console.log('[SalesReportParser] Using document-based parsing with schema');
-  const aiStartTime = Date.now();
-  const result = await parseDocument(pdfBase64, 'application/pdf', FALLBACK_INSTRUCTIONS, SALES_REPORT_SCHEMA) as SalesReportData;
-  console.log(`[SalesReportParser] Document parsing: ${Date.now() - aiStartTime}ms`);
-  console.log(`[SalesReportParser] TOTAL: ${Date.now() - startTime}ms`);
-  return result;
+Important:
+- Extract ALL products that were sold
+- SKU should be the BASE product code (e.g., "GHOSRX203729BK" not "GHOSRX203729BK_SM")
+- If the SKU in the PDF includes a size suffix like _SM, _MD, _LG, _XL, _2XL, _3XL, remove it
+- Size should be extracted separately as a standardized value (S, M, L, XL, 2XL, 3XL, One-Size)
+- Look for subtotals per product style (e.g., "Subtotal: SKELETOR ITIN TEE")
+- totalGross is the overall gross sales for the show
+- Return ONLY the JSON object
+`;
+
+  return parseDocument(pdfBase64, 'application/pdf', instructions) as Promise<SalesReportData>;
 }
