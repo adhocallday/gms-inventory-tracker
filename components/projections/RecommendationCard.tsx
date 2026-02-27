@@ -25,7 +25,7 @@ export function RecommendationCard({ recommendation, onAccept, onReject }: Recom
   };
 
   const config = typeConfig[recommendation.recommendation_type as keyof typeof typeConfig] ||
-    { bg: 'from-slate-50/80 to-white', border: 'border-[var(--color-bg-border)]', text: 'text-slate-700', badge: 'bg-[var(--color-bg-border)] text-slate-700' };
+    { bg: 'from-[var(--color-bg-elevated)] to-[var(--color-bg-surface)]', border: 'border-[var(--color-bg-border)]', text: 'text-[var(--color-text-primary)]', badge: 'bg-[var(--color-bg-border)] text-[var(--color-text-secondary)]' };
 
   return (
     <div className={`bg-gradient-to-br ${config.bg} border-2 ${config.border} rounded-2xl p-5 space-y-4 shadow-sm`}>

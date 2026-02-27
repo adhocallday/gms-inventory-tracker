@@ -191,7 +191,7 @@ export function ProductImageUpload({
                 {!image.is_primary && (
                   <button
                     onClick={() => handleSetPrimary(image.id)}
-                    className="px-3 py-1.5 bg-[var(--color-bg-surface)] text-black text-sm font-medium rounded hover:bg-gray-200 transition"
+                    className="px-3 py-1.5 bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] text-sm font-medium rounded hover:bg-[var(--color-bg-elevated)] transition"
                   >
                     Set Primary
                   </button>

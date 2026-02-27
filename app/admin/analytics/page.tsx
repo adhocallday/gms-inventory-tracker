@@ -192,7 +192,7 @@ export default function AnalyticsPage() {
                   <div className="flex items-center gap-4">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                       index === 0 ? 'bg-amber-500/20 text-amber-500' :
-                      index === 1 ? 'bg-slate-400/20 text-slate-400' :
+                      index === 1 ? 'bg-[var(--color-bg-border)] text-[var(--color-text-secondary)]' :
                       index === 2 ? 'bg-orange-600/20 text-orange-600' :
                       'bg-[var(--color-bg-border)] text-[var(--color-text-secondary)]'
                     }`}>

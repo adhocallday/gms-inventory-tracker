@@ -10,10 +10,10 @@ const badgeVariants = cva(
         active: 'bg-green-500/10 text-green-600 border-green-500/20',
         completed: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
         upcoming: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
-        cancelled: 'bg-gray-500/10 text-gray-600 border-gray-500/20',
+        cancelled: 'bg-[var(--color-bg-border)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)]',
 
         // Document statuses
-        draft: 'bg-gray-500/10 text-gray-600 border-gray-500/20',
+        draft: 'bg-[var(--color-bg-border)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)]',
         approved: 'bg-green-500/10 text-green-600 border-green-500/20',
         posted: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
         rejected: 'bg-red-500/10 text-red-600 border-red-500/20',
@@ -22,7 +22,7 @@ const badgeVariants = cva(
         // PO statuses
         open: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20',
         received: 'bg-green-500/10 text-green-600 border-green-500/20',
-        closed: 'bg-gray-500/10 text-gray-600 border-gray-500/20',
+        closed: 'bg-[var(--color-bg-border)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)]',
 
         // Inventory statuses
         'in-stock': 'bg-green-500/10 text-green-600 border-green-500/20',
@@ -34,7 +34,7 @@ const badgeVariants = cva(
         warning: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20',
         danger: 'bg-red-500/10 text-red-600 border-red-500/20',
         info: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-        default: 'bg-gray-500/10 text-gray-600 border-gray-500/20',
+        default: 'bg-[var(--color-bg-border)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)]',
       },
       size: {
         sm: 'text-xs px-2 py-0.5',

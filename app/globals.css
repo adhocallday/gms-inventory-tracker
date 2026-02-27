@@ -216,3 +216,82 @@ a {
     transform: translateY(0);
   }
 }
+
+/* Form inputs */
+.g-input {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-bg-border);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  transition: border-color var(--g-ease), box-shadow var(--g-ease);
+}
+
+.g-input:focus {
+  outline: none;
+  border-color: var(--color-red-primary);
+  box-shadow: 0 0 0 2px rgba(232, 0, 61, 0.15);
+}
+
+.g-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.g-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Select dropdowns */
+select.g-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23A0A0A0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+/* Native select option styling */
+select.g-input option {
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  padding: 0.5rem;
+}
+
+/* Textarea */
+textarea.g-input {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Native HTML inputs/selects without .g-input class */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="search"],
+select,
+textarea {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-elevated);
+}
+
+input[type="text"]::placeholder,
+input[type="number"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="search"]::placeholder,
+textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* Ensure select options are readable */
+option {
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+}

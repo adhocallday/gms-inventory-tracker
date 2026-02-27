@@ -259,7 +259,7 @@ export function WarehouseLocationManager({
                       {location.name}
                     </span>
                     {!location.is_active && (
-                      <span className="text-xs px-2 py-1 rounded bg-gray-500/10 text-gray-500">
+                      <span className="text-xs px-2 py-1 rounded bg-[var(--color-bg-border)] text-[var(--color-text-muted)]">
                         Inactive
                       </span>
                     )}
@@ -363,7 +363,7 @@ export function WarehouseLocationManager({
                       {location.name}
                     </span>
                     {!location.is_active && (
-                      <span className="text-xs px-2 py-1 rounded bg-gray-500/10 text-gray-500">
+                      <span className="text-xs px-2 py-1 rounded bg-[var(--color-bg-border)] text-[var(--color-text-muted)]">
                         Inactive
                       </span>
                     )}
