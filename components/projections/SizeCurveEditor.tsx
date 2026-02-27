@@ -164,7 +164,7 @@ export function SizeCurveEditor({
         <div className="flex items-center gap-2">
           <button
             onClick={handleReset}
-            className="flex items-center gap-1 px-2 py-1 text-xs text-[var(--color-text-muted)] hover:bg-[var(--g-bg-subtle)] rounded transition"
+            className="flex items-center gap-1 px-2 py-1 text-xs text-[var(--color-text-muted)] hover:bg-[var(--color-bg-elevated)] rounded transition"
             title="Reset to Historical"
           >
             <RotateCcw className="w-3 h-3" />
@@ -173,7 +173,7 @@ export function SizeCurveEditor({
           {aiRecommendation && (
             <button
               onClick={handleApplyAI}
-              className="flex items-center gap-1 px-2 py-1 text-xs text-[var(--color-red-primary)] hover:bg-[var(--g-bg-subtle)] rounded transition"
+              className="flex items-center gap-1 px-2 py-1 text-xs text-[var(--color-red-primary)] hover:bg-[var(--color-bg-elevated)] rounded transition"
               title={`Apply AI Recommendation (${(aiRecommendation.confidence * 100).toFixed(0)}% confidence)`}
             >
               <Sparkles className="w-3 h-3" />
@@ -197,7 +197,7 @@ export function SizeCurveEditor({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => toggleLock(size)}
-                  className={`p-0.5 rounded ${isLocked ? 'text-amber-500' : 'text-[var(--color-text-muted)]'} hover:bg-[var(--g-bg-subtle)]`}
+                  className={`p-0.5 rounded ${isLocked ? 'text-amber-500' : 'text-[var(--color-text-muted)]'} hover:bg-[var(--color-bg-elevated)]`}
                   title={isLocked ? 'Unlock' : 'Lock'}
                 >
                   {isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
@@ -230,7 +230,7 @@ export function SizeCurveEditor({
                   value={current.toFixed(0)}
                   onChange={(e) => handlePercentChange(size, e.target.value)}
                   disabled={isLocked}
-                  className="w-14 px-1 py-0.5 text-xs text-right border border-[var(--color-bg-border)] rounded bg-[var(--color-bg-base)] disabled:bg-[var(--g-bg-subtle)] disabled:text-[var(--color-text-muted)]"
+                  className="w-14 px-1 py-0.5 text-xs text-right border border-[var(--color-bg-border)] rounded bg-[var(--color-bg-base)] disabled:bg-[var(--color-bg-elevated)] disabled:text-[var(--color-text-muted)]"
                 />
                 <span className="text-xs text-[var(--color-text-muted)] w-4">%</span>
                 <span className="text-xs text-[var(--color-text-muted)] w-16 text-right font-mono">{units} units</span>
@@ -249,7 +249,7 @@ export function SizeCurveEditor({
         )}
 
         {aiRecommendation && (
-          <div className="text-xs text-[var(--color-text-muted)] bg-[var(--g-bg-subtle)] p-2 rounded">
+          <div className="text-xs text-[var(--color-text-muted)] bg-[var(--color-bg-elevated)] p-2 rounded">
             <span className="font-medium text-[var(--color-red-primary)]">AI Insight:</span>{' '}
             {aiRecommendation.reasoning}
           </div>
@@ -264,7 +264,7 @@ export function SizeCurveEditor({
               setEditedCurve(currentCurve);
               setIsDirty(false);
             }}
-            className="px-3 py-1.5 text-xs text-[var(--color-text-muted)] hover:bg-[var(--g-bg-subtle)] rounded transition"
+            className="px-3 py-1.5 text-xs text-[var(--color-text-muted)] hover:bg-[var(--color-bg-elevated)] rounded transition"
           >
             Cancel
           </button>

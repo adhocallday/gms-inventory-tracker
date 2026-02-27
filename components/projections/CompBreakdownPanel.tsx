@@ -203,7 +203,7 @@ export function CompBreakdownPanel({
                         onChange={(e) =>
                           handleValueChange(type.value, parseInt(e.target.value, 10) || 0)
                         }
-                        className="flex-1 px-3 py-2 text-center text-lg font-mono border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="flex-1 px-3 py-2 text-center text-lg font-mono bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         min="0"
                       />
                       <button
@@ -241,7 +241,7 @@ export function CompBreakdownPanel({
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
               rows={2}
               placeholder="Recipients, reason, etc..."
             />

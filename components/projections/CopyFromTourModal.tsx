@@ -236,7 +236,7 @@ export function CopyFromTourModal({
                   placeholder="Search tours..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
                 />
               </div>
 
@@ -285,7 +285,7 @@ export function CopyFromTourModal({
                 <select
                   value={selectedScenarioId || ''}
                   onChange={(e) => setSelectedScenarioId(e.target.value)}
-                  className="w-full px-3 py-2 border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
+                  className="w-full px-3 py-2 bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
                 >
                   <option value="">Select a scenario...</option>
                   {scenarios.map((scenario) => (

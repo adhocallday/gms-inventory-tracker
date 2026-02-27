@@ -136,7 +136,7 @@ export function DeliveryEditor({
               type="number"
               value={quantity}
               onChange={(e) => setQuantity(parseInt(e.target.value, 10) || 0)}
-              className="w-full px-3 py-2 border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
+              className="w-full px-3 py-2 bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
               placeholder="Enter quantity"
               min="0"
             />
@@ -153,7 +153,7 @@ export function DeliveryEditor({
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent resize-none"
+              className="w-full px-3 py-2 bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent resize-none"
               rows={2}
               placeholder="PO number, vendor, reason for adjustment..."
             />

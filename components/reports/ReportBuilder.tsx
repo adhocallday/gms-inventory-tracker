@@ -170,7 +170,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
           {sections.map((section) => (
             <label
               key={section.id}
-              className="flex items-center gap-3 p-3 rounded-lg border border-[var(--color-bg-border)] hover:bg-[var(--g-bg-subtle)] cursor-pointer transition"
+              className="flex items-center gap-3 p-3 rounded-lg border border-[var(--color-bg-border)] hover:bg-[var(--color-bg-elevated)] cursor-pointer transition"
             >
               <input
                 type="checkbox"
