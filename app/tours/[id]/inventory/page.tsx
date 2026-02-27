@@ -159,7 +159,7 @@ export default function InventoryTrackerPage() {
   if (loading) {
     return (
       <div className="g-container py-12">
-        <div className="text-center text-[var(--g-text-dim)]">
+        <div className="text-center text-[var(--color-text-secondary)]">
           Loading inventory data...
         </div>
       </div>
@@ -169,7 +169,7 @@ export default function InventoryTrackerPage() {
   if (!tour || !data) {
     return (
       <div className="g-container py-12">
-        <div className="text-center text-[var(--g-text-muted)]">
+        <div className="text-center text-[var(--color-text-muted)]">
           No data available
         </div>
       </div>
@@ -191,7 +191,7 @@ export default function InventoryTrackerPage() {
         <div>
           <p className="g-kicker">Inventory Tracker</p>
           <h1 className="text-3xl font-semibold g-title mt-2">{tour.name}</h1>
-          <p className="text-sm text-[var(--g-text-dim)]">{tour.artist}</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{tour.artist}</p>
         </div>
         <Button variant="outline" onClick={exportCsv}>
           Export CSV
@@ -201,31 +201,31 @@ export default function InventoryTrackerPage() {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-8">
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--g-text-muted)] mb-1">Products</p>
+          <p className="text-xs text-[var(--color-text-muted)] mb-1">Products</p>
           <p className="text-2xl font-semibold">{data.summary.total_products}</p>
         </div>
 
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--g-text-muted)] mb-1">On Hand</p>
+          <p className="text-xs text-[var(--color-text-muted)] mb-1">On Hand</p>
           <p className="text-2xl font-semibold text-green-300">
             {formatNumber(data.summary.total_on_hand)}
           </p>
         </div>
 
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--g-text-muted)] mb-1">On Order</p>
+          <p className="text-xs text-[var(--color-text-muted)] mb-1">On Order</p>
           <p className="text-2xl font-semibold text-blue-300">
             {formatNumber(data.summary.total_on_order)}
           </p>
         </div>
 
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--g-text-muted)] mb-1">Total Sold</p>
+          <p className="text-xs text-[var(--color-text-muted)] mb-1">Total Sold</p>
           <p className="text-2xl font-semibold">{formatNumber(data.summary.total_sold)}</p>
         </div>
 
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--g-text-muted)] mb-1">Inventory Value</p>
+          <p className="text-xs text-[var(--color-text-muted)] mb-1">Inventory Value</p>
           <p className="text-2xl font-semibold">
             {formatCurrency(data.summary.total_value)}
           </p>
@@ -243,7 +243,7 @@ export default function InventoryTrackerPage() {
                   <p className="text-sm font-semibold text-yellow-300">
                     {data.summary.low_stock_items} Low Stock Items
                   </p>
-                  <p className="text-xs text-[var(--g-text-muted)]">
+                  <p className="text-xs text-[var(--color-text-muted)]">
                     Less than 10 units remaining
                   </p>
                 </div>
@@ -259,7 +259,7 @@ export default function InventoryTrackerPage() {
                   <p className="text-sm font-semibold text-red-300">
                     {data.summary.out_of_stock_items} Out of Stock
                   </p>
-                  <p className="text-xs text-[var(--g-text-muted)]">
+                  <p className="text-xs text-[var(--color-text-muted)]">
                     No units available
                   </p>
                 </div>

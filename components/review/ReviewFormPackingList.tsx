@@ -88,7 +88,7 @@ export default function ReviewFormPackingList({
           {/* Delivery Number */}
           <div>
             <label className="g-label block mb-1">
-              Delivery Number <span className="text-[var(--g-accent)]">*</span>
+              Delivery Number <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             <input
               type="text"
@@ -103,7 +103,7 @@ export default function ReviewFormPackingList({
           {/* PO Number */}
           <div>
             <label className="g-label block mb-1">
-              PO Number <span className="text-[var(--g-accent)]">*</span>
+              PO Number <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             {tourId && purchaseOrders.length > 0 ? (
               <select
@@ -141,7 +141,7 @@ export default function ReviewFormPackingList({
           {/* Received Date */}
           <div>
             <label className="g-label block mb-1">
-              Received Date <span className="text-[var(--g-accent)]">*</span>
+              Received Date <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             <input
               type="date"
@@ -155,7 +155,7 @@ export default function ReviewFormPackingList({
           {/* Received Location */}
           <div>
             <label className="g-label block mb-1">
-              Received Location <span className="text-[var(--g-accent)]">*</span>
+              Received Location <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             <input
               type="text"
@@ -170,7 +170,7 @@ export default function ReviewFormPackingList({
           {/* Received By */}
           <div className="md:col-span-2">
             <label className="g-label block mb-1">
-              Received By <span className="text-[var(--g-accent)]">*</span>
+              Received By <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             <input
               type="text"

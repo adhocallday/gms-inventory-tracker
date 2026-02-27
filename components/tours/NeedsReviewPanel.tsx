@@ -72,7 +72,7 @@ export function NeedsReviewPanel({ documents }: { documents: ParsedDocumentRow[]
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold g-title">Needs Review</h2>
-          <p className="text-sm text-[var(--g-text-muted)]">
+          <p className="text-sm text-[var(--color-text-muted)]">
             Drafts and documents with parsing errors.
           </p>
         </div>
@@ -83,19 +83,19 @@ export function NeedsReviewPanel({ documents }: { documents: ParsedDocumentRow[]
 
       <div className="mt-4 space-y-3">
         {visibleDocs.length === 0 ? (
-          <div className="text-sm text-[var(--g-text-muted)]">
+          <div className="text-sm text-[var(--color-text-muted)]">
             No documents waiting for review.
           </div>
         ) : (
           visibleDocs.map((doc) => (
             <div
               key={doc.id}
-              className="border border-slate-200 rounded-lg p-4 flex flex-col gap-3"
+              className="border border-[var(--color-bg-border)] rounded-lg p-4 flex flex-col gap-3"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p className="text-sm font-semibold">{doc.doc_type}</p>
-                  <p className="text-xs text-[var(--g-text-muted)]">
+                  <p className="text-xs text-[var(--color-text-muted)]">
                     {doc.source_filename ?? 'Unnamed file'} · {formatDate(doc.updated_at)}
                   </p>
                 </div>

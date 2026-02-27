@@ -129,13 +129,13 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
       />
 
       {/* Auto-Detect Toggle */}
-      <div className="p-4 border border-white/10 rounded-lg bg-[var(--g-surface)]">
+      <div className="p-4 border border-white/10 rounded-lg bg-[var(--color-bg-surface)]">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-[var(--g-text)]">
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
               AI Auto-Detect
             </h3>
-            <p className="text-xs text-[var(--g-text-muted)] mt-1">
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">
               Automatically detect document type from PDF content
             </p>
           </div>
@@ -155,7 +155,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
       {/* Manual Type Selection (only when auto-detect is off) */}
       {!autoDetectEnabled && (
         <div>
-          <h3 className="text-xs uppercase tracking-[0.3em] text-[var(--g-text-muted)] mb-3">
+          <h3 className="text-xs uppercase tracking-[0.3em] text-[var(--color-text-muted)] mb-3">
             Select Document Type
           </h3>
           <div className="flex flex-wrap gap-3">
@@ -175,7 +175,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
             ))}
           </div>
           {docInfo && (
-            <p className="text-xs text-[var(--g-text-muted)] mt-2">{docInfo.description}</p>
+            <p className="text-xs text-[var(--color-text-muted)] mt-2">{docInfo.description}</p>
           )}
         </div>
       )}
@@ -200,7 +200,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
       <div className="g-card p-4 md:p-6 space-y-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <div>
-            <label className="text-xs text-[var(--g-text-muted)] block mb-2">Tour</label>
+            <label className="text-xs text-[var(--color-text-muted)] block mb-2">Tour</label>
             <select
               className="g-input w-full"
               value={tourId}
@@ -219,7 +219,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
           </div>
           {requiresShow[docType] && (
             <div>
-              <label className="text-xs text-[var(--g-text-muted)] block mb-2">Show</label>
+              <label className="text-xs text-[var(--color-text-muted)] block mb-2">Show</label>
               <select
                 className="g-input w-full"
                 value={showId}
@@ -279,15 +279,15 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
         )}
 
         <div className="space-y-3">
-          <div className="text-xs uppercase tracking-[0.3em] text-[var(--g-text-muted)]">
+          <div className="text-xs uppercase tracking-[0.3em] text-[var(--color-text-muted)]">
             Draft status
           </div>
           {parsedId ? (
-            <div className="border border-white/10 rounded-md p-4 bg-[var(--g-surface-2)] space-y-2">
-              <p className="text-sm text-[var(--g-text)] font-semibold">
+            <div className="border border-white/10 rounded-md p-4 bg-[var(--color-bg-elevated)] space-y-2">
+              <p className="text-sm text-[var(--color-text-primary)] font-semibold">
                 Draft created · ID {parsedId}
               </p>
-              <div className="text-xs text-[var(--g-text-muted)] space-y-1">
+              <div className="text-xs text-[var(--color-text-muted)] space-y-1">
                 {validation?.missing_fields?.length ? (
                   <p>Missing fields: {validation.missing_fields.join(', ')}</p>
                 ) : (
@@ -300,8 +300,8 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
                 )}
                 {matchingSteps.length > 0 && (
                   <div>
-                    <p className="text-[var(--g-text-muted)]">Inference:</p>
-                    <ul className="list-disc list-inside text-[var(--g-text-muted)]">
+                    <p className="text-[var(--color-text-muted)]">Inference:</p>
+                    <ul className="list-disc list-inside text-[var(--color-text-muted)]">
                       {matchingSteps.map((entry, index) => (
                         <li key={index}>{entry}</li>
                       ))}
@@ -311,28 +311,28 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
               </div>
               <Link
                 href={`/dashboard/parsed-documents/${parsedId}`}
-                className="inline-flex items-center gap-2 text-xs font-semibold text-[var(--g-accent)]"
+                className="inline-flex items-center gap-2 text-xs font-semibold text-[var(--color-red-primary)]"
               >
                 Review draft →
               </Link>
             </div>
           ) : (
-            <p className="text-sm text-[var(--g-text-muted)]">
+            <p className="text-sm text-[var(--color-text-muted)]">
               No document parsed yet. Upload a PDF to start a new draft.
             </p>
           )}
           {docId && (
-            <p className="text-xs text-[var(--g-text-muted)]">
+            <p className="text-xs text-[var(--color-text-muted)]">
               Resuming draft{' '}
-              <Link href={`/dashboard/parsed-documents/${docId}`} className="text-[var(--g-accent)]">
+              <Link href={`/dashboard/parsed-documents/${docId}`} className="text-[var(--color-red-primary)]">
                 #{docId}
               </Link>
               .
             </p>
           )}
-          <p className="text-xs text-[var(--g-text-muted)]">
+          <p className="text-xs text-[var(--color-text-muted)]">
             Need to continue reviewing other drafts?{' '}
-            <Link href="/dashboard/parsed-documents" className="text-[var(--g-accent)]">
+            <Link href="/dashboard/parsed-documents" className="text-[var(--color-red-primary)]">
               See the list
             </Link>
             .

@@ -52,7 +52,7 @@ export default function TopSellersPanel({ tourId, topSellers, productMap }: TopS
       </div>
       <div className="mt-4 space-y-4">
         {visibleSellers.length === 0 ? (
-          <p className="text-sm text-[var(--g-text-muted)]">
+          <p className="text-sm text-[var(--color-text-muted)]">
             No sales data yet. Upload a sales report to populate insights.
           </p>
         ) : (
@@ -63,17 +63,17 @@ export default function TopSellersPanel({ tourId, topSellers, productMap }: TopS
                 <Link
                   key={`${row.product_id}-${row.size}`}
                   href={`/products/${row.product_id}`}
-                  className="block border border-[var(--g-border)] rounded-md p-3 hover:border-[var(--g-accent)] transition"
+                  className="block border border-[var(--color-bg-border)] rounded-md p-3 hover:border-[var(--color-red-primary)] transition"
                 >
                   <p className="text-sm font-semibold">
                     {product?.sku ?? 'SKU'} · {row.size}
                   </p>
-                  <p className="text-xs text-[var(--g-text-muted)]">
+                  <p className="text-xs text-[var(--color-text-muted)]">
                     {product?.description ?? 'Description pending'}
                   </p>
-                  <div className="flex items-center justify-between text-sm text-[var(--g-text-dim)] mt-2">
+                  <div className="flex items-center justify-between text-sm text-[var(--color-text-secondary)] mt-2">
                     <span>{formatNumber(Number(row.total_sold ?? 0))} sold</span>
-                    <span className="font-medium text-[var(--g-text)]">
+                    <span className="font-medium text-[var(--color-text-primary)]">
                       {currencyFormatter.format(Number(row.total_gross ?? 0))}
                     </span>
                   </div>
@@ -84,7 +84,7 @@ export default function TopSellersPanel({ tourId, topSellers, productMap }: TopS
             {canLoadMore && (
               <button
                 onClick={handleLoadMore}
-                className="w-full py-2 rounded-lg border border-[var(--g-border)] hover:border-[var(--g-accent)] text-sm transition"
+                className="w-full py-2 rounded-lg border border-[var(--color-bg-border)] hover:border-[var(--color-red-primary)] text-sm transition"
               >
                 Load more ({topSellers.length - visibleCount} remaining)
               </button>

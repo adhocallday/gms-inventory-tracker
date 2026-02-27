@@ -714,13 +714,13 @@ export function ProjectionSheet({
 
       {/* 3. VIEW TOGGLE */}
       <div className="mt-6 flex items-center justify-between">
-        <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-lg">
+        <div className="flex items-center gap-1 p-1 bg-[var(--color-bg-border)] rounded-lg">
           <button
             onClick={() => setViewMode('aggregate')}
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition ${
               viewMode === 'aggregate'
-                ? 'bg-white shadow-sm text-[var(--g-text)]'
-                : 'text-[var(--g-text-muted)] hover:text-[var(--g-text)]'
+                ? 'bg-[var(--color-bg-surface)] shadow-sm text-[var(--color-text-primary)]'
+                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
             }`}
           >
             <LayoutGrid className="w-4 h-4" />
@@ -730,8 +730,8 @@ export function ProjectionSheet({
             onClick={() => setViewMode('by-show')}
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition ${
               viewMode === 'by-show'
-                ? 'bg-white shadow-sm text-[var(--g-text)]'
-                : 'text-[var(--g-text-muted)] hover:text-[var(--g-text)]'
+                ? 'bg-[var(--color-bg-surface)] shadow-sm text-[var(--color-text-primary)]'
+                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
             }`}
           >
             <Calendar className="w-4 h-4" />
@@ -741,7 +741,7 @@ export function ProjectionSheet({
         {viewMode === 'by-show' && (
           <button
             onClick={() => setShowCopyModal(true)}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--g-text-muted)] hover:text-[var(--g-text)] hover:bg-slate-100 rounded-lg transition"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-border)] rounded-lg transition"
           >
             <Copy className="w-4 h-4" />
             Copy from Tour
@@ -800,7 +800,7 @@ export function ProjectionSheet({
       <div className="mt-6 g-card p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-3">
-          <label className="text-xs text-[var(--g-text-muted)]">Scenario</label>
+          <label className="text-xs text-[var(--color-text-muted)]">Scenario</label>
           <select
             className="g-input"
             value={selectedScenarioId}
@@ -872,10 +872,10 @@ export function ProjectionSheet({
 
       <div className="overflow-x-auto mt-6">
         {isLoadingOverrides ? (
-          <p className="text-sm text-[var(--g-text-muted)]">Loading overrides…</p>
+          <p className="text-sm text-[var(--color-text-muted)]">Loading overrides…</p>
         ) : (
           <table className="min-w-[1200px] text-sm g-table">
-            <thead className="text-left border-b border-slate-200">
+            <thead className="text-left border-b border-[var(--color-bg-border)]">
               <tr>
                 <th className="py-2 pr-4">SKU</th>
                 <th className="py-2 pr-4">Design</th>
@@ -903,11 +903,11 @@ export function ProjectionSheet({
               {rows.map((row) => {
                 const warning = row.onHand + row.onOrder < row.forecastUnits;
                 return (
-                  <tr key={row.sku} className="border-b border-slate-200">
+                  <tr key={row.sku} className="border-b border-[var(--color-bg-border)]">
                     <td className="py-3 pr-4">
                       <div className="font-semibold">{row.sku}</div>
                       {warning ? (
-                        <div className="text-xs text-[var(--g-accent)]">
+                        <div className="text-xs text-[var(--color-red-primary)]">
                           Low stock vs forecast
                         </div>
                       ) : null}
@@ -1002,7 +1002,7 @@ export function ProjectionSheet({
               })}
             </tbody>
             <tfoot>
-              <tr className="border-t border-slate-200 font-semibold">
+              <tr className="border-t border-[var(--color-bg-border)] font-semibold">
                 <td className="py-3 pr-4" colSpan={6}>
                   Totals
                 </td>

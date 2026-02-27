@@ -218,7 +218,7 @@ export function FileDropzone({
         className={`
           border-2 border-dashed rounded-lg p-4 md:p-8 lg:p-12 text-center cursor-pointer
           transition-colors duration-200
-          ${isDragActive ? 'border-[var(--g-accent)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
+          ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
           ${uploading || parsing ? 'pointer-events-none opacity-50' : ''}
         `}
       >
@@ -226,16 +226,16 @@ export function FileDropzone({
         
         {detecting && (
           <div className="space-y-2">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--g-accent)] mx-auto"></div>
-            <p className="text-sm text-[var(--g-text-dim)]">Detecting document type...</p>
-            <p className="text-xs text-[var(--g-text-muted)] mt-1">Analyzing PDF with AI...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-red-primary)] mx-auto"></div>
+            <p className="text-sm text-[var(--color-text-secondary)]">Detecting document type...</p>
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">Analyzing PDF with AI...</p>
           </div>
         )}
 
         {uploading && (
           <div className="space-y-2">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--g-accent)] mx-auto"></div>
-            <p className="text-sm text-[var(--g-text-dim)]">Uploading file...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-red-primary)] mx-auto"></div>
+            <p className="text-sm text-[var(--color-text-secondary)]">Uploading file...</p>
           </div>
         )}
 
@@ -243,12 +243,12 @@ export function FileDropzone({
           <div className="space-y-2">
             <div className="animate-pulse">
               <div className="h-12 w-12 mx-auto mb-2">
-                <svg className="text-[var(--g-accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="text-[var(--color-red-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
               </div>
-              <p className="text-sm text-[var(--g-text-dim)]">AI is parsing your document...</p>
-              <p className="text-xs text-[var(--g-text-muted)] mt-1">This may take 10-30 seconds</p>
+              <p className="text-sm text-[var(--color-text-secondary)]">AI is parsing your document...</p>
+              <p className="text-xs text-[var(--color-text-muted)] mt-1">This may take 10-30 seconds</p>
             </div>
           </div>
         )}
@@ -256,7 +256,7 @@ export function FileDropzone({
         {!uploading && !parsing && !detecting && !classification && (
           <div className="space-y-2">
             <svg
-              className="mx-auto h-12 w-12 text-[var(--g-text-muted)]"
+              className="mx-auto h-12 w-12 text-[var(--color-text-muted)]"
               stroke="currentColor"
               fill="none"
               viewBox="0 0 48 48"
@@ -269,13 +269,13 @@ export function FileDropzone({
               />
             </svg>
             {isDragActive ? (
-              <p className="text-sm text-[var(--g-text-dim)]">Drop the PDF here</p>
+              <p className="text-sm text-[var(--color-text-secondary)]">Drop the PDF here</p>
             ) : (
               <>
-                <p className="text-sm text-[var(--g-text-dim)]">
+                <p className="text-sm text-[var(--color-text-secondary)]">
                   Drag & drop {getFileTypeLabel()} PDF here, or click to select
                 </p>
-                <p className="text-xs text-[var(--g-text-muted)]">PDF files only</p>
+                <p className="text-xs text-[var(--color-text-muted)]">PDF files only</p>
               </>
             )}
           </div>
@@ -297,13 +297,13 @@ export function FileDropzone({
           )}
 
           {/* Detection Results */}
-          <div className="p-4 border border-white/10 rounded-lg bg-[var(--g-surface)]">
+          <div className="p-4 border border-white/10 rounded-lg bg-[var(--color-bg-surface)]">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="text-sm font-semibold text-[var(--g-text)]">
+                <p className="text-sm font-semibold text-[var(--color-text-primary)]">
                   Detected: {classification.typeName}
                 </p>
-                <p className="text-xs text-[var(--g-text-muted)]">
+                <p className="text-xs text-[var(--color-text-muted)]">
                   Confidence: {classification.confidence}
                 </p>
               </div>
@@ -316,11 +316,11 @@ export function FileDropzone({
               </span>
             </div>
 
-            <p className="text-xs text-[var(--g-text-dim)] mb-2">
+            <p className="text-xs text-[var(--color-text-secondary)] mb-2">
               {classification.reasoning}
             </p>
 
-            <div className="text-xs text-[var(--g-text-muted)] mb-4">
+            <div className="text-xs text-[var(--color-text-muted)] mb-4">
               <strong>Indicators found:</strong>
               <ul className="list-disc list-inside mt-1">
                 {classification.indicators.map((indicator, i) => (
@@ -367,7 +367,7 @@ export function FileDropzone({
                     parseDocument(currentFile, detectedType);
                   }
                 }}
-                className="flex-1 px-3 py-2.5 md:px-4 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold text-sm md:text-base"
+                className="flex-1 px-3 py-2.5 md:px-4 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold text-sm md:text-base"
               >
                 Confirm & Parse
               </button>
@@ -383,7 +383,7 @@ export function FileDropzone({
                   setDetectedType(null);
                   setCurrentFile(null);
                 }}
-                className="px-3 py-2.5 md:px-4 border border-white/10 rounded-lg hover:bg-white/5 transition text-[var(--g-text)] text-sm md:text-base"
+                className="px-3 py-2.5 md:px-4 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)] text-sm md:text-base"
               >
                 Cancel
               </button>
@@ -394,18 +394,18 @@ export function FileDropzone({
 
       {error && (
         <div className="mt-4 p-4 border border-[rgba(225,6,20,0.35)] rounded-lg bg-[rgba(225,6,20,0.08)]">
-          <p className="text-sm text-[var(--g-accent)]">
+          <p className="text-sm text-[var(--color-red-primary)]">
             <strong>Error:</strong> {error}
           </p>
         </div>
       )}
 
       {parsedData && (
-        <div className="mt-4 p-3 md:p-4 border border-white/10 rounded-lg bg-[var(--g-surface)]">
-          <p className="text-sm text-[var(--g-text)] font-semibold mb-2">
+        <div className="mt-4 p-3 md:p-4 border border-white/10 rounded-lg bg-[var(--color-bg-surface)]">
+          <p className="text-sm text-[var(--color-text-primary)] font-semibold mb-2">
             ✓ Document parsed successfully!
           </p>
-          <pre className="text-xs bg-black/40 p-2 md:p-3 rounded border border-white/10 overflow-auto max-h-48 md:max-h-64 lg:max-h-96 text-[var(--g-text-dim)]">
+          <pre className="text-xs bg-black/40 p-2 md:p-3 rounded border border-white/10 overflow-auto max-h-48 md:max-h-64 lg:max-h-96 text-[var(--color-text-secondary)]">
             {JSON.stringify(parsedData, null, 2)}
           </pre>
         </div>

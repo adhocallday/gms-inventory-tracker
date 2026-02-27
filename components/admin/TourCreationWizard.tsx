@@ -102,11 +102,11 @@ export default function TourCreationWizard() {
   return (
     <div className="g-container py-12">
       <header className="mb-8">
-        <p className="text-xs uppercase tracking-[0.3em] text-[var(--g-text-muted)]">
+        <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-text-muted)]">
           Admin Panel
         </p>
         <h1 className="text-3xl font-semibold g-title mt-2">Create New Tour</h1>
-        <p className="text-sm text-[var(--g-text-dim)] mt-2 max-w-3xl">
+        <p className="text-sm text-[var(--color-text-secondary)] mt-2 max-w-3xl">
           Set up a new tour with AI-assisted data entry. Upload PDFs, CSVs, or images
           to automatically populate tour schedules, shows, and product catalogs.
         </p>
@@ -127,8 +127,8 @@ export default function TourCreationWizard() {
                     w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm
                     transition-all duration-200 border
                     ${index <= currentStepIndex
-                      ? 'bg-[var(--g-accent)] text-white border-[var(--g-accent)]'
-                      : 'bg-slate-100 text-[var(--g-text-muted)] border-slate-200'
+                      ? 'bg-[var(--color-red-primary)] text-white border-[var(--color-red-primary)]'
+                      : 'bg-[var(--color-bg-border)] text-[var(--color-text-muted)] border-[var(--color-bg-border)]'
                     }
                     ${index < currentStepIndex ? 'cursor-pointer hover:opacity-80' : ''}
                   `}
@@ -137,11 +137,11 @@ export default function TourCreationWizard() {
                 </button>
                 <div className="mt-2 text-center">
                   <p className={`text-xs font-medium ${
-                    index <= currentStepIndex ? 'text-[var(--g-text)]' : 'text-[var(--g-text-muted)]'
+                    index <= currentStepIndex ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-muted)]'
                   }`}>
                     {step.label}
                   </p>
-                  <p className="text-xs text-[var(--g-text-muted)] mt-0.5">
+                  <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
                     {step.description}
                   </p>
                 </div>
@@ -150,8 +150,8 @@ export default function TourCreationWizard() {
                 <div className={`
                   flex-1 h-0.5 mx-4 mb-8
                   ${index < currentStepIndex
-                    ? 'bg-[var(--g-accent)]'
-                    : 'bg-slate-200'
+                    ? 'bg-[var(--color-red-primary)]'
+                    : 'bg-[var(--color-bg-border)]'
                   }
                 `} />
               )}

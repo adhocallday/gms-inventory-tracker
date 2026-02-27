@@ -205,7 +205,7 @@ export function WarehouseLocationManager({
       {/* Messages */}
       {error && (
         <div className="p-4 border border-[rgba(225,6,20,0.35)] rounded-lg bg-[rgba(225,6,20,0.08)]">
-          <p className="text-sm text-[var(--g-accent)]">
+          <p className="text-sm text-[var(--color-red-primary)]">
             <strong>Error:</strong> {error}
           </p>
         </div>
@@ -224,7 +224,7 @@ export function WarehouseLocationManager({
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-xl font-semibold g-title">Template Locations</h2>
-            <p className="text-xs text-[var(--g-text-muted)] mt-1">
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">
               Suggested stock locations (fully editable)
             </p>
           </div>
@@ -237,7 +237,7 @@ export function WarehouseLocationManager({
           {standardLocations.map((location, index) => (
             <div
               key={location.id}
-              className="flex items-center justify-between p-3 border border-white/10 rounded-lg bg-[var(--g-surface)]"
+              className="flex items-center justify-between p-3 border border-white/10 rounded-lg bg-[var(--color-bg-surface)]"
             >
               <div className="flex items-center gap-3 flex-1">
                 {editing === location.id ? (
@@ -253,8 +253,8 @@ export function WarehouseLocationManager({
                   <>
                     <span className={`text-sm font-medium ${
                       location.is_active
-                        ? 'text-[var(--g-text)]'
-                        : 'text-[var(--g-text-muted)] line-through'
+                        ? 'text-[var(--color-text-primary)]'
+                        : 'text-[var(--color-text-muted)] line-through'
                     }`}>
                       {location.name}
                     </span>
@@ -272,7 +272,7 @@ export function WarehouseLocationManager({
                   <>
                     <button
                       onClick={() => handleEditLocation(location.id)}
-                      className="text-xs px-3 py-1 rounded bg-[var(--g-accent)] text-white hover:bg-[var(--g-accent-2)] transition"
+                      className="text-xs px-3 py-1 rounded bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] transition"
                     >
                       Save
                     </button>
@@ -324,7 +324,7 @@ export function WarehouseLocationManager({
           ))}
         </div>
 
-        <p className="text-xs text-[var(--g-text-muted)] mt-3">
+        <p className="text-xs text-[var(--color-text-muted)] mt-3">
           💡 Tip: Rename templates to match your workflow (e.g., "Road" → "Tour Truck", "Warehouse" → "Nashville Hub")
         </p>
       </div>
@@ -333,7 +333,7 @@ export function WarehouseLocationManager({
       <div className="g-card p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold g-title">Custom Locations</h2>
-          <span className="text-xs text-[var(--g-text-muted)]">
+          <span className="text-xs text-[var(--color-text-muted)]">
             {customLocations.length} custom location{customLocations.length !== 1 ? 's' : ''}
           </span>
         </div>
@@ -342,7 +342,7 @@ export function WarehouseLocationManager({
           {customLocations.map((location, index) => (
             <div
               key={location.id}
-              className="flex items-center justify-between p-3 border border-white/10 rounded-lg bg-[var(--g-surface)]"
+              className="flex items-center justify-between p-3 border border-white/10 rounded-lg bg-[var(--color-bg-surface)]"
             >
               <div className="flex items-center gap-3 flex-1">
                 {editing === location.id ? (
@@ -357,8 +357,8 @@ export function WarehouseLocationManager({
                   <>
                     <span className={`text-sm font-medium ${
                       location.is_active
-                        ? 'text-[var(--g-text)]'
-                        : 'text-[var(--g-text-muted)] line-through'
+                        ? 'text-[var(--color-text-primary)]'
+                        : 'text-[var(--color-text-muted)] line-through'
                     }`}>
                       {location.name}
                     </span>
@@ -376,7 +376,7 @@ export function WarehouseLocationManager({
                   <>
                     <button
                       onClick={() => handleEditLocation(location.id)}
-                      className="text-xs px-3 py-1 rounded bg-[var(--g-accent)] text-white hover:bg-[var(--g-accent-2)] transition"
+                      className="text-xs px-3 py-1 rounded bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] transition"
                     >
                       Save
                     </button>
@@ -423,7 +423,7 @@ export function WarehouseLocationManager({
                     </button>
                     <button
                       onClick={() => handleDeleteLocation(location)}
-                      className="text-xs px-3 py-1 rounded border border-[var(--g-accent)]/30 text-[var(--g-accent)] hover:bg-[var(--g-accent)]/10 transition"
+                      className="text-xs px-3 py-1 rounded border border-[var(--color-red-primary)]/30 text-[var(--color-red-primary)] hover:bg-[var(--color-red-primary)]/10 transition"
                     >
                       Delete
                     </button>
@@ -434,7 +434,7 @@ export function WarehouseLocationManager({
           ))}
 
           {customLocations.length === 0 && (
-            <p className="text-sm text-[var(--g-text-muted)] text-center py-8">
+            <p className="text-sm text-[var(--color-text-muted)] text-center py-8">
               No custom locations yet. Add one below to get started.
             </p>
           )}
@@ -442,7 +442,7 @@ export function WarehouseLocationManager({
 
         {/* Add New Location */}
         <div className="border-t border-white/10 pt-4">
-          <label className="text-xs text-[var(--g-text-muted)] block mb-2">
+          <label className="text-xs text-[var(--color-text-muted)] block mb-2">
             Add Custom Location
           </label>
           <div className="flex gap-2">
@@ -461,7 +461,7 @@ export function WarehouseLocationManager({
             <button
               onClick={handleAddLocation}
               disabled={adding || !newLocationName.trim()}
-              className="px-4 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {adding ? 'Adding...' : 'Add Location'}
             </button>

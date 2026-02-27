@@ -76,9 +76,9 @@ export function TourProductCostEditor({
 
   if (isEditing) {
     return (
-      <tr className="bg-[var(--g-accent)]/5">
+      <tr className="bg-[var(--color-red-primary)]/5">
         <td className="py-2 pr-4">
-          <span className="font-medium text-[var(--g-text)]">{size}</span>
+          <span className="font-medium text-[var(--color-text-primary)]">{size}</span>
         </td>
         <td className="py-2 pr-4 text-right">
           <input
@@ -88,7 +88,7 @@ export function TourProductCostEditor({
             onChange={(e) =>
               setEditValues({ ...editValues, blank_unit_cost: parseFloat(e.target.value) || 0 })
             }
-            className="w-20 px-2 py-1 text-right bg-white/10 border border-white/20 rounded text-[var(--g-text)] focus:outline-none focus:ring-1 focus:ring-[var(--g-accent)]"
+            className="w-20 px-2 py-1 text-right bg-[var(--color-bg-surface)]/10 border border-white/20 rounded text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-red-primary)]"
             disabled={isSaving}
           />
         </td>
@@ -100,11 +100,11 @@ export function TourProductCostEditor({
             onChange={(e) =>
               setEditValues({ ...editValues, print_unit_cost: parseFloat(e.target.value) || 0 })
             }
-            className="w-20 px-2 py-1 text-right bg-white/10 border border-white/20 rounded text-[var(--g-text)] focus:outline-none focus:ring-1 focus:ring-[var(--g-accent)]"
+            className="w-20 px-2 py-1 text-right bg-[var(--color-bg-surface)]/10 border border-white/20 rounded text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-red-primary)]"
             disabled={isSaving}
           />
         </td>
-        <td className="py-2 pr-4 text-right text-[var(--g-text-dim)]">
+        <td className="py-2 pr-4 text-right text-[var(--color-text-secondary)]">
           {formatCurrency(editValues.blank_unit_cost + editValues.print_unit_cost)}
         </td>
         <td className="py-2 pr-4 text-right">
@@ -115,12 +115,12 @@ export function TourProductCostEditor({
             onChange={(e) =>
               setEditValues({ ...editValues, suggested_retail: parseFloat(e.target.value) || 0 })
             }
-            className="w-20 px-2 py-1 text-right bg-white/10 border border-white/20 rounded text-[var(--g-text)] focus:outline-none focus:ring-1 focus:ring-[var(--g-accent)]"
+            className="w-20 px-2 py-1 text-right bg-[var(--color-bg-surface)]/10 border border-white/20 rounded text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-red-primary)]"
             placeholder="-"
             disabled={isSaving}
           />
         </td>
-        <td className="py-2 pr-4 text-right text-[var(--g-text-dim)]">{inventoryBalance}</td>
+        <td className="py-2 pr-4 text-right text-[var(--color-text-secondary)]">{inventoryBalance}</td>
         <td className="py-2 pr-4 text-center">
           <Badge variant={isActive ? 'active' : 'default'} size="sm">
             {isActive ? 'Active' : 'Inactive'}
@@ -139,7 +139,7 @@ export function TourProductCostEditor({
             <button
               onClick={handleCancel}
               disabled={isSaving}
-              className="p-1.5 text-[var(--g-text-muted)] hover:text-[var(--g-text)] hover:bg-white/10 rounded transition"
+              className="p-1.5 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-surface)]/10 rounded transition"
               title="Cancel"
             >
               <X className="w-4 h-4" />
@@ -153,17 +153,17 @@ export function TourProductCostEditor({
   return (
     <tr className={!isActive ? 'opacity-50' : ''}>
       <td className="py-2 pr-4">
-        <span className="font-medium text-[var(--g-text)]">{size}</span>
+        <span className="font-medium text-[var(--color-text-primary)]">{size}</span>
       </td>
-      <td className="py-2 pr-4 text-right text-[var(--g-text)]">{formatCurrency(blankCost)}</td>
-      <td className="py-2 pr-4 text-right text-[var(--g-text)]">{formatCurrency(printCost)}</td>
-      <td className="py-2 pr-4 text-right font-medium text-[var(--g-text)]">
+      <td className="py-2 pr-4 text-right text-[var(--color-text-primary)]">{formatCurrency(blankCost)}</td>
+      <td className="py-2 pr-4 text-right text-[var(--color-text-primary)]">{formatCurrency(printCost)}</td>
+      <td className="py-2 pr-4 text-right font-medium text-[var(--color-text-primary)]">
         {formatCurrency(fullPackageCost)}
       </td>
-      <td className="py-2 pr-4 text-right text-[var(--g-text)]">
+      <td className="py-2 pr-4 text-right text-[var(--color-text-primary)]">
         {formatCurrency(suggestedRetail)}
       </td>
-      <td className="py-2 pr-4 text-right text-[var(--g-text)]">{inventoryBalance}</td>
+      <td className="py-2 pr-4 text-right text-[var(--color-text-primary)]">{inventoryBalance}</td>
       <td className="py-2 pr-4 text-center">
         <button onClick={() => onToggleActive(tourProductId, isActive)}>
           <Badge
@@ -179,7 +179,7 @@ export function TourProductCostEditor({
         <div className="flex items-center justify-end gap-1">
           <button
             onClick={() => setIsEditing(true)}
-            className="p-1.5 text-[var(--g-text-muted)] hover:text-[var(--g-text)] hover:bg-white/10 rounded transition"
+            className="p-1.5 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-surface)]/10 rounded transition"
             title="Edit costs"
           >
             <Pencil className="w-4 h-4" />

@@ -36,13 +36,13 @@ export function InventoryGapChart({ gaps }: InventoryGapChartProps) {
       <h4 className="text-sm font-semibold mb-3">Inventory Gaps & Stockout Risks</h4>
       <div className="space-y-2 max-h-96 overflow-y-auto">
         {filteredGaps.map((g, i) => (
-          <div key={i} className="flex items-center gap-3 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+          <div key={i} className="flex items-center gap-3 p-2 border border-[var(--color-bg-border)] rounded-lg hover:bg-[var(--color-bg-elevated)] transition">
             <div className={`w-2 h-2 rounded-full ${riskColors[g.riskLevel]}`} />
             <div className="flex-1">
               <div className="text-xs font-medium">
                 {g.sku} {g.size && `· ${g.size}`}
               </div>
-              <div className="text-xs text-[var(--g-text-muted)]">
+              <div className="text-xs text-[var(--color-text-muted)]">
                 Need {g.forecastDemand} · Have {g.onHand} on hand + {g.onOrder} on order = <span className="text-red-500 font-semibold">Short {g.gap}</span>
               </div>
             </div>

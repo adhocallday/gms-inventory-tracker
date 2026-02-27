@@ -28,8 +28,8 @@ export function InventoryImpactTable({ data, loading }: InventoryImpactTableProp
         header: 'SKU',
         cell: ({ row }) => (
           <div>
-            <div className="font-semibold text-[var(--g-text)]">{row.getValue('sku')}</div>
-            <div className="text-xs text-[var(--g-text-muted)]">{row.original.description}</div>
+            <div className="font-semibold text-[var(--color-text-primary)]">{row.getValue('sku')}</div>
+            <div className="text-xs text-[var(--color-text-muted)]">{row.original.description}</div>
           </div>
         ),
         enableSorting: true,
@@ -38,7 +38,7 @@ export function InventoryImpactTable({ data, loading }: InventoryImpactTableProp
         accessorKey: 'size',
         header: 'Size',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text-dim)]">{row.getValue('size') || '—'}</span>
+          <span className="text-[var(--color-text-secondary)]">{row.getValue('size') || '—'}</span>
         ),
         enableSorting: true,
       },
@@ -48,7 +48,7 @@ export function InventoryImpactTable({ data, loading }: InventoryImpactTableProp
         cell: ({ row }) => {
           const value = row.getValue('startingBalance') as number | null;
           return value === null ? (
-            <span className="text-right text-[var(--g-text-muted)]">—</span>
+            <span className="text-right text-[var(--color-text-muted)]">—</span>
           ) : (
             <NumericCell value={value} format="number" />
           );
@@ -87,7 +87,7 @@ export function InventoryImpactTable({ data, loading }: InventoryImpactTableProp
         cell: ({ row }) => {
           const value = row.getValue('endingBalance') as number | null;
           if (value === null) {
-            return <span className="text-right text-[var(--g-text-muted)]">—</span>;
+            return <span className="text-right text-[var(--color-text-muted)]">—</span>;
           }
           return (
             <div className={`text-right font-semibold ${
@@ -111,7 +111,7 @@ export function InventoryImpactTable({ data, loading }: InventoryImpactTableProp
       stickyHeader
       striped
       emptyState={{
-        icon: <ArrowDownUp className="w-12 h-12 text-[var(--g-text-muted)]" />,
+        icon: <ArrowDownUp className="w-12 h-12 text-[var(--color-text-muted)]" />,
         title: 'No inventory data',
         description: 'Inventory impact will be calculated once products are assigned',
       }}

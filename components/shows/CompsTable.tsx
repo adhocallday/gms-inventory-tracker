@@ -24,7 +24,7 @@ export function CompsTable({ data, loading }: CompsTableProps) {
         accessorKey: 'comp_type',
         header: 'Type',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text)]">{row.getValue('comp_type')}</span>
+          <span className="text-[var(--color-text-primary)]">{row.getValue('comp_type')}</span>
         ),
         enableSorting: true,
       },
@@ -32,7 +32,7 @@ export function CompsTable({ data, loading }: CompsTableProps) {
         accessorKey: 'sku',
         header: 'SKU',
         cell: ({ row }) => (
-          <span className="font-semibold text-[var(--g-text)]">{row.getValue('sku')}</span>
+          <span className="font-semibold text-[var(--color-text-primary)]">{row.getValue('sku')}</span>
         ),
         enableSorting: true,
       },
@@ -40,7 +40,7 @@ export function CompsTable({ data, loading }: CompsTableProps) {
         accessorKey: 'size',
         header: 'Size',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text-dim)]">{row.getValue('size') || '—'}</span>
+          <span className="text-[var(--color-text-secondary)]">{row.getValue('size') || '—'}</span>
         ),
         enableSorting: true,
       },
@@ -62,7 +62,7 @@ export function CompsTable({ data, loading }: CompsTableProps) {
       stickyHeader
       striped
       emptyState={{
-        icon: <Gift className="w-12 h-12 text-[var(--g-text-muted)]" />,
+        icon: <Gift className="w-12 h-12 text-[var(--color-text-muted)]" />,
         title: 'No comps recorded',
         description: 'Comp items will appear here when sales reports are processed',
       }}

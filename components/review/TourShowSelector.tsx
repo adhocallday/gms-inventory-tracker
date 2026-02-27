@@ -102,7 +102,7 @@ export default function TourShowSelector({
         <h3 className="text-lg font-semibold g-title mb-4">
           Tour & Show Assignment
         </h3>
-        <p className="text-sm text-[var(--g-text-muted)] mb-4">
+        <p className="text-sm text-[var(--color-text-muted)] mb-4">
           {requiresShow
             ? 'Select the tour and show this document belongs to.'
             : 'Select the tour this document belongs to.'}
@@ -113,7 +113,7 @@ export default function TourShowSelector({
         {/* Tour Selection */}
         <div>
           <label className="g-label block mb-1">
-            Tour <span className="text-[var(--g-accent)]">*</span>
+            Tour <span className="text-[var(--color-red-primary)]">*</span>
           </label>
           <select
             className="g-input"
@@ -134,7 +134,7 @@ export default function TourShowSelector({
         {requiresShow && (
           <div>
             <label className="g-label block mb-1">
-              Show {requiresShow && <span className="text-[var(--g-accent)]">*</span>}
+              Show {requiresShow && <span className="text-[var(--color-red-primary)]">*</span>}
             </label>
             <select
               className="g-input"

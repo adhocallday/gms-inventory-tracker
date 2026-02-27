@@ -32,7 +32,7 @@ export function ProductSalesTable({ data, loading }: ProductSalesTableProps) {
         accessorKey: 'venue_name',
         header: 'Venue',
         cell: ({ row }) => (
-          <span className="font-medium text-[var(--g-text)]">
+          <span className="font-medium text-[var(--color-text-primary)]">
             {row.getValue('venue_name') || '—'}
           </span>
         ),
@@ -42,7 +42,7 @@ export function ProductSalesTable({ data, loading }: ProductSalesTableProps) {
         accessorKey: 'city',
         header: 'City',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text-dim)]">{row.getValue('city') || '—'}</span>
+          <span className="text-[var(--color-text-secondary)]">{row.getValue('city') || '—'}</span>
         ),
         enableSorting: true,
       },
@@ -50,7 +50,7 @@ export function ProductSalesTable({ data, loading }: ProductSalesTableProps) {
         accessorKey: 'size',
         header: 'Size',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text-dim)]">{row.getValue('size') || 'OS'}</span>
+          <span className="text-[var(--color-text-secondary)]">{row.getValue('size') || 'OS'}</span>
         ),
         enableSorting: true,
       },
@@ -78,7 +78,7 @@ export function ProductSalesTable({ data, loading }: ProductSalesTableProps) {
       stickyHeader
       striped
       emptyState={{
-        icon: <ShoppingBag className="w-12 h-12 text-[var(--g-text-muted)]" />,
+        icon: <ShoppingBag className="w-12 h-12 text-[var(--color-text-muted)]" />,
         title: 'No sales data yet',
         description: 'Sales will appear here as shows are completed',
       }}

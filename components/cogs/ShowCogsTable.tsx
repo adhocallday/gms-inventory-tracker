@@ -37,7 +37,7 @@ export function ShowCogsTable({ data, loading }: ShowCogsTableProps) {
         accessorKey: 'venue_name',
         header: 'Venue',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text)]">{row.getValue('venue_name')}</span>
+          <span className="text-[var(--color-text-primary)]">{row.getValue('venue_name')}</span>
         ),
         enableSorting: true,
       },
@@ -45,7 +45,7 @@ export function ShowCogsTable({ data, loading }: ShowCogsTableProps) {
         id: 'location',
         header: 'City',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text-dim)]">
+          <span className="text-[var(--color-text-secondary)]">
             {row.original.city}, {row.original.state}
           </span>
         ),
@@ -120,7 +120,7 @@ export function ShowCogsTable({ data, loading }: ShowCogsTableProps) {
       stickyHeader
       striped
       emptyState={{
-        icon: <Calendar className="w-12 h-12 text-[var(--g-text-muted)]" />,
+        icon: <Calendar className="w-12 h-12 text-[var(--color-text-muted)]" />,
         title: 'No show data',
         description: 'Upload sales reports to see show-level COGS analysis',
       }}

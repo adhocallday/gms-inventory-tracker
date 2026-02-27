@@ -38,13 +38,13 @@ export default async function WarehouseSettingsPage({ params }: PageProps) {
         <div className="flex items-center gap-3 mb-3">
           <a
             href={`/tours/${tourId}`}
-            className="text-sm text-[var(--g-text-muted)] hover:text-[var(--g-accent)] transition"
+            className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-red-primary)] transition"
           >
             ← Back to Tour
           </a>
         </div>
         <h1 className="text-3xl font-bold g-title mb-2">Stock Locations</h1>
-        <p className="text-sm text-[var(--g-text-dim)] max-w-3xl">
+        <p className="text-sm text-[var(--color-text-secondary)] max-w-3xl">
           Manage where inventory is stored for {tour.name}. Template locations (Road, Warehouse, Web)
           are provided as starting points—rename them to match your workflow or add custom locations
           like "Chicago Hub", "Tour Truck", or "Nashville Warehouse". These locations drive your

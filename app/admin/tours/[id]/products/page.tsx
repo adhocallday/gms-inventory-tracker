@@ -221,18 +221,18 @@ export default function TourProductsPage() {
       {/* Search and Controls */}
       <div className="flex flex-col gap-4 mb-6 md:flex-row md:items-center md:justify-between">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--g-text-muted)]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by SKU or description..."
-            className="w-full pl-10 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[var(--g-text)] placeholder-[var(--g-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
+            className="w-full pl-10 pr-10 py-2 bg-[var(--color-bg-elevated)] border border-[var(--color-bg-border)] rounded-lg text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
           />
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--g-text-muted)] hover:text-[var(--g-text)] transition"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition"
             >
               <X className="w-4 h-4" />
             </button>
@@ -250,7 +250,7 @@ export default function TourProductsPage() {
       </div>
 
       {/* Results count */}
-      <div className="mb-4 text-sm text-[var(--g-text-muted)]">
+      <div className="mb-4 text-sm text-[var(--color-text-muted)]">
         {loading ? (
           'Loading...'
         ) : (
@@ -265,15 +265,15 @@ export default function TourProductsPage() {
       {/* Products List */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--g-accent)]"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-red-primary)]"></div>
         </div>
       ) : filteredProducts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Package className="w-12 h-12 text-[var(--g-text-muted)] mb-4" />
-          <h3 className="text-lg font-semibold text-[var(--g-text)] mb-2">
+          <Package className="w-12 h-12 text-[var(--color-text-muted)] mb-4" />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">
             {search ? 'No products found' : 'No products added yet'}
           </h3>
-          <p className="text-sm text-[var(--g-text-muted)] mb-4">
+          <p className="text-sm text-[var(--color-text-muted)] mb-4">
             {search
               ? 'Try a different search term'
               : 'Add products to this tour to manage costs and inventory'}
@@ -295,49 +295,49 @@ export default function TourProductsPage() {
             return (
               <div
                 key={product.product_id}
-                className="border border-slate-200 rounded-lg bg-[var(--g-surface)] overflow-hidden"
+                className="border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-surface)] overflow-hidden"
               >
                 {/* Product Header */}
                 <button
                   onClick={() => toggleExpanded(product.product_id)}
-                  className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition"
+                  className="w-full flex items-center justify-between p-4 hover:bg-[var(--color-bg-elevated)] transition"
                 >
                   <div className="flex items-center gap-4">
                     {isExpanded ? (
-                      <ChevronDown className="w-5 h-5 text-[var(--g-text-muted)]" />
+                      <ChevronDown className="w-5 h-5 text-[var(--color-text-muted)]" />
                     ) : (
-                      <ChevronRight className="w-5 h-5 text-[var(--g-text-muted)]" />
+                      <ChevronRight className="w-5 h-5 text-[var(--color-text-muted)]" />
                     )}
                     <div className="text-left">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-[var(--g-text)]">{product.sku}</span>
+                        <span className="font-semibold text-[var(--color-text-primary)]">{product.sku}</span>
                         <Badge variant={getTypeBadgeVariant(product.product_type)} size="sm">
                           {product.product_type.replace('-', ' ')}
                         </Badge>
                       </div>
-                      <p className="text-sm text-[var(--g-text-dim)]">{product.description}</p>
+                      <p className="text-sm text-[var(--color-text-secondary)]">{product.description}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-6 text-sm">
                     <div className="text-right">
-                      <span className="text-[var(--g-text-muted)]">Sizes:</span>{' '}
-                      <span className="text-[var(--g-text)]">
+                      <span className="text-[var(--color-text-muted)]">Sizes:</span>{' '}
+                      <span className="text-[var(--color-text-primary)]">
                         {activeCount}/{product.sizes.length}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[var(--g-text-muted)]">Inventory:</span>{' '}
-                      <span className="text-[var(--g-text)]">{totalInventory}</span>
+                      <span className="text-[var(--color-text-muted)]">Inventory:</span>{' '}
+                      <span className="text-[var(--color-text-primary)]">{totalInventory}</span>
                     </div>
                   </div>
                 </button>
 
                 {/* Expanded Content - Size Details */}
                 {isExpanded && (
-                  <div className="border-t border-slate-200 p-4 bg-slate-50/50">
+                  <div className="border-t border-[var(--color-bg-border)] p-4 bg-[var(--color-bg-elevated)]/50">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="text-left text-[var(--g-text-muted)]">
+                        <tr className="text-left text-[var(--color-text-muted)]">
                           <th className="pb-2 font-medium">Size</th>
                           <th className="pb-2 font-medium text-right">Blank Cost</th>
                           <th className="pb-2 font-medium text-right">Print Cost</th>

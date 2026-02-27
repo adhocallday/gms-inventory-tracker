@@ -54,7 +54,7 @@ export function ServerPagination({
 
   return (
     <div className="flex items-center justify-between gap-4 py-4">
-      <div className="text-sm text-[var(--g-text-muted)]">
+      <div className="text-sm text-[var(--color-text-muted)]">
         Page {currentPage} of {totalPages}
       </div>
 
@@ -74,7 +74,7 @@ export function ServerPagination({
             {getPageNumbers().map((page, index) => {
               if (page === '...') {
                 return (
-                  <span key={`ellipsis-${index}`} className="px-2 text-[var(--g-text-muted)]">
+                  <span key={`ellipsis-${index}`} className="px-2 text-[var(--color-text-muted)]">
                     ...
                   </span>
                 );
@@ -90,8 +90,8 @@ export function ServerPagination({
                   className={cn(
                     'min-w-[2rem] h-8 px-3 rounded-lg text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-[var(--g-accent)] text-white'
-                      : 'hover:bg-[var(--g-surface-2)] text-[var(--g-text-dim)]'
+                      ? 'bg-[var(--color-red-primary)] text-white'
+                      : 'hover:bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)]'
                   )}
                 >
                   {pageNum}
@@ -137,7 +137,7 @@ export function LoadMorePagination({
   if (!canLoadMore) {
     return (
       <div className="flex justify-center py-4">
-        <div className="text-sm text-[var(--g-text-muted)]">
+        <div className="text-sm text-[var(--color-text-muted)]">
           Showing all {totalCount} {itemLabel}
         </div>
       </div>
@@ -148,12 +148,12 @@ export function LoadMorePagination({
 
   return (
     <div className="flex flex-col items-center gap-3 py-6">
-      <div className="text-sm text-[var(--g-text-muted)]">
+      <div className="text-sm text-[var(--color-text-muted)]">
         Showing {visibleCount} of {totalCount} {itemLabel}
       </div>
       <Button variant="outline" onClick={onLoadMore}>
         Load {nextIncrement} more {itemLabel}
-        <span className="text-[var(--g-text-muted)] ml-1">
+        <span className="text-[var(--color-text-muted)] ml-1">
           ({remainingCount} remaining)
         </span>
       </Button>
@@ -185,10 +185,10 @@ export function HybridPagination({
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t border-[var(--g-border)]">
-      <div className="text-sm text-[var(--g-text-muted)]">
-        Showing <span className="font-semibold text-[var(--g-text)]">{visibleCount}</span> of{' '}
-        <span className="font-semibold text-[var(--g-text)]">{totalCount}</span> {itemLabel}
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t border-[var(--color-bg-border)]">
+      <div className="text-sm text-[var(--color-text-muted)]">
+        Showing <span className="font-semibold text-[var(--color-text-primary)]">{visibleCount}</span> of{' '}
+        <span className="font-semibold text-[var(--color-text-primary)]">{totalCount}</span> {itemLabel}
       </div>
 
       <div className="flex items-center gap-2">

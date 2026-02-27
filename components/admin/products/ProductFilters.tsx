@@ -42,8 +42,8 @@ export function ProductFilters({
             className={cn(
               'px-3 py-1.5 text-sm font-medium rounded-lg transition-all border',
               isActive
-                ? 'bg-[var(--g-accent)] text-white border-[var(--g-accent)]'
-                : 'bg-slate-100 text-[var(--g-text-muted)] border-slate-200 hover:bg-slate-200 hover:text-[var(--g-text)]'
+                ? 'bg-[var(--color-red-primary)] text-white border-[var(--color-red-primary)]'
+                : 'bg-[var(--color-bg-border)] text-[var(--color-text-muted)] border-[var(--color-bg-border)] hover:bg-[var(--color-bg-border)] hover:text-[var(--color-text-primary)]'
             )}
           >
             {option.label}
@@ -51,7 +51,7 @@ export function ProductFilters({
               <span
                 className={cn(
                   'ml-2 px-1.5 py-0.5 text-xs rounded',
-                  isActive ? 'bg-white/20' : 'bg-slate-200'
+                  isActive ? 'bg-[var(--color-bg-surface)]/20' : 'bg-[var(--color-bg-border)]'
                 )}
               >
                 {count}

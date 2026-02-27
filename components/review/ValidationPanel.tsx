@@ -33,25 +33,25 @@ export default function ValidationPanel({ validation }: ValidationPanelProps) {
     <div className="space-y-4 mb-6">
       {/* Missing Fields (Blocking Errors) */}
       {missingFields.length > 0 && (
-        <div className="g-card p-4 border-[var(--g-accent)]">
+        <div className="g-card p-4 border-[var(--color-red-primary)]">
           <button
             className="w-full flex items-center justify-between text-left"
             onClick={() => setExpandedErrors(!expandedErrors)}
           >
             <div className="flex items-center gap-2">
-              <span className="text-[var(--g-accent)] text-xl">⚠️</span>
-              <span className="text-sm font-semibold text-[var(--g-accent)]">
+              <span className="text-[var(--color-red-primary)] text-xl">⚠️</span>
+              <span className="text-sm font-semibold text-[var(--color-red-primary)]">
                 {missingFields.length} Required{' '}
                 {missingFields.length === 1 ? 'Field' : 'Fields'} Missing
               </span>
             </div>
-            <span className="text-xs text-[var(--g-text-muted)]">
+            <span className="text-xs text-[var(--color-text-muted)]">
               {expandedErrors ? '▼' : '▶'}
             </span>
           </button>
 
           {expandedErrors && (
-            <ul className="mt-3 space-y-1 text-sm list-disc list-inside text-[var(--g-text-dim)]">
+            <ul className="mt-3 space-y-1 text-sm list-disc list-inside text-[var(--color-text-secondary)]">
               {missingFields.map((field, index) => (
                 <li key={index}>{field}</li>
               ))}
@@ -59,7 +59,7 @@ export default function ValidationPanel({ validation }: ValidationPanelProps) {
           )}
 
           {expandedErrors && (
-            <p className="mt-3 text-xs text-[var(--g-text-muted)] border-t border-white/10 pt-3">
+            <p className="mt-3 text-xs text-[var(--color-text-muted)] border-t border-white/10 pt-3">
               These fields must be filled before the document can be posted to
               the database.
             </p>
@@ -81,13 +81,13 @@ export default function ValidationPanel({ validation }: ValidationPanelProps) {
                 {warnings.length === 1 ? 'Warning' : 'Warnings'}
               </span>
             </div>
-            <span className="text-xs text-[var(--g-text-muted)]">
+            <span className="text-xs text-[var(--color-text-muted)]">
               {expandedWarnings ? '▼' : '▶'}
             </span>
           </button>
 
           {expandedWarnings && (
-            <ul className="mt-3 space-y-1 text-sm list-disc list-inside text-[var(--g-text-dim)]">
+            <ul className="mt-3 space-y-1 text-sm list-disc list-inside text-[var(--color-text-secondary)]">
               {warnings.map((warning, index) => (
                 <li key={index}>{warning}</li>
               ))}
@@ -95,7 +95,7 @@ export default function ValidationPanel({ validation }: ValidationPanelProps) {
           )}
 
           {expandedWarnings && (
-            <p className="mt-3 text-xs text-[var(--g-text-muted)] border-t border-white/10 pt-3">
+            <p className="mt-3 text-xs text-[var(--color-text-muted)] border-t border-white/10 pt-3">
               These warnings won't prevent posting, but you should review them
               carefully.
             </p>

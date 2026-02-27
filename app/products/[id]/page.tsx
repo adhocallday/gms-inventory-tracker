@@ -80,7 +80,7 @@ export default async function ProductDetailPage({ params }: ProductDetailParams)
   return (
     <div className="g-container py-8">
       <div className="mb-6">
-        <Link href="/" className="text-sm text-[var(--g-text-muted)] hover:text-[var(--g-text)] transition">
+        <Link href="/" className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition">
           ← Back to Tours
         </Link>
       </div>
@@ -89,22 +89,22 @@ export default async function ProductDetailPage({ params }: ProductDetailParams)
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold g-title mb-2">{product.sku}</h1>
-            <p className="text-lg text-[var(--g-text-dim)]">{product.description}</p>
-            <p className="text-sm text-[var(--g-text-muted)] mt-1 capitalize">{product.product_type}</p>
+            <p className="text-lg text-[var(--color-text-secondary)]">{product.description}</p>
+            <p className="text-sm text-[var(--color-text-muted)] mt-1 capitalize">{product.product_type}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-6 mt-8">
           <div>
-            <p className="text-sm text-[var(--g-text-muted)] mb-1">Total Sold</p>
+            <p className="text-sm text-[var(--color-text-muted)] mb-1">Total Sold</p>
             <p className="text-2xl font-semibold">{formatNumber(totalSold)}</p>
           </div>
           <div>
-            <p className="text-sm text-[var(--g-text-muted)] mb-1">Total Revenue</p>
+            <p className="text-sm text-[var(--color-text-muted)] mb-1">Total Revenue</p>
             <p className="text-2xl font-semibold">{currencyFormatter.format(totalGross)}</p>
           </div>
           <div>
-            <p className="text-sm text-[var(--g-text-muted)] mb-1">Current Inventory</p>
+            <p className="text-sm text-[var(--color-text-muted)] mb-1">Current Inventory</p>
             <p className="text-2xl font-semibold">{formatNumber(totalInventory)}</p>
           </div>
         </div>
@@ -115,13 +115,13 @@ export default async function ProductDetailPage({ params }: ProductDetailParams)
           <h2 className="text-lg font-semibold g-title mb-4">Sales by Size</h2>
           <div className="space-y-3">
             {salesBySizeArray.length === 0 ? (
-              <p className="text-sm text-[var(--g-text-muted)]">No sales data yet.</p>
+              <p className="text-sm text-[var(--color-text-muted)]">No sales data yet.</p>
             ) : (
               (salesBySizeArray as any[]).map((row) => (
-                <div key={row.size} className="flex items-center justify-between p-3 border border-[var(--g-border)] rounded-lg">
+                <div key={row.size} className="flex items-center justify-between p-3 border border-[var(--color-bg-border)] rounded-lg">
                   <div>
                     <p className="font-medium">{row.size}</p>
-                    <p className="text-sm text-[var(--g-text-muted)]">{formatNumber(row.qty_sold)} units</p>
+                    <p className="text-sm text-[var(--color-text-muted)]">{formatNumber(row.qty_sold)} units</p>
                   </div>
                   <p className="font-semibold">{currencyFormatter.format(row.gross_sales)}</p>
                 </div>
@@ -134,10 +134,10 @@ export default async function ProductDetailPage({ params }: ProductDetailParams)
           <h2 className="text-lg font-semibold g-title mb-4">Inventory by Size</h2>
           <div className="space-y-3">
             {inventoryBySizeArray.length === 0 ? (
-              <p className="text-sm text-[var(--g-text-muted)]">No inventory data yet.</p>
+              <p className="text-sm text-[var(--color-text-muted)]">No inventory data yet.</p>
             ) : (
               (inventoryBySizeArray as any[]).map((row) => (
-                <div key={row.size} className="flex items-center justify-between p-3 border border-[var(--g-border)] rounded-lg">
+                <div key={row.size} className="flex items-center justify-between p-3 border border-[var(--color-bg-border)] rounded-lg">
                   <p className="font-medium">{row.size}</p>
                   <p className="font-semibold">{formatNumber(row.balance)} units</p>
                 </div>

@@ -91,12 +91,12 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
   };
 
   return (
-    <div className="border border-white/10 rounded-lg bg-[var(--g-surface-2)] p-6">
+    <div className="border border-white/10 rounded-lg bg-[var(--color-bg-elevated)] p-6">
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-[var(--g-text)] mb-1">
+        <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">
           AI Chat Assistant
         </h3>
-        <p className="text-xs text-[var(--g-text-muted)]">
+        <p className="text-xs text-[var(--color-text-muted)]">
           Paste your tour schedule as plain text. Example: "January 15 Tampa, FL at Amalie Arena, Jan 17 Atlanta GA"
         </p>
       </div>
@@ -109,7 +109,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Paste tour dates here...&#10;&#10;Example:&#10;January 15 Tampa, FL at Amalie Arena&#10;Jan 17 Atlanta, GA&#10;1/19 Nashville TN - Bridgestone Arena"
-                className="w-full h-32 px-4 py-3 bg-[var(--g-surface)] border border-white/10 rounded-lg text-sm text-[var(--g-text)] placeholder:text-[var(--g-text-muted)] focus:outline-none focus:border-[var(--g-accent)] resize-y"
+                className="w-full h-32 px-4 py-3 bg-[var(--color-bg-surface)] border border-white/10 rounded-lg text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-red-primary)] resize-y"
                 disabled={processing}
               />
             </div>
@@ -124,7 +124,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
               type="button"
               onClick={handleParseClick}
               disabled={processing || !input.trim()}
-              className="w-full px-4 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-2 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {processing ? (
                 <span className="flex items-center justify-center gap-2">
@@ -138,7 +138,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
           </div>
 
           <div className="mt-4 pt-4 border-t border-white/10">
-            <p className="text-xs text-[var(--g-text-muted)]">
+            <p className="text-xs text-[var(--color-text-muted)]">
               <strong>💡 Tips:</strong> You can paste dates in any format (1/15, Jan 15, January 15th). Include city and state. Venue names are optional.
             </p>
           </div>
@@ -154,19 +154,19 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
           <div className="border border-white/10 rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-white/5">
+                <thead className="bg-[var(--color-bg-surface)]/5">
                   <tr>
-                    <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--g-text-muted)]">Date</th>
-                    <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--g-text-muted)]">Venue</th>
-                    <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--g-text-muted)]">City</th>
-                    <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--g-text-muted)]">State</th>
-                    <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--g-text-muted)]">Country</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Date</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Venue</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">City</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">State</th>
+                    <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Country</th>
                     <th className="px-3 py-2"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
                   {pendingShows.map((show, index) => (
-                    <tr key={index} className="hover:bg-white/5">
+                    <tr key={index} className="hover:bg-[var(--color-bg-surface)]/5">
                       <td className="px-3 py-2">
                         <input
                           type="date"
@@ -231,14 +231,14 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
             <button
               type="button"
               onClick={confirmShows}
-              className="flex-1 px-4 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold text-sm"
+              className="flex-1 px-4 py-2 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold text-sm"
             >
               Add {pendingShows.length} Show{pendingShows.length !== 1 ? 's' : ''}
             </button>
             <button
               type="button"
               onClick={cancelReview}
-              className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition text-[var(--g-text)] text-sm"
+              className="px-4 py-2 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)] text-sm"
             >
               Cancel
             </button>

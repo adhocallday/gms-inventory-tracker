@@ -56,7 +56,7 @@ export function StockMovementPanel({ rows }: { rows: StockMovementRow[] }) {
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h2 className="text-lg font-semibold g-title">Stock Movement</h2>
-          <p className="text-sm text-[var(--g-text-muted)]">
+          <p className="text-sm text-[var(--color-text-muted)]">
             Chronological receipts by delivery.
           </p>
         </div>
@@ -84,7 +84,7 @@ export function StockMovementPanel({ rows }: { rows: StockMovementRow[] }) {
 
       <div className="overflow-x-auto mt-4">
         <table className="min-w-full text-sm g-table">
-          <thead className="text-left border-b border-slate-200">
+          <thead className="text-left border-b border-[var(--color-bg-border)]">
             <tr>
               <th className="py-2 pr-4">Date</th>
               <th className="py-2 pr-4">Delivery</th>
@@ -103,7 +103,7 @@ export function StockMovementPanel({ rows }: { rows: StockMovementRow[] }) {
               </tr>
             ) : (
               visibleRows.map((row, index) => (
-                <tr key={`${row.delivery_number ?? 'delivery'}-${index}`} className="border-b border-slate-200">
+                <tr key={`${row.delivery_number ?? 'delivery'}-${index}`} className="border-b border-[var(--color-bg-border)]">
                   <td className="py-3 pr-4">{formatDate(row.received_date)}</td>
                   <td className="py-3 pr-4">{row.delivery_number ?? '—'}</td>
                   <td className="py-3 pr-4 font-semibold">{row.sku}</td>
@@ -121,7 +121,7 @@ export function StockMovementPanel({ rows }: { rows: StockMovementRow[] }) {
             <button
               type="button"
               onClick={handleLoadMore}
-              className="px-4 py-2 rounded-full border border-slate-300 text-sm hover:bg-slate-50 transition"
+              className="px-4 py-2 rounded-full border border-[var(--color-bg-border)] text-sm hover:bg-[var(--color-bg-elevated)] transition"
             >
               Load more ({filteredRows.length - visibleCount} remaining)
             </button>

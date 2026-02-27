@@ -36,8 +36,8 @@ export function ProductCogsTable({ data, loading, totals }: ProductCogsTableProp
         header: 'SKU',
         cell: ({ row }) => (
           <div>
-            <div className="font-semibold text-[var(--g-text)]">{row.getValue('sku')}</div>
-            <div className="text-xs text-[var(--g-text-muted)]">{row.original.description}</div>
+            <div className="font-semibold text-[var(--color-text-primary)]">{row.getValue('sku')}</div>
+            <div className="text-xs text-[var(--color-text-muted)]">{row.original.description}</div>
           </div>
         ),
         enableSorting: true,
@@ -46,7 +46,7 @@ export function ProductCogsTable({ data, loading, totals }: ProductCogsTableProp
         accessorKey: 'size',
         header: 'Size',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text-dim)]">{row.getValue('size')}</span>
+          <span className="text-[var(--color-text-secondary)]">{row.getValue('size')}</span>
         ),
         enableSorting: true,
       },
@@ -128,33 +128,33 @@ export function ProductCogsTable({ data, loading, totals }: ProductCogsTableProp
         stickyHeader
         striped
         emptyState={{
-          icon: <DollarSign className="w-12 h-12 text-[var(--g-text-muted)]" />,
+          icon: <DollarSign className="w-12 h-12 text-[var(--color-text-muted)]" />,
           title: 'No COGS data',
           description: 'Upload sales reports to see cost of goods sold analysis',
         }}
       />
 
       {totals && data.length > 0 && (
-        <div className="mt-4 p-4 bg-white/5 rounded-lg border border-white/10">
+        <div className="mt-4 p-4 bg-[var(--color-bg-surface)]/5 rounded-lg border border-white/10">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Total Units</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Units</p>
               <p className="font-semibold">{totals.total_units_sold.toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Total Revenue</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Revenue</p>
               <p className="font-semibold">{formatCurrency(totals.total_revenue)}</p>
             </div>
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Total COGS</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total COGS</p>
               <p className="font-semibold text-red-300">{formatCurrency(totals.total_cogs)}</p>
             </div>
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Total Margin</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Margin</p>
               <p className="font-semibold text-green-300">{formatCurrency(totals.total_margin)}</p>
             </div>
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Margin %</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Margin %</p>
               <p className="font-semibold text-green-300">{totals.margin_percentage.toFixed(1)}%</p>
             </div>
           </div>

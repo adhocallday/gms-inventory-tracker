@@ -125,40 +125,40 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold g-title mb-4">Product Catalog</h2>
-        <p className="text-sm text-[var(--g-text-dim)]">
+        <p className="text-sm text-[var(--color-text-secondary)]">
           Upload a product catalog or grab sheet (PDF/CSV/Excel), or add products manually.
           AI will extract SKUs, names, categories, and pricing.
         </p>
       </div>
 
       {/* AI Upload Area */}
-      <div className="p-6 border border-white/10 rounded-lg bg-[var(--g-surface-2)]">
-        <h3 className="text-sm font-semibold text-[var(--g-text)] mb-3">
+      <div className="p-6 border border-white/10 rounded-lg bg-[var(--color-bg-elevated)]">
+        <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
           AI-Assisted Upload
         </h3>
         <div
           {...getRootProps()}
           className={`
             border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition
-            ${isDragActive ? 'border-[var(--g-accent)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
+            ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
             ${parsing ? 'pointer-events-none opacity-50' : ''}
           `}
         >
           <input {...getInputProps()} />
           {parsing ? (
             <div className="space-y-2">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--g-accent)] mx-auto"></div>
-              <p className="text-sm text-[var(--g-text-dim)]">Parsing product catalog with AI...</p>
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--color-red-primary)] mx-auto"></div>
+              <p className="text-sm text-[var(--color-text-secondary)]">Parsing product catalog with AI...</p>
             </div>
           ) : (
             <div className="space-y-2">
-              <svg className="mx-auto h-10 w-10 text-[var(--g-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="mx-auto h-10 w-10 text-[var(--color-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
-              <p className="text-sm text-[var(--g-text-dim)]">
+              <p className="text-sm text-[var(--color-text-secondary)]">
                 {isDragActive ? 'Drop the file here' : 'Drag & drop product catalog or grab sheet, or click to select'}
               </p>
-              <p className="text-xs text-[var(--g-text-muted)]">
+              <p className="text-xs text-[var(--color-text-muted)]">
                 Supports PDF, CSV, Excel, or product images
               </p>
             </div>
@@ -174,13 +174,13 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
       {/* Products Table */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-[var(--g-text)]">
+          <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
             Products ({products.length})
           </h3>
           <button
             type="button"
             onClick={addManualProduct}
-            className="px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 text-white rounded-lg transition font-medium"
+            className="px-3 py-1.5 text-xs bg-[var(--color-bg-surface)]/10 hover:bg-[var(--color-bg-surface)]/20 text-white rounded-lg transition font-medium"
           >
             + Add Product Manually
           </button>
@@ -189,10 +189,10 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
         {products.length > 0 ? (
           <div className="space-y-4">
             {products.map((product, index) => (
-              <div key={index} className="border border-white/10 rounded-lg p-4 bg-[var(--g-surface)]">
+              <div key={index} className="border border-white/10 rounded-lg p-4 bg-[var(--color-bg-surface)]">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
-                    <label className="text-xs text-[var(--g-text-muted)] block mb-1">SKU *</label>
+                    <label className="text-xs text-[var(--color-text-muted)] block mb-1">SKU *</label>
                     <input
                       type="text"
                       className="g-input text-sm w-full"
@@ -203,7 +203,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-[var(--g-text-muted)] block mb-1">Product Name *</label>
+                    <label className="text-xs text-[var(--color-text-muted)] block mb-1">Product Name *</label>
                     <input
                       type="text"
                       className="g-input text-sm w-full"
@@ -214,7 +214,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-[var(--g-text-muted)] block mb-1">Base Price *</label>
+                    <label className="text-xs text-[var(--color-text-muted)] block mb-1">Base Price *</label>
                     <input
                       type="number"
                       step="0.01"
@@ -228,7 +228,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
                 </div>
 
                 <div className="mb-4">
-                  <label className="text-xs text-[var(--g-text-muted)] block mb-2">Sizes Available</label>
+                  <label className="text-xs text-[var(--color-text-muted)] block mb-2">Sizes Available</label>
                   <div className="flex flex-wrap gap-2">
                     {allSizes.map(size => (
                       <button
@@ -238,8 +238,8 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
                         className={`
                           px-3 py-1 text-xs rounded-lg border transition
                           ${product.sizes.includes(size)
-                            ? 'bg-[var(--g-accent)] border-[var(--g-accent)] text-white'
-                            : 'border-white/20 text-[var(--g-text-dim)] hover:border-white/40'
+                            ? 'bg-[var(--color-red-primary)] border-[var(--color-red-primary)] text-white'
+                            : 'border-white/20 text-[var(--color-text-secondary)] hover:border-white/40'
                           }
                         `}
                       >
@@ -263,7 +263,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
           </div>
         ) : (
           <div className="border border-white/10 rounded-lg p-8 text-center">
-            <p className="text-sm text-[var(--g-text-muted)]">
+            <p className="text-sm text-[var(--color-text-muted)]">
               No products added yet. Upload a catalog or add products manually.
             </p>
           </div>
@@ -275,13 +275,13 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
         <button
           type="button"
           onClick={onPrev}
-          className="px-6 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition text-[var(--g-text)]"
+          className="px-6 py-2 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)]"
         >
           ← Previous
         </button>
         <button
           type="submit"
-          className="px-6 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold"
+          className="px-6 py-2 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold"
         >
           Next: Set Initial Stock →
         </button>

@@ -318,10 +318,10 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
           <h1 className="text-3xl font-semibold g-title mt-3">
             {tour.name}
           </h1>
-          <p className="text-sm text-[var(--g-text-dim)] mt-1">
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
             {tour.artist}
           </p>
-          <p className="text-sm text-[var(--g-text-muted)] mt-2">
+          <p className="text-sm text-[var(--color-text-muted)] mt-2">
             {formatDate(tour.start_date)} — {formatDate(tour.end_date)}
           </p>
         </div>
@@ -334,37 +334,37 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       <nav className="flex gap-2 mt-8 border-b border-white/10 pb-0 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
         <Link
           href={`/tours/${tour.id}/projections`}
-          className="px-4 py-2 text-sm font-medium text-[var(--g-text-dim)] hover:text-[var(--g-text)] hover:border-b-2 hover:border-[var(--g-accent)] transition"
+          className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
         >
           📊 Projections
         </Link>
         <Link
           href={`/tours/${tour.id}/reports`}
-          className="px-4 py-2 text-sm font-medium text-[var(--g-text-dim)] hover:text-[var(--g-text)] hover:border-b-2 hover:border-[var(--g-accent)] transition"
+          className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
         >
           📈 Reports
         </Link>
         <Link
           href={`/tours/${tour.id}/inventory`}
-          className="px-4 py-2 text-sm font-medium text-[var(--g-text-dim)] hover:text-[var(--g-text)] hover:border-b-2 hover:border-[var(--g-accent)] transition"
+          className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
         >
           📦 Inventory
         </Link>
         <Link
           href={`/tours/${tour.id}/cogs`}
-          className="px-4 py-2 text-sm font-medium text-[var(--g-text-dim)] hover:text-[var(--g-text)] hover:border-b-2 hover:border-[var(--g-accent)] transition"
+          className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
         >
           💰 COGS
         </Link>
         <Link
           href={`/admin/tours/${tour.id}/products`}
-          className="px-4 py-2 text-sm font-medium text-[var(--g-text-dim)] hover:text-[var(--g-text)] hover:border-b-2 hover:border-[var(--g-accent)] transition"
+          className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
         >
           🏷️ Product Costs
         </Link>
         <Link
           href={`/tours/${tour.id}/settings/warehouses`}
-          className="px-4 py-2 text-sm font-medium text-[var(--g-text-dim)] hover:text-[var(--g-text)] hover:border-b-2 hover:border-[var(--g-accent)] transition"
+          className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
         >
           ⚙️ Warehouse Settings
         </Link>
@@ -372,25 +372,25 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--g-text-muted)]">Total gross</p>
+          <p className="text-xs text-[var(--color-text-muted)]">Total gross</p>
           <p className="text-2xl font-semibold mt-2">
             {currencyFormatter.format(totalGross)}
           </p>
         </div>
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--g-text-muted)]">Per-head</p>
+          <p className="text-xs text-[var(--color-text-muted)]">Per-head</p>
           <p className="text-2xl font-semibold mt-2">
             {currencyFormatter.format(perHead)}
           </p>
         </div>
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--g-text-muted)]">Shows logged</p>
+          <p className="text-xs text-[var(--color-text-muted)]">Shows logged</p>
           <p className="text-2xl font-semibold mt-2">
             {showSummary?.length ?? 0}
           </p>
         </div>
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--g-text-muted)]">Inventory balance</p>
+          <p className="text-xs text-[var(--color-text-muted)]">Inventory balance</p>
           <p className="text-2xl font-semibold mt-2">
             {formatNumber(totalBalance)} units
           </p>
@@ -419,32 +419,32 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
           </div>
           {baselineScenario ? (
             <div className="mt-4 space-y-3 text-sm">
-              <p className="text-[var(--g-text-muted)]">
+              <p className="text-[var(--color-text-muted)]">
                 Baseline scenario: <span className="text-white">{baselineScenario.name}</span>
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="border border-white/10 rounded-md p-3">
-                  <p className="text-xs text-[var(--g-text-muted)]">Forecast units</p>
+                  <p className="text-xs text-[var(--color-text-muted)]">Forecast units</p>
                   <p className="text-lg font-semibold mt-1">{formatNumber(forecastUnits)}</p>
                 </div>
                 <div className="border border-white/10 rounded-md p-3">
-                  <p className="text-xs text-[var(--g-text-muted)]">Forecast gross</p>
+                  <p className="text-xs text-[var(--color-text-muted)]">Forecast gross</p>
                   <p className="text-lg font-semibold mt-1">
                     {currencyFormatter.format(forecastGross)}
                   </p>
                 </div>
               </div>
               {topForecasted.length === 0 ? (
-                <p className="text-xs text-[var(--g-text-muted)]">
+                <p className="text-xs text-[var(--color-text-muted)]">
                   No overrides saved yet. Open the sheet to plan units.
                 </p>
               ) : (
                 <div className="space-y-2">
-                  <p className="text-xs text-[var(--g-text-muted)]">Top forecasted SKUs</p>
+                  <p className="text-xs text-[var(--color-text-muted)]">Top forecasted SKUs</p>
                   {topForecasted.map(([sku, units]) => (
                     <div key={sku} className="flex items-center justify-between">
                       <span className="text-sm">{sku}</span>
-                      <span className="text-sm text-[var(--g-text-dim)]">
+                      <span className="text-sm text-[var(--color-text-secondary)]">
                         {formatNumber(units)} units
                       </span>
                     </div>
@@ -453,7 +453,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
               )}
             </div>
           ) : (
-            <div className="mt-4 p-4 border border-dashed border-white/10 rounded-md text-sm text-[var(--g-text-muted)]">
+            <div className="mt-4 p-4 border border-dashed border-white/10 rounded-md text-sm text-[var(--color-text-muted)]">
               No projection scenarios yet. Add a scenario to compare forecasted units and revenue.
             </div>
           )}
@@ -461,12 +461,12 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
 
         <section className="g-card p-6">
           <h2 className="text-lg font-semibold g-title">Grab sheet</h2>
-          <p className="text-sm text-[var(--g-text-muted)] mt-2">
+          <p className="text-sm text-[var(--color-text-muted)] mt-2">
             Add design assets to quickly preview merch layouts for this tour.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
             {designAssets.length === 0 ? (
-              <div className="sm:col-span-2 text-sm text-[var(--g-text-muted)] border border-dashed border-white/10 rounded-md p-4">
+              <div className="sm:col-span-2 text-sm text-[var(--color-text-muted)] border border-dashed border-white/10 rounded-md p-4">
                 No design assets uploaded yet.
               </div>
             ) : (
@@ -477,14 +477,14 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
                     key={asset.id}
                     className="border border-white/10 rounded-md overflow-hidden"
                   >
-                    <div className="h-28 bg-black/40 flex items-center justify-center text-xs text-[var(--g-text-muted)]">
+                    <div className="h-28 bg-black/40 flex items-center justify-center text-xs text-[var(--color-text-muted)]">
                       {asset.storage_path}
                     </div>
                     <div className="p-2">
                       <p className="text-xs font-semibold">
                         {product?.sku ?? asset.sku ?? 'SKU'}
                       </p>
-                      <p className="text-[11px] text-[var(--g-text-muted)]">
+                      <p className="text-[11px] text-[var(--color-text-muted)]">
                         {asset.asset_type ?? 'asset'}
                       </p>
                     </div>

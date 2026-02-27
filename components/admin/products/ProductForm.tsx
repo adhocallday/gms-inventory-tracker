@@ -241,7 +241,7 @@ export function ProductForm({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-[var(--g-bg)] border border-white/10 rounded-xl w-full max-w-2xl mx-4 shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-[var(--color-bg-base)] border border-white/10 rounded-xl w-full max-w-2xl mx-4 shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-white/10">
           <h2 className="text-lg font-semibold g-title">
@@ -249,7 +249,7 @@ export function ProductForm({
           </h2>
           <button
             onClick={onCancel}
-            className="text-[var(--g-text-muted)] hover:text-[var(--g-text)] transition"
+            className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -263,8 +263,8 @@ export function ProductForm({
               onClick={() => setMode('upload')}
               className={`flex-1 px-4 py-3 text-sm font-medium transition ${
                 mode === 'upload'
-                  ? 'text-[var(--g-accent)] border-b-2 border-[var(--g-accent)]'
-                  : 'text-[var(--g-text-muted)] hover:text-[var(--g-text)]'
+                  ? 'text-[var(--color-red-primary)] border-b-2 border-[var(--color-red-primary)]'
+                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
               }`}
             >
               <Upload className="w-4 h-4 inline-block mr-2" />
@@ -275,8 +275,8 @@ export function ProductForm({
               onClick={() => setMode('manual')}
               className={`flex-1 px-4 py-3 text-sm font-medium transition ${
                 mode === 'manual'
-                  ? 'text-[var(--g-accent)] border-b-2 border-[var(--g-accent)]'
-                  : 'text-[var(--g-text-muted)] hover:text-[var(--g-text)]'
+                  ? 'text-[var(--color-red-primary)] border-b-2 border-[var(--color-red-primary)]'
+                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
               }`}
             >
               <FileText className="w-4 h-4 inline-block mr-2" />
@@ -297,41 +297,41 @@ export function ProductForm({
             /* Manual Entry Form */
             <form onSubmit={handleManualSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--g-text-muted)] mb-1">
+                <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">
                   SKU <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.sku}
                   onChange={(e) => setFormData({ ...formData, sku: e.target.value.toUpperCase() })}
-                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-[var(--g-text)] placeholder-[var(--g-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
+                  className="w-full px-3 py-2 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
                   placeholder="e.g., TSHIRT-BLK-001"
                   disabled={isSubmitting}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[var(--g-text-muted)] mb-1">
+                <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">
                   Description <span className="text-red-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-[var(--g-text)] placeholder-[var(--g-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
+                  className="w-full px-3 py-2 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
                   placeholder="e.g., Black Tour T-Shirt"
                   disabled={isSubmitting}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[var(--g-text-muted)] mb-1">
+                <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">
                   Product Type
                 </label>
                 <select
                   value={formData.product_type}
                   onChange={(e) => setFormData({ ...formData, product_type: e.target.value })}
-                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-[var(--g-text)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
+                  className="w-full px-3 py-2 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
                   disabled={isSubmitting}
                 >
                   {productTypes.map((type) => (
@@ -370,27 +370,27 @@ export function ProductForm({
                 {...getRootProps()}
                 className={`
                   border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition
-                  ${isDragActive ? 'border-[var(--g-accent)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
+                  ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
                   ${parsing ? 'pointer-events-none opacity-50' : ''}
                 `}
               >
                 <input {...getInputProps()} />
                 {parsing ? (
                   <div className="space-y-2">
-                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--g-accent)] mx-auto"></div>
-                    <p className="text-sm text-[var(--g-text-dim)]">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--color-red-primary)] mx-auto"></div>
+                    <p className="text-sm text-[var(--color-text-secondary)]">
                       Parsing product catalog with AI...
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <Upload className="mx-auto h-10 w-10 text-[var(--g-text-muted)]" />
-                    <p className="text-sm text-[var(--g-text-dim)]">
+                    <Upload className="mx-auto h-10 w-10 text-[var(--color-text-muted)]" />
+                    <p className="text-sm text-[var(--color-text-secondary)]">
                       {isDragActive
                         ? 'Drop the file here'
                         : 'Drag & drop product catalog or grab sheet, or click to select'}
                     </p>
-                    <p className="text-xs text-[var(--g-text-muted)]">
+                    <p className="text-xs text-[var(--color-text-muted)]">
                       Supports PDF, CSV, Excel, or product images
                     </p>
                   </div>
@@ -401,13 +401,13 @@ export function ProductForm({
               {parsedProducts.length > 0 && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-[var(--g-text)]">
+                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
                       Parsed Products ({parsedProducts.length})
                     </h3>
                     <button
                       type="button"
                       onClick={toggleAll}
-                      className="text-xs text-[var(--g-accent)] hover:underline"
+                      className="text-xs text-[var(--color-red-primary)] hover:underline"
                     >
                       {selectedProducts.size === parsedProducts.length ? 'Deselect All' : 'Select All'}
                     </button>
@@ -419,7 +419,7 @@ export function ProductForm({
                         key={index}
                         className={`
                           border rounded-lg p-4 transition
-                          ${selectedProducts.has(index) ? 'border-[var(--g-accent)]/50 bg-[var(--g-accent)]/5' : 'border-white/10 bg-white/5'}
+                          ${selectedProducts.has(index) ? 'border-[var(--color-red-primary)]/50 bg-[var(--color-red-primary)]/5' : 'border-white/10 bg-[var(--color-bg-surface)]/5'}
                         `}
                       >
                         <div className="flex items-start gap-3">
@@ -438,10 +438,10 @@ export function ProductForm({
                                 onChange={(e) =>
                                   updateParsedProduct(index, 'sku', e.target.value.toUpperCase())
                                 }
-                                className="font-mono text-sm bg-transparent border-b border-transparent hover:border-white/20 focus:border-[var(--g-accent)] focus:outline-none text-[var(--g-text)]"
+                                className="font-mono text-sm bg-transparent border-b border-transparent hover:border-white/20 focus:border-[var(--color-red-primary)] focus:outline-none text-[var(--color-text-primary)]"
                                 placeholder="SKU"
                               />
-                              <span className="text-xs px-2 py-0.5 bg-white/10 rounded text-[var(--g-text-muted)]">
+                              <span className="text-xs px-2 py-0.5 bg-[var(--color-bg-surface)]/10 rounded text-[var(--color-text-muted)]">
                                 {product.category}
                               </span>
                             </div>
@@ -451,13 +451,13 @@ export function ProductForm({
                               type="text"
                               value={product.name}
                               onChange={(e) => updateParsedProduct(index, 'name', e.target.value)}
-                              className="w-full text-sm bg-transparent border-b border-transparent hover:border-white/20 focus:border-[var(--g-accent)] focus:outline-none text-[var(--g-text-dim)]"
+                              className="w-full text-sm bg-transparent border-b border-transparent hover:border-white/20 focus:border-[var(--color-red-primary)] focus:outline-none text-[var(--color-text-secondary)]"
                               placeholder="Product name"
                             />
 
                             {/* Sizes Row */}
                             <div>
-                              <label className="text-xs text-[var(--g-text-muted)] block mb-1.5">
+                              <label className="text-xs text-[var(--color-text-muted)] block mb-1.5">
                                 Available Sizes
                               </label>
                               <div className="flex flex-wrap gap-1.5">
@@ -470,8 +470,8 @@ export function ProductForm({
                                       px-2 py-0.5 text-xs rounded border transition
                                       ${
                                         product.sizes.includes(size)
-                                          ? 'bg-[var(--g-accent)] border-[var(--g-accent)] text-white'
-                                          : 'border-white/20 text-[var(--g-text-dim)] hover:border-white/40'
+                                          ? 'bg-[var(--color-red-primary)] border-[var(--color-red-primary)] text-white'
+                                          : 'border-white/20 text-[var(--color-text-secondary)] hover:border-white/40'
                                       }
                                     `}
                                   >
@@ -484,7 +484,7 @@ export function ProductForm({
                           <button
                             type="button"
                             onClick={() => removeParsedProduct(index)}
-                            className="text-[var(--g-text-muted)] hover:text-red-400 transition"
+                            className="text-[var(--color-text-muted)] hover:text-red-400 transition"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

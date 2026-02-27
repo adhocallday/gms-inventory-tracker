@@ -306,7 +306,7 @@ export default function ParsedDocumentsPage() {
                   <span
                     className={cn(
                       'ml-2 px-1.5 py-0.5 text-xs rounded',
-                      isActive ? 'bg-white/20' : 'bg-[var(--color-bg-border)]'
+                      isActive ? 'bg-[var(--color-bg-surface)]/20' : 'bg-[var(--color-bg-border)]'
                     )}
                   >
                     {count}

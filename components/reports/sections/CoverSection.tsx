@@ -21,18 +21,18 @@ export function CoverSection({ tour, report, showCount }: CoverSectionProps) {
         </h1>
 
         {/* Report Title */}
-        <div className="text-3xl text-[var(--g-text-muted)] print:text-4xl">
+        <div className="text-3xl text-[var(--color-text-muted)] print:text-4xl">
           {report.title}
         </div>
 
         {/* Tour Info */}
-        <div className="space-y-2 text-lg text-[var(--g-text-muted)]">
+        <div className="space-y-2 text-lg text-[var(--color-text-muted)]">
           <p>{startDate} - {endDate}</p>
           <p>{showCount} Shows</p>
         </div>
 
         {/* Generated Date */}
-        <div className="pt-8 text-sm text-[var(--g-text-muted)]">
+        <div className="pt-8 text-sm text-[var(--color-text-muted)]">
           Generated {format(new Date(report.created_at), 'MMMM d, yyyy')}
         </div>
       </div>

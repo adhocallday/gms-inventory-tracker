@@ -159,18 +159,18 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
         <div className="flex items-center gap-4 mb-4">
           <Link
             href="/admin/tours"
-            className="text-[var(--g-text-muted)] hover:text-[var(--g-text)] transition"
+            className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition"
           >
             ← Back to tours
           </Link>
         </div>
-        <p className="text-xs uppercase tracking-[0.3em] text-[var(--g-text-muted)]">
+        <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-text-muted)]">
           Admin Panel
         </p>
         <h1 className="text-3xl font-semibold g-title mt-2">
           Edit Tour: {tour.name}
         </h1>
-        <p className="text-sm text-[var(--g-text-dim)] mt-2">
+        <p className="text-sm text-[var(--color-text-secondary)] mt-2">
           Modify tour details, add shows, and manage products
         </p>
       </header>
@@ -182,8 +182,8 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
             onClick={() => setActiveTab('info')}
             className={`pb-4 px-2 text-sm font-medium border-b-2 transition ${
               activeTab === 'info'
-                ? 'border-[var(--g-accent)] text-[var(--g-text)]'
-                : 'border-transparent text-[var(--g-text-muted)] hover:text-[var(--g-text)]'
+                ? 'border-[var(--color-red-primary)] text-[var(--color-text-primary)]'
+                : 'border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
             }`}
           >
             Tour Information
@@ -192,8 +192,8 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
             onClick={() => setActiveTab('shows')}
             className={`pb-4 px-2 text-sm font-medium border-b-2 transition ${
               activeTab === 'shows'
-                ? 'border-[var(--g-accent)] text-[var(--g-text)]'
-                : 'border-transparent text-[var(--g-text-muted)] hover:text-[var(--g-text)]'
+                ? 'border-[var(--color-red-primary)] text-[var(--color-text-primary)]'
+                : 'border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
             }`}
           >
             Shows ({shows.length})
@@ -202,8 +202,8 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
             onClick={() => setActiveTab('products')}
             className={`pb-4 px-2 text-sm font-medium border-b-2 transition ${
               activeTab === 'products'
-                ? 'border-[var(--g-accent)] text-[var(--g-text)]'
-                : 'border-transparent text-[var(--g-text-muted)] hover:text-[var(--g-text)]'
+                ? 'border-[var(--color-red-primary)] text-[var(--color-text-primary)]'
+                : 'border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
             }`}
           >
             Products ({initialProducts.length})
@@ -222,7 +222,7 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
         <div className="g-card p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                 Tour Name
               </label>
               <input
@@ -234,7 +234,7 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                 Artist
               </label>
               <input
@@ -246,7 +246,7 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                 Start Date
               </label>
               <input
@@ -258,7 +258,7 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                 End Date
               </label>
               <input
@@ -270,7 +270,7 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
+              <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                 Status
               </label>
               <select
@@ -286,7 +286,7 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
+            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
               Description
             </label>
             <textarea
@@ -300,7 +300,7 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
             <button
               onClick={saveTourInfo}
               disabled={saving}
-              className="px-6 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold disabled:opacity-50"
+              className="px-6 py-2 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
@@ -323,13 +323,13 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
           {/* Shows Table */}
           <div className="g-card p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-[var(--g-text)]">
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
                 Tour Schedule ({shows.length} shows)
               </h3>
               <button
                 type="button"
                 onClick={addManualShow}
-                className="px-4 py-2 text-sm bg-white/10 hover:bg-white/20 text-white rounded-lg transition font-medium"
+                className="px-4 py-2 text-sm bg-[var(--color-bg-surface)]/10 hover:bg-[var(--color-bg-surface)]/20 text-white rounded-lg transition font-medium"
               >
                 + Add Show
               </button>
@@ -339,19 +339,19 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
               <div className="border border-white/10 rounded-lg overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead className="bg-white/5">
+                    <thead className="bg-[var(--color-bg-surface)]/5">
                       <tr>
-                        <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">Date</th>
-                        <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">Venue</th>
-                        <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">City</th>
-                        <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">State</th>
-                        <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">Country</th>
+                        <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Date</th>
+                        <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Venue</th>
+                        <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">City</th>
+                        <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">State</th>
+                        <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Country</th>
                         <th className="px-4 py-3"></th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/10">
                       {shows.map((show, index) => (
-                        <tr key={show.id || index} className="hover:bg-white/5">
+                        <tr key={show.id || index} className="hover:bg-[var(--color-bg-surface)]/5">
                           <td className="px-4 py-2">
                             <input
                               type="date"
@@ -409,7 +409,7 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
               </div>
             ) : (
               <div className="border border-white/10 rounded-lg p-8 text-center">
-                <p className="text-sm text-[var(--g-text-muted)]">
+                <p className="text-sm text-[var(--color-text-muted)]">
                   No shows added yet. Use the AI chat assistant above or add manually.
                 </p>
               </div>
@@ -419,7 +419,7 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
               <button
                 onClick={saveShows}
                 disabled={saving}
-                className="px-6 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold disabled:opacity-50"
+                className="px-6 py-2 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold disabled:opacity-50"
               >
                 {saving ? 'Saving...' : 'Save Shows'}
               </button>
@@ -431,7 +431,7 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
       {/* Products Tab */}
       {activeTab === 'products' && (
         <div className="g-card p-6">
-          <p className="text-sm text-[var(--g-text-muted)]">
+          <p className="text-sm text-[var(--color-text-muted)]">
             Product management coming soon. Currently showing {initialProducts.length} products.
           </p>
         </div>

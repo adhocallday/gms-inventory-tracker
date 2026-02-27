@@ -51,15 +51,15 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold g-title mb-4">Basic Tour Information</h2>
-        <p className="text-sm text-[var(--g-text-dim)]">
+        <p className="text-sm text-[var(--color-text-secondary)]">
           Start by entering the basic details about this tour. Select an existing artist or add a new one.
         </p>
       </div>
 
       {/* Artist Selection */}
       <div>
-        <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
-          Artist <span className="text-[var(--g-accent)]">*</span>
+        <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+          Artist <span className="text-[var(--color-red-primary)]">*</span>
         </label>
 
         {!showNewArtistField ? (
@@ -102,7 +102,7 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
                 setShowNewArtistField(false);
                 onUpdate({ ...tourData, artist: '' });
               }}
-              className="text-xs text-[var(--g-text-dim)] hover:text-[var(--g-text)]"
+              className="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
             >
               ← Back to artist selection
             </button>
@@ -112,8 +112,8 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
 
       {/* Tour Name */}
       <div>
-        <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
-          Tour Name <span className="text-[var(--g-accent)]">*</span>
+        <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+          Tour Name <span className="text-[var(--color-red-primary)]">*</span>
         </label>
         <input
           type="text"
@@ -123,7 +123,7 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
           onChange={(e) => onUpdate({ ...tourData, name: e.target.value })}
           required
         />
-        <p className="text-xs text-[var(--g-text-muted)] mt-1">
+        <p className="text-xs text-[var(--color-text-muted)] mt-1">
           Organized under artist "{tourData.artist || '(select artist above)'}"
         </p>
       </div>
@@ -131,8 +131,8 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
       {/* Date Range */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
-            Start Date <span className="text-xs text-[var(--g-text-muted)]">(Optional - auto-fills from shows)</span>
+          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+            Start Date <span className="text-xs text-[var(--color-text-muted)]">(Optional - auto-fills from shows)</span>
           </label>
           <input
             type="date"
@@ -142,8 +142,8 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
-            End Date <span className="text-xs text-[var(--g-text-muted)]">(Optional - auto-fills from shows)</span>
+          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
+            End Date <span className="text-xs text-[var(--color-text-muted)]">(Optional - auto-fills from shows)</span>
           </label>
           <input
             type="date"
@@ -153,13 +153,13 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
           />
         </div>
       </div>
-      <p className="text-xs text-[var(--g-text-muted)] -mt-2">
+      <p className="text-xs text-[var(--color-text-muted)] -mt-2">
         💡 Leave dates blank - they'll automatically populate based on show schedule in the next step
       </p>
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
+        <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
           Description (Optional)
         </label>
         <textarea
@@ -174,7 +174,7 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
       <div className="flex justify-end pt-6 border-t border-white/10">
         <button
           type="submit"
-          className="px-6 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold"
+          className="px-6 py-2 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold"
         >
           Next: Add Shows →
         </button>

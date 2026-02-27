@@ -39,8 +39,8 @@ export function InventoryBalanceTable({ data, loading, showTotals = true }: Inve
 
           return (
             <div>
-              <div className="font-semibold text-[var(--g-text)]">{row.getValue('sku')}</div>
-              <div className="text-xs text-[var(--g-text-muted)]">{row.original.description}</div>
+              <div className="font-semibold text-[var(--color-text-primary)]">{row.getValue('sku')}</div>
+              <div className="text-xs text-[var(--color-text-muted)]">{row.original.description}</div>
               {isOutOfStock && (
                 <Badge variant="out-of-stock" className="mt-1 text-xs">Out of stock</Badge>
               )}
@@ -56,7 +56,7 @@ export function InventoryBalanceTable({ data, loading, showTotals = true }: Inve
         accessorKey: 'size',
         header: 'Size',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text-dim)]">{row.getValue('size')}</span>
+          <span className="text-[var(--color-text-secondary)]">{row.getValue('size')}</span>
         ),
         enableSorting: true,
       },
@@ -66,7 +66,7 @@ export function InventoryBalanceTable({ data, loading, showTotals = true }: Inve
         cell: ({ row }) => {
           const type = row.getValue('product_type') as string;
           return (
-            <span className="text-[var(--g-text-dim)] capitalize">{type}</span>
+            <span className="text-[var(--color-text-secondary)] capitalize">{type}</span>
           );
         },
         enableSorting: true,
@@ -155,33 +155,33 @@ export function InventoryBalanceTable({ data, loading, showTotals = true }: Inve
         stickyHeader
         striped
         emptyState={{
-          icon: <Package className="w-12 h-12 text-[var(--g-text-muted)]" />,
+          icon: <Package className="w-12 h-12 text-[var(--color-text-muted)]" />,
           title: 'No inventory items',
           description: 'Upload a packing list or purchase order to see inventory balances',
         }}
       />
 
       {showTotals && data.length > 0 && (
-        <div className="mt-4 p-4 bg-white/5 rounded-lg border border-white/10">
+        <div className="mt-4 p-4 bg-[var(--color-bg-surface)]/5 rounded-lg border border-white/10">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Total Received</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Received</p>
               <p className="font-semibold">{formatNumber(totals.received)}</p>
             </div>
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Total Sold</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Sold</p>
               <p className="font-semibold">{formatNumber(totals.sold)}</p>
             </div>
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Total Comps</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Comps</p>
               <p className="font-semibold">{formatNumber(totals.comps)}</p>
             </div>
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Total Balance</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Balance</p>
               <p className="font-semibold text-green-300">{formatNumber(totals.balance)}</p>
             </div>
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Total Value</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Value</p>
               <p className="font-semibold">{formatCurrency(totals.value)}</p>
             </div>
           </div>

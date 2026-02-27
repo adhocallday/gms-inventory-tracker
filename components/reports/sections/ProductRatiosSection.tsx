@@ -31,10 +31,10 @@ export function ProductRatiosSection({ products, showSummary }: ProductRatiosSec
     <section className="print:page-break-inside-avoid">
       <div className="mb-6">
         <h2 className="text-3xl font-bold g-title mb-2">Product Ratios</h2>
-        <p className="text-sm text-[var(--g-text-muted)]">
+        <p className="text-sm text-[var(--color-text-muted)]">
           Shows how many attendees purchased each product (e.g., "1 in 8" means 1 out of every 8 attendees bought this item)
         </p>
-        <div className="mt-2 text-sm text-[var(--g-text-muted)]">
+        <div className="mt-2 text-sm text-[var(--color-text-muted)]">
           <span className="font-semibold">Total Attendance: </span>
           {totalAttendance.toLocaleString()}
         </div>
@@ -44,7 +44,7 @@ export function ProductRatiosSection({ products, showSummary }: ProductRatiosSec
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[var(--g-border)]">
+              <tr className="border-b border-[var(--color-bg-border)]">
                 <th className="text-left py-3 px-4 text-sm font-semibold g-title">Product</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold g-title">SKU</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold g-title">Units Sold</th>
@@ -56,25 +56,25 @@ export function ProductRatiosSection({ products, showSummary }: ProductRatiosSec
               {productRatios.map((product, index) => (
                 <tr
                   key={product.sku}
-                  className={`border-b border-[var(--g-border)] ${
-                    index % 2 === 0 ? 'bg-[var(--g-bg-muted)]' : ''
+                  className={`border-b border-[var(--color-bg-border)] ${
+                    index % 2 === 0 ? 'bg-[var(--color-bg-elevated)]' : ''
                   }`}
                 >
                   <td className="py-3 px-4 text-sm">
                     {product.description || 'No description'}
                   </td>
-                  <td className="py-3 px-4 text-sm font-mono text-[var(--g-text-muted)]">
+                  <td className="py-3 px-4 text-sm font-mono text-[var(--color-text-muted)]">
                     {product.sku}
                   </td>
                   <td className="py-3 px-4 text-sm text-right font-semibold">
                     {product.units.toLocaleString()}
                   </td>
                   <td className="py-3 px-4 text-sm text-right">
-                    <span className="font-semibold text-[var(--g-accent)]">
+                    <span className="font-semibold text-[var(--color-red-primary)]">
                       1 in {product.ratio}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-sm text-right text-[var(--g-text-muted)]">
+                  <td className="py-3 px-4 text-sm text-right text-[var(--color-text-muted)]">
                     {product.percent}%
                   </td>
                 </tr>
@@ -84,7 +84,7 @@ export function ProductRatiosSection({ products, showSummary }: ProductRatiosSec
         </div>
 
         {productRatios.length === 0 && (
-          <div className="text-center py-8 text-[var(--g-text-muted)]">
+          <div className="text-center py-8 text-[var(--color-text-muted)]">
             No product ratio data available
           </div>
         )}

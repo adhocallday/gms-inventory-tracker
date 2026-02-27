@@ -149,13 +149,13 @@ export function AddProductToTourModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-[var(--g-bg)] border border-white/10 rounded-xl w-full max-w-2xl mx-4 shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-[var(--color-bg-base)] border border-white/10 rounded-xl w-full max-w-2xl mx-4 shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-white/10">
           <h2 className="text-lg font-semibold g-title">Add Product to {tourName}</h2>
           <button
             onClick={onClose}
-            className="text-[var(--g-text-muted)] hover:text-[var(--g-text)] transition"
+            className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -174,13 +174,13 @@ export function AddProductToTourModal({
             <div className="p-4">
               {/* Search */}
               <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--g-text-muted)]" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search products by SKU or description..."
-                  className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-[var(--g-text)] placeholder-[var(--g-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
                   autoFocus
                 />
               </div>
@@ -188,12 +188,12 @@ export function AddProductToTourModal({
               {/* Product List */}
               {loading ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--g-accent)]"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-red-primary)]"></div>
                 </div>
               ) : filteredProducts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <Package className="w-12 h-12 text-[var(--g-text-muted)] mb-4" />
-                  <p className="text-sm text-[var(--g-text-muted)]">
+                  <Package className="w-12 h-12 text-[var(--color-text-muted)] mb-4" />
+                  <p className="text-sm text-[var(--color-text-muted)]">
                     {search
                       ? 'No products found matching your search'
                       : 'All products have been added to this tour'}
@@ -205,21 +205,21 @@ export function AddProductToTourModal({
                     <button
                       key={product.id}
                       onClick={() => handleSelectProduct(product)}
-                      className="w-full text-left p-3 border border-white/10 rounded-lg hover:bg-white/5 hover:border-white/20 transition"
+                      className="w-full text-left p-3 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 hover:border-white/20 transition"
                     >
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-[var(--g-text)]">
+                            <span className="font-semibold text-[var(--color-text-primary)]">
                               {product.sku}
                             </span>
                             <Badge variant={getTypeBadgeVariant(product.product_type)} size="sm">
                               {product.product_type.replace('-', ' ')}
                             </Badge>
                           </div>
-                          <p className="text-sm text-[var(--g-text-dim)]">{product.description}</p>
+                          <p className="text-sm text-[var(--color-text-secondary)]">{product.description}</p>
                         </div>
-                        <span className="text-xs text-[var(--g-text-muted)]">
+                        <span className="text-xs text-[var(--color-text-muted)]">
                           {product.tour_count} tour{product.tour_count !== 1 ? 's' : ''}
                         </span>
                       </div>
@@ -232,11 +232,11 @@ export function AddProductToTourModal({
             /* Size and Cost Configuration */
             <div className="p-4 space-y-6">
               {/* Selected Product */}
-              <div className="p-3 bg-[var(--g-accent)]/10 border border-[var(--g-accent)]/30 rounded-lg">
+              <div className="p-3 bg-[var(--color-red-primary)]/10 border border-[var(--color-red-primary)]/30 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-[var(--g-text)]">
+                      <span className="font-semibold text-[var(--color-text-primary)]">
                         {selectedProduct.sku}
                       </span>
                       <Badge
@@ -246,11 +246,11 @@ export function AddProductToTourModal({
                         {selectedProduct.product_type.replace('-', ' ')}
                       </Badge>
                     </div>
-                    <p className="text-sm text-[var(--g-text-dim)]">{selectedProduct.description}</p>
+                    <p className="text-sm text-[var(--color-text-secondary)]">{selectedProduct.description}</p>
                   </div>
                   <button
                     onClick={() => setSelectedProduct(null)}
-                    className="text-sm text-[var(--g-accent)] hover:underline"
+                    className="text-sm text-[var(--color-red-primary)] hover:underline"
                   >
                     Change
                   </button>
@@ -259,7 +259,7 @@ export function AddProductToTourModal({
 
               {/* Size Selection */}
               <div>
-                <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
+                <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
                   Select Sizes
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -272,8 +272,8 @@ export function AddProductToTourModal({
                         px-3 py-1.5 text-sm rounded-lg border transition
                         ${
                           selectedSizes.has(size)
-                            ? 'bg-[var(--g-accent)] border-[var(--g-accent)] text-white'
-                            : 'border-white/20 text-[var(--g-text-dim)] hover:border-white/40'
+                            ? 'bg-[var(--color-red-primary)] border-[var(--color-red-primary)] text-white'
+                            : 'border-white/20 text-[var(--color-text-secondary)] hover:border-white/40'
                         }
                       `}
                     >
@@ -286,11 +286,11 @@ export function AddProductToTourModal({
               {/* Cost Configuration */}
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[var(--g-text-muted)] mb-1">
+                  <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">
                     Blank Cost
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--g-text-muted)]">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]">
                       $
                     </span>
                     <input
@@ -300,17 +300,17 @@ export function AddProductToTourModal({
                       onChange={(e) =>
                         setCosts({ ...costs, blank_unit_cost: parseFloat(e.target.value) || 0 })
                       }
-                      className="w-full pl-7 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-[var(--g-text)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)]"
+                      className="w-full pl-7 pr-3 py-2 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
                       placeholder="0.00"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--g-text-muted)] mb-1">
+                  <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">
                     Print Cost
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--g-text-muted)]">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]">
                       $
                     </span>
                     <input
@@ -320,17 +320,17 @@ export function AddProductToTourModal({
                       onChange={(e) =>
                         setCosts({ ...costs, print_unit_cost: parseFloat(e.target.value) || 0 })
                       }
-                      className="w-full pl-7 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-[var(--g-text)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)]"
+                      className="w-full pl-7 pr-3 py-2 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
                       placeholder="0.00"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--g-text-muted)] mb-1">
+                  <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">
                     Suggested Retail
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--g-text-muted)]">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]">
                       $
                     </span>
                     <input
@@ -340,7 +340,7 @@ export function AddProductToTourModal({
                       onChange={(e) =>
                         setCosts({ ...costs, suggested_retail: parseFloat(e.target.value) || 0 })
                       }
-                      className="w-full pl-7 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-[var(--g-text)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)]"
+                      className="w-full pl-7 pr-3 py-2 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
                       placeholder="0.00"
                     />
                   </div>
@@ -348,10 +348,10 @@ export function AddProductToTourModal({
               </div>
 
               {/* Total Cost Preview */}
-              <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
+              <div className="p-3 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-[var(--g-text-muted)]">Total Package Cost:</span>
-                  <span className="font-semibold text-[var(--g-text)]">
+                  <span className="text-[var(--color-text-muted)]">Total Package Cost:</span>
+                  <span className="font-semibold text-[var(--color-text-primary)]">
                     ${(costs.blank_unit_cost + costs.print_unit_cost).toFixed(2)}
                   </span>
                 </div>

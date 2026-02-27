@@ -43,9 +43,9 @@ export function UpcomingShowsPanel({ shows }: UpcomingShowsPanelProps) {
 
       {shows.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-center">
-          <Calendar className="w-10 h-10 text-[var(--g-text-muted)] mb-3" />
-          <p className="text-sm text-[var(--g-text-muted)]">No upcoming shows</p>
-          <p className="text-xs text-[var(--g-text-muted)] mt-1">
+          <Calendar className="w-10 h-10 text-[var(--color-text-muted)] mb-3" />
+          <p className="text-sm text-[var(--color-text-muted)]">No upcoming shows</p>
+          <p className="text-xs text-[var(--color-text-muted)] mt-1">
             Shows will appear here as they're scheduled
           </p>
         </div>
@@ -55,9 +55,9 @@ export function UpcomingShowsPanel({ shows }: UpcomingShowsPanelProps) {
             <Link
               key={show.id}
               href={`/tours/${show.tour_id}/shows/${show.id}`}
-              className="flex items-start gap-3 p-3 rounded-lg border border-[var(--g-border)] hover:border-[var(--g-accent)]/50 hover:bg-[var(--g-bg-subtle)] transition group"
+              className="flex items-start gap-3 p-3 rounded-lg border border-[var(--color-bg-border)] hover:border-[var(--color-red-primary)]/50 hover:bg-[var(--g-bg-subtle)] transition group"
             >
-              <div className="flex flex-col items-center justify-center w-12 h-12 rounded-lg bg-[var(--g-accent)]/10 text-[var(--g-accent)]">
+              <div className="flex flex-col items-center justify-center w-12 h-12 rounded-lg bg-[var(--color-red-primary)]/10 text-[var(--color-red-primary)]">
                 <span className="text-xs font-medium uppercase">
                   {new Date(show.show_date).toLocaleDateString('en-US', { month: 'short' })}
                 </span>
@@ -66,10 +66,10 @@ export function UpcomingShowsPanel({ shows }: UpcomingShowsPanelProps) {
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-[var(--g-text)] truncate group-hover:text-[var(--g-accent)] transition">
+                <p className="text-sm font-medium text-[var(--color-text-primary)] truncate group-hover:text-[var(--color-red-primary)] transition">
                   {show.venue_name || 'Venue TBD'}
                 </p>
-                <div className="flex items-center gap-3 mt-1 text-xs text-[var(--g-text-muted)]">
+                <div className="flex items-center gap-3 mt-1 text-xs text-[var(--color-text-muted)]">
                   {show.city && (
                     <span className="flex items-center gap-1">
                       <MapPin className="w-3 h-3" />
@@ -82,7 +82,7 @@ export function UpcomingShowsPanel({ shows }: UpcomingShowsPanelProps) {
                   </span>
                 </div>
               </div>
-              <span className="text-xs text-[var(--g-text-muted)] whitespace-nowrap">
+              <span className="text-xs text-[var(--color-text-muted)] whitespace-nowrap">
                 {formatDate(show.show_date)}
               </span>
             </Link>

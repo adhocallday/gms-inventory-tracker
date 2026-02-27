@@ -29,10 +29,10 @@ export function CogsTable({ data, loading }: CogsTableProps) {
         header: 'SKU',
         cell: ({ row }) => (
           <div>
-            <div className="font-semibold text-[var(--g-text)]">
+            <div className="font-semibold text-[var(--color-text-primary)]">
               {row.original.sku || 'SKU'}
             </div>
-            <div className="text-xs text-[var(--g-text-muted)] mt-0.5">
+            <div className="text-xs text-[var(--color-text-muted)] mt-0.5">
               {row.original.description || 'Description pending'}
             </div>
           </div>
@@ -47,7 +47,7 @@ export function CogsTable({ data, loading }: CogsTableProps) {
       {
         accessorKey: 'size',
         header: 'Size',
-        cell: ({ row }) => row.getValue('size') || <span className="text-[var(--g-text-muted)]">—</span>,
+        cell: ({ row }) => row.getValue('size') || <span className="text-[var(--color-text-muted)]">—</span>,
         enableSorting: true,
       },
       {
@@ -105,7 +105,7 @@ export function CogsTable({ data, loading }: CogsTableProps) {
       stickyHeader
       striped
       emptyState={{
-        icon: <DollarSign className="w-12 h-12 text-[var(--g-text-muted)]" />,
+        icon: <DollarSign className="w-12 h-12 text-[var(--color-text-muted)]" />,
         title: 'No COGS data yet',
         description: 'Upload sales and cost data to see cost of goods sold',
       }}

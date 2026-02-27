@@ -32,7 +32,7 @@ export function ReceivingContextTable({ data, loading }: ReceivingContextTablePr
         accessorKey: 'delivery_number',
         header: 'Delivery',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text-dim)]">{row.getValue('delivery_number') || '—'}</span>
+          <span className="text-[var(--color-text-secondary)]">{row.getValue('delivery_number') || '—'}</span>
         ),
         enableSorting: true,
       },
@@ -40,7 +40,7 @@ export function ReceivingContextTable({ data, loading }: ReceivingContextTablePr
         accessorKey: 'sku',
         header: 'SKU',
         cell: ({ row }) => (
-          <span className="font-semibold text-[var(--g-text)]">{row.getValue('sku')}</span>
+          <span className="font-semibold text-[var(--color-text-primary)]">{row.getValue('sku')}</span>
         ),
         enableSorting: true,
       },
@@ -48,7 +48,7 @@ export function ReceivingContextTable({ data, loading }: ReceivingContextTablePr
         accessorKey: 'size',
         header: 'Size',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text-dim)]">{row.getValue('size') || '—'}</span>
+          <span className="text-[var(--color-text-secondary)]">{row.getValue('size') || '—'}</span>
         ),
         enableSorting: true,
       },
@@ -69,7 +69,7 @@ export function ReceivingContextTable({ data, loading }: ReceivingContextTablePr
         accessorKey: 'vendor',
         header: 'Vendor',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text-dim)]">{row.getValue('vendor') || '—'}</span>
+          <span className="text-[var(--color-text-secondary)]">{row.getValue('vendor') || '—'}</span>
         ),
         enableSorting: true,
       },
@@ -85,7 +85,7 @@ export function ReceivingContextTable({ data, loading }: ReceivingContextTablePr
       stickyHeader
       striped
       emptyState={{
-        icon: <Truck className="w-12 h-12 text-[var(--g-text-muted)]" />,
+        icon: <Truck className="w-12 h-12 text-[var(--color-text-muted)]" />,
         title: 'No receipts between shows',
         description: 'Receiving data will appear when stock is received',
       }}

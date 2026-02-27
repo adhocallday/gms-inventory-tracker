@@ -304,7 +304,7 @@ export function ShowProjectionGrid({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-sm text-[var(--g-text-muted)]">Loading show projections...</div>
+        <div className="text-sm text-[var(--color-text-muted)]">Loading show projections...</div>
       </div>
     );
   }
@@ -312,9 +312,9 @@ export function ShowProjectionGrid({
   if (shows.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <Package className="w-10 h-10 text-[var(--g-text-muted)] mb-3" />
-        <p className="text-sm text-[var(--g-text-muted)]">No shows found for this tour</p>
-        <p className="text-xs text-[var(--g-text-muted)] mt-1">
+        <Package className="w-10 h-10 text-[var(--color-text-muted)] mb-3" />
+        <p className="text-sm text-[var(--color-text-muted)]">No shows found for this tour</p>
+        <p className="text-xs text-[var(--color-text-muted)] mt-1">
           Add shows to start creating projections
         </p>
       </div>
@@ -325,7 +325,7 @@ export function ShowProjectionGrid({
     <div className="overflow-hidden">
       {/* Navigation */}
       <div className="flex items-center justify-between mb-4">
-        <div className="text-sm text-[var(--g-text-muted)]">
+        <div className="text-sm text-[var(--color-text-muted)]">
           Showing shows {visibleStartIndex + 1}-
           {Math.min(visibleStartIndex + VISIBLE_SHOWS, shows.length)} of {shows.length}
         </div>
@@ -333,7 +333,7 @@ export function ShowProjectionGrid({
           <button
             onClick={() => setVisibleStartIndex((prev) => Math.max(0, prev - VISIBLE_SHOWS))}
             disabled={!canScrollLeft}
-            className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 rounded-lg border border-[var(--color-bg-border)] hover:bg-[var(--color-bg-elevated)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -344,7 +344,7 @@ export function ShowProjectionGrid({
               )
             }
             disabled={!canScrollRight}
-            className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 rounded-lg border border-[var(--color-bg-border)] hover:bg-[var(--color-bg-elevated)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -355,15 +355,15 @@ export function ShowProjectionGrid({
       <div className="overflow-x-auto">
         <table className="w-full text-sm border-collapse">
           <thead>
-            <tr className="border-b border-slate-200">
+            <tr className="border-b border-[var(--color-bg-border)]">
               {/* Frozen columns */}
-              <th className="sticky left-0 z-20 bg-white py-2 px-3 text-left font-medium min-w-[120px]">
+              <th className="sticky left-0 z-20 bg-[var(--color-bg-surface)] py-2 px-3 text-left font-medium min-w-[120px]">
                 SKU
               </th>
-              <th className="sticky left-[120px] z-20 bg-white py-2 px-3 text-left font-medium min-w-[60px]">
+              <th className="sticky left-[120px] z-20 bg-[var(--color-bg-surface)] py-2 px-3 text-left font-medium min-w-[60px]">
                 Size
               </th>
-              <th className="sticky left-[180px] z-20 bg-white py-2 px-3 text-right font-medium min-w-[80px] border-r border-slate-300">
+              <th className="sticky left-[180px] z-20 bg-[var(--color-bg-surface)] py-2 px-3 text-right font-medium min-w-[80px] border-r border-[var(--color-bg-border)]">
                 Initial
               </th>
               {/* Show columns */}
@@ -371,11 +371,11 @@ export function ShowProjectionGrid({
                 <th
                   key={show.id}
                   className={`py-2 px-2 text-center font-medium min-w-[100px] ${
-                    idx < visibleShows.length - 1 ? 'border-r border-slate-100' : ''
+                    idx < visibleShows.length - 1 ? 'border-r border-[var(--color-bg-border)]' : ''
                   }`}
                 >
                   <div className="text-xs font-semibold">{formatDate(show.show_date)}</div>
-                  <div className="text-[10px] text-[var(--g-text-muted)] truncate max-w-[90px]">
+                  <div className="text-[10px] text-[var(--color-text-muted)] truncate max-w-[90px]">
                     {show.city || show.venue_name || 'TBD'}
                   </div>
                 </th>
@@ -397,25 +397,25 @@ export function ShowProjectionGrid({
               return (
                 <tr
                   key={row.key}
-                  className={`border-b border-slate-100 hover:bg-slate-50 ${
-                    isFirstOfSku ? 'border-t border-slate-200' : ''
+                  className={`border-b border-[var(--color-bg-border)] hover:bg-[var(--color-bg-elevated)] ${
+                    isFirstOfSku ? 'border-t border-[var(--color-bg-border)]' : ''
                   }`}
                 >
                   {/* Frozen columns */}
-                  <td className="sticky left-0 z-10 bg-white py-2 px-3">
+                  <td className="sticky left-0 z-10 bg-[var(--color-bg-surface)] py-2 px-3">
                     {isFirstOfSku ? (
                       <div>
                         <div className="font-mono text-xs font-medium">{row.sku}</div>
-                        <div className="text-[10px] text-[var(--g-text-muted)] truncate max-w-[110px]">
+                        <div className="text-[10px] text-[var(--color-text-muted)] truncate max-w-[110px]">
                           {row.description}
                         </div>
                       </div>
                     ) : null}
                   </td>
-                  <td className="sticky left-[120px] z-10 bg-white py-2 px-3 text-xs">
+                  <td className="sticky left-[120px] z-10 bg-[var(--color-bg-surface)] py-2 px-3 text-xs">
                     {row.size || 'OS'}
                   </td>
-                  <td className="sticky left-[180px] z-10 bg-white py-2 px-3 text-right font-mono text-xs border-r border-slate-300">
+                  <td className="sticky left-[180px] z-10 bg-[var(--color-bg-surface)] py-2 px-3 text-right font-mono text-xs border-r border-[var(--color-bg-border)]">
                     {initialQty}
                   </td>
 
@@ -450,7 +450,7 @@ export function ShowProjectionGrid({
                       <td
                         key={show.id}
                         className={`py-1 px-1 ${
-                          idx < visibleShows.length - 1 ? 'border-r border-slate-100' : ''
+                          idx < visibleShows.length - 1 ? 'border-r border-[var(--color-bg-border)]' : ''
                         }`}
                       >
                         <div className="flex flex-col gap-0.5">
@@ -463,7 +463,7 @@ export function ShowProjectionGrid({
                                 onChange={(e) => setEditValue(e.target.value)}
                                 onBlur={handleCellBlur}
                                 onKeyDown={handleKeyDown}
-                                className="w-14 px-1 py-0.5 text-center text-xs border border-[var(--g-accent)] rounded focus:outline-none focus:ring-1 focus:ring-[var(--g-accent)]"
+                                className="w-14 px-1 py-0.5 text-center text-xs border border-[var(--color-red-primary)] rounded focus:outline-none focus:ring-1 focus:ring-[var(--color-red-primary)]"
                                 autoFocus
                               />
                             ) : (
@@ -471,7 +471,7 @@ export function ShowProjectionGrid({
                                 onClick={() =>
                                   handleCellClick(show.id, row.sku, row.size, projectedUnits)
                                 }
-                                className="w-14 px-1 py-0.5 text-center text-xs font-mono hover:bg-slate-100 rounded cursor-text"
+                                className="w-14 px-1 py-0.5 text-center text-xs font-mono hover:bg-[var(--color-bg-border)] rounded cursor-text"
                                 disabled={isSaving}
                               >
                                 {projectedUnits || '-'}
@@ -508,7 +508,7 @@ export function ShowProjectionGrid({
                                 ? 'text-red-600 bg-red-50 rounded'
                                 : balance < 0
                                   ? 'text-orange-600'
-                                  : 'text-[var(--g-text-muted)]'
+                                  : 'text-[var(--color-text-muted)]'
                             }`}
                           >
                             {belowThreshold && (
@@ -528,7 +528,7 @@ export function ShowProjectionGrid({
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 mt-4 text-xs text-[var(--g-text-muted)]">
+      <div className="flex items-center gap-4 mt-4 text-xs text-[var(--color-text-muted)]">
         <div className="flex items-center gap-1">
           <Truck className="w-3 h-3 text-green-600" />
           <span>Delivery</span>

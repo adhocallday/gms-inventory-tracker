@@ -33,7 +33,7 @@ export function PerHeadsChartSection({ title, showSummary }: PerHeadsChartSectio
     <section className="print:page-break-inside-avoid">
       <div className="mb-6">
         <h2 className="text-3xl font-bold g-title mb-2">{title}</h2>
-        <div className="flex gap-6 text-sm text-[var(--g-text-muted)]">
+        <div className="flex gap-6 text-sm text-[var(--color-text-muted)]">
           <div>
             <span className="font-semibold">Average Per Head: </span>
             ${avgPerHead.toFixed(2)}
@@ -48,7 +48,7 @@ export function PerHeadsChartSection({ title, showSummary }: PerHeadsChartSectio
       <div className="g-card p-6">
         <ResponsiveContainer width="100%" height={400}>
           <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 100 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--g-border)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-bg-border)" />
             <XAxis
               dataKey="city"
               angle={-45}
@@ -66,10 +66,10 @@ export function PerHeadsChartSection({ title, showSummary }: PerHeadsChartSectio
                 const show = chartData.find(d => d.city === label);
                 return `${label}${show ? ` (${show.attendance.toLocaleString()} attendance)` : ''}`;
               }}
-              labelStyle={{ color: 'var(--g-text)' }}
+              labelStyle={{ color: 'var(--color-text-primary)' }}
               contentStyle={{
                 backgroundColor: 'var(--g-bg-surface)',
-                border: '1px solid var(--g-border)',
+                border: '1px solid var(--color-bg-border)',
                 borderRadius: '8px'
               }}
             />

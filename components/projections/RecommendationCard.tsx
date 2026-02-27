@@ -25,7 +25,7 @@ export function RecommendationCard({ recommendation, onAccept, onReject }: Recom
   };
 
   const config = typeConfig[recommendation.recommendation_type as keyof typeof typeConfig] ||
-    { bg: 'from-slate-50/80 to-white', border: 'border-slate-200', text: 'text-slate-700', badge: 'bg-slate-100 text-slate-700' };
+    { bg: 'from-slate-50/80 to-white', border: 'border-[var(--color-bg-border)]', text: 'text-slate-700', badge: 'bg-[var(--color-bg-border)] text-slate-700' };
 
   return (
     <div className={`bg-gradient-to-br ${config.bg} border-2 ${config.border} rounded-2xl p-5 space-y-4 shadow-sm`}>
@@ -35,22 +35,22 @@ export function RecommendationCard({ recommendation, onAccept, onReject }: Recom
             <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${config.badge}`}>
               {recommendation.recommendation_type.replace('_', ' ')}
             </span>
-            <span className="text-xs text-[var(--g-text-muted)] uppercase tracking-wide">
+            <span className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide">
               {Math.round((recommendation.confidence_score || 0) * 100)}% confidence
             </span>
           </div>
 
-          <div className="text-base font-semibold text-[var(--g-text)]">
+          <div className="text-base font-semibold text-[var(--color-text-primary)]">
             {recommendation.target_sku}
-            {recommendation.target_size && <span className="text-[var(--g-text-muted)]"> · {recommendation.target_size}</span>}
-            {recommendation.target_bucket && <span className="text-[var(--g-text-muted)]"> · {recommendation.target_bucket}</span>}
+            {recommendation.target_size && <span className="text-[var(--color-text-muted)]"> · {recommendation.target_size}</span>}
+            {recommendation.target_bucket && <span className="text-[var(--color-text-muted)]"> · {recommendation.target_bucket}</span>}
           </div>
 
-          <div className="text-3xl font-bold text-[var(--g-accent)] mt-2">
-            {recommendation.recommended_units.toLocaleString()} <span className="text-lg font-medium text-[var(--g-text-muted)]">units</span>
+          <div className="text-3xl font-bold text-[var(--color-red-primary)] mt-2">
+            {recommendation.recommended_units.toLocaleString()} <span className="text-lg font-medium text-[var(--color-text-muted)]">units</span>
           </div>
 
-          <p className="text-sm text-[var(--g-text-dim)] mt-3 leading-relaxed">
+          <p className="text-sm text-[var(--color-text-secondary)] mt-3 leading-relaxed">
             {recommendation.reasoning}
           </p>
         </div>
@@ -60,13 +60,13 @@ export function RecommendationCard({ recommendation, onAccept, onReject }: Recom
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
           <button
             onClick={onAccept}
-            className="flex-1 px-4 py-2.5 bg-[var(--g-accent)] text-white rounded-xl hover:bg-[var(--g-accent-2)] transition text-sm font-semibold shadow-md shadow-[var(--g-accent)]/20"
+            className="flex-1 px-4 py-2.5 bg-[var(--color-red-primary)] text-white rounded-xl hover:bg-[var(--color-red-hover)] transition text-sm font-semibold shadow-md shadow-[var(--color-red-primary)]/20"
           >
             Accept & Apply
           </button>
           <button
             onClick={onReject}
-            className="px-4 py-2.5 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition text-sm font-medium text-[var(--g-text)]"
+            className="px-4 py-2.5 border border-[var(--color-bg-border)] rounded-xl bg-[var(--color-bg-surface)] hover:bg-[var(--color-bg-elevated)] transition text-sm font-medium text-[var(--color-text-primary)]"
           >
             Reject
           </button>

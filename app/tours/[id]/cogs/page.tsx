@@ -76,7 +76,7 @@ export default function CogsReportPage() {
   if (loading) {
     return (
       <div className="g-container py-12">
-        <div className="text-center text-[var(--g-text-dim)]">
+        <div className="text-center text-[var(--color-text-secondary)]">
           Loading COGS data...
         </div>
       </div>
@@ -86,7 +86,7 @@ export default function CogsReportPage() {
   if (!tour || !cogsData) {
     return (
       <div className="g-container py-12">
-        <div className="text-center text-[var(--g-text-muted)]">
+        <div className="text-center text-[var(--color-text-muted)]">
           No data available
         </div>
       </div>
@@ -122,35 +122,35 @@ export default function CogsReportPage() {
         <div>
           <p className="g-kicker">COGS Report</p>
           <h1 className="text-3xl font-semibold g-title mt-2">{tour.name}</h1>
-          <p className="text-sm text-[var(--g-text-dim)]">{tour.artist}</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{tour.artist}</p>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--g-text-muted)] mb-1">Total Revenue</p>
-          <p className="text-2xl font-semibold text-[var(--g-text)]">
+          <p className="text-xs text-[var(--color-text-muted)] mb-1">Total Revenue</p>
+          <p className="text-2xl font-semibold text-[var(--color-text-primary)]">
             {formatCurrency(cogsData.totals.total_revenue)}
           </p>
         </div>
 
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--g-text-muted)] mb-1">Total COGS</p>
+          <p className="text-xs text-[var(--color-text-muted)] mb-1">Total COGS</p>
           <p className="text-2xl font-semibold text-red-300">
             {formatCurrency(cogsData.totals.total_cogs)}
           </p>
         </div>
 
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--g-text-muted)] mb-1">Gross Margin</p>
+          <p className="text-xs text-[var(--color-text-muted)] mb-1">Gross Margin</p>
           <p className="text-2xl font-semibold text-green-300">
             {formatCurrency(cogsData.totals.total_margin)}
           </p>
         </div>
 
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--g-text-muted)] mb-1">Margin %</p>
+          <p className="text-xs text-[var(--color-text-muted)] mb-1">Margin %</p>
           <p className="text-2xl font-semibold text-green-300">
             {formatPercent(cogsData.totals.margin_percentage)}
           </p>
@@ -179,7 +179,7 @@ export default function CogsReportPage() {
                     <p className="text-sm font-semibold">
                       {product.sku} - {product.size}
                     </p>
-                    <p className="text-xs text-[var(--g-text-muted)]">
+                    <p className="text-xs text-[var(--color-text-muted)]">
                       {product.description}
                     </p>
                   </div>
@@ -187,7 +187,7 @@ export default function CogsReportPage() {
                     <p className="text-sm font-semibold text-green-300">
                       {formatPercent(marginPct)}
                     </p>
-                    <p className="text-xs text-[var(--g-text-muted)]">
+                    <p className="text-xs text-[var(--color-text-muted)]">
                       {formatCurrency(product.gross_margin)}
                     </p>
                   </div>
@@ -217,7 +217,7 @@ export default function CogsReportPage() {
                     <p className="text-sm font-semibold">
                       {product.sku} - {product.size}
                     </p>
-                    <p className="text-xs text-[var(--g-text-muted)]">
+                    <p className="text-xs text-[var(--color-text-muted)]">
                       {product.description}
                     </p>
                   </div>
@@ -225,7 +225,7 @@ export default function CogsReportPage() {
                     <p className="text-sm font-semibold text-yellow-300">
                       {formatPercent(marginPct)}
                     </p>
-                    <p className="text-xs text-[var(--g-text-muted)]">
+                    <p className="text-xs text-[var(--color-text-muted)]">
                       {formatCurrency(product.gross_margin)}
                     </p>
                   </div>

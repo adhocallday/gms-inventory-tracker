@@ -71,7 +71,7 @@ export default function ReviewFormSettlement({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="g-label block mb-1">
-              Show Date <span className="text-[var(--g-accent)]">*</span>
+              Show Date <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             <input
               type="date"
@@ -84,7 +84,7 @@ export default function ReviewFormSettlement({
 
           <div>
             <label className="g-label block mb-1">
-              Venue Name <span className="text-[var(--g-accent)]">*</span>
+              Venue Name <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             <input
               type="text"
@@ -98,7 +98,7 @@ export default function ReviewFormSettlement({
 
           <div>
             <label className="g-label block mb-1">
-              Gross Sales Total <span className="text-[var(--g-accent)]">*</span>
+              Gross Sales Total <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             <input
               type="number"
@@ -114,7 +114,7 @@ export default function ReviewFormSettlement({
 
           <div>
             <label className="g-label block mb-1">
-              Sales Tax Total <span className="text-[var(--g-accent)]">*</span>
+              Sales Tax Total <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             <input
               type="number"
@@ -130,7 +130,7 @@ export default function ReviewFormSettlement({
 
           <div>
             <label className="g-label block mb-1">
-              Credit Card Fees <span className="text-[var(--g-accent)]">*</span>
+              Credit Card Fees <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             <input
               type="number"
@@ -174,7 +174,7 @@ export default function ReviewFormSettlement({
 
           <div>
             <label className="g-label block mb-1">Net Settlement Amount</label>
-            <div className="g-input bg-black/20 text-[var(--g-text-dim)] cursor-not-allowed">
+            <div className="g-input bg-black/20 text-[var(--color-text-secondary)] cursor-not-allowed">
               {formatCurrency(netSettlement)}
             </div>
           </div>
@@ -182,36 +182,36 @@ export default function ReviewFormSettlement({
       </div>
 
       <div className="g-card p-4 bg-black/20">
-        <h4 className="text-sm font-semibold text-[var(--g-text-dim)] mb-3">
+        <h4 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3">
           Settlement Calculation
         </h4>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-[var(--g-text-muted)]">Gross Sales:</span>
-            <span className="text-[var(--g-text)]">{formatCurrency(data.gross_sales_total || 0)}</span>
+            <span className="text-[var(--color-text-muted)]">Gross Sales:</span>
+            <span className="text-[var(--color-text-primary)]">{formatCurrency(data.gross_sales_total || 0)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-[var(--g-text-muted)]">- Sales Tax:</span>
+            <span className="text-[var(--color-text-muted)]">- Sales Tax:</span>
             <span className="text-red-300">-{formatCurrency(data.sales_tax_total || 0)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-[var(--g-text-muted)]">- Credit Card Fees:</span>
+            <span className="text-[var(--color-text-muted)]">- Credit Card Fees:</span>
             <span className="text-red-300">-{formatCurrency(data.credit_card_fees || 0)}</span>
           </div>
           {(data.other_fees || 0) > 0 && (
             <div className="flex justify-between">
-              <span className="text-[var(--g-text-muted)]">- Other Fees:</span>
+              <span className="text-[var(--color-text-muted)]">- Other Fees:</span>
               <span className="text-red-300">-{formatCurrency(data.other_fees || 0)}</span>
             </div>
           )}
           {(data.refunds || 0) > 0 && (
             <div className="flex justify-between">
-              <span className="text-[var(--g-text-muted)]">- Refunds:</span>
+              <span className="text-[var(--color-text-muted)]">- Refunds:</span>
               <span className="text-red-300">-{formatCurrency(data.refunds || 0)}</span>
             </div>
           )}
           <div className="border-t border-white/10 pt-2 mt-2 flex justify-between font-semibold">
-            <span className="text-[var(--g-text)]">Net Settlement:</span>
+            <span className="text-[var(--color-text-primary)]">Net Settlement:</span>
             <span className={netSettlement >= 0 ? 'text-green-300' : 'text-red-300'}>
               {formatCurrency(netSettlement)}
             </span>

@@ -57,14 +57,14 @@ export function ProductPercentageSection({ products }: ProductPercentageSectionP
         <div className="g-card p-3 shadow-lg">
           <p className="font-semibold g-title">{data.name}</p>
           {data.sku && (
-            <p className="text-xs text-[var(--g-text-muted)] font-mono">{data.sku}</p>
+            <p className="text-xs text-[var(--color-text-muted)] font-mono">{data.sku}</p>
           )}
-          <p className="text-sm text-[var(--g-text-muted)] mt-1">
+          <p className="text-sm text-[var(--color-text-muted)] mt-1">
             <span className="font-semibold">${data.value.toLocaleString()}</span>
             {' '}({data.percent.toFixed(1)}%)
           </p>
           {data.units > 0 && (
-            <p className="text-xs text-[var(--g-text-muted)]">
+            <p className="text-xs text-[var(--color-text-muted)]">
               {data.units.toLocaleString()} units
             </p>
           )}
@@ -78,7 +78,7 @@ export function ProductPercentageSection({ products }: ProductPercentageSectionP
     <section className="print:page-break-inside-avoid">
       <div className="mb-6">
         <h2 className="text-3xl font-bold g-title mb-2">Product % Breakdown</h2>
-        <div className="text-sm text-[var(--g-text-muted)]">
+        <div className="text-sm text-[var(--color-text-muted)]">
           <span className="font-semibold">Total Gross: </span>
           ${totalGross.toLocaleString()}
         </div>
@@ -113,7 +113,7 @@ export function ProductPercentageSection({ products }: ProductPercentageSectionP
           <div className="overflow-y-auto max-h-[400px]">
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-[var(--g-bg-surface)]">
-                <tr className="border-b border-[var(--g-border)]">
+                <tr className="border-b border-[var(--color-bg-border)]">
                   <th className="text-left py-2 px-2 font-semibold g-title">Product</th>
                   <th className="text-right py-2 px-2 font-semibold g-title">Gross</th>
                   <th className="text-right py-2 px-2 font-semibold g-title">%</th>
@@ -121,7 +121,7 @@ export function ProductPercentageSection({ products }: ProductPercentageSectionP
               </thead>
               <tbody>
                 {chartData.map((item, index) => (
-                  <tr key={item.sku || item.name} className="border-b border-[var(--g-border)]">
+                  <tr key={item.sku || item.name} className="border-b border-[var(--color-bg-border)]">
                     <td className="py-2 px-2">
                       <div className="flex items-center gap-2">
                         <div
@@ -131,14 +131,14 @@ export function ProductPercentageSection({ products }: ProductPercentageSectionP
                         <div>
                           <div className="font-medium">{item.name}</div>
                           {item.sku && (
-                            <div className="text-xs text-[var(--g-text-muted)] font-mono">
+                            <div className="text-xs text-[var(--color-text-muted)] font-mono">
                               {item.sku}
                             </div>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="py-2 px-2 text-right text-[var(--g-text-muted)]">
+                    <td className="py-2 px-2 text-right text-[var(--color-text-muted)]">
                       ${item.value.toLocaleString()}
                     </td>
                     <td className="py-2 px-2 text-right font-semibold">

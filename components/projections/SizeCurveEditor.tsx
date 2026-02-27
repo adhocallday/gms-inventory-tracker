@@ -158,13 +158,13 @@ export function SizeCurveEditor({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <BarChart3 className="w-4 h-4 text-[var(--g-text-muted)]" />
-          <span className="text-sm font-medium text-[var(--g-text)]">Size Distribution</span>
+          <BarChart3 className="w-4 h-4 text-[var(--color-text-muted)]" />
+          <span className="text-sm font-medium text-[var(--color-text-primary)]">Size Distribution</span>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handleReset}
-            className="flex items-center gap-1 px-2 py-1 text-xs text-[var(--g-text-muted)] hover:bg-[var(--g-bg-subtle)] rounded transition"
+            className="flex items-center gap-1 px-2 py-1 text-xs text-[var(--color-text-muted)] hover:bg-[var(--g-bg-subtle)] rounded transition"
             title="Reset to Historical"
           >
             <RotateCcw className="w-3 h-3" />
@@ -173,7 +173,7 @@ export function SizeCurveEditor({
           {aiRecommendation && (
             <button
               onClick={handleApplyAI}
-              className="flex items-center gap-1 px-2 py-1 text-xs text-[var(--g-accent)] hover:bg-[var(--g-bg-subtle)] rounded transition"
+              className="flex items-center gap-1 px-2 py-1 text-xs text-[var(--color-red-primary)] hover:bg-[var(--g-bg-subtle)] rounded transition"
               title={`Apply AI Recommendation (${(aiRecommendation.confidence * 100).toFixed(0)}% confidence)`}
             >
               <Sparkles className="w-3 h-3" />
@@ -197,16 +197,16 @@ export function SizeCurveEditor({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => toggleLock(size)}
-                  className={`p-0.5 rounded ${isLocked ? 'text-amber-500' : 'text-[var(--g-text-muted)]'} hover:bg-[var(--g-bg-subtle)]`}
+                  className={`p-0.5 rounded ${isLocked ? 'text-amber-500' : 'text-[var(--color-text-muted)]'} hover:bg-[var(--g-bg-subtle)]`}
                   title={isLocked ? 'Unlock' : 'Lock'}
                 >
                   {isLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
                 </button>
-                <span className="w-8 text-xs font-medium text-[var(--g-text-muted)]">{size}</span>
+                <span className="w-8 text-xs font-medium text-[var(--color-text-muted)]">{size}</span>
                 <div className="flex-1 h-4 relative">
                   {/* Historical (background) */}
                   <div
-                    className="absolute inset-y-0 left-0 bg-[var(--g-border)] rounded opacity-50"
+                    className="absolute inset-y-0 left-0 bg-[var(--color-bg-border)] rounded opacity-50"
                     style={{ width: `${(historical / (maxPct * 100)) * 100}%` }}
                   />
                   {/* AI recommendation (if different) */}
@@ -230,10 +230,10 @@ export function SizeCurveEditor({
                   value={current.toFixed(0)}
                   onChange={(e) => handlePercentChange(size, e.target.value)}
                   disabled={isLocked}
-                  className="w-14 px-1 py-0.5 text-xs text-right border border-[var(--g-border)] rounded bg-[var(--g-bg)] disabled:bg-[var(--g-bg-subtle)] disabled:text-[var(--g-text-muted)]"
+                  className="w-14 px-1 py-0.5 text-xs text-right border border-[var(--color-bg-border)] rounded bg-[var(--color-bg-base)] disabled:bg-[var(--g-bg-subtle)] disabled:text-[var(--color-text-muted)]"
                 />
-                <span className="text-xs text-[var(--g-text-muted)] w-4">%</span>
-                <span className="text-xs text-[var(--g-text-muted)] w-16 text-right font-mono">{units} units</span>
+                <span className="text-xs text-[var(--color-text-muted)] w-4">%</span>
+                <span className="text-xs text-[var(--color-text-muted)] w-16 text-right font-mono">{units} units</span>
               </div>
             </div>
           );
@@ -249,8 +249,8 @@ export function SizeCurveEditor({
         )}
 
         {aiRecommendation && (
-          <div className="text-xs text-[var(--g-text-muted)] bg-[var(--g-bg-subtle)] p-2 rounded">
-            <span className="font-medium text-[var(--g-accent)]">AI Insight:</span>{' '}
+          <div className="text-xs text-[var(--color-text-muted)] bg-[var(--g-bg-subtle)] p-2 rounded">
+            <span className="font-medium text-[var(--color-red-primary)]">AI Insight:</span>{' '}
             {aiRecommendation.reasoning}
           </div>
         )}
@@ -258,20 +258,20 @@ export function SizeCurveEditor({
 
       {/* Actions */}
       {isDirty && (
-        <div className="flex justify-end gap-2 pt-2 border-t border-[var(--g-border)]">
+        <div className="flex justify-end gap-2 pt-2 border-t border-[var(--color-bg-border)]">
           <button
             onClick={() => {
               setEditedCurve(currentCurve);
               setIsDirty(false);
             }}
-            className="px-3 py-1.5 text-xs text-[var(--g-text-muted)] hover:bg-[var(--g-bg-subtle)] rounded transition"
+            className="px-3 py-1.5 text-xs text-[var(--color-text-muted)] hover:bg-[var(--g-bg-subtle)] rounded transition"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={!isValid}
-            className="px-3 py-1.5 text-xs bg-[var(--g-accent)] text-white hover:bg-[var(--g-accent-2)] rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 text-xs bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Save Changes
           </button>
@@ -279,9 +279,9 @@ export function SizeCurveEditor({
       )}
 
       {/* Legend */}
-      <div className="flex items-center gap-4 text-xs text-[var(--g-text-muted)] pt-2 border-t border-[var(--g-border)]">
+      <div className="flex items-center gap-4 text-xs text-[var(--color-text-muted)] pt-2 border-t border-[var(--color-bg-border)]">
         <div className="flex items-center gap-1">
-          <div className="w-3 h-2 bg-[var(--g-border)] rounded opacity-50" />
+          <div className="w-3 h-2 bg-[var(--color-bg-border)] rounded opacity-50" />
           <span>Historical</span>
         </div>
         {aiRecommendation && (
@@ -291,7 +291,7 @@ export function SizeCurveEditor({
           </div>
         )}
         <div className="flex items-center gap-1">
-          <div className="w-3 h-2 bg-[var(--g-accent)] rounded" />
+          <div className="w-3 h-2 bg-[var(--color-red-primary)] rounded" />
           <span>Current</span>
         </div>
       </div>

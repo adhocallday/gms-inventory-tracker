@@ -27,8 +27,8 @@ export function SalesLinesTable({ data, loading }: SalesLinesTableProps) {
         header: 'SKU',
         cell: ({ row }) => (
           <div>
-            <div className="font-semibold text-[var(--g-text)]">{row.getValue('sku')}</div>
-            <div className="text-xs text-[var(--g-text-muted)]">{row.original.description}</div>
+            <div className="font-semibold text-[var(--color-text-primary)]">{row.getValue('sku')}</div>
+            <div className="text-xs text-[var(--color-text-muted)]">{row.original.description}</div>
           </div>
         ),
         enableSorting: true,
@@ -37,7 +37,7 @@ export function SalesLinesTable({ data, loading }: SalesLinesTableProps) {
         accessorKey: 'size',
         header: 'Size',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text-dim)]">{row.getValue('size') || '—'}</span>
+          <span className="text-[var(--color-text-secondary)]">{row.getValue('size') || '—'}</span>
         ),
         enableSorting: true,
       },
@@ -71,7 +71,7 @@ export function SalesLinesTable({ data, loading }: SalesLinesTableProps) {
       stickyHeader
       striped
       emptyState={{
-        icon: <ShoppingCart className="w-12 h-12 text-[var(--g-text-muted)]" />,
+        icon: <ShoppingCart className="w-12 h-12 text-[var(--color-text-muted)]" />,
         title: 'No sales recorded',
         description: 'Sales data will appear here when sales reports are uploaded',
       }}

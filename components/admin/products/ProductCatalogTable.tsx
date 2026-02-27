@@ -46,7 +46,7 @@ export function ProductCatalogTable({
         cell: ({ row }) => (
           <Link
             href={`/products/${row.original.id}`}
-            className="font-semibold text-[var(--g-text)] hover:text-[var(--g-accent)] transition"
+            className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--color-red-primary)] transition"
           >
             {row.getValue('sku')}
           </Link>
@@ -57,7 +57,7 @@ export function ProductCatalogTable({
         accessorKey: 'description',
         header: 'Description',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text-dim)]">
+          <span className="text-[var(--color-text-secondary)]">
             {row.getValue('description')}
           </span>
         ),
@@ -82,7 +82,7 @@ export function ProductCatalogTable({
         cell: ({ row }) => {
           const count = row.getValue('tour_count') as number;
           return (
-            <span className={`text-sm ${count > 0 ? 'text-[var(--g-text)]' : 'text-[var(--g-text-muted)]'}`}>
+            <span className={`text-sm ${count > 0 ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-muted)]'}`}>
               {count} {count === 1 ? 'tour' : 'tours'}
             </span>
           );
@@ -135,7 +135,7 @@ export function ProductCatalogTable({
       stickyHeader
       striped
       emptyState={{
-        icon: <Package className="w-12 h-12 text-[var(--g-text-muted)]" />,
+        icon: <Package className="w-12 h-12 text-[var(--color-text-muted)]" />,
         title: 'No products found',
         description: 'Create a new product to get started',
       }}

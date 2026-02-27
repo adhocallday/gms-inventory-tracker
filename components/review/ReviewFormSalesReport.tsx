@@ -74,7 +74,7 @@ export default function ReviewFormSalesReport({
           {/* Show Date */}
           <div>
             <label className="g-label block mb-1">
-              Show Date <span className="text-[var(--g-accent)]">*</span>
+              Show Date <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             <input
               type="date"
@@ -88,7 +88,7 @@ export default function ReviewFormSalesReport({
           {/* Venue Name */}
           <div>
             <label className="g-label block mb-1">
-              Venue Name <span className="text-[var(--g-accent)]">*</span>
+              Venue Name <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             <input
               type="text"
@@ -143,7 +143,7 @@ export default function ReviewFormSalesReport({
           {/* Per Head (Calculated) */}
           <div>
             <label className="g-label block mb-1">Per Head</label>
-            <div className="g-input bg-black/20 text-[var(--g-text-dim)] cursor-not-allowed">
+            <div className="g-input bg-black/20 text-[var(--color-text-secondary)] cursor-not-allowed">
               {formatPerHead()}
             </div>
           </div>
@@ -153,13 +153,13 @@ export default function ReviewFormSalesReport({
             <label className="g-label block mb-1">Total Gross Sales</label>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-xs text-[var(--g-text-muted)] mb-1">Calculated (Line Items)</p>
-                <div className={`g-input ${grossMismatch ? 'bg-yellow-500/10 border-yellow-500/30' : 'bg-black/20'} text-[var(--g-text-dim)] cursor-not-allowed`}>
+                <p className="text-xs text-[var(--color-text-muted)] mb-1">Calculated (Line Items)</p>
+                <div className={`g-input ${grossMismatch ? 'bg-yellow-500/10 border-yellow-500/30' : 'bg-black/20'} text-[var(--color-text-secondary)] cursor-not-allowed`}>
                   {formatCurrency(calculatedGross)}
                 </div>
               </div>
               <div>
-                <p className="text-xs text-[var(--g-text-muted)] mb-1">Reported</p>
+                <p className="text-xs text-[var(--color-text-muted)] mb-1">Reported</p>
                 <input
                   type="number"
                   step="0.01"

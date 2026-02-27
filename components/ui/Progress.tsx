@@ -5,10 +5,10 @@ import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 
-const progressVariants = cva('h-2 w-full overflow-hidden rounded-full bg-[var(--g-bg-muted)]', {
+const progressVariants = cva('h-2 w-full overflow-hidden rounded-full bg-[var(--color-bg-elevated)]', {
   variants: {
     variant: {
-      default: '[&>div]:bg-[var(--g-accent)]',
+      default: '[&>div]:bg-[var(--color-red-primary)]',
       success: '[&>div]:bg-green-600',
       warning: '[&>div]:bg-yellow-600',
       danger: '[&>div]:bg-red-600',
@@ -39,7 +39,7 @@ const Progress = React.forwardRef<
 >(({ className, value, variant, size, label, showValue, ...props }, ref) => (
   <div className="w-full space-y-1">
     {(label || showValue) && (
-      <div className="flex items-center justify-between text-sm text-[var(--g-text-muted)]">
+      <div className="flex items-center justify-between text-sm text-[var(--color-text-muted)]">
         {label && <span>{label}</span>}
         {showValue && <span>{value}%</span>}
       </div>

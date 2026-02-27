@@ -117,20 +117,20 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold g-title mb-4">Tour Schedule & Shows</h2>
-        <p className="text-sm text-[var(--g-text-dim)]">
+        <p className="text-sm text-[var(--color-text-secondary)]">
           Paste tour dates as text, upload a PDF/CSV, or add shows manually. AI will extract show dates, venues, and cities.
         </p>
       </div>
 
       {/* AI Input Mode Toggle */}
-      <div className="flex gap-2 p-1 bg-[var(--g-surface)] border border-white/10 rounded-lg w-fit">
+      <div className="flex gap-2 p-1 bg-[var(--color-bg-surface)] border border-white/10 rounded-lg w-fit">
         <button
           type="button"
           onClick={() => setInputMode('chat')}
           className={`px-4 py-2 text-sm font-medium rounded-md transition ${
             inputMode === 'chat'
-              ? 'bg-[var(--g-accent)] text-white'
-              : 'text-[var(--g-text-dim)] hover:text-[var(--g-text)]'
+              ? 'bg-[var(--color-red-primary)] text-white'
+              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
           }`}
         >
           Paste Text
@@ -140,8 +140,8 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
           onClick={() => setInputMode('upload')}
           className={`px-4 py-2 text-sm font-medium rounded-md transition ${
             inputMode === 'upload'
-              ? 'bg-[var(--g-accent)] text-white'
-              : 'text-[var(--g-text-dim)] hover:text-[var(--g-text)]'
+              ? 'bg-[var(--color-red-primary)] text-white'
+              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
           }`}
         >
           Upload File
@@ -161,33 +161,33 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
 
       {/* AI File Upload */}
       {inputMode === 'upload' && (
-        <div className="p-6 border border-white/10 rounded-lg bg-[var(--g-surface-2)]">
-          <h3 className="text-sm font-semibold text-[var(--g-text)] mb-3">
+        <div className="p-6 border border-white/10 rounded-lg bg-[var(--color-bg-elevated)]">
+          <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
             AI-Assisted File Upload
           </h3>
           <div
             {...getRootProps()}
             className={`
               border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition
-              ${isDragActive ? 'border-[var(--g-accent)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
+              ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
               ${parsing ? 'pointer-events-none opacity-50' : ''}
             `}
           >
             <input {...getInputProps()} />
             {parsing ? (
               <div className="space-y-2">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--g-accent)] mx-auto"></div>
-                <p className="text-sm text-[var(--g-text-dim)]">Parsing schedule with AI...</p>
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--color-red-primary)] mx-auto"></div>
+                <p className="text-sm text-[var(--color-text-secondary)]">Parsing schedule with AI...</p>
               </div>
             ) : (
               <div className="space-y-2">
-                <svg className="mx-auto h-10 w-10 text-[var(--g-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="mx-auto h-10 w-10 text-[var(--color-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
-                <p className="text-sm text-[var(--g-text-dim)]">
+                <p className="text-sm text-[var(--color-text-secondary)]">
                   {isDragActive ? 'Drop the file here' : 'Drag & drop tour schedule PDF/CSV, or click to select'}
                 </p>
-                <p className="text-xs text-[var(--g-text-muted)]">
+                <p className="text-xs text-[var(--color-text-muted)]">
                   Supports PDF, CSV, XLS, XLSX
                 </p>
               </div>
@@ -204,13 +204,13 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
       {/* Shows Table */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-[var(--g-text)]">
+          <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
             Shows ({shows.length})
           </h3>
           <button
             type="button"
             onClick={addManualShow}
-            className="px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 text-white rounded-lg transition font-medium"
+            className="px-3 py-1.5 text-xs bg-[var(--color-bg-surface)]/10 hover:bg-[var(--color-bg-surface)]/20 text-white rounded-lg transition font-medium"
           >
             + Add Show Manually
           </button>
@@ -220,20 +220,20 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
           <div className="border border-white/10 rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-white/5">
+                <thead className="bg-[var(--color-bg-surface)]/5">
                   <tr>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">Date</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">Venue</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">City</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">State</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">Country</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">Capacity</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Date</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Venue</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">City</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">State</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Country</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Capacity</th>
                     <th className="px-4 py-3"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
                   {shows.map((show, index) => (
-                    <tr key={index} className="hover:bg-white/5">
+                    <tr key={index} className="hover:bg-[var(--color-bg-surface)]/5">
                       <td className="px-4 py-2">
                         <input
                           type="date"
@@ -307,7 +307,7 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
           </div>
         ) : (
           <div className="border border-white/10 rounded-lg p-8 text-center">
-            <p className="text-sm text-[var(--g-text-muted)]">
+            <p className="text-sm text-[var(--color-text-muted)]">
               No shows added yet. Upload a schedule or add shows manually.
             </p>
           </div>
@@ -319,13 +319,13 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
         <button
           type="button"
           onClick={onPrev}
-          className="px-6 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition text-[var(--g-text)]"
+          className="px-6 py-2 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)]"
         >
           ← Previous
         </button>
         <button
           type="submit"
-          className="px-6 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold"
+          className="px-6 py-2 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold"
         >
           Next: Add Products →
         </button>

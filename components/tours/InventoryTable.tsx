@@ -34,10 +34,10 @@ export function InventoryTable({ data, loading }: InventoryTableProps) {
         header: 'SKU',
         cell: ({ row }) => (
           <div>
-            <div className="font-semibold text-[var(--g-text)]">
+            <div className="font-semibold text-[var(--color-text-primary)]">
               {row.original.sku || 'SKU'}
             </div>
-            <div className="text-xs text-[var(--g-text-muted)] mt-0.5">
+            <div className="text-xs text-[var(--color-text-muted)] mt-0.5">
               {row.original.description || 'Description pending'}
             </div>
           </div>
@@ -52,7 +52,7 @@ export function InventoryTable({ data, loading }: InventoryTableProps) {
       {
         accessorKey: 'size',
         header: 'Size',
-        cell: ({ row }) => row.getValue('size') || <span className="text-[var(--g-text-muted)]">—</span>,
+        cell: ({ row }) => row.getValue('size') || <span className="text-[var(--color-text-muted)]">—</span>,
         enableSorting: true,
       },
       {
@@ -102,7 +102,7 @@ export function InventoryTable({ data, loading }: InventoryTableProps) {
           const cost = row.getValue('unit_cost') as number;
           return (
             <div className="text-right">
-              {cost ? <NumericCell value={cost} format="currency" /> : <span className="text-[var(--g-text-muted)]">—</span>}
+              {cost ? <NumericCell value={cost} format="currency" /> : <span className="text-[var(--color-text-muted)]">—</span>}
             </div>
           );
         },
@@ -115,7 +115,7 @@ export function InventoryTable({ data, loading }: InventoryTableProps) {
           const value = row.getValue('inventory_value') as number;
           return (
             <div className="text-right">
-              {value ? <NumericCell value={value} format="currency" /> : <span className="text-[var(--g-text-muted)]">—</span>}
+              {value ? <NumericCell value={value} format="currency" /> : <span className="text-[var(--color-text-muted)]">—</span>}
             </div>
           );
         },
@@ -133,7 +133,7 @@ export function InventoryTable({ data, loading }: InventoryTableProps) {
       stickyHeader
       striped
       emptyState={{
-        icon: <Package className="w-12 h-12 text-[var(--g-text-muted)]" />,
+        icon: <Package className="w-12 h-12 text-[var(--color-text-muted)]" />,
         title: 'No inventory data yet',
         description: 'Upload packing lists and sales reports to track inventory',
       }}

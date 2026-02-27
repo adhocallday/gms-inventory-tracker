@@ -208,7 +208,7 @@ export default function ReviewDocumentPage({
   if (loading) {
     return (
       <div className="g-container py-12">
-        <div className="text-center text-[var(--g-text-dim)]">
+        <div className="text-center text-[var(--color-text-secondary)]">
           Loading document...
         </div>
       </div>
@@ -310,7 +310,7 @@ export default function ReviewDocumentPage({
       {/* Actions */}
       {!isPosted && !isRejected && (
         <div className="flex items-center justify-between pt-6 border-t border-white/10">
-          <div className="text-sm text-[var(--g-text-dim)]">{statusMessage}</div>
+          <div className="text-sm text-[var(--color-text-secondary)]">{statusMessage}</div>
           <div className="flex gap-3">
             <button
               type="button"

@@ -187,20 +187,20 @@ export function CopyFromTourModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col">
+      <div className="bg-[var(--color-bg-surface)] rounded-xl shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-200">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--color-bg-border)]">
           <div className="flex items-center gap-2">
-            <Copy className="w-5 h-5 text-[var(--g-accent)]" />
+            <Copy className="w-5 h-5 text-[var(--color-red-primary)]" />
             <h2 className="font-semibold">Copy Projections from Another Tour</h2>
           </div>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100">
+          <button onClick={onClose} className="p-1 rounded-lg hover:bg-[var(--color-bg-border)]">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Steps indicator */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100 bg-slate-50">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)]">
           {[
             { key: 'select-tour', label: 'Select Tour' },
             { key: 'configure', label: 'Configure' },
@@ -211,11 +211,11 @@ export function CopyFromTourModal({
               <div
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-sm ${
                   step === s.key
-                    ? 'bg-[var(--g-accent)] text-white'
-                    : 'bg-slate-200 text-slate-600'
+                    ? 'bg-[var(--color-red-primary)] text-white'
+                    : 'bg-[var(--color-bg-border)] text-slate-600'
                 }`}
               >
-                <span className="w-5 h-5 flex items-center justify-center rounded-full bg-white/20 text-xs">
+                <span className="w-5 h-5 flex items-center justify-center rounded-full bg-[var(--color-bg-surface)]/20 text-xs">
                   {idx + 1}
                 </span>
                 {s.label}
@@ -236,7 +236,7 @@ export function CopyFromTourModal({
                   placeholder="Search tours..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
                 />
               </div>
 
@@ -247,23 +247,23 @@ export function CopyFromTourModal({
                     onClick={() => setSelectedTourId(tour.id)}
                     className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition ${
                       selectedTourId === tour.id
-                        ? 'border-[var(--g-accent)] bg-[var(--g-accent)]/5'
-                        : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                        ? 'border-[var(--color-red-primary)] bg-[var(--color-red-primary)]/5'
+                        : 'border-[var(--color-bg-border)] hover:border-[var(--color-bg-border)] hover:bg-[var(--color-bg-elevated)]'
                     }`}
                   >
                     <div>
                       <div className="font-medium">{tour.name}</div>
                       {tour.artist && (
-                        <div className="text-sm text-[var(--g-text-muted)]">{tour.artist}</div>
+                        <div className="text-sm text-[var(--color-text-muted)]">{tour.artist}</div>
                       )}
                     </div>
                     {selectedTourId === tour.id && (
-                      <Check className="w-5 h-5 text-[var(--g-accent)]" />
+                      <Check className="w-5 h-5 text-[var(--color-red-primary)]" />
                     )}
                   </button>
                 ))}
                 {filteredTours.length === 0 && (
-                  <div className="text-center py-8 text-[var(--g-text-muted)]">
+                  <div className="text-center py-8 text-[var(--color-text-muted)]">
                     No tours found
                   </div>
                 )}
@@ -274,8 +274,8 @@ export function CopyFromTourModal({
           {/* Step 2: Configure */}
           {step === 'configure' && selectedTour && (
             <div className="space-y-6">
-              <div className="bg-slate-50 rounded-lg p-4">
-                <div className="text-sm text-[var(--g-text-muted)]">Copying from</div>
+              <div className="bg-[var(--color-bg-elevated)] rounded-lg p-4">
+                <div className="text-sm text-[var(--color-text-muted)]">Copying from</div>
                 <div className="font-semibold">{selectedTour.name}</div>
               </div>
 
@@ -285,7 +285,7 @@ export function CopyFromTourModal({
                 <select
                   value={selectedScenarioId || ''}
                   onChange={(e) => setSelectedScenarioId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
                 >
                   <option value="">Select a scenario...</option>
                   {scenarios.map((scenario) => (
@@ -322,8 +322,8 @@ export function CopyFromTourModal({
                       key={option.value}
                       className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition ${
                         matchMode === option.value
-                          ? 'border-[var(--g-accent)] bg-[var(--g-accent)]/5'
-                          : 'border-slate-200 hover:border-slate-300'
+                          ? 'border-[var(--color-red-primary)] bg-[var(--color-red-primary)]/5'
+                          : 'border-[var(--color-bg-border)] hover:border-[var(--color-bg-border)]'
                       }`}
                     >
                       <input
@@ -336,7 +336,7 @@ export function CopyFromTourModal({
                       />
                       <div>
                         <div className="font-medium">{option.label}</div>
-                        <div className="text-sm text-[var(--g-text-muted)]">
+                        <div className="text-sm text-[var(--color-text-muted)]">
                           {option.description}
                         </div>
                       </div>
@@ -352,11 +352,11 @@ export function CopyFromTourModal({
                     type="checkbox"
                     checked={scaleByAttendance}
                     onChange={(e) => setScaleByAttendance(e.target.checked)}
-                    className="w-4 h-4 rounded border-slate-300"
+                    className="w-4 h-4 rounded border-[var(--color-bg-border)]"
                   />
                   <div>
                     <div className="font-medium">Scale by attendance</div>
-                    <div className="text-sm text-[var(--g-text-muted)]">
+                    <div className="text-sm text-[var(--color-text-muted)]">
                       Adjust projections based on venue capacity differences
                     </div>
                   </div>
@@ -367,11 +367,11 @@ export function CopyFromTourModal({
                     type="checkbox"
                     checked={includeInitialInventory}
                     onChange={(e) => setIncludeInitialInventory(e.target.checked)}
-                    className="w-4 h-4 rounded border-slate-300"
+                    className="w-4 h-4 rounded border-[var(--color-bg-border)]"
                   />
                   <div>
                     <div className="font-medium">Copy initial inventory</div>
-                    <div className="text-sm text-[var(--g-text-muted)]">
+                    <div className="text-sm text-[var(--color-text-muted)]">
                       Also copy the starting inventory quantities
                     </div>
                   </div>
@@ -385,23 +385,23 @@ export function CopyFromTourModal({
             <div className="space-y-4">
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="text-sm text-[var(--g-text-muted)]">Loading preview...</div>
+                  <div className="text-sm text-[var(--color-text-muted)]">Loading preview...</div>
                 </div>
               ) : (
                 <>
                   {previewSummary && (
                     <div className="grid grid-cols-4 gap-3">
-                      <div className="bg-slate-50 rounded-lg p-3 text-center">
+                      <div className="bg-[var(--color-bg-elevated)] rounded-lg p-3 text-center">
                         <div className="text-2xl font-semibold">
                           {previewSummary.totalSourceShows}
                         </div>
-                        <div className="text-xs text-[var(--g-text-muted)]">Source Shows</div>
+                        <div className="text-xs text-[var(--color-text-muted)]">Source Shows</div>
                       </div>
-                      <div className="bg-slate-50 rounded-lg p-3 text-center">
+                      <div className="bg-[var(--color-bg-elevated)] rounded-lg p-3 text-center">
                         <div className="text-2xl font-semibold">
                           {previewSummary.totalTargetShows}
                         </div>
-                        <div className="text-xs text-[var(--g-text-muted)]">Target Shows</div>
+                        <div className="text-xs text-[var(--color-text-muted)]">Target Shows</div>
                       </div>
                       <div className="bg-green-50 rounded-lg p-3 text-center">
                         <div className="text-2xl font-semibold text-green-700">
@@ -418,9 +418,9 @@ export function CopyFromTourModal({
                     </div>
                   )}
 
-                  <div className="max-h-[300px] overflow-y-auto border border-slate-200 rounded-lg">
+                  <div className="max-h-[300px] overflow-y-auto border border-[var(--color-bg-border)] rounded-lg">
                     <table className="w-full text-sm">
-                      <thead className="bg-slate-50 sticky top-0">
+                      <thead className="bg-[var(--color-bg-elevated)] sticky top-0">
                         <tr>
                           <th className="text-left py-2 px-3 font-medium">Target Show</th>
                           <th className="text-left py-2 px-3 font-medium">Matched Source</th>
@@ -429,12 +429,12 @@ export function CopyFromTourModal({
                       </thead>
                       <tbody>
                         {preview.map((match, idx) => (
-                          <tr key={idx} className="border-t border-slate-100">
+                          <tr key={idx} className="border-t border-[var(--color-bg-border)]">
                             <td className="py-2 px-3">
                               <div className="font-medium">
                                 {formatDate(match.targetShow.show_date)}
                               </div>
-                              <div className="text-xs text-[var(--g-text-muted)]">
+                              <div className="text-xs text-[var(--color-text-muted)]">
                                 {match.targetShow.city || match.targetShow.venue_name || 'TBD'}
                               </div>
                             </td>
@@ -444,14 +444,14 @@ export function CopyFromTourModal({
                                   <div className="font-medium">
                                     {formatDate(match.matchedSourceShow.show_date)}
                                   </div>
-                                  <div className="text-xs text-[var(--g-text-muted)]">
+                                  <div className="text-xs text-[var(--color-text-muted)]">
                                     {match.matchedSourceShow.city ||
                                       match.matchedSourceShow.venue_name ||
                                       'TBD'}
                                   </div>
                                 </>
                               ) : (
-                                <span className="text-[var(--g-text-muted)]">No match</span>
+                                <span className="text-[var(--color-text-muted)]">No match</span>
                               )}
                             </td>
                             <td className="py-2 px-3 text-center">
@@ -479,14 +479,14 @@ export function CopyFromTourModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-between p-4 border-t border-slate-200">
+        <div className="flex justify-between p-4 border-t border-[var(--color-bg-border)]">
           <button
             onClick={() => {
               if (step === 'configure') setStep('select-tour');
               else if (step === 'preview') setStep('configure');
               else onClose();
             }}
-            className="px-4 py-2 text-sm rounded-lg border border-slate-200 hover:bg-slate-50"
+            className="px-4 py-2 text-sm rounded-lg border border-[var(--color-bg-border)] hover:bg-[var(--color-bg-elevated)]"
           >
             {step === 'select-tour' ? 'Cancel' : 'Back'}
           </button>
@@ -495,7 +495,7 @@ export function CopyFromTourModal({
             <button
               onClick={() => setStep('configure')}
               disabled={!selectedTourId}
-              className="px-4 py-2 text-sm rounded-lg bg-[var(--g-accent)] text-white hover:bg-[var(--g-accent-2)] disabled:opacity-50"
+              className="px-4 py-2 text-sm rounded-lg bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] disabled:opacity-50"
             >
               Next
             </button>
@@ -505,7 +505,7 @@ export function CopyFromTourModal({
             <button
               onClick={() => setStep('preview')}
               disabled={!selectedScenarioId}
-              className="px-4 py-2 text-sm rounded-lg bg-[var(--g-accent)] text-white hover:bg-[var(--g-accent-2)] disabled:opacity-50"
+              className="px-4 py-2 text-sm rounded-lg bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] disabled:opacity-50"
             >
               Preview
             </button>
@@ -515,7 +515,7 @@ export function CopyFromTourModal({
             <button
               onClick={handleCopy}
               disabled={isCopying || isLoading}
-              className="px-4 py-2 text-sm rounded-lg bg-[var(--g-accent)] text-white hover:bg-[var(--g-accent-2)] disabled:opacity-50"
+              className="px-4 py-2 text-sm rounded-lg bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] disabled:opacity-50"
             >
               {isCopying ? 'Copying...' : 'Copy Projections'}
             </button>

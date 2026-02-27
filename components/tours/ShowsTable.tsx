@@ -52,7 +52,7 @@ export default function ShowsTable({ tourId, shows }: ShowsTableProps) {
       {
         accessorKey: 'venue_name',
         header: 'Venue',
-        cell: ({ row }) => row.getValue('venue_name') || <span className="text-[var(--g-text-muted)]">TBD</span>,
+        cell: ({ row }) => row.getValue('venue_name') || <span className="text-[var(--color-text-muted)]">TBD</span>,
         enableSorting: true,
       },
       {
@@ -61,7 +61,7 @@ export default function ShowsTable({ tourId, shows }: ShowsTableProps) {
         cell: ({ row }) => {
           const city = row.original.city;
           const state = row.original.state;
-          if (!city) return <span className="text-[var(--g-text-muted)]">—</span>;
+          if (!city) return <span className="text-[var(--color-text-muted)]">—</span>;
           return (
             <span>
               {city}
@@ -122,7 +122,7 @@ export default function ShowsTable({ tourId, shows }: ShowsTableProps) {
         stickyHeader
         striped
         emptyState={{
-          icon: <Calendar className="w-12 h-12 text-[var(--g-text-muted)]" />,
+          icon: <Calendar className="w-12 h-12 text-[var(--color-text-muted)]" />,
           title: 'No shows yet',
           description: 'Upload a sales report to add shows to this tour',
         }}

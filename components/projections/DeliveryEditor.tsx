@@ -70,16 +70,16 @@ export function DeliveryEditor({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
+      <div className="bg-[var(--color-bg-surface)] rounded-xl shadow-xl w-full max-w-md mx-4">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-200">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--color-bg-border)]">
           <div className="flex items-center gap-2">
-            <Truck className="w-5 h-5 text-[var(--g-accent)]" />
+            <Truck className="w-5 h-5 text-[var(--color-red-primary)]" />
             <h2 className="font-semibold">Add Delivery/Adjustment</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-slate-100"
+            className="p-1 rounded-lg hover:bg-[var(--color-bg-border)]"
           >
             <X className="w-5 h-5" />
           </button>
@@ -88,17 +88,17 @@ export function DeliveryEditor({
         {/* Content */}
         <div className="p-4 space-y-4">
           {/* Show info */}
-          <div className="bg-slate-50 rounded-lg p-3">
+          <div className="bg-[var(--color-bg-elevated)] rounded-lg p-3">
             <div className="text-sm font-medium">{showInfo.venue || 'TBD'}</div>
-            <div className="text-xs text-[var(--g-text-muted)]">
+            <div className="text-xs text-[var(--color-text-muted)]">
               {showInfo.city} · {showInfo.date}
             </div>
           </div>
 
           {/* Product info */}
-          <div className="bg-slate-50 rounded-lg p-3">
+          <div className="bg-[var(--color-bg-elevated)] rounded-lg p-3">
             <div className="text-sm font-medium font-mono">{sku}</div>
-            {size && <div className="text-xs text-[var(--g-text-muted)]">Size: {size}</div>}
+            {size && <div className="text-xs text-[var(--color-text-muted)]">Size: {size}</div>}
           </div>
 
           {/* Type selection */}
@@ -117,8 +117,8 @@ export function DeliveryEditor({
                     onClick={() => setDeliveryType(option.value as DeliveryType)}
                     className={`flex-1 flex items-center justify-center gap-1 py-2 px-3 rounded-lg border text-sm ${
                       deliveryType === option.value
-                        ? 'border-[var(--g-accent)] bg-[var(--g-accent)]/10 text-[var(--g-accent)]'
-                        : 'border-slate-200 hover:border-slate-300'
+                        ? 'border-[var(--color-red-primary)] bg-[var(--color-red-primary)]/10 text-[var(--color-red-primary)]'
+                        : 'border-[var(--color-bg-border)] hover:border-[var(--color-bg-border)]'
                     }`}
                   >
                     {Icon && <Icon className="w-4 h-4" />}
@@ -136,11 +136,11 @@ export function DeliveryEditor({
               type="number"
               value={quantity}
               onChange={(e) => setQuantity(parseInt(e.target.value, 10) || 0)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
+              className="w-full px-3 py-2 border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
               placeholder="Enter quantity"
               min="0"
             />
-            <p className="text-xs text-[var(--g-text-muted)] mt-1">
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">
               {deliveryType === 'delivery' && 'Units being received at this show'}
               {deliveryType === 'return' && 'Units being sent back/returned'}
               {deliveryType === 'adjustment' && 'Positive = add stock, Negative = remove stock'}
@@ -153,7 +153,7 @@ export function DeliveryEditor({
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent resize-none"
               rows={2}
               placeholder="PO number, vendor, reason for adjustment..."
             />
@@ -161,17 +161,17 @@ export function DeliveryEditor({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-2 p-4 border-t border-slate-200">
+        <div className="flex justify-end gap-2 p-4 border-t border-[var(--color-bg-border)]">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm rounded-lg border border-slate-200 hover:bg-slate-50"
+            className="px-4 py-2 text-sm rounded-lg border border-[var(--color-bg-border)] hover:bg-[var(--color-bg-elevated)]"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={isSaving || quantity === 0}
-            className="px-4 py-2 text-sm rounded-lg bg-[var(--g-accent)] text-white hover:bg-[var(--g-accent-2)] disabled:opacity-50"
+            className="px-4 py-2 text-sm rounded-lg bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] disabled:opacity-50"
           >
             {isSaving ? 'Saving...' : 'Save'}
           </button>

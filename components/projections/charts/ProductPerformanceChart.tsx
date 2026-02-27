@@ -37,7 +37,7 @@ export function ProductPerformanceChart({ products, historicalData }: ProductPer
             <div className="text-xs font-medium mb-1">{p.sku}</div>
             <div className="flex gap-2">
               <div className="flex-1">
-                <div className="text-xs text-[var(--g-text-muted)] mb-1">
+                <div className="text-xs text-[var(--color-text-muted)] mb-1">
                   Historical: {p.historicalUnits.toLocaleString()}
                 </div>
                 <div className="h-4 bg-blue-500/20 rounded-full overflow-hidden">
@@ -48,7 +48,7 @@ export function ProductPerformanceChart({ products, historicalData }: ProductPer
                 </div>
               </div>
               <div className="flex-1">
-                <div className="text-xs text-[var(--g-text-muted)] mb-1">
+                <div className="text-xs text-[var(--color-text-muted)] mb-1">
                   Forecast: {p.forecastUnits.toLocaleString()}
                 </div>
                 <div className="h-4 bg-green-500/20 rounded-full overflow-hidden">

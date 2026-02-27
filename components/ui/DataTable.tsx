@@ -62,7 +62,7 @@ export function DataTable<TData, TValue>({
       <div className="g-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-[var(--g-surface-2)] border-b border-[var(--g-border)]">
+            <thead className="bg-[var(--color-bg-elevated)] border-b border-[var(--color-bg-border)]">
               <tr>
                 {columns.map((_, index) => (
                   <th key={index} className="px-4 py-3 text-left">
@@ -73,7 +73,7 @@ export function DataTable<TData, TValue>({
             </thead>
             <tbody>
               {[...Array(5)].map((_, rowIndex) => (
-                <tr key={rowIndex} className="border-b border-[var(--g-border)]">
+                <tr key={rowIndex} className="border-b border-[var(--color-bg-border)]">
                   {columns.map((_, colIndex) => (
                     <td key={colIndex} className="px-4 py-4">
                       <Skeleton className="h-4 w-full" />
@@ -107,7 +107,7 @@ export function DataTable<TData, TValue>({
         <table className="w-full">
           <thead
             className={cn(
-              'bg-[var(--g-surface-2)] border-b border-[var(--g-border)]',
+              'bg-[var(--color-bg-elevated)] border-b border-[var(--color-bg-border)]',
               stickyHeader && 'sticky top-0 z-10 shadow-sm'
             )}
           >
@@ -121,9 +121,9 @@ export function DataTable<TData, TValue>({
                     <th
                       key={header.id}
                       className={cn(
-                        'px-4 text-left text-xs font-semibold uppercase tracking-wider text-[var(--g-text-muted)]',
+                        'px-4 text-left text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]',
                         compact ? 'py-2' : 'py-3',
-                        canSort && 'cursor-pointer select-none hover:text-[var(--g-text)]'
+                        canSort && 'cursor-pointer select-none hover:text-[var(--color-text-primary)]'
                       )}
                       onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
                     >
@@ -134,7 +134,7 @@ export function DataTable<TData, TValue>({
                             header.getContext()
                           )}
                           {canSort && (
-                            <span className="text-[var(--g-text-muted)]">
+                            <span className="text-[var(--color-text-muted)]">
                               {sorted === 'asc' ? (
                                 <ArrowUp className="w-3 h-3" />
                               ) : sorted === 'desc' ? (
@@ -157,9 +157,9 @@ export function DataTable<TData, TValue>({
               <tr
                 key={row.id}
                 className={cn(
-                  'border-b border-[var(--g-border)] transition-colors',
-                  striped && index % 2 === 1 && 'bg-[var(--g-bg-muted)]',
-                  onRowClick && 'cursor-pointer hover:bg-[var(--g-surface-2)]'
+                  'border-b border-[var(--color-bg-border)] transition-colors',
+                  striped && index % 2 === 1 && 'bg-[var(--color-bg-elevated)]',
+                  onRowClick && 'cursor-pointer hover:bg-[var(--color-bg-elevated)]'
                 )}
                 onClick={() => onRowClick?.(row.original)}
               >
@@ -167,7 +167,7 @@ export function DataTable<TData, TValue>({
                   <td
                     key={cell.id}
                     className={cn(
-                      'px-4 text-[var(--g-text-dim)]',
+                      'px-4 text-[var(--color-text-secondary)]',
                       compact ? 'py-3' : 'py-4'
                     )}
                   >
@@ -186,7 +186,7 @@ export function DataTable<TData, TValue>({
 // Helper component for numeric columns
 export function NumericCell({ value, format = 'number' }: { value: number | null | undefined; format?: 'number' | 'currency' | 'percentage' }) {
   if (value === null || value === undefined) {
-    return <span className="text-[var(--g-text-muted)]">—</span>;
+    return <span className="text-[var(--color-text-muted)]">—</span>;
   }
 
   let formatted = value.toString();
@@ -210,7 +210,7 @@ export function NumericCell({ value, format = 'number' }: { value: number | null
 // Helper for date columns
 export function DateCell({ value }: { value: string | Date | null | undefined }) {
   if (!value) {
-    return <span className="text-[var(--g-text-muted)]">—</span>;
+    return <span className="text-[var(--color-text-muted)]">—</span>;
   }
 
   const date = typeof value === 'string' ? new Date(value) : value;

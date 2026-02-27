@@ -27,7 +27,7 @@ const typeConfig = {
     icon: Info,
     iconColor: 'text-blue-600',
     textColor: 'text-blue-800',
-    iconBg: 'bg-white shadow-inner',
+    iconBg: 'bg-[var(--color-bg-surface)] shadow-inner',
   },
   success: {
     border: 'border-emerald-200',
@@ -35,7 +35,7 @@ const typeConfig = {
     icon: CheckCircle,
     iconColor: 'text-emerald-600',
     textColor: 'text-emerald-800',
-    iconBg: 'bg-white shadow-inner',
+    iconBg: 'bg-[var(--color-bg-surface)] shadow-inner',
   },
   warning: {
     border: 'border-amber-200',
@@ -43,7 +43,7 @@ const typeConfig = {
     icon: AlertTriangle,
     iconColor: 'text-amber-600',
     textColor: 'text-amber-800',
-    iconBg: 'bg-white shadow-inner',
+    iconBg: 'bg-[var(--color-bg-surface)] shadow-inner',
   },
   error: {
     border: 'border-red-200',
@@ -51,7 +51,7 @@ const typeConfig = {
     icon: AlertCircle,
     iconColor: 'text-red-600',
     textColor: 'text-red-800',
-    iconBg: 'bg-white shadow-inner',
+    iconBg: 'bg-[var(--color-bg-surface)] shadow-inner',
   },
 };
 
@@ -85,13 +85,13 @@ export function InsightCard({
           {title}
         </h3>
       </div>
-      <p className="text-sm text-[var(--g-text-dim)] leading-relaxed">
+      <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
         {description}
       </p>
       {action && (
         <button
           onClick={action.onClick}
-          className="text-sm font-semibold text-[var(--g-accent)] underline-offset-2 hover:underline transition"
+          className="text-sm font-semibold text-[var(--color-red-primary)] underline-offset-2 hover:underline transition"
         >
           {action.label} →
         </button>
@@ -99,7 +99,7 @@ export function InsightCard({
       {linkText && linkHref && (
         <Link
           href={linkHref}
-          className="text-sm font-semibold text-[var(--g-accent)] underline-offset-2 hover:underline transition"
+          className="text-sm font-semibold text-[var(--color-red-primary)] underline-offset-2 hover:underline transition"
         >
           {linkText} →
         </Link>

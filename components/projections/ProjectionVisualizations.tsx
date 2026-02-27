@@ -82,7 +82,7 @@ export function ProjectionVisualizations({
 
   if (!projectionData || projectionData.length === 0) {
     return (
-      <div className="g-card p-8 text-center text-[var(--g-text-muted)]">
+      <div className="g-card p-8 text-center text-[var(--color-text-muted)]">
         <p>Generate AI projections to see visualizations</p>
       </div>
     );

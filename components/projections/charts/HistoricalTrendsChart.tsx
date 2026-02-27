@@ -12,7 +12,7 @@ export function HistoricalTrendsChart({ data }: HistoricalTrendsChartProps) {
     return (
       <div className="g-card p-4">
         <h4 className="text-sm font-semibold mb-3">Historical Sales Trends</h4>
-        <p className="text-sm text-[var(--g-text-muted)]">No historical sales data available</p>
+        <p className="text-sm text-[var(--color-text-muted)]">No historical sales data available</p>
       </div>
     );
   }
@@ -35,17 +35,17 @@ export function HistoricalTrendsChart({ data }: HistoricalTrendsChartProps) {
         {chartData.map((d, i) => (
           <div key={i} className="flex-1 flex flex-col items-center min-w-0">
             <div
-              className="w-full bg-[var(--g-accent)] rounded-t hover:opacity-80 transition cursor-pointer"
+              className="w-full bg-[var(--color-red-primary)] rounded-t hover:opacity-80 transition cursor-pointer"
               style={{ height: `${(d.gross / maxGross) * 100}%`, minHeight: d.gross > 0 ? '2px' : '0' }}
               title={`${new Date(d.date).toLocaleDateString()}: $${d.gross.toLocaleString()}`}
             />
-            <div className="text-xs text-[var(--g-text-muted)] mt-1 whitespace-nowrap overflow-hidden text-ellipsis w-full text-center">
+            <div className="text-xs text-[var(--color-text-muted)] mt-1 whitespace-nowrap overflow-hidden text-ellipsis w-full text-center">
               {new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </div>
           </div>
         ))}
       </div>
-      <div className="mt-2 flex justify-between text-xs text-[var(--g-text-muted)]">
+      <div className="mt-2 flex justify-between text-xs text-[var(--color-text-muted)]">
         <span>Total: ${chartData.reduce((sum, d) => sum + d.gross, 0).toLocaleString()}</span>
         <span>{chartData.length} shows</span>
       </div>

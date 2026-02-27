@@ -223,18 +223,18 @@ export default function AdminProductsPage() {
       {/* Search and Filters */}
       <div className="flex flex-col gap-4 mb-6 md:flex-row md:items-center md:justify-between">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--g-text-muted)]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by SKU or description..."
-            className="w-full pl-10 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[var(--g-text)] placeholder-[var(--g-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)] focus:border-transparent"
+            className="w-full pl-10 pr-10 py-2 bg-[var(--color-bg-elevated)] border border-[var(--color-bg-border)] rounded-lg text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
           />
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--g-text-muted)] hover:text-[var(--g-text)] transition"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition"
             >
               <X className="w-4 h-4" />
             </button>
@@ -249,7 +249,7 @@ export default function AdminProductsPage() {
       </div>
 
       {/* Results count */}
-      <div className="mb-4 text-sm text-[var(--g-text-muted)]">
+      <div className="mb-4 text-sm text-[var(--color-text-muted)]">
         {loading ? (
           'Loading...'
         ) : (
@@ -280,7 +280,7 @@ export default function AdminProductsPage() {
           >
             Previous
           </Button>
-          <span className="text-sm text-[var(--g-text-muted)]">
+          <span className="text-sm text-[var(--color-text-muted)]">
             Page {page} of {pagination.totalPages}
           </span>
           <Button

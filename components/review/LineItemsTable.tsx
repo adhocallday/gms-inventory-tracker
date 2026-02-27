@@ -306,7 +306,7 @@ export default function LineItemsTable({
                         }
                       />
                     </td>
-                    <td className="py-2 pr-2 text-right text-[var(--g-text-dim)]">
+                    <td className="py-2 pr-2 text-right text-[var(--color-text-secondary)]">
                       {formatCurrency((item as POLineItem).line_total)}
                     </td>
                   </>
@@ -362,7 +362,7 @@ export default function LineItemsTable({
                         }
                       />
                     </td>
-                    <td className="py-2 pr-2 text-right text-[var(--g-text-dim)]">
+                    <td className="py-2 pr-2 text-right text-[var(--color-text-secondary)]">
                       {formatCurrency((item as SalesLineItem).gross_sales)}
                     </td>
                   </>
@@ -390,7 +390,7 @@ export default function LineItemsTable({
                 <td className="py-2 text-center">
                   <button
                     type="button"
-                    className="text-[var(--g-accent)] hover:text-[var(--g-accent-2)] text-sm"
+                    className="text-[var(--color-red-primary)] hover:text-[var(--color-red-hover)] text-sm"
                     onClick={() => removeLineItem(index)}
                     title="Remove"
                   >
@@ -404,7 +404,7 @@ export default function LineItemsTable({
       </div>
 
       {lineItems.length === 0 && (
-        <p className="text-center text-sm text-[var(--g-text-muted)] py-8">
+        <p className="text-center text-sm text-[var(--color-text-muted)] py-8">
           No line items. Click "+ Add Row" to add an item.
         </p>
       )}

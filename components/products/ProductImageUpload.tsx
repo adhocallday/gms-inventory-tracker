@@ -131,23 +131,23 @@ export function ProductImageUpload({
         {...getRootProps()}
         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition ${
           isDragActive
-            ? 'border-[var(--g-accent)] bg-[var(--g-accent)]/5'
-            : 'border-[var(--g-border)] hover:border-[var(--g-accent)]'
+            ? 'border-[var(--color-red-primary)] bg-[var(--color-red-primary)]/5'
+            : 'border-[var(--color-bg-border)] hover:border-[var(--color-red-primary)]'
         } ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         <input {...getInputProps()} />
         <div className="space-y-2">
           <div className="text-4xl">📸</div>
           {uploading ? (
-            <p className="text-sm text-[var(--g-text-muted)]">Uploading...</p>
+            <p className="text-sm text-[var(--color-text-muted)]">Uploading...</p>
           ) : isDragActive ? (
-            <p className="text-sm text-[var(--g-text)]">Drop images here</p>
+            <p className="text-sm text-[var(--color-text-primary)]">Drop images here</p>
           ) : (
             <>
-              <p className="text-sm text-[var(--g-text)]">
+              <p className="text-sm text-[var(--color-text-primary)]">
                 Drag & drop product images here, or click to select
               </p>
-              <p className="text-xs text-[var(--g-text-muted)]">
+              <p className="text-xs text-[var(--color-text-muted)]">
                 PNG, JPG, GIF, WebP (max 10MB per file)
               </p>
             </>
@@ -168,10 +168,10 @@ export function ProductImageUpload({
           {images.map((image) => (
             <div
               key={image.id}
-              className="relative group border border-[var(--g-border)] rounded-lg overflow-hidden"
+              className="relative group border border-[var(--color-bg-border)] rounded-lg overflow-hidden"
             >
               {/* Image */}
-              <div className="aspect-square bg-[var(--g-bg-muted)]">
+              <div className="aspect-square bg-[var(--color-bg-elevated)]">
                 <img
                   src={image.file_url}
                   alt={image.caption || 'Product image'}
@@ -181,7 +181,7 @@ export function ProductImageUpload({
 
               {/* Primary Badge */}
               {image.is_primary && (
-                <div className="absolute top-2 left-2 px-2 py-1 bg-[var(--g-accent)] text-white text-xs font-semibold rounded">
+                <div className="absolute top-2 left-2 px-2 py-1 bg-[var(--color-red-primary)] text-white text-xs font-semibold rounded">
                   Primary
                 </div>
               )}
@@ -191,7 +191,7 @@ export function ProductImageUpload({
                 {!image.is_primary && (
                   <button
                     onClick={() => handleSetPrimary(image.id)}
-                    className="px-3 py-1.5 bg-white text-black text-sm font-medium rounded hover:bg-gray-200 transition"
+                    className="px-3 py-1.5 bg-[var(--color-bg-surface)] text-black text-sm font-medium rounded hover:bg-gray-200 transition"
                   >
                     Set Primary
                   </button>
@@ -216,7 +216,7 @@ export function ProductImageUpload({
       )}
 
       {images.length === 0 && !uploading && (
-        <div className="text-center text-sm text-[var(--g-text-muted)] py-8">
+        <div className="text-center text-sm text-[var(--color-text-muted)] py-8">
           No images uploaded yet
         </div>
       )}

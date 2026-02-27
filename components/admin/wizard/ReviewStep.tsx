@@ -117,7 +117,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold g-title mb-4">Review & Create Tour</h2>
-        <p className="text-sm text-[var(--g-text-dim)]">
+        <p className="text-sm text-[var(--color-text-secondary)]">
           Review all entered information below. Click "Create Tour" to finalize and set up the inventory tracker.
         </p>
       </div>
@@ -149,50 +149,50 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
       )}
 
       {/* Tour Info Section */}
-      <div className="border border-white/10 rounded-lg bg-[var(--g-surface-2)]">
+      <div className="border border-white/10 rounded-lg bg-[var(--color-bg-elevated)]">
         <button
           type="button"
           onClick={() => toggleSection('tour')}
-          className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition"
+          className="w-full flex items-center justify-between p-4 text-left hover:bg-[var(--color-bg-surface)]/5 transition"
         >
           <div>
-            <h3 className="text-sm font-semibold text-[var(--g-text)]">Tour Information</h3>
-            <p className="text-xs text-[var(--g-text-muted)] mt-1">
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Tour Information</h3>
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">
               {tourData.name} · {tourData.artist}
             </p>
           </div>
-          <span className="text-xl text-[var(--g-text-muted)]">
+          <span className="text-xl text-[var(--color-text-muted)]">
             {expandedSections.tour ? '−' : '+'}
           </span>
         </button>
         {expandedSections.tour && (
           <div className="p-4 border-t border-white/10 space-y-3">
             <div>
-              <p className="text-xs text-[var(--g-text-muted)]">Tour Name</p>
-              <p className="text-sm text-[var(--g-text)] font-medium">{tourData.name || '—'}</p>
+              <p className="text-xs text-[var(--color-text-muted)]">Tour Name</p>
+              <p className="text-sm text-[var(--color-text-primary)] font-medium">{tourData.name || '—'}</p>
             </div>
             <div>
-              <p className="text-xs text-[var(--g-text-muted)]">Artist</p>
-              <p className="text-sm text-[var(--g-text)] font-medium">{tourData.artist || '—'}</p>
+              <p className="text-xs text-[var(--color-text-muted)]">Artist</p>
+              <p className="text-sm text-[var(--color-text-primary)] font-medium">{tourData.artist || '—'}</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <p className="text-xs text-[var(--g-text-muted)]">Start Date</p>
-                <p className="text-sm text-[var(--g-text)] font-medium">
+                <p className="text-xs text-[var(--color-text-muted)]">Start Date</p>
+                <p className="text-sm text-[var(--color-text-primary)] font-medium">
                   {tourData.startDate ? new Date(tourData.startDate).toLocaleDateString() : '—'}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-[var(--g-text-muted)]">End Date</p>
-                <p className="text-sm text-[var(--g-text)] font-medium">
+                <p className="text-xs text-[var(--color-text-muted)]">End Date</p>
+                <p className="text-sm text-[var(--color-text-primary)] font-medium">
                   {tourData.endDate ? new Date(tourData.endDate).toLocaleDateString() : '—'}
                 </p>
               </div>
             </div>
             {tourData.description && (
               <div>
-                <p className="text-xs text-[var(--g-text-muted)]">Description</p>
-                <p className="text-sm text-[var(--g-text)]">{tourData.description}</p>
+                <p className="text-xs text-[var(--color-text-muted)]">Description</p>
+                <p className="text-sm text-[var(--color-text-primary)]">{tourData.description}</p>
               </div>
             )}
           </div>
@@ -200,19 +200,19 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
       </div>
 
       {/* Shows Section */}
-      <div className="border border-white/10 rounded-lg bg-[var(--g-surface-2)]">
+      <div className="border border-white/10 rounded-lg bg-[var(--color-bg-elevated)]">
         <button
           type="button"
           onClick={() => toggleSection('shows')}
-          className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition"
+          className="w-full flex items-center justify-between p-4 text-left hover:bg-[var(--color-bg-surface)]/5 transition"
         >
           <div>
-            <h3 className="text-sm font-semibold text-[var(--g-text)]">Shows</h3>
-            <p className="text-xs text-[var(--g-text-muted)] mt-1">
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Shows</h3>
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">
               {shows.length} show{shows.length !== 1 ? 's' : ''} scheduled
             </p>
           </div>
-          <span className="text-xl text-[var(--g-text-muted)]">
+          <span className="text-xl text-[var(--color-text-muted)]">
             {expandedSections.shows ? '−' : '+'}
           </span>
         </button>
@@ -221,17 +221,17 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
             {shows.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-white/5">
+                  <thead className="bg-[var(--color-bg-surface)]/5">
                     <tr>
-                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--g-text-muted)]">Date</th>
-                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--g-text-muted)]">Venue</th>
-                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--g-text-muted)]">Location</th>
-                      <th className="text-right px-3 py-2 text-xs font-semibold text-[var(--g-text-muted)]">Capacity</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Date</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Venue</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Location</th>
+                      <th className="text-right px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Capacity</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
                     {shows.map((show, index) => (
-                      <tr key={index} className="hover:bg-white/5">
+                      <tr key={index} className="hover:bg-[var(--color-bg-surface)]/5">
                         <td className="px-3 py-2 text-xs">
                           {new Date(show.showDate).toLocaleDateString()}
                         </td>
@@ -248,26 +248,26 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
                 </table>
               </div>
             ) : (
-              <p className="text-sm text-[var(--g-text-muted)]">No shows added</p>
+              <p className="text-sm text-[var(--color-text-muted)]">No shows added</p>
             )}
           </div>
         )}
       </div>
 
       {/* Products Section */}
-      <div className="border border-white/10 rounded-lg bg-[var(--g-surface-2)]">
+      <div className="border border-white/10 rounded-lg bg-[var(--color-bg-elevated)]">
         <button
           type="button"
           onClick={() => toggleSection('products')}
-          className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition"
+          className="w-full flex items-center justify-between p-4 text-left hover:bg-[var(--color-bg-surface)]/5 transition"
         >
           <div>
-            <h3 className="text-sm font-semibold text-[var(--g-text)]">Products</h3>
-            <p className="text-xs text-[var(--g-text-muted)] mt-1">
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Products</h3>
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">
               {products.length} product{products.length !== 1 ? 's' : ''} in catalog
             </p>
           </div>
-          <span className="text-xl text-[var(--g-text-muted)]">
+          <span className="text-xl text-[var(--color-text-muted)]">
             {expandedSections.products ? '−' : '+'}
           </span>
         </button>
@@ -279,13 +279,13 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
                   <div key={index} className="border border-white/10 rounded-lg p-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <p className="text-sm font-semibold text-[var(--g-text)]">{product.name}</p>
-                        <p className="text-xs text-[var(--g-text-muted)] mt-1">
+                        <p className="text-sm font-semibold text-[var(--color-text-primary)]">{product.name}</p>
+                        <p className="text-xs text-[var(--color-text-muted)] mt-1">
                           SKU: {product.sku} · Category: {product.category} · Base Price: ${product.basePrice.toFixed(2)}
                         </p>
                         <div className="flex flex-wrap gap-1 mt-2">
                           {product.sizes.map(size => (
-                            <span key={size} className="px-2 py-0.5 text-xs bg-white/10 rounded">
+                            <span key={size} className="px-2 py-0.5 text-xs bg-[var(--color-bg-surface)]/10 rounded">
                               {size}
                             </span>
                           ))}
@@ -303,26 +303,26 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-[var(--g-text-muted)]">No products added</p>
+              <p className="text-sm text-[var(--color-text-muted)]">No products added</p>
             )}
           </div>
         )}
       </div>
 
       {/* Inventory Section */}
-      <div className="border border-white/10 rounded-lg bg-[var(--g-surface-2)]">
+      <div className="border border-white/10 rounded-lg bg-[var(--color-bg-elevated)]">
         <button
           type="button"
           onClick={() => toggleSection('inventory')}
-          className="w-full flex items-center justify-between p-4 text-left hover:bg-white/5 transition"
+          className="w-full flex items-center justify-between p-4 text-left hover:bg-[var(--color-bg-surface)]/5 transition"
         >
           <div>
-            <h3 className="text-sm font-semibold text-[var(--g-text)]">Initial Inventory</h3>
-            <p className="text-xs text-[var(--g-text-muted)] mt-1">
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Initial Inventory</h3>
+            <p className="text-xs text-[var(--color-text-muted)] mt-1">
               {totalInventory} total units across {initialInventory.length} line item{initialInventory.length !== 1 ? 's' : ''}
             </p>
           </div>
-          <span className="text-xl text-[var(--g-text-muted)]">
+          <span className="text-xl text-[var(--color-text-muted)]">
             {expandedSections.inventory ? '−' : '+'}
           </span>
         </button>
@@ -331,17 +331,17 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
             {initialInventory.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-white/5">
+                  <thead className="bg-[var(--color-bg-surface)]/5">
                     <tr>
-                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--g-text-muted)]">SKU</th>
-                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--g-text-muted)]">Size</th>
-                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--g-text-muted)]">Location</th>
-                      <th className="text-right px-3 py-2 text-xs font-semibold text-[var(--g-text-muted)]">Quantity</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">SKU</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Size</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Location</th>
+                      <th className="text-right px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Quantity</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
                     {initialInventory.map((item, index) => (
-                      <tr key={index} className="hover:bg-white/5">
+                      <tr key={index} className="hover:bg-[var(--color-bg-surface)]/5">
                         <td className="px-3 py-2 text-xs font-mono">{item.sku}</td>
                         <td className="px-3 py-2 text-xs">{item.size}</td>
                         <td className="px-3 py-2 text-xs">{item.location}</td>
@@ -352,7 +352,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
                 </table>
               </div>
             ) : (
-              <p className="text-sm text-[var(--g-text-muted)]">
+              <p className="text-sm text-[var(--color-text-muted)]">
                 No initial inventory set. Starting with zero inventory.
               </p>
             )}
@@ -373,7 +373,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
           type="button"
           onClick={onPrev}
           disabled={submitting}
-          className="px-6 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition text-[var(--g-text)] disabled:opacity-50"
+          className="px-6 py-2 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)] disabled:opacity-50"
         >
           ← Previous
         </button>
@@ -381,7 +381,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
           type="button"
           onClick={handleSubmit}
           disabled={submitting || validation.missingFields.length > 0}
-          className="px-6 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting ? 'Creating Tour...' : 'Create Tour'}
         </button>

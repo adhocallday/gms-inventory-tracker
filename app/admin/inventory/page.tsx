@@ -169,11 +169,11 @@ export default function AdminInventoryPage() {
           <div>
             <Link
               href={`/tours/${row.original.tour_id}`}
-              className="font-medium text-[var(--g-text)] hover:text-[var(--g-accent)] transition"
+              className="font-medium text-[var(--color-text-primary)] hover:text-[var(--color-red-primary)] transition"
             >
               {row.original.tour_name}
             </Link>
-            <div className="text-xs text-[var(--g-text-muted)]">{row.original.artist}</div>
+            <div className="text-xs text-[var(--color-text-muted)]">{row.original.artist}</div>
           </div>
         ),
         enableSorting: true,
@@ -188,8 +188,8 @@ export default function AdminInventoryPage() {
 
           return (
             <div>
-              <div className="font-semibold text-[var(--g-text)]">{row.getValue('sku')}</div>
-              <div className="text-xs text-[var(--g-text-muted)]">{row.original.description}</div>
+              <div className="font-semibold text-[var(--color-text-primary)]">{row.getValue('sku')}</div>
+              <div className="text-xs text-[var(--color-text-muted)]">{row.original.description}</div>
               {isOutOfStock && (
                 <Badge variant="error" className="mt-1 text-xs">
                   Out of stock
@@ -209,7 +209,7 @@ export default function AdminInventoryPage() {
         accessorKey: 'size',
         header: 'Size',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text-dim)]">{row.getValue('size')}</span>
+          <span className="text-[var(--color-text-secondary)]">{row.getValue('size')}</span>
         ),
         enableSorting: true,
       },
@@ -217,7 +217,7 @@ export default function AdminInventoryPage() {
         accessorKey: 'product_type',
         header: 'Type',
         cell: ({ row }) => (
-          <span className="text-[var(--g-text-dim)] capitalize">
+          <span className="text-[var(--color-text-secondary)] capitalize">
             {row.getValue('product_type')}
           </span>
         ),
@@ -322,7 +322,7 @@ export default function AdminInventoryPage() {
           color="red"
         />
         <div className="g-card p-6">
-          <p className="text-xs text-[var(--g-text-muted)] uppercase tracking-wide">
+          <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide">
             Total Inventory Value
           </p>
           <p className="text-2xl font-bold mt-2">{formatCurrency(stats.totalValue)}</p>
@@ -334,11 +334,11 @@ export default function AdminInventoryPage() {
         <div className="flex flex-wrap items-center gap-3">
           {/* Tour Filter */}
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-[var(--g-text-muted)]" />
+            <Filter className="w-4 h-4 text-[var(--color-text-muted)]" />
             <select
               value={tourFilter}
               onChange={(e) => setTourFilter(e.target.value)}
-              className="px-3 py-2 rounded-lg bg-[var(--g-surface-2)] border border-[var(--g-border)] text-sm text-[var(--g-text)] focus:outline-none focus:ring-2 focus:ring-[var(--g-accent)]/50"
+              className="px-3 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-bg-border)] text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]/50"
             >
               <option value="all">All Tours</option>
               {tours.map((tour) => (
@@ -364,8 +364,8 @@ export default function AdminInventoryPage() {
                   onClick={() => setStockFilter(status)}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-[var(--g-accent)] text-white'
-                      : 'bg-[var(--g-surface-2)] text-[var(--g-text-dim)] hover:bg-[var(--g-surface)] hover:text-[var(--g-text)]'
+                      ? 'bg-[var(--color-red-primary)] text-white'
+                      : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-surface)] hover:text-[var(--color-text-primary)]'
                   }`}
                 >
                   {labels[status]}
@@ -387,7 +387,7 @@ export default function AdminInventoryPage() {
 
       {/* Results count */}
       {(searchQuery || tourFilter !== 'all' || stockFilter !== 'all') && (
-        <div className="mb-4 text-sm text-[var(--g-text-muted)]">
+        <div className="mb-4 text-sm text-[var(--color-text-muted)]">
           Showing {filteredInventory.length} of {inventory.length} items
           {searchQuery && ` matching "${searchQuery}"`}
         </div>
@@ -402,7 +402,7 @@ export default function AdminInventoryPage() {
           stickyHeader
           striped
           emptyState={{
-            icon: <Package className="w-12 h-12 text-[var(--g-text-muted)]" />,
+            icon: <Package className="w-12 h-12 text-[var(--color-text-muted)]" />,
             title: 'No inventory items found',
             description: stockFilter !== 'all' || tourFilter !== 'all' || searchQuery
               ? 'Try adjusting your filters or search criteria'
@@ -416,7 +416,7 @@ export default function AdminInventoryPage() {
         <div className="mt-4 p-4 g-card">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Total Received</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Received</p>
               <p className="font-semibold">
                 {new Intl.NumberFormat('en-US').format(
                   filteredInventory.reduce((sum, i) => sum + i.total_received, 0)
@@ -424,7 +424,7 @@ export default function AdminInventoryPage() {
               </p>
             </div>
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Total Sold</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Sold</p>
               <p className="font-semibold">
                 {new Intl.NumberFormat('en-US').format(
                   filteredInventory.reduce((sum, i) => sum + i.total_sold, 0)
@@ -432,7 +432,7 @@ export default function AdminInventoryPage() {
               </p>
             </div>
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Total Comps</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Comps</p>
               <p className="font-semibold">
                 {new Intl.NumberFormat('en-US').format(
                   filteredInventory.reduce((sum, i) => sum + i.total_comps, 0)
@@ -440,7 +440,7 @@ export default function AdminInventoryPage() {
               </p>
             </div>
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Total Balance</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Balance</p>
               <p className="font-semibold text-green-400">
                 {new Intl.NumberFormat('en-US').format(
                   filteredInventory.reduce((sum, i) => sum + i.balance, 0)
@@ -448,7 +448,7 @@ export default function AdminInventoryPage() {
               </p>
             </div>
             <div>
-              <p className="text-[var(--g-text-muted)] text-xs mb-1">Filtered Value</p>
+              <p className="text-[var(--color-text-muted)] text-xs mb-1">Filtered Value</p>
               <p className="font-semibold">
                 {formatCurrency(
                   filteredInventory.reduce((sum, i) => sum + i.balance * i.full_package_cost, 0)

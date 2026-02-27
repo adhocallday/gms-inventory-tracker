@@ -85,7 +85,7 @@ export function InlineDraftReview({
     return (
       <div className="bg-gradient-to-br from-emerald-50/80 to-white border-2 border-emerald-200 rounded-2xl p-6 space-y-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-white shadow-inner">
+          <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
             <Check className="w-5 h-5 text-emerald-600" />
           </div>
           <div>
@@ -108,9 +108,9 @@ export function InlineDraftReview({
   }
 
   return (
-    <div className="bg-[var(--g-surface)] border border-[var(--g-border)] rounded-xl overflow-hidden">
+    <div className="bg-[var(--color-bg-surface)] border border-[var(--color-bg-border)] rounded-xl overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-[var(--g-border)] bg-slate-50">
+      <div className="p-4 border-b border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${hasErrors ? 'bg-red-100' : 'bg-emerald-100'}`}>
@@ -121,18 +121,18 @@ export function InlineDraftReview({
               )}
             </div>
             <div>
-              <h3 className="font-semibold text-[var(--g-text)]">
+              <h3 className="font-semibold text-[var(--color-text-primary)]">
                 {docType === 'sales-report' && 'Sales Report'}
                 {docType === 'po' && 'Purchase Order'}
                 {docType === 'packing-list' && 'Packing List'}
                 {docType === 'settlement' && 'Settlement Report'}
               </h3>
-              <p className="text-xs text-[var(--g-text-muted)]">
+              <p className="text-xs text-[var(--color-text-muted)]">
                 Review and post to database
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-lg transition">
+          <button onClick={onClose} className="p-2 hover:bg-[var(--color-bg-border)] rounded-lg transition">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -140,7 +140,7 @@ export function InlineDraftReview({
 
       {/* Validation Messages */}
       {(hasErrors || hasWarnings) && (
-        <div className="p-4 space-y-2 border-b border-[var(--g-border)]">
+        <div className="p-4 space-y-2 border-b border-[var(--color-bg-border)]">
           {validation.missing_fields.map((field) => (
             <div key={field} className="flex items-center gap-2 text-sm text-red-600">
               <X className="w-3 h-3" />
@@ -158,7 +158,7 @@ export function InlineDraftReview({
 
       {/* Matching Info */}
       {matching.length > 0 && (
-        <div className="p-4 bg-blue-50/50 border-b border-[var(--g-border)]">
+        <div className="p-4 bg-blue-50/50 border-b border-[var(--color-bg-border)]">
           <p className="text-xs text-blue-700 font-medium mb-1">Auto-matched:</p>
           {matching.map((m, i) => (
             <p key={i} className="text-xs text-blue-600">{m}</p>
@@ -172,7 +172,7 @@ export function InlineDraftReview({
         {(docType === 'sales-report' || docType === 'settlement') && (
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-[var(--g-text-muted)] block mb-1">Date</label>
+              <label className="text-xs text-[var(--color-text-muted)] block mb-1">Date</label>
               <input
                 type="date"
                 value={editedData?.show_date || ''}
@@ -181,7 +181,7 @@ export function InlineDraftReview({
               />
             </div>
             <div>
-              <label className="text-xs text-[var(--g-text-muted)] block mb-1">Venue</label>
+              <label className="text-xs text-[var(--color-text-muted)] block mb-1">Venue</label>
               <input
                 type="text"
                 value={editedData?.venue_name || ''}
@@ -196,7 +196,7 @@ export function InlineDraftReview({
         {docType === 'sales-report' && (
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="text-xs text-[var(--g-text-muted)] block mb-1">Attendance</label>
+              <label className="text-xs text-[var(--color-text-muted)] block mb-1">Attendance</label>
               <input
                 type="number"
                 value={editedData?.attendance || ''}
@@ -205,14 +205,14 @@ export function InlineDraftReview({
               />
             </div>
             <div>
-              <label className="text-xs text-[var(--g-text-muted)] block mb-1">Total Gross</label>
-              <div className="text-lg font-semibold text-[var(--g-text)]">
+              <label className="text-xs text-[var(--color-text-muted)] block mb-1">Total Gross</label>
+              <div className="text-lg font-semibold text-[var(--color-text-primary)]">
                 {formatCurrency(editedData?.total_gross || 0)}
               </div>
             </div>
             <div>
-              <label className="text-xs text-[var(--g-text-muted)] block mb-1">Line Items</label>
-              <div className="text-lg font-semibold text-[var(--g-text)]">
+              <label className="text-xs text-[var(--color-text-muted)] block mb-1">Line Items</label>
+              <div className="text-lg font-semibold text-[var(--color-text-primary)]">
                 {lineItems.length}
               </div>
             </div>
@@ -223,7 +223,7 @@ export function InlineDraftReview({
         {docType === 'po' && (
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-[var(--g-text-muted)] block mb-1">PO Number</label>
+              <label className="text-xs text-[var(--color-text-muted)] block mb-1">PO Number</label>
               <input
                 type="text"
                 value={editedData?.po_number || ''}
@@ -232,7 +232,7 @@ export function InlineDraftReview({
               />
             </div>
             <div>
-              <label className="text-xs text-[var(--g-text-muted)] block mb-1">Vendor</label>
+              <label className="text-xs text-[var(--color-text-muted)] block mb-1">Vendor</label>
               <input
                 type="text"
                 value={editedData?.vendor || ''}
@@ -246,9 +246,9 @@ export function InlineDraftReview({
         {/* Line Items Toggle */}
         <button
           onClick={() => setShowLineItems(!showLineItems)}
-          className="flex items-center justify-between w-full p-2 bg-slate-50 rounded-lg hover:bg-slate-100 transition"
+          className="flex items-center justify-between w-full p-2 bg-[var(--color-bg-elevated)] rounded-lg hover:bg-[var(--color-bg-border)] transition"
         >
-          <span className="text-sm font-medium text-[var(--g-text)]">
+          <span className="text-sm font-medium text-[var(--color-text-primary)]">
             {docType === 'settlement' ? 'Comps' : 'Line Items'} ({lineItems.length})
           </span>
           {showLineItems ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -256,9 +256,9 @@ export function InlineDraftReview({
 
         {/* Line Items Table */}
         {showLineItems && lineItems.length > 0 && (
-          <div className="max-h-48 overflow-y-auto border border-slate-200 rounded-lg">
+          <div className="max-h-48 overflow-y-auto border border-[var(--color-bg-border)] rounded-lg">
             <table className="w-full text-xs">
-              <thead className="bg-slate-50 sticky top-0">
+              <thead className="bg-[var(--color-bg-elevated)] sticky top-0">
                 <tr>
                   <th className="text-left p-2 font-medium">SKU</th>
                   <th className="text-left p-2 font-medium">Size</th>
@@ -272,7 +272,7 @@ export function InlineDraftReview({
               </thead>
               <tbody>
                 {lineItems.map((item: any, i: number) => (
-                  <tr key={i} className="border-t border-slate-100">
+                  <tr key={i} className="border-t border-[var(--color-bg-border)]">
                     <td className="p-2 font-mono">{item.sku}</td>
                     <td className="p-2">{item.size || '-'}</td>
                     <td className="p-2 text-right">
@@ -301,7 +301,7 @@ export function InlineDraftReview({
       )}
 
       {/* Actions */}
-      <div className="p-4 border-t border-[var(--g-border)] bg-slate-50 flex gap-2">
+      <div className="p-4 border-t border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)] flex gap-2">
         <Button
           onClick={() => router.push(`/dashboard/parsed-documents/${parsedDocumentId}`)}
           variant="outline"

@@ -95,7 +95,7 @@ export function ReportList({ tourId, reports }: ReportListProps) {
       <div className="g-card p-8 text-center">
         <div className="text-4xl mb-4">📊</div>
         <h3 className="text-lg font-semibold g-title mb-2">No Reports Yet</h3>
-        <p className="text-sm text-[var(--g-text-muted)]">
+        <p className="text-sm text-[var(--color-text-muted)]">
           Create your first report to get started
         </p>
       </div>
@@ -110,7 +110,7 @@ export function ReportList({ tourId, reports }: ReportListProps) {
         {reports.map((report) => (
             <div
               key={report.id}
-              className="border border-[var(--g-border)] rounded-lg p-4 hover:border-[var(--g-accent)] transition"
+              className="border border-[var(--color-bg-border)] rounded-lg p-4 hover:border-[var(--color-red-primary)] transition"
             >
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
@@ -118,7 +118,7 @@ export function ReportList({ tourId, reports }: ReportListProps) {
                     <h3 className="font-semibold g-title">{report.title}</h3>
                     {getStatusBadge(report.status)}
                   </div>
-                  <p className="text-sm text-[var(--g-text-muted)]">
+                  <p className="text-sm text-[var(--color-text-muted)]">
                     {getReportTypeLabel(report.report_type)}
                   </p>
                 </div>
@@ -126,14 +126,14 @@ export function ReportList({ tourId, reports }: ReportListProps) {
                 <div className="flex items-center gap-2">
                   <Link
                     href={`/tours/${tourId}/reports/${report.id}`}
-                    className="px-3 py-1.5 text-sm bg-[var(--g-accent)] text-white rounded hover:bg-[var(--g-accent-2)] transition"
+                    className="px-3 py-1.5 text-sm bg-[var(--color-red-primary)] text-white rounded hover:bg-[var(--color-red-hover)] transition"
                   >
                     View Report
                   </Link>
                   {report.status === 'completed' && report.pdf_url && (
                     <button
                       onClick={() => handleDownload(report)}
-                      className="px-3 py-1.5 text-sm border border-[var(--g-border)] rounded hover:bg-[var(--g-bg-muted)] transition"
+                      className="px-3 py-1.5 text-sm border border-[var(--color-bg-border)] rounded hover:bg-[var(--color-bg-elevated)] transition"
                     >
                       Download PDF
                     </button>
@@ -141,7 +141,7 @@ export function ReportList({ tourId, reports }: ReportListProps) {
                   <button
                     onClick={() => handleDelete(report.id)}
                     disabled={deletingId === report.id}
-                    className="px-3 py-1.5 text-sm border border-[var(--g-border)] rounded hover:bg-[var(--g-bg-muted)] transition disabled:opacity-50"
+                    className="px-3 py-1.5 text-sm border border-[var(--color-bg-border)] rounded hover:bg-[var(--color-bg-elevated)] transition disabled:opacity-50"
                   >
                     {deletingId === report.id ? 'Deleting...' : 'Delete'}
                   </button>
@@ -149,12 +149,12 @@ export function ReportList({ tourId, reports }: ReportListProps) {
               </div>
 
               {report.description && (
-                <p className="text-sm text-[var(--g-text-muted)] mb-2">
+                <p className="text-sm text-[var(--color-text-muted)] mb-2">
                   {report.description}
                 </p>
               )}
 
-              <div className="flex items-center gap-4 text-xs text-[var(--g-text-muted)] mt-3 pt-3 border-t border-[var(--g-border)]">
+              <div className="flex items-center gap-4 text-xs text-[var(--color-text-muted)] mt-3 pt-3 border-t border-[var(--color-bg-border)]">
                 <span>
                   {report.section_count || 0} {report.section_count === 1 ? 'section' : 'sections'}
                 </span>

@@ -46,13 +46,13 @@ export function ReportViewer({
     <div className={`min-h-screen ${isPrintMode ? 'print-mode' : ''}`}>
       {/* Header - Hide in print mode */}
       {!isPrintMode && (
-        <header className="g-bg-surface border-b border-[var(--g-border)] print:hidden">
+        <header className="g-bg-surface border-b border-[var(--color-bg-border)] print:hidden">
           <div className="g-container py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <Link
                   href={`/tours/${tour.id}/reports`}
-                  className="text-sm text-[var(--g-text-muted)] hover:text-[var(--g-text)]"
+                  className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
                 >
                   ← Back to Reports
                 </Link>
@@ -62,7 +62,7 @@ export function ReportViewer({
               <div className="flex items-center gap-2">
                 <button
                   onClick={handlePrint}
-                  className="px-4 py-2 border border-[var(--g-border)] rounded hover:bg-[var(--g-bg-muted)] transition text-sm"
+                  className="px-4 py-2 border border-[var(--color-bg-border)] rounded hover:bg-[var(--color-bg-elevated)] transition text-sm"
                 >
                   Print Report
                 </button>

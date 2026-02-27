@@ -268,10 +268,10 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
           <h1 className="text-3xl font-semibold g-title">
             {tour.name} · {show.venue_name ?? 'Show Detail'}
           </h1>
-          <p className="text-sm text-[var(--g-text-dim)] mt-1">
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
             {show.city ?? '—'} {show.state ? `, ${show.state}` : ''}
           </p>
-          <p className="text-sm text-[var(--g-text-muted)] mt-2">
+          <p className="text-sm text-[var(--color-text-muted)] mt-2">
             {formatDate(show.show_date)} · {show.attendance ?? 0} attendance
           </p>
         </div>
@@ -315,29 +315,29 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
         {settlementDoc ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm">
             <div className="border border-white/10 rounded-md p-3">
-              <p className="text-xs text-[var(--g-text-muted)]">Gross sales</p>
+              <p className="text-xs text-[var(--color-text-muted)]">Gross sales</p>
               <p className="text-lg font-semibold mt-1">
                 {currencyFormatter.format(Number(settlementSource.gross_sales_total ?? 0))}
               </p>
             </div>
             <div className="border border-white/10 rounded-md p-3">
-              <p className="text-xs text-[var(--g-text-muted)]">Fees</p>
+              <p className="text-xs text-[var(--color-text-muted)]">Fees</p>
               <p className="text-lg font-semibold mt-1">
                 {currencyFormatter.format(Number(settlementSource.other_fees ?? 0))}
               </p>
             </div>
             <div className="border border-white/10 rounded-md p-3">
-              <p className="text-xs text-[var(--g-text-muted)]">Net settlement</p>
+              <p className="text-xs text-[var(--color-text-muted)]">Net settlement</p>
               <p className="text-lg font-semibold mt-1">
                 {currencyFormatter.format(Number(settlementSource.net_settlement_amount ?? 0))}
               </p>
             </div>
-            <div className="text-xs text-[var(--g-text-muted)] md:col-span-3">
+            <div className="text-xs text-[var(--color-text-muted)] md:col-span-3">
               Status: {settlementDoc.status}
             </div>
           </div>
         ) : (
-          <p className="text-sm text-[var(--g-text-muted)] mt-3">
+          <p className="text-sm text-[var(--color-text-muted)] mt-3">
             No settlement document posted yet.
           </p>
         )}
@@ -350,7 +350,7 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
 
       <section className="g-card p-6 mt-10">
         <h2 className="text-lg font-semibold g-title mb-2">Receiving context</h2>
-        <p className="text-sm text-[var(--g-text-muted)] mb-4">
+        <p className="text-sm text-[var(--color-text-muted)] mb-4">
           Receipts since the previous show.
         </p>
         <ReceivingContextTable data={receiptsBetween} />

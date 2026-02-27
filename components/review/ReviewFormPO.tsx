@@ -66,7 +66,7 @@ export default function ReviewFormPO({
           {/* PO Number */}
           <div>
             <label className="g-label block mb-1">
-              PO Number <span className="text-[var(--g-accent)]">*</span>
+              PO Number <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             <input
               type="text"
@@ -81,7 +81,7 @@ export default function ReviewFormPO({
           {/* Vendor */}
           <div>
             <label className="g-label block mb-1">
-              Vendor <span className="text-[var(--g-accent)]">*</span>
+              Vendor <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             <input
               type="text"
@@ -96,7 +96,7 @@ export default function ReviewFormPO({
           {/* Order Date */}
           <div>
             <label className="g-label block mb-1">
-              Order Date <span className="text-[var(--g-accent)]">*</span>
+              Order Date <span className="text-[var(--color-red-primary)]">*</span>
             </label>
             <input
               type="date"
@@ -137,7 +137,7 @@ export default function ReviewFormPO({
           {/* Total Amount (Read-only) */}
           <div>
             <label className="g-label block mb-1">Total Amount</label>
-            <div className="g-input bg-black/20 text-[var(--g-text-dim)] cursor-not-allowed">
+            <div className="g-input bg-black/20 text-[var(--color-text-secondary)] cursor-not-allowed">
               {formatCurrency(totalAmount)}
             </div>
           </div>

@@ -134,14 +134,14 @@ export function EnhancedAIAgentPanel({
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         <div>
           <h2 className="text-2xl font-bold g-title">AI Projection Assistant</h2>
-          <p className="text-sm text-[var(--g-text-muted)] mt-1">
+          <p className="text-sm text-[var(--color-text-muted)] mt-1">
             Generate complete projections from historical data with one click
           </p>
         </div>
         <button
           onClick={handleGenerate}
           disabled={loading}
-          className="px-6 py-3 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition disabled:opacity-50 font-semibold text-lg whitespace-nowrap"
+          className="px-6 py-3 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition disabled:opacity-50 font-semibold text-lg whitespace-nowrap"
         >
           {loading ? 'Generating...' : 'Generate AI Projections'}
         </button>
@@ -150,7 +150,7 @@ export function EnhancedAIAgentPanel({
       {generated && (
         <div className="mb-4 p-5 bg-gradient-to-br from-emerald-50/80 to-white border-2 border-emerald-200 rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-white shadow-inner">
+            <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
               <span className="text-emerald-600 text-lg">✓</span>
             </div>
             <div>
@@ -164,7 +164,7 @@ export function EnhancedAIAgentPanel({
       {error && (
         <div className="mb-4 p-5 bg-gradient-to-br from-red-50/80 to-white border-2 border-red-200 rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-white shadow-inner">
+            <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
               <span className="text-red-600 text-lg">✗</span>
             </div>
             <div>
@@ -175,23 +175,23 @@ export function EnhancedAIAgentPanel({
         </div>
       )}
 
-      <div className="flex gap-2 mb-4 border-b border-[var(--g-border)]">
+      <div className="flex gap-2 mb-4 border-b border-[var(--color-bg-border)]">
         <button
           onClick={() => setActiveTab('analysis')}
-          className={`px-4 py-2 ${activeTab === 'analysis' ? 'border-b-2 border-[var(--g-accent)] text-[var(--g-text)]' : 'text-[var(--g-text-muted)]'}`}
+          className={`px-4 py-2 ${activeTab === 'analysis' ? 'border-b-2 border-[var(--color-red-primary)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-muted)]'}`}
         >
           Analysis
         </button>
         <button
           onClick={() => setActiveTab('sizes')}
-          className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'sizes' ? 'border-b-2 border-[var(--g-accent)] text-[var(--g-text)]' : 'text-[var(--g-text-muted)]'}`}
+          className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'sizes' ? 'border-b-2 border-[var(--color-red-primary)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-muted)]'}`}
         >
           <BarChart3 className="w-4 h-4" />
           Size Analysis
         </button>
         <button
           onClick={() => setActiveTab('chat')}
-          className={`px-4 py-2 ${activeTab === 'chat' ? 'border-b-2 border-[var(--g-accent)] text-[var(--g-text)]' : 'text-[var(--g-text-muted)]'}`}
+          className={`px-4 py-2 ${activeTab === 'chat' ? 'border-b-2 border-[var(--color-red-primary)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-muted)]'}`}
         >
           Chat
         </button>
@@ -205,13 +205,13 @@ export function EnhancedAIAgentPanel({
           <div className="space-y-4">
             {!sizeAnalysis && !sizeLoading && (
               <div className="text-center py-8">
-                <BarChart3 className="w-12 h-12 mx-auto mb-3 text-[var(--g-text-muted)] opacity-50" />
-                <p className="text-[var(--g-text-muted)] mb-4">
+                <BarChart3 className="w-12 h-12 mx-auto mb-3 text-[var(--color-text-muted)] opacity-50" />
+                <p className="text-[var(--color-text-muted)] mb-4">
                   Analyze historical sales data to optimize size distribution for each product.
                 </p>
                 <button
                   onClick={handleAnalyzeSizes}
-                  className="px-6 py-3 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-medium"
+                  className="px-6 py-3 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-medium"
                 >
                   Analyze Size Distribution
                 </button>

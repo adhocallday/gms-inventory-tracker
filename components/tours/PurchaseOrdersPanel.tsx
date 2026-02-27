@@ -97,7 +97,7 @@ export function PurchaseOrdersPanel({
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h2 className="text-lg font-semibold g-title">Purchase Orders</h2>
-          <p className="text-sm text-[var(--g-text-muted)]">
+          <p className="text-sm text-[var(--color-text-muted)]">
             Track ordered vs received inventory by SKU.
           </p>
         </div>
@@ -135,7 +135,7 @@ export function PurchaseOrdersPanel({
 
       <div className="mt-4 space-y-3">
         {filteredOrders.length === 0 ? (
-          <div className="text-sm text-[var(--g-text-muted)]">
+          <div className="text-sm text-[var(--color-text-muted)]">
             No purchase orders match the current filters.
           </div>
         ) : (
@@ -145,7 +145,7 @@ export function PurchaseOrdersPanel({
             return (
               <div
                 key={po.id}
-                className="border border-slate-200 rounded-lg overflow-hidden"
+                className="border border-[var(--color-bg-border)] rounded-lg overflow-hidden"
               >
                 <button
                   type="button"
@@ -159,12 +159,12 @@ export function PurchaseOrdersPanel({
                 >
                   <div>
                     <p className="text-sm font-semibold">{po.po_number}</p>
-                    <p className="text-xs text-[var(--g-text-muted)]">
+                    <p className="text-xs text-[var(--color-text-muted)]">
                       {po.vendor} · Ordered {formatDate(po.order_date)} · ETA{' '}
                       {formatDate(po.expected_delivery)}
                     </p>
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-[var(--g-text-muted)]">
+                  <div className="flex items-center gap-4 text-xs text-[var(--color-text-muted)]">
                     <span className="uppercase tracking-wide">{po.status}</span>
                     <span>
                       {po.total_amount
@@ -175,7 +175,7 @@ export function PurchaseOrdersPanel({
                   </div>
                 </button>
                 {isOpen && (
-                  <div className="border-t border-slate-200 px-4 pb-4 overflow-x-auto">
+                  <div className="border-t border-[var(--color-bg-border)] px-4 pb-4 overflow-x-auto">
                     <table className="min-w-full text-sm g-table mt-3">
                       <thead>
                         <tr>
@@ -188,10 +188,10 @@ export function PurchaseOrdersPanel({
                       </thead>
                       <tbody>
                         {rows.map((row) => (
-                          <tr key={row.po_line_item_id} className="border-t border-slate-200">
+                          <tr key={row.po_line_item_id} className="border-t border-[var(--color-bg-border)]">
                             <td className="py-2">
                               <div className="font-semibold">{row.sku}</div>
-                              <div className="text-xs text-[var(--g-text-muted)]">
+                              <div className="text-xs text-[var(--color-text-muted)]">
                                 {row.description}
                               </div>
                             </td>
@@ -215,7 +215,7 @@ export function PurchaseOrdersPanel({
             <button
               type="button"
               onClick={handleLoadMore}
-              className="px-4 py-2 rounded-full border border-slate-300 text-sm hover:bg-slate-50 transition"
+              className="px-4 py-2 rounded-full border border-[var(--color-bg-border)] text-sm hover:bg-[var(--color-bg-elevated)] transition"
             >
               Load more ({filteredOrders.length - visibleCount} remaining)
             </button>

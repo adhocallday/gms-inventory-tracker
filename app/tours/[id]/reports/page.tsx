@@ -26,7 +26,7 @@ export default async function TourReportsPage({ params }: TourReportsPageProps) 
     return (
       <div className="g-container py-8">
         <div className="g-card p-8 text-center">
-          <p className="text-[var(--g-text-muted)]">Tour not found</p>
+          <p className="text-[var(--color-text-muted)]">Tour not found</p>
         </div>
       </div>
     );

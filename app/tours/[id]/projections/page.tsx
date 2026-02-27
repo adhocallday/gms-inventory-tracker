@@ -78,7 +78,7 @@ export default async function ProjectionPage({ params }: ProjectionParams) {
           <h1 className="text-3xl font-semibold g-title mt-2">
             {tour.name}
           </h1>
-          <p className="text-sm text-[var(--g-text-dim)]">{tour.artist}</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{tour.artist}</p>
         </div>
       </div>
 

@@ -124,40 +124,40 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold g-title mb-4">Initial Inventory (Optional)</h2>
-        <p className="text-sm text-[var(--g-text-dim)]">
+        <p className="text-sm text-[var(--color-text-secondary)]">
           Set starting inventory levels for products you already have in stock from previous tours.
           This step is optional - you can skip it and start with zero inventory.
         </p>
       </div>
 
       {/* AI Upload Area */}
-      <div className="p-6 border border-white/10 rounded-lg bg-[var(--g-surface-2)]">
-        <h3 className="text-sm font-semibold text-[var(--g-text)] mb-3">
+      <div className="p-6 border border-white/10 rounded-lg bg-[var(--color-bg-elevated)]">
+        <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
           AI-Assisted Upload
         </h3>
         <div
           {...getRootProps()}
           className={`
             border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition
-            ${isDragActive ? 'border-[var(--g-accent)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
+            ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
             ${parsing ? 'pointer-events-none opacity-50' : ''}
           `}
         >
           <input {...getInputProps()} />
           {parsing ? (
             <div className="space-y-2">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--g-accent)] mx-auto"></div>
-              <p className="text-sm text-[var(--g-text-dim)]">Parsing inventory data with AI...</p>
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[var(--color-red-primary)] mx-auto"></div>
+              <p className="text-sm text-[var(--color-text-secondary)]">Parsing inventory data with AI...</p>
             </div>
           ) : (
             <div className="space-y-2">
-              <svg className="mx-auto h-10 w-10 text-[var(--g-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="mx-auto h-10 w-10 text-[var(--color-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
-              <p className="text-sm text-[var(--g-text-dim)]">
+              <p className="text-sm text-[var(--color-text-secondary)]">
                 {isDragActive ? 'Drop the file here' : 'Drag & drop inventory spreadsheet (CSV/Excel), or click to select'}
               </p>
-              <p className="text-xs text-[var(--g-text-muted)]">
+              <p className="text-xs text-[var(--color-text-muted)]">
                 Supports CSV, XLS, XLSX
               </p>
             </div>
@@ -174,36 +174,36 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
       {!showAdvanced && inventorySummary.some(p => p.totalQuantity > 0) && (
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-[var(--g-text)]">
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
               Inventory Summary
             </h3>
             <button
               type="button"
               onClick={() => setShowAdvanced(true)}
-              className="text-xs text-[var(--g-accent)] hover:underline"
+              className="text-xs text-[var(--color-red-primary)] hover:underline"
             >
               View Details
             </button>
           </div>
           <div className="border border-white/10 rounded-lg overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-white/5">
+              <thead className="bg-[var(--color-bg-surface)]/5">
                 <tr>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">SKU</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">Product</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">SKU</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Product</th>
                   {LOCATIONS.map(loc => (
-                    <th key={loc} className="text-right px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">{loc}</th>
+                    <th key={loc} className="text-right px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">{loc}</th>
                   ))}
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">Total</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Total</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
                 {inventorySummary.filter(p => p.totalQuantity > 0).map(product => (
-                  <tr key={product.sku} className="hover:bg-white/5">
+                  <tr key={product.sku} className="hover:bg-[var(--color-bg-surface)]/5">
                     <td className="px-4 py-3 text-xs font-mono">{product.sku}</td>
                     <td className="px-4 py-3 text-xs">{product.name}</td>
                     {product.locations.map(loc => (
-                      <td key={loc.location} className="px-4 py-3 text-xs text-right text-[var(--g-text-dim)]">
+                      <td key={loc.location} className="px-4 py-3 text-xs text-right text-[var(--color-text-secondary)]">
                         {loc.quantity > 0 ? loc.quantity : '-'}
                       </td>
                     ))}
@@ -220,21 +220,21 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
       {showAdvanced && (
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-[var(--g-text)]">
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
               Inventory Items ({inventory.length})
             </h3>
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => setShowAdvanced(false)}
-                className="text-xs text-[var(--g-text-dim)] hover:text-[var(--g-text)]"
+                className="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
               >
                 Show Summary
               </button>
               <button
                 type="button"
                 onClick={addInventoryItem}
-                className="px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 text-white rounded-lg transition font-medium"
+                className="px-3 py-1.5 text-xs bg-[var(--color-bg-surface)]/10 hover:bg-[var(--color-bg-surface)]/20 text-white rounded-lg transition font-medium"
               >
                 + Add Item
               </button>
@@ -245,18 +245,18 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
             <div className="border border-white/10 rounded-lg overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-white/5">
+                  <thead className="bg-[var(--color-bg-surface)]/5">
                     <tr>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">SKU</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">Size</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">Location</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--g-text-muted)]">Quantity</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">SKU</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Size</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Location</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Quantity</th>
                       <th className="px-4 py-3"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
                     {inventory.map((item, index) => (
-                      <tr key={index} className="hover:bg-white/5">
+                      <tr key={index} className="hover:bg-[var(--color-bg-surface)]/5">
                         <td className="px-4 py-2">
                           <select
                             className="g-input text-xs w-full"
@@ -316,7 +316,7 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
             </div>
           ) : (
             <div className="border border-white/10 rounded-lg p-8 text-center">
-              <p className="text-sm text-[var(--g-text-muted)]">
+              <p className="text-sm text-[var(--color-text-muted)]">
                 No inventory items added. Click "+ Add Item" or upload a spreadsheet.
               </p>
             </div>
@@ -339,13 +339,13 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
         <button
           type="button"
           onClick={onPrev}
-          className="px-6 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition text-[var(--g-text)]"
+          className="px-6 py-2 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)]"
         >
           ← Previous
         </button>
         <button
           type="submit"
-          className="px-6 py-2 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition font-semibold"
+          className="px-6 py-2 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold"
         >
           Next: Review & Create →
         </button>

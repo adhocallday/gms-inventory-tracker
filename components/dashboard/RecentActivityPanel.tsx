@@ -63,9 +63,9 @@ export function RecentActivityPanel({ documents }: RecentActivityPanelProps) {
 
       {documents.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-center">
-          <FileQuestion className="w-10 h-10 text-[var(--g-text-muted)] mb-3" />
-          <p className="text-sm text-[var(--g-text-muted)]">No recent documents</p>
-          <p className="text-xs text-[var(--g-text-muted)] mt-1">
+          <FileQuestion className="w-10 h-10 text-[var(--color-text-muted)] mb-3" />
+          <p className="text-sm text-[var(--color-text-muted)]">No recent documents</p>
+          <p className="text-xs text-[var(--color-text-muted)] mt-1">
             Upload a document to get started
           </p>
         </div>
@@ -75,25 +75,25 @@ export function RecentActivityPanel({ documents }: RecentActivityPanelProps) {
             <Link
               key={doc.id}
               href={`/dashboard/parsed-documents/${doc.id}`}
-              className="flex items-start gap-3 p-3 rounded-lg border border-[var(--g-border)] hover:border-[var(--g-accent)]/50 hover:bg-[var(--g-bg-subtle)] transition group"
+              className="flex items-start gap-3 p-3 rounded-lg border border-[var(--color-bg-border)] hover:border-[var(--color-red-primary)]/50 hover:bg-[var(--g-bg-subtle)] transition group"
             >
               <div className="mt-0.5">
-                {statusIcons[doc.status] || <FileText className="w-4 h-4 text-[var(--g-text-muted)]" />}
+                {statusIcons[doc.status] || <FileText className="w-4 h-4 text-[var(--color-text-muted)]" />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-[var(--g-text)] truncate group-hover:text-[var(--g-accent)] transition">
+                <p className="text-sm font-medium text-[var(--color-text-primary)] truncate group-hover:text-[var(--color-red-primary)] transition">
                   {doc.source_filename || 'Untitled document'}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant={doc.status as any} size="sm">
                     {doc.status}
                   </Badge>
-                  <span className="text-xs text-[var(--g-text-muted)]">
+                  <span className="text-xs text-[var(--color-text-muted)]">
                     {formatDocType(doc.doc_type)}
                   </span>
                 </div>
               </div>
-              <span className="text-xs text-[var(--g-text-muted)] whitespace-nowrap">
+              <span className="text-xs text-[var(--color-text-muted)] whitespace-nowrap">
                 {formatRelativeTime(doc.created_at)}
               </span>
             </Link>

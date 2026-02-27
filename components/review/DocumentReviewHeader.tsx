@@ -46,19 +46,19 @@ export default function DocumentReviewHeader({
   return (
     <div className="mb-8">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-[var(--g-text-muted)] mb-4">
-        <Link href="/" className="hover:text-[var(--g-accent)] transition">
+      <nav className="flex items-center gap-2 text-sm text-[var(--color-text-muted)] mb-4">
+        <Link href="/" className="hover:text-[var(--color-red-primary)] transition">
           Dashboard
         </Link>
         <span>→</span>
         <Link
           href="/dashboard/parsed-documents"
-          className="hover:text-[var(--g-accent)] transition"
+          className="hover:text-[var(--color-red-primary)] transition"
         >
           Parsed Documents
         </Link>
         <span>→</span>
-        <span className="text-[var(--g-text)]">
+        <span className="text-[var(--color-text-primary)]">
           {DOC_TYPE_LABELS[docType] || docType}
         </span>
       </nav>
@@ -81,7 +81,7 @@ export default function DocumentReviewHeader({
           <h1 className="text-3xl font-semibold g-title">
             {filename || 'Untitled Document'}
           </h1>
-          <p className="text-sm text-[var(--g-text-muted)] mt-2">
+          <p className="text-sm text-[var(--color-text-muted)] mt-2">
             Uploaded on {formatDate(createdAt)}
           </p>
         </div>

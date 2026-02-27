@@ -60,7 +60,7 @@ export function ProductBreakdownSection({
     <section className="print:page-break-inside-avoid">
       <div className="mb-6">
         <h2 className="text-3xl font-bold g-title mb-2">{title}</h2>
-        <div className="flex gap-6 text-sm text-[var(--g-text-muted)]">
+        <div className="flex gap-6 text-sm text-[var(--color-text-muted)]">
           <div>
             <span className="font-semibold">Total Units: </span>
             {totalUnits.toLocaleString()}
@@ -83,7 +83,7 @@ export function ProductBreakdownSection({
             <div key={category.id}>
               <h3
                 className="text-xl font-semibold mb-4 pb-2 border-b-2"
-                style={{ borderColor: category.color || 'var(--g-border)' }}
+                style={{ borderColor: category.color || 'var(--color-bg-border)' }}
               >
                 {category.name}
               </h3>
@@ -96,7 +96,7 @@ export function ProductBreakdownSection({
                   >
                     {/* Product Image */}
                     {getProductImage(product.product_id) ? (
-                      <div className="aspect-square bg-[var(--g-bg-muted)] rounded-lg overflow-hidden mb-3">
+                      <div className="aspect-square bg-[var(--color-bg-elevated)] rounded-lg overflow-hidden mb-3">
                         <img
                           src={getProductImage(product.product_id)}
                           alt={product.description || product.sku}
@@ -104,14 +104,14 @@ export function ProductBreakdownSection({
                         />
                       </div>
                     ) : (
-                      <div className="aspect-square bg-[var(--g-bg-muted)] rounded-lg flex items-center justify-center mb-3 text-4xl">
+                      <div className="aspect-square bg-[var(--color-bg-elevated)] rounded-lg flex items-center justify-center mb-3 text-4xl">
                         📦
                       </div>
                     )}
 
                     {/* Product Info */}
                     <div className="space-y-1">
-                      <div className="text-xs text-[var(--g-text-muted)] font-mono">
+                      <div className="text-xs text-[var(--color-text-muted)] font-mono">
                         {product.sku}
                       </div>
                       <div className="text-sm font-semibold g-title line-clamp-2">
@@ -120,10 +120,10 @@ export function ProductBreakdownSection({
                       <div className="text-lg font-bold" style={{ color: category.color }}>
                         {product.total_sold?.toLocaleString() || 0} units
                       </div>
-                      <div className="text-xs text-[var(--g-text-muted)]">
+                      <div className="text-xs text-[var(--color-text-muted)]">
                         {getProductPercent(product)}% of total
                       </div>
-                      <div className="text-sm text-[var(--g-text-muted)]">
+                      <div className="text-sm text-[var(--color-text-muted)]">
                         ${product.total_gross?.toLocaleString() || 0}
                       </div>
                     </div>
@@ -145,7 +145,7 @@ export function ProductBreakdownSection({
             >
               {/* Product Image */}
               {getProductImage(product.product_id) ? (
-                <div className="aspect-square bg-[var(--g-bg-muted)] rounded-lg overflow-hidden mb-3">
+                <div className="aspect-square bg-[var(--color-bg-elevated)] rounded-lg overflow-hidden mb-3">
                   <img
                     src={getProductImage(product.product_id)}
                     alt={product.description || product.sku}
@@ -153,26 +153,26 @@ export function ProductBreakdownSection({
                   />
                 </div>
               ) : (
-                <div className="aspect-square bg-[var(--g-bg-muted)] rounded-lg flex items-center justify-center mb-3 text-4xl">
+                <div className="aspect-square bg-[var(--color-bg-elevated)] rounded-lg flex items-center justify-center mb-3 text-4xl">
                   📦
                 </div>
               )}
 
               {/* Product Info */}
               <div className="space-y-1">
-                <div className="text-xs text-[var(--g-text-muted)] font-mono">
+                <div className="text-xs text-[var(--color-text-muted)] font-mono">
                   {product.sku}
                 </div>
                 <div className="text-sm font-semibold g-title line-clamp-2">
                   {product.description || 'No description'}
                 </div>
-                <div className="text-lg font-bold text-[var(--g-accent)]">
+                <div className="text-lg font-bold text-[var(--color-red-primary)]">
                   {product.total_sold?.toLocaleString() || 0} units
                 </div>
-                <div className="text-xs text-[var(--g-text-muted)]">
+                <div className="text-xs text-[var(--color-text-muted)]">
                   {getProductPercent(product)}% of total
                 </div>
-                <div className="text-sm text-[var(--g-text-muted)]">
+                <div className="text-sm text-[var(--color-text-muted)]">
                   ${product.total_gross?.toLocaleString() || 0}
                 </div>
               </div>

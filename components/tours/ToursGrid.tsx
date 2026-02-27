@@ -77,7 +77,7 @@ export function ToursGrid({ tours }: ToursGridProps) {
     return (
       <div className="mt-8">
         <EmptyState
-          icon={<Music className="w-16 h-16 text-[var(--g-text-muted)]" />}
+          icon={<Music className="w-16 h-16 text-[var(--color-text-muted)]" />}
           title="No tours yet"
           description="Seed the database or add a tour to get started"
         />
@@ -114,8 +114,8 @@ export function ToursGrid({ tours }: ToursGridProps) {
                 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap
                 ${
                   isActive
-                    ? 'bg-[var(--g-accent)] text-white'
-                    : 'bg-[var(--g-surface-2)] text-[var(--g-text-dim)] hover:bg-[var(--g-surface)] hover:text-[var(--g-text)]'
+                    ? 'bg-[var(--color-red-primary)] text-white'
+                    : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-surface)] hover:text-[var(--color-text-primary)]'
                 }
               `}
             >
@@ -123,7 +123,7 @@ export function ToursGrid({ tours }: ToursGridProps) {
               <span
                 className={`
                   px-2 py-0.5 rounded-full text-xs
-                  ${isActive ? 'bg-white/30' : 'bg-[var(--g-bg-subtle)]'}
+                  ${isActive ? 'bg-[var(--color-bg-surface)]/30' : 'bg-[var(--g-bg-subtle)]'}
                 `}
               >
                 {count}
@@ -135,7 +135,7 @@ export function ToursGrid({ tours }: ToursGridProps) {
 
       {/* Results count */}
       {searchQuery && (
-        <div className="mb-4 text-sm text-[var(--g-text-muted)]">
+        <div className="mb-4 text-sm text-[var(--color-text-muted)]">
           Found {filteredTours.length} {filteredTours.length === 1 ? 'tour' : 'tours'}
           {searchQuery && ` matching "${searchQuery}"`}
         </div>
@@ -144,7 +144,7 @@ export function ToursGrid({ tours }: ToursGridProps) {
       {/* Tours grid */}
       {filteredTours.length === 0 ? (
         <EmptyState
-          icon={<Music className="w-12 h-12 text-[var(--g-text-muted)]" />}
+          icon={<Music className="w-12 h-12 text-[var(--color-text-muted)]" />}
           title="No tours found"
           description={`Try adjusting your search or filter criteria`}
         />
@@ -154,21 +154,21 @@ export function ToursGrid({ tours }: ToursGridProps) {
             <Link
               key={tour.id}
               href={`/tours/${tour.id}`}
-              className="block g-card p-6 transition-all hover:border-[var(--g-accent)] hover:shadow-lg"
+              className="block g-card p-6 transition-all hover:border-[var(--color-red-primary)] hover:shadow-lg"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-semibold g-title truncate">
                     {tour.name}
                   </h3>
-                  <p className="text-sm text-[var(--g-text-muted)] mt-1">
+                  <p className="text-sm text-[var(--color-text-muted)] mt-1">
                     {tour.artist}
                   </p>
                 </div>
                 <Badge variant={tour.status as any}>{tour.status}</Badge>
               </div>
 
-              <p className="text-sm text-[var(--g-text-dim)] mt-3">
+              <p className="text-sm text-[var(--color-text-secondary)] mt-3">
                 {formatDateRange(tour.start_date, tour.end_date)}
               </p>
 
@@ -186,7 +186,7 @@ export function ToursGrid({ tours }: ToursGridProps) {
                     label="Tour Progress"
                     showValue={false}
                   />
-                  <p className="text-xs text-[var(--g-text-muted)] mt-1">
+                  <p className="text-xs text-[var(--color-text-muted)] mt-1">
                     {tour.completedShowCount} of {tour.showCount} shows completed
                   </p>
                 </div>
@@ -194,26 +194,26 @@ export function ToursGrid({ tours }: ToursGridProps) {
 
               <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
                 <div>
-                  <p className="text-xs text-[var(--g-text-muted)] uppercase tracking-wide">
+                  <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide">
                     Shows
                   </p>
-                  <p className="font-semibold text-[var(--g-text)] mt-1">
+                  <p className="font-semibold text-[var(--color-text-primary)] mt-1">
                     {tour.showCount}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-[var(--g-text-muted)] uppercase tracking-wide">
+                  <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide">
                     Products
                   </p>
-                  <p className="font-semibold text-[var(--g-text)] mt-1">
+                  <p className="font-semibold text-[var(--color-text-primary)] mt-1">
                     {tour.productCount}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-[var(--g-text-muted)] uppercase tracking-wide">
+                  <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide">
                     Gross
                   </p>
-                  <p className="font-semibold text-[var(--g-text)] mt-1">
+                  <p className="font-semibold text-[var(--color-text-primary)] mt-1">
                     {currencyFormatter.format(tour.gross)}
                   </p>
                 </div>

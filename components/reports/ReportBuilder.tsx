@@ -126,14 +126,14 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
     <div className="g-card p-6">
       <div className="mb-6">
         <h2 className="text-2xl font-bold g-title mb-2">Generate New Report</h2>
-        <p className="text-sm text-[var(--g-text-muted)]">
+        <p className="text-sm text-[var(--color-text-muted)]">
           Create a professional PDF report with sales data, charts, and product images
         </p>
       </div>
 
       {/* Report Type */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
+        <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
           Report Type
         </label>
         <select
@@ -149,7 +149,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
 
       {/* Report Title */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-[var(--g-text)] mb-2">
+        <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
           Report Title
         </label>
         <input
@@ -163,26 +163,26 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
 
       {/* Sections */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-[var(--g-text)] mb-3">
+        <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-3">
           Report Sections
         </label>
         <div className="space-y-2">
           {sections.map((section) => (
             <label
               key={section.id}
-              className="flex items-center gap-3 p-3 rounded-lg border border-[var(--g-border)] hover:bg-[var(--g-bg-subtle)] cursor-pointer transition"
+              className="flex items-center gap-3 p-3 rounded-lg border border-[var(--color-bg-border)] hover:bg-[var(--g-bg-subtle)] cursor-pointer transition"
             >
               <input
                 type="checkbox"
                 checked={section.enabled}
                 onChange={() => toggleSection(section.id)}
-                className="w-4 h-4 text-[var(--g-accent)] border-gray-300 rounded focus:ring-[var(--g-accent)]"
+                className="w-4 h-4 text-[var(--color-red-primary)] border-gray-300 rounded focus:ring-[var(--color-red-primary)]"
               />
               <div className="flex-1">
-                <div className="text-sm font-medium text-[var(--g-text)]">
+                <div className="text-sm font-medium text-[var(--color-text-primary)]">
                   {section.title}
                 </div>
-                <div className="text-xs text-[var(--g-text-muted)]">
+                <div className="text-xs text-[var(--color-text-muted)]">
                   {section.type.replace('_', ' ')}
                 </div>
               </div>
@@ -195,7 +195,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
       <button
         onClick={handleGenerate}
         disabled={loading || !title}
-        className="w-full px-6 py-3 bg-[var(--g-accent)] text-white rounded-lg hover:bg-[var(--g-accent-2)] transition disabled:opacity-50 font-semibold"
+        className="w-full px-6 py-3 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition disabled:opacity-50 font-semibold"
       >
         {loading ? 'Generating Report...' : 'Generate Report'}
       </button>
@@ -220,7 +220,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
       {success && (
         <div className="mt-4 p-5 bg-gradient-to-br from-emerald-50/80 to-white border-2 border-emerald-200 rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-white shadow-inner">
+            <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
               <span className="text-emerald-600 text-lg">✓</span>
             </div>
             <div>
@@ -234,7 +234,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
       {error && (
         <div className="mt-4 p-5 bg-gradient-to-br from-red-50/80 to-white border-2 border-red-200 rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-white shadow-inner">
+            <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
               <span className="text-red-600 text-lg">✗</span>
             </div>
             <div>
