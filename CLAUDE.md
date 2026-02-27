@@ -242,9 +242,79 @@ scripts/             # Utility scripts
 
 ---
 
+## AI Parsing (Golden Feature)
+
+The AI-powered document parsing is the core feature of this application. Key details:
+
+### Models Used
+- **Haiku** (`claude-3-5-haiku-20241022`): Fast model for structured extraction (~3-5s)
+- **Sonnet** (`claude-sonnet-4-20250514`): Powerful model for complex docs (fallback)
+
+### Architecture
+```
+lib/ai/
+  claude-client.ts      # Core API client
+  pdf-utils.ts          # PDF text extraction (pdf-parse v2)
+  parsers/              # Document-specific parsers
+    sales-report-parser.ts
+    po-parser.ts
+    packing-list-parser.ts
+    settlement-parser.ts
+  agents/               # Document agents with prompts
+```
+
+### Parsing Flow
+1. **Text Extraction**: `pdf-parse` extracts text from PDF (~400ms)
+2. **Schema Parsing**: Use `tool_choice` with JSON schema for guaranteed valid output
+3. **Fallback**: Full document parsing with Sonnet if text extraction fails
+
+### Common Issues
+- **405 Error on Parse Routes**: Usually stale Vercel deployment - redeploy to fix
+- **JSON Parse Errors**: Usually malformed response - schema enforcement helps
+- **Hydration Errors**: Use `mounted` state pattern for client-side-only rendering
+
+---
+
+## UI Patterns
+
+### Theme System
+- Dark/light mode with CSS variables in `globals.css`
+- Theme set via `data-theme` attribute on `<html>`
+- Use inline script in `<head>` to prevent flash of wrong theme
+
+### Collapsible Sidebar
+- State managed via `SidebarContext`
+- Collapsed state persisted in localStorage
+- Key: `sidebar-collapsed`
+
+### Hydration-Safe Components
+```tsx
+// Pattern for client-side-only rendering
+const [mounted, setMounted] = useState(false);
+useEffect(() => setMounted(true), []);
+if (!mounted) return <Placeholder />;
+return <ActualComponent />;
+```
+
+### CSS Variables
+```css
+/* Use these for theme support */
+--color-bg-base       /* Main background */
+--color-bg-surface    /* Card/panel backgrounds */
+--color-bg-elevated   /* Elevated elements */
+--color-bg-border     /* Borders */
+--color-text-primary  /* Main text */
+--color-text-secondary /* Secondary text */
+--color-text-muted    /* Muted/placeholder text */
+--color-red-primary   /* Brand red */
+```
+
+---
+
 ## Questions?
 
 If you're unsure about:
 - Deployment → Ask the user before pushing to main
 - Security → Check SECURITY.md
 - Architecture → Check existing patterns in codebase
+- AI Parsing → Check lib/ai/ directory and parsers
