@@ -295,3 +295,153 @@ option {
   background-color: var(--color-bg-surface);
   color: var(--color-text-primary);
 }
+
+/* Spreadsheet-like table styles */
+.spreadsheet {
+  border-collapse: collapse;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  width: 100%;
+}
+
+.spreadsheet th,
+.spreadsheet td {
+  border: 1px solid var(--color-bg-border);
+  padding: 4px 8px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.spreadsheet th {
+  background: var(--color-bg-elevated);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.spreadsheet th:first-child,
+.spreadsheet th:nth-child(2) {
+  text-align: left;
+}
+
+.spreadsheet td:first-child,
+.spreadsheet td:nth-child(2) {
+  text-align: left;
+}
+
+/* Sticky first two columns (SKU and Description) */
+.spreadsheet th.sticky-col,
+.spreadsheet td.sticky-col {
+  position: sticky;
+  background: var(--color-bg-surface);
+  z-index: 5;
+}
+
+.spreadsheet th.sticky-col {
+  z-index: 15;
+  background: var(--color-bg-elevated);
+}
+
+.spreadsheet th.sticky-col-1,
+.spreadsheet td.sticky-col-1 {
+  left: 0;
+  min-width: 100px;
+  max-width: 100px;
+}
+
+.spreadsheet th.sticky-col-2,
+.spreadsheet td.sticky-col-2 {
+  left: 100px;
+  min-width: 140px;
+  max-width: 140px;
+  border-right: 2px solid var(--color-bg-border);
+}
+
+/* Alternating rows */
+.spreadsheet tbody tr:nth-child(even) {
+  background: var(--color-bg-elevated);
+}
+
+.spreadsheet tbody tr:hover {
+  background: rgba(232, 0, 61, 0.05);
+}
+
+/* Compact spreadsheet inputs */
+.spreadsheet-input {
+  width: 100%;
+  min-width: 50px;
+  max-width: 70px;
+  padding: 2px 4px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  text-align: right;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  color: var(--color-text-primary);
+  transition: border-color 0.1s, background 0.1s;
+}
+
+.spreadsheet-input:hover {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-bg-border);
+}
+
+.spreadsheet-input:focus {
+  outline: none;
+  background: var(--color-bg-surface);
+  border-color: var(--color-red-primary);
+  box-shadow: 0 0 0 1px var(--color-red-primary);
+}
+
+/* Warning row highlight */
+.spreadsheet tr.warning-row {
+  background: rgba(232, 0, 61, 0.08) !important;
+}
+
+/* Totals row */
+.spreadsheet tfoot tr {
+  background: var(--color-bg-elevated);
+  font-weight: 600;
+}
+
+.spreadsheet tfoot td {
+  border-top: 2px solid var(--color-bg-border);
+}
+
+/* Fullscreen modal */
+.fullscreen-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--color-bg-base);
+  overflow: auto;
+  padding: 1rem;
+}
+
+.fullscreen-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-bg-border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+/* Spreadsheet container with horizontal scroll */
+.spreadsheet-container {
+  overflow-x: auto;
+  overflow-y: visible;
+  max-height: calc(100vh - 300px);
+  border: 1px solid var(--color-bg-border);
+  border-radius: 4px;
+}
+
+.fullscreen-modal .spreadsheet-container {
+  max-height: calc(100vh - 120px);
+}

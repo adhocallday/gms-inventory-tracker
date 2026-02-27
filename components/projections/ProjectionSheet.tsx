@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { LayoutGrid, Calendar, Copy } from 'lucide-react';
+import { LayoutGrid, Calendar, Copy, Maximize2, Minimize2, X } from 'lucide-react';
 import { EnhancedAIAgentPanel } from './AIAgentPanel';
 import { ProjectionVisualizations } from './ProjectionVisualizations';
 import { ShowProjectionGrid } from './ShowProjectionGrid';
@@ -149,6 +149,7 @@ export function ProjectionSheet({
     sku: string;
     size: string | null;
   } | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Fetch warehouse locations for this tour
   useEffect(() => {
@@ -797,243 +798,268 @@ export function ProjectionSheet({
 
       {/* 6. AGGREGATE SPREADSHEET */}
       {viewMode === 'aggregate' && (
-      <div className="mt-6 g-card p-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex flex-wrap items-center gap-3">
-          <label className="text-xs text-[var(--color-text-muted)]">Scenario</label>
-          <select
-            className="g-input"
-            value={selectedScenarioId}
-            onChange={(event) => setSelectedScenarioId(event.target.value)}
-          >
-            {scenarioList.map((scenario) => (
-              <option key={scenario.id} value={scenario.id}>
-                {scenario.name}
-                {scenario.is_baseline ? ' (baseline)' : ''}
-              </option>
-            ))}
-          </select>
-          <button type="button" className="g-button g-button-outline text-xs" onClick={createScenario}>
-            Create
-          </button>
-          <button type="button" className="g-button g-button-outline text-xs" onClick={duplicateScenario}>
-            Duplicate
-          </button>
-          <button type="button" className="g-button g-button-outline text-xs" onClick={setBaseline}>
-            Set baseline
-          </button>
-          <button type="button" className="g-button g-button-outline text-xs" onClick={deleteScenario}>
-            Delete
-          </button>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href={`/tours/${tourId}/projections/compare`}
-            className="g-button g-button-outline text-xs"
-          >
-            Compare Scenarios
-          </Link>
-          <button type="button" className="g-button g-button-outline text-xs" onClick={exportCsv}>
-            Export CSV
-          </button>
-        </div>
-      </div>
+      <div className={isFullscreen ? 'fullscreen-modal' : 'mt-6 g-card p-6'}>
+        {/* Fullscreen Header */}
+        {isFullscreen && (
+          <div className="fullscreen-modal-header mb-4">
+            <h2 className="text-lg font-semibold">Projection Sheet - Full View</h2>
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="p-2 hover:bg-[var(--color-bg-elevated)] rounded-lg transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-        <div className="g-panel">
-          <label className="g-label">Expected attendance</label>
-          <input
-            className="g-input w-full"
-            type="number"
-            value={Math.round(expectedAttendance)}
-            onChange={(event) => setExpectedAttendance(Number(event.target.value))}
-          />
-        </div>
-        <div className="g-panel">
-          <label className="g-label">Expected per-head</label>
-          <input
-            className="g-input w-full"
-            type="number"
-            value={expectedPerHead.toFixed(2)}
-            onChange={(event) => setExpectedPerHead(Number(event.target.value))}
-          />
-        </div>
-        <div className="g-panel">
-          <label className="g-label">Expected gross</label>
-          <div className="text-lg font-semibold">
-            {(expectedAttendance * expectedPerHead).toLocaleString('en-US', {
-              style: 'currency',
-              currency: 'USD',
-              maximumFractionDigits: 0
-            })}
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="text-xs text-[var(--color-text-muted)]">Scenario</label>
+            <select
+              className="g-input"
+              value={selectedScenarioId}
+              onChange={(event) => setSelectedScenarioId(event.target.value)}
+            >
+              {scenarioList.map((scenario) => (
+                <option key={scenario.id} value={scenario.id}>
+                  {scenario.name}
+                  {scenario.is_baseline ? ' (baseline)' : ''}
+                </option>
+              ))}
+            </select>
+            <button type="button" className="g-button g-button-outline text-xs" onClick={createScenario}>
+              Create
+            </button>
+            <button type="button" className="g-button g-button-outline text-xs" onClick={duplicateScenario}>
+              Duplicate
+            </button>
+            <button type="button" className="g-button g-button-outline text-xs" onClick={setBaseline}>
+              Set baseline
+            </button>
+            <button type="button" className="g-button g-button-outline text-xs" onClick={deleteScenario}>
+              Delete
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="g-button g-button-outline text-xs flex items-center gap-1"
+              onClick={() => setIsFullscreen(!isFullscreen)}
+            >
+              {isFullscreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+              {isFullscreen ? 'Exit Fullscreen' : 'Expand'}
+            </button>
+            <Link
+              href={`/tours/${tourId}/projections/compare`}
+              className="g-button g-button-outline text-xs"
+            >
+              Compare Scenarios
+            </Link>
+            <button type="button" className="g-button g-button-outline text-xs" onClick={exportCsv}>
+              Export CSV
+            </button>
           </div>
         </div>
-      </div>
 
-      <div className="overflow-x-auto mt-6">
-        {isLoadingOverrides ? (
-          <p className="text-sm text-[var(--color-text-muted)]">Loading overrides…</p>
-        ) : (
-          <table className="min-w-[1200px] text-sm g-table">
-            <thead className="text-left border-b border-[var(--color-bg-border)]">
-              <tr>
-                <th className="py-2 pr-4">SKU</th>
-                <th className="py-2 pr-4">Design</th>
-                <th className="py-2 pr-4 text-right">Price</th>
-                <th className="py-2 pr-4 text-right">% Gross</th>
-                <th className="py-2 pr-4 text-right">On hand</th>
-                <th className="py-2 pr-4 text-right">On order</th>
-                <th className="py-2 pr-4 text-right">Forecast units</th>
-                {sizeOrder.map((size) => (
-                  <th key={size} className="py-2 pr-4 text-right">
-                    {size}
-                  </th>
-                ))}
-                {warehouseLocations.map((location) => (
-                  <th key={location.id} className="py-2 pr-4 text-right">
-                    {location.name}
-                  </th>
-                ))}
-                <th className="py-2 pr-4 text-right">Gross</th>
-                <th className="py-2 pr-4 text-right">COGS</th>
-                <th className="py-2 pr-4 text-right">Margin</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => {
-                const warning = row.onHand + row.onOrder < row.forecastUnits;
-                return (
-                  <tr key={row.sku} className="border-b border-[var(--color-bg-border)]">
-                    <td className="py-3 pr-4">
-                      <div className="font-semibold">{row.sku}</div>
-                      {warning ? (
-                        <div className="text-xs text-[var(--color-red-primary)]">
-                          Low stock vs forecast
-                        </div>
-                      ) : null}
-                    </td>
-                    <td className="py-3 pr-4">{row.description}</td>
-                    <td className="py-3 pr-4 text-right">
-                      <input
-                        className="g-input w-20 text-right"
-                        type="number"
-                        value={overrideMap[`${row.sku}::PRICE::`] ?? row.price.toFixed(2)}
-                        onChange={(event) =>
-                          updateOverride(row.sku, 'PRICE', null, event.target.value)
-                        }
-                        onBlur={(event) =>
-                          saveOverride(row.sku, 'PRICE', null, event.target.value)
-                        }
-                      />
-                    </td>
-                    <td className="py-3 pr-4 text-right">
-                      {(row.share * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 pr-4 text-right">{row.onHand.toFixed(0)}</td>
-                    <td className="py-3 pr-4 text-right">{row.onOrder.toFixed(0)}</td>
-                    <td className="py-3 pr-4 text-right">
-                      <input
-                        className="g-input w-20 text-right"
-                        type="number"
-                        value={overrideMap[`${row.sku}::::`] ?? row.forecastUnits.toFixed(0)}
-                        onChange={(event) => updateOverride(row.sku, null, null, event.target.value)}
-                        onBlur={(event) => saveOverride(row.sku, null, null, event.target.value)}
-                      />
-                    </td>
-                    {sizeOrder.map((size) => (
-                      <td key={`${row.sku}-${size}`} className="py-3 pr-4 text-right">
-                        <input
-                          className="g-input w-16 text-right"
-                          type="number"
-                          value={
-                            overrideMap[`${row.sku}::${size}::`] ??
-                            (row.sizeBreakdown[size] ?? 0)
-                          }
-                          onChange={(event) =>
-                            updateOverride(row.sku, size, null, event.target.value)
-                          }
-                          onBlur={(event) =>
-                            saveOverride(row.sku, size, null, event.target.value)
-                          }
-                        />
-                      </td>
-                    ))}
-                    {warehouseLocations.map((location) => (
-                      <td key={`${row.sku}-${location.id}`} className="py-3 pr-4 text-right">
-                        <input
-                          className="g-input w-16 text-right"
-                          type="number"
-                          value={
-                            overrideMap[`${row.sku}::::${location.id}`] ??
-                            row.warehouseAllocations[location.id]
-                          }
-                          onChange={(event) =>
-                            updateOverride(row.sku, null, location.id, event.target.value)
-                          }
-                          onBlur={(event) =>
-                            saveOverride(row.sku, null, location.id, event.target.value)
-                          }
-                        />
-                      </td>
-                    ))}
-                    <td className="py-3 pr-4 text-right">
-                      {row.forecastGross.toLocaleString('en-US', {
-                        style: 'currency',
-                        currency: 'USD',
-                        maximumFractionDigits: 0
-                      })}
-                    </td>
-                    <td className="py-3 pr-4 text-right">
-                      {row.forecastCogs.toLocaleString('en-US', {
-                        style: 'currency',
-                        currency: 'USD',
-                        maximumFractionDigits: 0
-                      })}
-                    </td>
-                    <td className="py-3 pr-4 text-right">
-                      {row.forecastMargin.toLocaleString('en-US', {
-                        style: 'currency',
-                        currency: 'USD',
-                        maximumFractionDigits: 0
-                      })}
-                    </td>
-                  </tr>
-                );
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          <div className="g-panel">
+            <label className="g-label">Expected attendance</label>
+            <input
+              className="g-input w-full"
+              type="number"
+              value={Math.round(expectedAttendance)}
+              onChange={(event) => setExpectedAttendance(Number(event.target.value))}
+            />
+          </div>
+          <div className="g-panel">
+            <label className="g-label">Expected per-head</label>
+            <input
+              className="g-input w-full"
+              type="number"
+              value={expectedPerHead.toFixed(2)}
+              onChange={(event) => setExpectedPerHead(Number(event.target.value))}
+            />
+          </div>
+          <div className="g-panel">
+            <label className="g-label">Expected gross</label>
+            <div className="text-lg font-semibold">
+              {(expectedAttendance * expectedPerHead).toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 0
               })}
-            </tbody>
-            <tfoot>
-              <tr className="border-t border-[var(--color-bg-border)] font-semibold">
-                <td className="py-3 pr-4" colSpan={6}>
-                  Totals
-                </td>
-                <td className="py-3 pr-4 text-right">{totals.units.toFixed(0)}</td>
-                <td className="py-3 pr-4" colSpan={sizeOrder.length + warehouseLocations.length} />
-                <td className="py-3 pr-4 text-right">
-                  {totals.gross.toLocaleString('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                    maximumFractionDigits: 0
-                  })}
-                </td>
-                <td className="py-3 pr-4 text-right">
-                  {totals.cogs.toLocaleString('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                    maximumFractionDigits: 0
-                  })}
-                </td>
-                <td className="py-3 pr-4 text-right">
-                  {totals.margin.toLocaleString('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                    maximumFractionDigits: 0
-                  })}
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-        )}
-      </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="spreadsheet-container mt-6">
+          {isLoadingOverrides ? (
+            <p className="text-sm text-[var(--color-text-muted)] p-4">Loading overrides…</p>
+          ) : (
+            <table className="spreadsheet">
+              <thead>
+                <tr>
+                  <th className="sticky-col sticky-col-1">SKU</th>
+                  <th className="sticky-col sticky-col-2">Design</th>
+                  <th>Price</th>
+                  <th>% Gross</th>
+                  <th>On Hand</th>
+                  <th>On Order</th>
+                  <th>Forecast</th>
+                  {sizeOrder.map((size) => (
+                    <th key={size}>{size}</th>
+                  ))}
+                  {warehouseLocations.map((location) => (
+                    <th key={location.id}>{location.name}</th>
+                  ))}
+                  <th>Gross</th>
+                  <th>COGS</th>
+                  <th>Margin</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => {
+                  const warning = row.onHand + row.onOrder < row.forecastUnits;
+                  return (
+                    <tr key={row.sku} className={warning ? 'warning-row' : ''}>
+                      <td className="sticky-col sticky-col-1">
+                        <div className="font-semibold text-xs">{row.sku}</div>
+                        {warning && (
+                          <div className="text-[10px] text-[var(--color-red-primary)]">Low stock</div>
+                        )}
+                      </td>
+                      <td className="sticky-col sticky-col-2">
+                        <div className="text-xs truncate max-w-[130px]" title={row.description}>
+                          {row.description}
+                        </div>
+                      </td>
+                      <td>
+                        <input
+                          className="spreadsheet-input"
+                          type="number"
+                          value={overrideMap[`${row.sku}::PRICE::`] ?? row.price.toFixed(2)}
+                          onChange={(event) =>
+                            updateOverride(row.sku, 'PRICE', null, event.target.value)
+                          }
+                          onBlur={(event) =>
+                            saveOverride(row.sku, 'PRICE', null, event.target.value)
+                          }
+                        />
+                      </td>
+                      <td>{(row.share * 100).toFixed(1)}%</td>
+                      <td>{row.onHand.toFixed(0)}</td>
+                      <td>{row.onOrder.toFixed(0)}</td>
+                      <td>
+                        <input
+                          className="spreadsheet-input"
+                          type="number"
+                          value={overrideMap[`${row.sku}::::`] ?? row.forecastUnits.toFixed(0)}
+                          onChange={(event) => updateOverride(row.sku, null, null, event.target.value)}
+                          onBlur={(event) => saveOverride(row.sku, null, null, event.target.value)}
+                        />
+                      </td>
+                      {sizeOrder.map((size) => (
+                        <td key={`${row.sku}-${size}`}>
+                          <input
+                            className="spreadsheet-input"
+                            type="number"
+                            value={
+                              overrideMap[`${row.sku}::${size}::`] ??
+                              (row.sizeBreakdown[size] ?? 0)
+                            }
+                            onChange={(event) =>
+                              updateOverride(row.sku, size, null, event.target.value)
+                            }
+                            onBlur={(event) =>
+                              saveOverride(row.sku, size, null, event.target.value)
+                            }
+                          />
+                        </td>
+                      ))}
+                      {warehouseLocations.map((location) => (
+                        <td key={`${row.sku}-${location.id}`}>
+                          <input
+                            className="spreadsheet-input"
+                            type="number"
+                            value={
+                              overrideMap[`${row.sku}::::${location.id}`] ??
+                              row.warehouseAllocations[location.id]
+                            }
+                            onChange={(event) =>
+                              updateOverride(row.sku, null, location.id, event.target.value)
+                            }
+                            onBlur={(event) =>
+                              saveOverride(row.sku, null, location.id, event.target.value)
+                            }
+                          />
+                        </td>
+                      ))}
+                      <td className="font-medium">
+                        {row.forecastGross.toLocaleString('en-US', {
+                          style: 'currency',
+                          currency: 'USD',
+                          maximumFractionDigits: 0
+                        })}
+                      </td>
+                      <td>
+                        {row.forecastCogs.toLocaleString('en-US', {
+                          style: 'currency',
+                          currency: 'USD',
+                          maximumFractionDigits: 0
+                        })}
+                      </td>
+                      <td className={row.forecastMargin > 0 ? 'text-green-600' : 'text-red-600'}>
+                        {row.forecastMargin.toLocaleString('en-US', {
+                          style: 'currency',
+                          currency: 'USD',
+                          maximumFractionDigits: 0
+                        })}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td className="sticky-col sticky-col-1 font-semibold">Totals</td>
+                  <td className="sticky-col sticky-col-2"></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td className="font-semibold">{totals.units.toFixed(0)}</td>
+                  {sizeOrder.map((size) => (
+                    <td key={size}></td>
+                  ))}
+                  {warehouseLocations.map((location) => (
+                    <td key={location.id}></td>
+                  ))}
+                  <td className="font-semibold">
+                    {totals.gross.toLocaleString('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                      maximumFractionDigits: 0
+                    })}
+                  </td>
+                  <td className="font-semibold">
+                    {totals.cogs.toLocaleString('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                      maximumFractionDigits: 0
+                    })}
+                  </td>
+                  <td className="font-semibold">
+                    {totals.margin.toLocaleString('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                      maximumFractionDigits: 0
+                    })}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          )}
+        </div>
       </div>
       )}
 
