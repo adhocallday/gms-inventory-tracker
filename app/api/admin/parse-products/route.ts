@@ -259,8 +259,8 @@ Return ONLY a valid JSON object (no markdown formatting):
 
 If no products are found, return: {"products": []}`;
 
-    // Use schema for fast Haiku parsing with guaranteed valid JSON
-    const parsedResponse = await parseDocument(base64Data, mediaType, instructions, PRODUCTS_SCHEMA);
+    // Parse document with Claude
+    const parsedResponse = await parseDocument(base64Data, mediaType, instructions);
 
     console.log(`[Parse Products] Successfully extracted ${parsedResponse.products?.length || 0} products`);
 

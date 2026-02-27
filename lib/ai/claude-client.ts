@@ -95,3 +95,53 @@ export async function parseDocument(
     throw error;
   }
 }
+
+/**
+ * Parse plain text with Claude (for spreadsheet data, etc.)
+ */
+export async function parseText(
+  text: string,
+  instructions: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _schema?: object
+): Promise<ParsedDocument> {
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 16384,
+      messages: [
+        {
+          role: 'user',
+          content: `${instructions}\n\nData to parse:\n${text}`
+        }
+      ]
+    });
+
+    const textContent = response.content.find(c => c.type === 'text');
+    if (!textContent || textContent.type !== 'text') {
+      throw new Error('No text response from Claude');
+    }
+
+    let responseText = textContent.text;
+
+    // Remove markdown code blocks if present
+    if (responseText.includes('```')) {
+      const codeBlockMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (codeBlockMatch) {
+        responseText = codeBlockMatch[1];
+      }
+    }
+
+    // Extract JSON object
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error('Failed to extract JSON from Claude response:', responseText.substring(0, 500));
+      throw new Error('No JSON found in response');
+    }
+
+    return JSON.parse(jsonMatch[0]);
+  } catch (error) {
+    console.error('Claude API Error:', error);
+    throw error;
+  }
+}
