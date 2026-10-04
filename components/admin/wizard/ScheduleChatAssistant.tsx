@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { readJsonResponse } from '@/lib/upload/upload-client';
 
 interface Show {
   showDate: string;
@@ -64,13 +65,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
           artist
         })
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to parse schedule');
-      }
-
-      const result = await response.json();
+      const result = await readJsonResponse(response);
 
       if (result.shows.length === 0) {
         setError('No shows found in the text. Try rephrasing with dates, cities, and venues.');

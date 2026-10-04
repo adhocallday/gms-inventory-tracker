@@ -247,8 +247,10 @@ scripts/             # Utility scripts
 The AI-powered document parsing is the core feature of this application. Key details:
 
 ### Models Used
-- **Haiku** (`claude-3-5-haiku-20241022`): Fast model for structured extraction (~3-5s)
-- **Sonnet** (`claude-sonnet-4-20250514`): Powerful model for complex docs (fallback)
+Model IDs live only in `lib/ai/models.ts` (`getModelForTask()`); never hardcode them elsewhere.
+- **Haiku 4.5** (`claude-haiku-4-5`): document type classification (~3s)
+- **Sonnet 5.5** (`claude-sonnet-5-5`): document parsing and chat
+- **Opus 5.5** (`claude-opus-5-5`): projections and recommendations
 
 ### Architecture
 ```
@@ -264,13 +266,22 @@ lib/ai/
 ```
 
 ### Parsing Flow
-1. **Text Extraction**: `pdf-parse` extracts text from PDF (~400ms)
-2. **Schema Parsing**: Use `tool_choice` with JSON schema for guaranteed valid output
-3. **Fallback**: Full document parsing with Sonnet if text extraction fails
+1. **Upload**: PDFs over 4 MB go to the Supabase `documents` bucket via a signed URL
+   (`/api/uploads/sign`), and routes receive `{ filePath }` instead of form data
+   (`lib/ai/read-upload.ts`). This avoids Vercel's 4.5 MB body limit.
+2. **Schema Parsing**: The PDF is sent as a `document` block with `output_config.format`
+   (JSON schema structured outputs), streamed via `.finalMessage()`.
+3. **Errors**: `AIParseError` carries a user-facing `message` plus `details`; routes return both.
+
+### API rules for current models
+- Do **not** use forced `tool_choice` (`tool`/`any`): it returns a 400 on Sonnet/Opus 5.5.
+- No `temperature`, `budget_tokens`, or assistant prefill. Use `output_config.effort`.
+- The first content block may be `thinking`: always find the `text` block, never `content[0]`.
+- AI routes need `export const maxDuration = 300`.
 
 ### Common Issues
 - **405 Error on Parse Routes**: Usually stale Vercel deployment - redeploy to fix
-- **JSON Parse Errors**: Usually malformed response - schema enforcement helps
+- **JSON Parse Errors**: Pass a schema to `parseDocument`/`parseText` for schema-valid output
 - **Hydration Errors**: Use `mounted` state pattern for client-side-only rendering
 
 ---

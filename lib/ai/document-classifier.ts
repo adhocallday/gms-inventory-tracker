@@ -3,11 +3,8 @@
  * Detects document type (PO, Packing List, Sales Report, Settlement)
  */
 
-import Anthropic from '@anthropic-ai/sdk';
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+import { getAnthropicClient } from './claude-client';
+import { getModelForTask } from './models';
 
 export type DocType = 'po' | 'packing-list' | 'sales-report' | 'settlement';
 
@@ -92,8 +89,8 @@ Analyze this document and determine its type. Respond in JSON format:
 Be specific about which indicators you found (e.g., "PO Number: 12345", "Venue: Madison Square Garden").`;
 
   try {
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+    const response = await getAnthropicClient().messages.create({
+      model: getModelForTask('document-classification'),
       max_tokens: 1024,
       messages: [
         {

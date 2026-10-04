@@ -1,4 +1,4 @@
-import { parseDocument } from '../claude-client';
+import { parseDocument, type JsonSchema } from '../claude-client';
 
 export interface POLineItem {
   sku: string;
@@ -17,6 +17,34 @@ export interface PurchaseOrderData {
   lineItems: POLineItem[];
   totalAmount: number;
 }
+
+// JSON schema for structured output (guarantees schema-valid JSON)
+const PO_SCHEMA: JsonSchema = {
+  type: 'object',
+  properties: {
+    poNumber: { type: 'string', description: 'Purchase order number' },
+    vendor: { type: 'string', description: 'Vendor name' },
+    orderDate: { type: 'string', description: 'Order date in YYYY-MM-DD format' },
+    expectedDelivery: { type: 'string', description: 'Expected delivery date in YYYY-MM-DD format' },
+    totalAmount: { type: 'number', description: 'Total order amount' },
+    lineItems: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          sku: { type: 'string', description: 'Product SKU' },
+          description: { type: 'string', description: 'Product description' },
+          size: { type: 'string', description: 'Size: S, M, L, XL, 2XL, 3XL, or One-Size' },
+          quantity: { type: 'number', description: 'Quantity ordered' },
+          unitCost: { type: 'number', description: 'Unit cost' },
+          total: { type: 'number', description: 'Line item total' }
+        },
+        required: ['sku', 'description', 'size', 'quantity', 'unitCost', 'total']
+      }
+    }
+  },
+  required: ['poNumber', 'vendor', 'orderDate', 'lineItems', 'totalAmount']
+};
 
 export async function parsePurchaseOrder(
   pdfBase64: string
@@ -49,5 +77,5 @@ Rules:
 - Return ONLY the JSON, no explanation or markdown
 `;
 
-  return parseDocument(pdfBase64, 'application/pdf', instructions) as Promise<PurchaseOrderData>;
+  return parseDocument(pdfBase64, 'application/pdf', instructions, PO_SCHEMA) as Promise<PurchaseOrderData>;
 }

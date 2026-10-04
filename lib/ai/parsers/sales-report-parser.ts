@@ -1,4 +1,4 @@
-import { parseDocument } from '../claude-client';
+import { parseDocument, type JsonSchema } from '../claude-client';
 
 export interface SalesLineItem {
   sku: string;
@@ -18,6 +18,35 @@ export interface SalesReportData {
   totalGross: number;
   lineItems: SalesLineItem[];
 }
+
+// JSON schema for structured output (guarantees schema-valid JSON)
+const SALES_REPORT_SCHEMA: JsonSchema = {
+  type: 'object',
+  properties: {
+    showDate: { type: 'string', description: 'Show date in YYYY-MM-DD format' },
+    venueName: { type: 'string', description: 'Venue name' },
+    city: { type: 'string', description: 'City name' },
+    state: { type: 'string', description: 'State abbreviation' },
+    attendance: { type: 'number', description: 'Attendance count' },
+    totalGross: { type: 'number', description: 'Total gross sales amount' },
+    lineItems: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          sku: { type: 'string', description: 'Product SKU (strip size suffix)' },
+          description: { type: 'string', description: 'Product description' },
+          size: { type: 'string', description: 'Size: S, M, L, XL, 2XL, 3XL, or One-Size' },
+          sold: { type: 'number', description: 'Quantity sold' },
+          unitPrice: { type: 'number', description: 'Unit price' },
+          gross: { type: 'number', description: 'Gross sales for this item' }
+        },
+        required: ['sku', 'description', 'size', 'sold', 'unitPrice', 'gross']
+      }
+    }
+  },
+  required: ['showDate', 'venueName', 'totalGross', 'lineItems']
+};
 
 export async function parseSalesReport(
   pdfBase64: string
@@ -54,5 +83,5 @@ Important:
 - Return ONLY the JSON object
 `;
 
-  return parseDocument(pdfBase64, 'application/pdf', instructions) as Promise<SalesReportData>;
+  return parseDocument(pdfBase64, 'application/pdf', instructions, SALES_REPORT_SCHEMA) as Promise<SalesReportData>;
 }

@@ -3,11 +3,9 @@ import { parseDocument, parseText } from '@/lib/ai/claude-client';
 import { createServiceClient } from '@/lib/supabase/client';
 import { parseSpreadsheet, spreadsheetToText, isSpreadsheetFile } from '@/lib/parsers/spreadsheet-parser';
 import { uploadProductImages } from '@/lib/storage/product-images';
-import * as pdfjsLib from 'pdfjs-dist';
-import { createCanvas } from 'canvas';
 
-// Configure pdf.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+export const runtime = 'nodejs';
+export const maxDuration = 300;
 
 interface Product {
   sku: string;
@@ -53,6 +51,12 @@ const PRODUCTS_SCHEMA = {
  */
 async function extractProductImagesFromPDF(buffer: Buffer): Promise<string[]> {
   try {
+    // Loaded lazily: canvas is a native module, so a load failure here must not
+    // take down the whole route (spreadsheet and AI parsing still work without it).
+    // The legacy build runs in Node without a web worker.
+    const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf');
+    const { createCanvas } = await import('canvas');
+
     const pdfData = new Uint8Array(buffer);
     const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
     const images: string[] = [];

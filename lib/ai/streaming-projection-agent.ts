@@ -58,7 +58,7 @@ export async function* streamAnalysis(
 
     const stream = anthropic.messages.stream({
       model,
-      max_tokens: 16384,
+      max_tokens: 32000,
       messages: [{
         role: 'user',
         content: prompt
@@ -141,7 +141,7 @@ export async function* streamComprehensiveProjections(
 
     const stream = anthropic.messages.stream({
       model,
-      max_tokens: 16384,
+      max_tokens: 32000,
       messages: [{
         role: 'user',
         content: prompt
@@ -212,7 +212,7 @@ export async function* streamChat(
   try {
     const stream = anthropic.messages.stream({
       model,
-      max_tokens: 4096,
+      max_tokens: 16000,
       system: systemPrompt,
       messages: conversationHistory.map(m => ({
         role: m.role as 'user' | 'assistant',

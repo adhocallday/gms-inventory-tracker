@@ -5,8 +5,11 @@ import { parsePurchaseOrder } from '@/lib/ai/parsers/po-parser';
 import { parsePackingList } from '@/lib/ai/parsers/packing-list-parser';
 import { parseSalesReport } from '@/lib/ai/parsers/sales-report-parser';
 import { parseSettlementReport } from '@/lib/ai/parsers/settlement-parser';
+import { AIParseError } from '@/lib/ai/claude-client';
+import { readUploadedFile, UploadError } from '@/lib/ai/read-upload';
 
 export const runtime = 'nodejs';
+export const maxDuration = 300;
 
 type DocType = 'po' | 'packing-list' | 'sales-report' | 'settlement';
 
@@ -346,17 +349,20 @@ export async function POST(
       return NextResponse.json({ error: 'Unsupported doc type' }, { status: 400 });
     }
 
-    const formData = await request.formData();
-  const file = formData.get('file');
-  const tourId = formData.get('tourId')?.toString() ?? null;
-  const showId = formData.get('showId')?.toString() ?? null;
-
-  if (!file || !(file instanceof File)) {
-    return NextResponse.json({ error: 'Missing PDF file' }, { status: 400 });
-  }
+    let upload;
+    try {
+      upload = await readUploadedFile(request, ['tourId', 'showId']);
+    } catch (e) {
+      if (e instanceof UploadError) {
+        return NextResponse.json({ error: e.message }, { status: e.status });
+      }
+      throw e;
+    }
+  const { buffer, fileName } = upload;
+  const tourId = upload.fields.tourId;
+  const showId = upload.fields.showId;
 
   const bufferStart = Date.now();
-  const buffer = Buffer.from(await file.arrayBuffer());
   const sourceHash = crypto.createHash('sha256').update(buffer).digest('hex');
   const base64 = buffer.toString('base64');
   console.log(`[Parse/${docType}] Buffer/hash: ${Date.now() - bufferStart}ms`);
@@ -385,7 +391,7 @@ export async function POST(
     .insert({
       doc_type: docType,
       source_hash: sourceHash,
-      source_filename: file.name,
+      source_filename: fileName,
       tour_id: tourId,
       show_id: showId,
       status: 'processing'
@@ -399,14 +405,16 @@ export async function POST(
     parsed = await parseByType(docType, base64);
     console.log(`[Parse/${docType}] AI parsing: ${Date.now() - parseStart}ms`);
   } catch (error: any) {
-    console.error(`[Parse Error] Doc type: ${docType}, File: ${file.name}`);
+    console.error(`[Parse Error] Doc type: ${docType}, File: ${fileName}`);
     console.error('[Parse Error] Error:', error);
     console.error('[Parse Error] Stack:', error.stack);
 
-    const errorMessage = error.message || 'Unknown parsing error';
+    const errorMessage = error instanceof AIParseError
+      ? [error.message, error.details].filter(Boolean).join(': ')
+      : error.message || 'Unknown parsing error';
     const errorDetails = {
       docType,
-      fileName: file.name,
+      fileName: fileName,
       error: errorMessage,
       timestamp: new Date().toISOString()
     };
@@ -423,10 +431,10 @@ export async function POST(
 
     return NextResponse.json(
       {
-        error: 'Failed to parse document',
+        error: error instanceof AIParseError ? error.message : 'Failed to parse document',
         details: errorMessage,
         docType,
-        fileName: file.name
+        fileName: fileName
       },
       { status: 500 }
     );
@@ -448,7 +456,7 @@ export async function POST(
       {
         doc_type: docType,
         source_hash: sourceHash,
-        source_filename: file.name,
+        source_filename: fileName,
         tour_id: tourId,
         show_id: showId,
         extracted_json: parsed,

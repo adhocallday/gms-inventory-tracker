@@ -1,4 +1,4 @@
-import { parseDocument } from '../claude-client';
+import { parseDocument, type JsonSchema } from '../claude-client';
 
 export interface SettlementComp {
   sku: string;
@@ -15,6 +15,32 @@ export interface SettlementReportData {
   ccFees: number;
   comps: SettlementComp[];
 }
+
+// JSON schema for structured output (guarantees schema-valid JSON)
+const SETTLEMENT_SCHEMA: JsonSchema = {
+  type: 'object',
+  properties: {
+    showDate: { type: 'string', description: 'Show date in YYYY-MM-DD format' },
+    venueName: { type: 'string', description: 'Venue name' },
+    grossSales: { type: 'number', description: 'Gross sales amount' },
+    salesTax: { type: 'number', description: 'Sales tax amount' },
+    ccFees: { type: 'number', description: 'Credit card fees' },
+    comps: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          sku: { type: 'string', description: 'Product SKU (strip size suffix)' },
+          description: { type: 'string', description: 'Product description' },
+          size: { type: 'string', description: 'Size: S, M, L, XL, 2XL, 3XL, or One-Size' },
+          quantity: { type: 'number', description: 'Quantity comped' }
+        },
+        required: ['sku', 'description', 'size', 'quantity']
+      }
+    }
+  },
+  required: ['showDate', 'venueName', 'grossSales', 'salesTax', 'ccFees', 'comps']
+};
 
 export async function parseSettlementReport(
   pdfBase64: string
@@ -49,5 +75,5 @@ Rules:
 - Return ONLY the JSON, no explanation or markdown
 `;
 
-  return parseDocument(pdfBase64, 'application/pdf', instructions) as Promise<SettlementReportData>;
+  return parseDocument(pdfBase64, 'application/pdf', instructions, SETTLEMENT_SCHEMA) as Promise<SettlementReportData>;
 }

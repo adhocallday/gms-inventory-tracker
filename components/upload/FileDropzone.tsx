@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useRouter } from 'next/navigation';
+import { buildUploadBody, readJsonResponse, stageLargeUpload } from '@/lib/upload/upload-client';
 
 type DocType = 'po' | 'packing-list' | 'sales-report' | 'settlement';
 
@@ -58,6 +59,15 @@ export function FileDropzone({
   const [tourShowMatch, setTourShowMatch] = useState<TourShowMatch | null>(null);
   const [pdfPreview, setPdfPreview] = useState<string | null>(null);
   const [currentFile, setCurrentFile] = useState<File | null>(null);
+  // Large files are staged in storage once, then reused for detect + parse
+  const stagedUpload = useRef<{ file: File; path: string | null } | null>(null);
+
+  const getStagedPath = useCallback(async (file: File) => {
+    if (stagedUpload.current?.file === file) return stagedUpload.current.path;
+    const path = await stageLargeUpload(file);
+    stagedUpload.current = { file, path };
+    return path;
+  }, []);
 
   // Clean up preview URL on unmount
   useEffect(() => {
@@ -78,20 +88,12 @@ export function FileDropzone({
     setPdfPreview(previewUrl);
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-
+      const stagedPath = await getStagedPath(file);
       const response = await fetch('/api/detect-doc-type', {
         method: 'POST',
-        body: formData
+        ...buildUploadBody(file, stagedPath)
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Detection failed');
-      }
-
-      const result = await response.json();
+      const result = await readJsonResponse(response);
       setDetectedType(result.classification.detectedType);
       setClassification(result.classification);
       setTourShowMatch(result.tourShowMatch || null);
@@ -115,7 +117,7 @@ export function FileDropzone({
     } finally {
       setDetecting(false);
     }
-  }, [onTypeDetected]);
+  }, [onTypeDetected, getStagedPath]);
 
   // Function to parse document
   const parseDocument = useCallback(async (file: File, type: DocType) => {
@@ -124,22 +126,12 @@ export function FileDropzone({
     setError(null);
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      if (tourId) formData.append('tourId', tourId);
-      if (showId) formData.append('showId', showId);
-
+      const stagedPath = await getStagedPath(file);
       const response = await fetch(`/api/parse/${type}`, {
         method: 'POST',
-        body: formData
+        ...buildUploadBody(file, stagedPath, { tourId, showId })
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Parsing failed');
-      }
-
-      const result = await response.json();
+      const result = await readJsonResponse(response);
       setParsedData(result.normalized_json);
 
       // Call callback if provided
@@ -166,7 +158,7 @@ export function FileDropzone({
       setUploading(false);
       setParsing(false);
     }
-  }, [tourId, showId, onParseComplete, autoRedirect, router]);
+  }, [tourId, showId, onParseComplete, autoRedirect, router, getStagedPath]);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) return;

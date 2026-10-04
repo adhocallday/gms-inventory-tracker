@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parseDocument } from '@/lib/ai/claude-client';
 
+export const runtime = 'nodejs';
+export const maxDuration = 300;
+
 interface Show {
   showDate: string;
   venueName: string;

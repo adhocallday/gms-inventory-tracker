@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/client';
 import { generateComprehensiveProjections } from '@/lib/ai/projection-agent';
 
+export const maxDuration = 300;
+
 export async function POST(request: NextRequest) {
   try {
     const { tourId, scenarioId, expectedAttendance, expectedPerHead, comparableTourId, warehouseLocations } = await request.json();

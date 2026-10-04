@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { readJsonResponse } from '@/lib/upload/upload-client';
 
 interface Product {
   sku: string;
@@ -47,13 +48,7 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
         method: 'POST',
         body: formData
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to parse inventory');
-      }
-
-      const result = await response.json();
+      const result = await readJsonResponse(response);
       onUpdate([...inventory, ...result.inventory]);
     } catch (err: any) {
       setError(err.message);

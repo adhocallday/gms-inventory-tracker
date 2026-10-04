@@ -5,6 +5,15 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
 
+// Current models always think, so the first content block may be a thinking
+// block — collect the text blocks instead of reading content[0].
+function responseText(response: Anthropic.Message): string {
+  return response.content
+    .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+    .map(b => b.text)
+    .join('');
+}
+
 // Types
 export interface ProjectionContext {
   tourId: string;
@@ -75,18 +84,16 @@ export async function analyzeProjectionData(
 
   console.log(`[ProjectionAgent] analyzeProjectionData using ${getModelName(model)}`);
 
-  const response = await anthropic.messages.create({
+  const response = await anthropic.messages.stream({
     model,
-    max_tokens: 16384,
+    max_tokens: 32000,
     messages: [{
       role: 'user',
       content: prompt
     }]
-  });
+  }).finalMessage();
 
-  const content = response.content[0].type === 'text'
-    ? response.content[0].text
-    : '';
+  const content = responseText(response);
 
   return parseAnalysisResponse(content);
 }
@@ -105,18 +112,16 @@ export async function generateRecommendations(
 
   console.log(`[ProjectionAgent] generateRecommendations using ${getModelName(model)}`);
 
-  const response = await anthropic.messages.create({
+  const response = await anthropic.messages.stream({
     model,
-    max_tokens: 16384,
+    max_tokens: 32000,
     messages: [{
       role: 'user',
       content: prompt
     }]
-  });
+  }).finalMessage();
 
-  const content = response.content[0].type === 'text'
-    ? response.content[0].text
-    : '';
+  const content = responseText(response);
 
   return parseRecommendationsResponse(content);
 }
@@ -131,19 +136,17 @@ export async function chatWithAgent(
 
   console.log(`[ProjectionAgent] chatWithAgent using ${getModelName(model)}`);
 
-  const response = await anthropic.messages.create({
+  const response = await anthropic.messages.stream({
     model,
-    max_tokens: 4096,
+    max_tokens: 16000,
     system: systemPrompt,
     messages: conversationHistory.map(m => ({
       role: m.role as 'user' | 'assistant',
       content: m.content
     }))
-  });
+  }).finalMessage();
 
-  return response.content[0].type === 'text'
-    ? response.content[0].text
-    : '';
+  return responseText(response);
 }
 
 // Generate comprehensive projections (prices, units, sizes, buckets)
@@ -155,18 +158,16 @@ export async function generateComprehensiveProjections(
 
   console.log(`[ProjectionAgent] generateComprehensiveProjections using ${getModelName(model)}`);
 
-  const response = await anthropic.messages.create({
+  const response = await anthropic.messages.stream({
     model,
-    max_tokens: 16384,
+    max_tokens: 32000,
     messages: [{
       role: 'user',
       content: prompt
     }]
-  });
+  }).finalMessage();
 
-  const content = response.content[0].type === 'text'
-    ? response.content[0].text
-    : '';
+  const content = responseText(response);
 
   return parseComprehensiveProjectionsResponse(content);
 }
@@ -461,18 +462,16 @@ export async function analyzeSizeDistribution(
 
   console.log(`[ProjectionAgent] analyzeSizeDistribution using ${getModelName(model)}`);
 
-  const response = await anthropic.messages.create({
+  const response = await anthropic.messages.stream({
     model,
-    max_tokens: 16384,
+    max_tokens: 32000,
     messages: [{
       role: 'user',
       content: prompt
     }]
-  });
+  }).finalMessage();
 
-  const content = response.content[0].type === 'text'
-    ? response.content[0].text
-    : '';
+  const content = responseText(response);
 
   return parseSizeAnalysisResponse(content);
 }

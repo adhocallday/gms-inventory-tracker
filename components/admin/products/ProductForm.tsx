@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { X, Upload, FileText, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { readJsonResponse } from '@/lib/upload/upload-client';
 
 export interface ProductFormData {
   sku: string;
@@ -94,13 +95,7 @@ export function ProductForm({
         method: 'POST',
         body: formData,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to parse products');
-      }
-
-      const result = await response.json();
+      const result = await readJsonResponse(response);
 
       if (result.products && result.products.length > 0) {
         setParsedProducts(result.products);

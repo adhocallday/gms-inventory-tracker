@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import ScheduleChatAssistant from './ScheduleChatAssistant';
+import { readJsonResponse } from '@/lib/upload/upload-client';
 
 interface TourData {
   name: string;
@@ -50,13 +51,7 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
         method: 'POST',
         body: formData
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to parse schedule');
-      }
-
-      const result = await response.json();
+      const result = await readJsonResponse(response);
       onUpdate([...shows, ...result.shows]);
     } catch (err: any) {
       setError(err.message);

@@ -2,6 +2,8 @@ import { NextRequest } from 'next/server';
 import { streamAnalysis, streamComprehensiveProjections } from '@/lib/ai/streaming-projection-agent';
 import { createServiceClient } from '@/lib/supabase/client';
 
+export const maxDuration = 300;
+
 /**
  * POST /api/projections/analyze-stream
  * Stream AI analysis with Server-Sent Events

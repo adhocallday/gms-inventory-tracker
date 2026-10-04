@@ -6,6 +6,9 @@ import { parsePackingList } from '@/lib/ai/parsers/packing-list-parser';
 import { parseSalesReport } from '@/lib/ai/parsers/sales-report-parser';
 import { parseSettlementReport } from '@/lib/ai/parsers/settlement-parser';
 
+export const runtime = 'nodejs';
+export const maxDuration = 300;
+
 export async function POST(request: NextRequest) {
   const totalStart = Date.now();
 

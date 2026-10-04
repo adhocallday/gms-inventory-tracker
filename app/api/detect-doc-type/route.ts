@@ -1,6 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { parseDocument } from '@/lib/ai/claude-client';
+import { parseDocument, AIParseError, type JsonSchema } from '@/lib/ai/claude-client';
+import { readUploadedFile, UploadError } from '@/lib/ai/read-upload';
 import { createServiceClient } from '@/lib/supabase/client';
+
+export const runtime = 'nodejs';
+export const maxDuration = 120;
+
+const NULLABLE_STRING = { type: ['string', 'null'] };
+
+const CLASSIFICATION_SCHEMA: JsonSchema = {
+  type: 'object',
+  properties: {
+    detectedType: { type: 'string', enum: ['po', 'packing-list', 'sales-report', 'settlement'] },
+    confidence: { type: 'string', enum: ['high', 'medium', 'low'] },
+    reasoning: { type: 'string' },
+    indicators: { type: 'array', items: { type: 'string' } },
+    extractedInfo: {
+      type: 'object',
+      properties: {
+        artistOrTourName: NULLABLE_STRING,
+        showDate: NULLABLE_STRING,
+        venueName: NULLABLE_STRING,
+        city: NULLABLE_STRING,
+        state: NULLABLE_STRING,
+      },
+      required: ['artistOrTourName', 'showDate', 'venueName', 'city', 'state'],
+    },
+  },
+  required: ['detectedType', 'confidence', 'reasoning', 'indicators', 'extractedInfo'],
+};
 
 type DocType = 'po' | 'packing-list' | 'sales-report' | 'settlement';
 
@@ -149,22 +177,18 @@ async function matchTourAndShow(extractedInfo: any): Promise<TourShowMatch> {
  */
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
-
-    if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      );
+    let upload;
+    try {
+      upload = await readUploadedFile(request);
+    } catch (e) {
+      if (e instanceof UploadError) {
+        return NextResponse.json({ error: e.message }, { status: e.status });
+      }
+      throw e;
     }
+    const base64Pdf = upload.buffer.toString('base64');
 
-    // Convert file to base64
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const base64Pdf = buffer.toString('base64');
-
-    console.log(`[Detect Doc Type] Analyzing ${file.name} (${(file.size / 1024).toFixed(1)} KB) with Claude`);
+    console.log(`[Detect Doc Type] Analyzing ${upload.fileName} (${(upload.buffer.length / 1024).toFixed(1)} KB) with Claude`);
 
     // Use the same parseDocument function that all other parsers use
     const instructions = `You are analyzing a PDF document to determine its type and extract key information.
@@ -196,7 +220,10 @@ Important: Extract artistOrTourName, showDate, and venueName even if confidence 
 - Venue names (e.g., "CFG Bank Arena", "Madison Square Garden")
 - Show dates in any format`;
 
-    const parsedResponse = await parseDocument(base64Pdf, 'application/pdf', instructions);
+    const parsedResponse = await parseDocument(base64Pdf, 'application/pdf', instructions, CLASSIFICATION_SCHEMA, {
+      task: 'document-classification',
+      maxTokens: 2048,
+    });
 
     const classification: ClassificationResult = {
       detectedType: parsedResponse.detectedType,
@@ -223,7 +250,10 @@ Important: Extract artistOrTourName, showDate, and venueName even if confidence 
   } catch (error: any) {
     console.error('[Detect doc type] Error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to detect document type' },
+      {
+        error: error instanceof AIParseError ? error.message : 'Failed to detect document type',
+        details: error instanceof AIParseError ? error.details : error.message,
+      },
       { status: 500 }
     );
   }

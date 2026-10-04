@@ -1,9 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { parseText, AIParseError, type JsonSchema } from '@/lib/ai/claude-client';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!
-});
+export const runtime = 'nodejs';
+export const maxDuration = 120;
+
+const SHOWS_SCHEMA: JsonSchema = {
+  type: 'object',
+  properties: {
+    shows: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          showDate: { type: 'string' },
+          venueName: { type: 'string' },
+          city: { type: 'string' },
+          state: { type: 'string' },
+          country: { type: 'string' },
+          capacity: { type: ['number', 'null'] },
+        },
+        required: ['showDate', 'venueName', 'city', 'state', 'country', 'capacity'],
+      },
+    },
+  },
+  required: ['shows'],
+};
 
 interface Show {
   showDate: string;
@@ -33,12 +54,7 @@ export async function POST(request: NextRequest) {
     console.log(`[Parse Schedule Text] Processing text for ${tourName} by ${artist}`);
 
     // Use Claude to parse the unstructured text
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
-      messages: [{
-        role: 'user',
-        content: `You are analyzing text containing tour schedule information for "${tourName}" by ${artist}.
+    const instructions = `You are analyzing text containing tour schedule information for "${tourName}" by ${artist}.
 
 Extract all show/concert dates from this unstructured text and return them as a structured JSON array.
 
@@ -90,36 +106,9 @@ EXAMPLE OUTPUT:
   ]
 }
 
-USER TEXT:
-${text}
+If no shows are found, return an empty shows array.`;
 
-Return ONLY valid JSON (no markdown formatting):
-{"shows": [...]}
-
-If no shows are found, return: {"shows": []}`
-      }]
-    });
-
-    const textContent = response.content.find(c => c.type === 'text');
-    if (!textContent || textContent.type !== 'text') {
-      throw new Error('No text response from Claude');
-    }
-
-    let responseText = textContent.text;
-
-    // Remove markdown code blocks if present
-    if (responseText.includes('```')) {
-      const match = responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-      if (match) responseText = match[1];
-    }
-
-    // Extract JSON object
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in response');
-    }
-
-    const parsedResponse = JSON.parse(jsonMatch[0]);
+    const parsedResponse = await parseText(text, instructions, SHOWS_SCHEMA);
 
     console.log(`[Parse Schedule Text] Successfully extracted ${parsedResponse.shows?.length || 0} shows`);
 
@@ -149,7 +138,10 @@ If no shows are found, return: {"shows": []}`
   } catch (error: any) {
     console.error('[Parse Schedule Text] Error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to parse schedule text' },
+      {
+        error: error instanceof AIParseError ? error.message : 'Failed to parse schedule text',
+        details: error instanceof AIParseError ? error.details : error.message,
+      },
       { status: 500 }
     );
   }

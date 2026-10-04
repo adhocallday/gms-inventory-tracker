@@ -2,6 +2,8 @@ import { NextRequest } from 'next/server';
 import { streamChat } from '@/lib/ai/streaming-projection-agent';
 import { createServiceClient } from '@/lib/supabase/client';
 
+export const maxDuration = 300;
+
 /**
  * POST /api/projections/chat-stream
  * Stream chat responses token by token using SSE

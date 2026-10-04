@@ -12,14 +12,14 @@
  * Available Claude models
  */
 export const MODELS = {
-  /** Claude Opus 4 - Most capable, best for complex reasoning */
-  OPUS: 'claude-opus-4-20250514',
+  /** Claude Opus 5.5 - Most capable, best for complex reasoning */
+  OPUS: 'claude-opus-5-5',
 
-  /** Claude Sonnet 4 - Balanced performance, reliable JSON output */
-  SONNET: 'claude-sonnet-4-20250514',
+  /** Claude Sonnet 5.5 - Balanced performance, reliable structured output */
+  SONNET: 'claude-sonnet-5-5',
 
-  /** Claude Haiku 3.5 - Fastest, best for simple tasks */
-  HAIKU: 'claude-3-5-haiku-20241022',
+  /** Claude Haiku 4.5 - Fastest, best for simple tasks */
+  HAIKU: 'claude-haiku-4-5',
 } as const;
 
 export type ModelName = (typeof MODELS)[keyof typeof MODELS];
@@ -33,7 +33,7 @@ export type TaskType =
   | 'recommendations'
   | 'size-distribution'
   | 'comprehensive-projections'
-  // Document parsing → Sonnet
+  // Document parsing → Sonnet, classification → Haiku
   | 'document-parsing'
   | 'document-classification'
   // Conversational → Sonnet
@@ -43,8 +43,8 @@ export type TaskType =
  * Task-based model routing configuration
  *
  * - **Opus**: Complex reasoning, trend analysis, business recommendations
- * - **Sonnet**: Document parsing, classification, conversational AI
- * - **Haiku**: Reserved for simple, high-volume tasks (future)
+ * - **Sonnet**: Document parsing, conversational AI
+ * - **Haiku**: Document type classification (fast, cheap)
  */
 export const MODEL_ROUTING: Record<TaskType, ModelName> = {
   // Complex reasoning tasks → Opus (most capable)
@@ -53,9 +53,11 @@ export const MODEL_ROUTING: Record<TaskType, ModelName> = {
   'size-distribution': MODELS.OPUS,
   'comprehensive-projections': MODELS.OPUS,
 
-  // Document parsing → Sonnet (reliable JSON, good accuracy)
+  // Document parsing → Sonnet (reliable structured output, good accuracy)
   'document-parsing': MODELS.SONNET,
-  'document-classification': MODELS.SONNET,
+
+  // Classification → Haiku (only needs a short label)
+  'document-classification': MODELS.HAIKU,
 
   // Conversational → Sonnet (balanced performance)
   'chat': MODELS.SONNET,
@@ -69,11 +71,11 @@ export const MODEL_ROUTING: Record<TaskType, ModelName> = {
  *
  * @example
  * const model = getModelForTask('projection-analysis');
- * // Returns: 'claude-opus-4-20250514'
+ * // Returns: 'claude-opus-5-5'
  *
  * @example
  * const model = getModelForTask('document-parsing');
- * // Returns: 'claude-sonnet-4-20250514'
+ * // Returns: 'claude-sonnet-5-5'
  */
 export function getModelForTask(task: TaskType): ModelName {
   return MODEL_ROUTING[task];
@@ -86,9 +88,9 @@ export const MODEL_INFO: Record<
   ModelName,
   { name: string; tier: 'opus' | 'sonnet' | 'haiku'; costTier: 'high' | 'medium' | 'low' }
 > = {
-  [MODELS.OPUS]: { name: 'Claude Opus 4', tier: 'opus', costTier: 'high' },
-  [MODELS.SONNET]: { name: 'Claude Sonnet 4', tier: 'sonnet', costTier: 'medium' },
-  [MODELS.HAIKU]: { name: 'Claude Haiku 3.5', tier: 'haiku', costTier: 'low' },
+  [MODELS.OPUS]: { name: 'Claude Opus 5.5', tier: 'opus', costTier: 'high' },
+  [MODELS.SONNET]: { name: 'Claude Sonnet 5.5', tier: 'sonnet', costTier: 'medium' },
+  [MODELS.HAIKU]: { name: 'Claude Haiku 4.5', tier: 'haiku', costTier: 'low' },
 };
 
 /**
