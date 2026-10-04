@@ -5,6 +5,7 @@ import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { StatCard } from '@/components/dashboard/StatCard';
+import { ArrowRight, BarChart3, Calendar, ClipboardList, FileText, Folder, Music, Package, Plus, Settings, Tag } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -66,7 +67,7 @@ export default async function AdminDashboard() {
     {
       title: 'Create New Tour',
       description: 'Set up a new tour with AI-assisted data entry',
-      icon: '➕',
+      icon: Plus,
       href: '/admin/tours/new',
       color: 'bg-[var(--color-red-primary)]',
       hoverColor: 'hover:bg-[var(--color-red-hover)]',
@@ -76,7 +77,7 @@ export default async function AdminDashboard() {
     {
       title: 'Manage Tours',
       description: 'Edit existing tours, add shows, extend dates',
-      icon: '📋',
+      icon: ClipboardList,
       href: '/admin/tours',
       color: 'bg-[var(--color-bg-elevated)]',
       hoverColor: 'hover:bg-[var(--color-bg-border)]',
@@ -86,7 +87,7 @@ export default async function AdminDashboard() {
     {
       title: 'Upload Documents',
       description: 'Parse PDFs, CSVs, and sales reports',
-      icon: '📄',
+      icon: FileText,
       href: '/upload',
       color: 'bg-[var(--color-bg-elevated)]',
       hoverColor: 'hover:bg-[var(--color-bg-border)]',
@@ -96,7 +97,7 @@ export default async function AdminDashboard() {
     {
       title: 'Product Catalog',
       description: 'Manage global products and SKUs',
-      icon: '🏷️',
+      icon: Tag,
       href: '/admin/products',
       color: 'bg-[var(--color-bg-elevated)]',
       hoverColor: 'hover:bg-[var(--color-bg-border)]',
@@ -106,7 +107,7 @@ export default async function AdminDashboard() {
     {
       title: 'View Inventory',
       description: 'Check stock levels across all tours',
-      icon: '📦',
+      icon: Package,
       href: '/admin/inventory',
       color: 'bg-[var(--color-bg-elevated)]',
       hoverColor: 'hover:bg-[var(--color-bg-border)]',
@@ -149,7 +150,7 @@ export default async function AdminDashboard() {
               href={action.href}
               className={`group p-6 rounded-xl border border-[var(--color-bg-border)] ${action.color} ${action.hoverColor} transition-all duration-200 hover:scale-105`}
             >
-              <div className="text-3xl mb-3">{action.icon}</div>
+              <action.icon className={`block h-8 w-8 mb-3 ${action.textColor}`} aria-hidden="true" />
               <h3 className={`text-sm font-semibold mb-2 ${action.textColor}`}>
                 {action.title}
               </h3>
@@ -171,7 +172,7 @@ export default async function AdminDashboard() {
             href="/admin/tours"
             className="text-sm text-[var(--color-red-primary)] hover:underline font-medium"
           >
-            View all →
+            View all <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
           </Link>
         </div>
 
@@ -191,10 +192,10 @@ export default async function AdminDashboard() {
                     <Badge variant={tour.status}>{tour.status}</Badge>
                   </div>
                   <div className="flex items-center gap-4 text-xs text-[var(--color-text-secondary)]">
-                    <span>🎸 {tour.artist}</span>
+                    <span><Music className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> {tour.artist}</span>
                     {tour.start_date && tour.end_date && (
                       <span>
-                        📅 {new Date(tour.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        <Calendar className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> {new Date(tour.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         {' - '}
                         {new Date(tour.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </span>
@@ -202,7 +203,7 @@ export default async function AdminDashboard() {
                   </div>
                 </div>
                 <div className="text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition">
-                  →
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </div>
               </Link>
             ))}
@@ -229,7 +230,7 @@ export default async function AdminDashboard() {
             href="/admin/analytics"
             className="group p-6 rounded-xl border border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-border)] transition-all duration-200 hover:scale-105"
           >
-            <div className="text-3xl mb-3">📊</div>
+            <BarChart3 className="block h-8 w-8 mb-3 text-[var(--color-text-secondary)]" aria-hidden="true" />
             <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-2 group-hover:text-[var(--color-red-primary)]">
               Analytics Dashboard
             </h3>
@@ -242,7 +243,7 @@ export default async function AdminDashboard() {
             href="/admin/documents"
             className="group p-6 rounded-xl border border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-border)] transition-all duration-200 hover:scale-105"
           >
-            <div className="text-3xl mb-3">📁</div>
+            <Folder className="block h-8 w-8 mb-3 text-[var(--color-text-secondary)]" aria-hidden="true" />
             <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-2 group-hover:text-[var(--color-red-primary)]">
               Document Management
             </h3>
@@ -252,7 +253,7 @@ export default async function AdminDashboard() {
           </Link>
 
           <div className="p-6 rounded-xl border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] opacity-50">
-            <div className="text-3xl mb-3">⚙️</div>
+            <Settings className="block h-8 w-8 mb-3 text-[var(--color-text-secondary)]" aria-hidden="true" />
             <h3 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-2">
               User Management
             </h3>

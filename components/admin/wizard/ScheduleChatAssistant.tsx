@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { readJsonResponse } from '@/lib/upload/upload-client';
+import { Check, Lightbulb } from 'lucide-react';
 
 interface Show {
   showDate: string;
@@ -134,7 +135,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
 
           <div className="mt-4 pt-4 border-t border-white/10">
             <p className="text-xs text-[var(--color-text-muted)]">
-              <strong>💡 Tips:</strong> You can paste dates in any format (1/15, Jan 15, January 15th). Include city and state. Venue names are optional.
+              <strong><Lightbulb className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Tips:</strong> You can paste dates in any format (1/15, Jan 15, January 15th). Include city and state. Venue names are optional.
             </p>
           </div>
         </>
@@ -142,7 +143,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
         <div className="space-y-4">
           <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
             <p className="text-sm text-green-400 font-semibold">
-              ✓ Found {pendingShows.length} show{pendingShows.length !== 1 ? 's' : ''}. Review and edit before adding:
+              <Check className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Found {pendingShows.length} show{pendingShows.length !== 1 ? 's' : ''}. Review and edit before adding:
             </p>
           </div>
 

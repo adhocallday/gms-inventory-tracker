@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { InventoryBalanceTable, type InventoryBalanceRow } from '@/components/inventory/InventoryBalanceTable';
 import { StockMovementsTable, type StockMovementRow } from '@/components/inventory/StockMovementsTable';
 import { Button } from '@/components/ui/Button';
+import { AlertTriangle, ArrowLeft, Ban } from 'lucide-react';
 
 interface Tour {
   id: string;
@@ -184,7 +185,7 @@ export default function InventoryTrackerPage() {
     <div className="g-container py-12">
       {/* Header */}
       <Link href={`/tours/${tourId}`} className="text-sm font-medium g-link">
-        ← Back to tour
+        <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to tour
       </Link>
 
       <div className="flex flex-col gap-4 mt-4 lg:flex-row lg:items-start lg:justify-between">
@@ -238,7 +239,7 @@ export default function InventoryTrackerPage() {
           {data.summary.low_stock_items > 0 && (
             <div className="g-card p-4 border-yellow-500/30">
               <div className="flex items-center gap-2">
-                <span className="text-yellow-400 text-xl">⚠️</span>
+                <AlertTriangle className="h-5 w-5 shrink-0 text-yellow-400" aria-hidden="true" />
                 <div>
                   <p className="text-sm font-semibold text-yellow-300">
                     {data.summary.low_stock_items} Low Stock Items
@@ -254,7 +255,7 @@ export default function InventoryTrackerPage() {
           {data.summary.out_of_stock_items > 0 && (
             <div className="g-card p-4 border-red-500/30">
               <div className="flex items-center gap-2">
-                <span className="text-red-400 text-xl">🚫</span>
+                <Ban className="h-5 w-5 shrink-0 text-red-400" aria-hidden="true" />
                 <div>
                   <p className="text-sm font-semibold text-red-300">
                     {data.summary.out_of_stock_items} Out of Stock

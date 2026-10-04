@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import LineItemsTable from './LineItemsTable';
+import { AlertTriangle } from 'lucide-react';
 
 interface SalesLineItem {
   sku: string;
@@ -172,7 +173,7 @@ export default function ReviewFormSalesReport({
             </div>
             {grossMismatch && (
               <p className="text-xs text-yellow-400 mt-2">
-                ⚠️ Warning: Calculated total ({formatCurrency(calculatedGross)}) differs from reported total ({formatCurrency(reportedGross)}) by {formatCurrency(Math.abs(calculatedGross - reportedGross))}
+                <AlertTriangle className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Warning: Calculated total ({formatCurrency(calculatedGross)}) differs from reported total ({formatCurrency(reportedGross)}) by {formatCurrency(Math.abs(calculatedGross - reportedGross))}
               </p>
             )}
           </div>

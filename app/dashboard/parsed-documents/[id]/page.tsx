@@ -9,6 +9,7 @@ import ReviewFormPO from '@/components/review/ReviewFormPO';
 import ReviewFormPackingList from '@/components/review/ReviewFormPackingList';
 import ReviewFormSalesReport from '@/components/review/ReviewFormSalesReport';
 import ReviewFormSettlement from '@/components/review/ReviewFormSettlement';
+import { CheckIcon, X } from 'lucide-react';
 
 interface ParsedDocument {
   id: string;
@@ -343,7 +344,7 @@ export default function ReviewDocumentPage({
       {isPosted && (
         <div className="g-card p-6 bg-green-500/10 border-green-500/30">
           <p className="text-sm text-green-300">
-            ✓ This document has been posted to the database and cannot be edited.
+            <CheckIcon className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> This document has been posted to the database and cannot be edited.
           </p>
         </div>
       )}
@@ -351,7 +352,7 @@ export default function ReviewDocumentPage({
       {isRejected && (
         <div className="g-card p-6 bg-red-500/10 border-red-500/30">
           <p className="text-sm text-red-300">
-            ✕ This document has been rejected.
+            <X className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> This document has been rejected.
           </p>
         </div>
       )}

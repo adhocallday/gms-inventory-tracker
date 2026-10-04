@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { ChevronDown, ChevronRight, ClipboardList, DollarSign, FileText, Package, Receipt } from 'lucide-react';
 
 interface ParsedDocument {
   id: string;
@@ -216,7 +217,7 @@ export default function DocumentsPage() {
         </div>
       ) : filteredDocuments.length === 0 ? (
         <div className="g-card p-12 text-center">
-          <div className="text-4xl mb-4">📄</div>
+          <FileText className="block mx-auto h-10 w-10 mb-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
           <p className="text-[var(--color-text-secondary)] mb-4">
             {documents.length === 0 ? 'No documents have been uploaded yet.' : 'No documents match your filters.'}
           </p>
@@ -235,10 +236,10 @@ export default function DocumentsPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="text-2xl">
-                      {doc.doc_type === 'po' && '📦'}
-                      {doc.doc_type === 'packing-list' && '📋'}
-                      {doc.doc_type === 'sales-report' && '💰'}
-                      {doc.doc_type === 'settlement' && '🧾'}
+                      {doc.doc_type === 'po' && <Package className="h-5 w-5" aria-hidden="true" />}
+                      {doc.doc_type === 'packing-list' && <ClipboardList className="h-5 w-5" aria-hidden="true" />}
+                      {doc.doc_type === 'sales-report' && <DollarSign className="h-5 w-5" aria-hidden="true" />}
+                      {doc.doc_type === 'settlement' && <Receipt className="h-5 w-5" aria-hidden="true" />}
                     </div>
                     <div>
                       <div className="flex items-center gap-2 mb-1">
@@ -271,7 +272,7 @@ export default function DocumentsPage() {
                       {new Date(doc.created_at).toLocaleDateString()}
                     </div>
                     <div className="text-[var(--color-text-secondary)]">
-                      {expandedDoc === doc.id ? '▼' : '▶'}
+                      {expandedDoc === doc.id ? <ChevronDown className="h-4 w-4" aria-hidden="true" /> : <ChevronRight className="h-4 w-4" aria-hidden="true" />}
                     </div>
                   </div>
                 </div>

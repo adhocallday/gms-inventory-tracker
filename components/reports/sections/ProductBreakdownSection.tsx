@@ -1,4 +1,5 @@
 'use client';
+import { Package } from 'lucide-react';
 
 interface ProductBreakdownSectionProps {
   title: string;
@@ -105,7 +106,7 @@ export function ProductBreakdownSection({
                       </div>
                     ) : (
                       <div className="aspect-square bg-[var(--color-bg-elevated)] rounded-lg flex items-center justify-center mb-3 text-4xl">
-                        📦
+                        <Package className="h-4 w-4" aria-hidden="true" />
                       </div>
                     )}
 
@@ -154,7 +155,7 @@ export function ProductBreakdownSection({
                 </div>
               ) : (
                 <div className="aspect-square bg-[var(--color-bg-elevated)] rounded-lg flex items-center justify-center mb-3 text-4xl">
-                  📦
+                  <Package className="h-4 w-4" aria-hidden="true" />
                 </div>
               )}
 

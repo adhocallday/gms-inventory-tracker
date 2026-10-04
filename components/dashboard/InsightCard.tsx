@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LucideIcon, AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-react';
+import { AlertCircle, AlertTriangle, ArrowRight, CheckCircle, Info, LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface InsightCardProps {
@@ -93,7 +93,7 @@ export function InsightCard({
           onClick={action.onClick}
           className="text-sm font-semibold text-[var(--color-red-primary)] underline-offset-2 hover:underline transition"
         >
-          {action.label} →
+          {action.label} <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
         </button>
       )}
       {linkText && linkHref && (
@@ -101,7 +101,7 @@ export function InsightCard({
           href={linkHref}
           className="text-sm font-semibold text-[var(--color-red-primary)] underline-offset-2 hover:underline transition"
         >
-          {linkText} →
+          {linkText} <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
         </Link>
       )}
     </div>

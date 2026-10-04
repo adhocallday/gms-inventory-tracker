@@ -1,6 +1,7 @@
 import { createServiceClient } from '@/lib/supabase/client';
 import { redirect } from 'next/navigation';
 import { WarehouseLocationManager } from '@/components/warehouses/WarehouseLocationManager';
+import { ArrowLeft } from 'lucide-react';
 
 type PageProps = {
   params: { id: string };
@@ -40,7 +41,7 @@ export default async function WarehouseSettingsPage({ params }: PageProps) {
             href={`/tours/${tourId}`}
             className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-red-primary)] transition"
           >
-            ← Back to Tour
+            <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to Tour
           </a>
         </div>
         <h1 className="text-3xl font-bold g-title mb-2">Stock Locations</h1>

@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { readJsonResponse } from '@/lib/upload/upload-client';
+import { ArrowLeft, ArrowRight, Lightbulb, UploadCloud } from 'lucide-react';
 
 interface Product {
   sku: string;
@@ -146,9 +147,7 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
             </div>
           ) : (
             <div className="space-y-2">
-              <svg className="mx-auto h-10 w-10 text-[var(--color-text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
+              <UploadCloud className="mx-auto h-10 w-10 text-[var(--color-text-muted)]" aria-hidden="true" />
               <p className="text-sm text-[var(--color-text-secondary)]">
                 {isDragActive ? 'Drop the file here' : 'Drag & drop inventory spreadsheet (CSV/Excel), or click to select'}
               </p>
@@ -323,7 +322,7 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
       {inventory.length === 0 && (
         <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
           <p className="text-sm text-blue-300">
-            💡 You can skip this step if you're starting fresh with no existing inventory.
+            <Lightbulb className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> You can skip this step if you're starting fresh with no existing inventory.
             You'll be able to add inventory later through purchase orders and receipts.
           </p>
         </div>
@@ -336,13 +335,13 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
           onClick={onPrev}
           className="px-6 py-2 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)]"
         >
-          ← Previous
+          <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Previous
         </button>
         <button
           type="submit"
           className="px-6 py-2 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold"
         >
-          Next: Review & Create →
+          Next: Review & Create <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
         </button>
       </div>
     </form>

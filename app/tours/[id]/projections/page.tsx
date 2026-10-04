@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createServiceClient } from '@/lib/supabase/client';
 import { ProjectionSheet } from '@/components/projections/ProjectionSheet';
+import { ArrowLeft } from 'lucide-react';
 
 type ProjectionParams = {
   params: { id: string };
@@ -70,7 +71,7 @@ export default async function ProjectionPage({ params }: ProjectionParams) {
   return (
     <div className="g-container py-12">
       <Link href={`/tours/${tour.id}`} className="text-sm font-medium g-link">
-        ← Back to tour
+        <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to tour
       </Link>
       <div className="flex flex-col gap-4 mt-4 lg:flex-row lg:items-start lg:justify-between">
         <div>

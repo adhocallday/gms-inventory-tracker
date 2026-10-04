@@ -1,4 +1,5 @@
 'use client';
+import { Check, X } from 'lucide-react';
 
 interface RecommendationCardProps {
   recommendation: {
@@ -75,14 +76,14 @@ export function RecommendationCard({ recommendation, onAccept, onReject }: Recom
 
       {recommendation.status === 'accepted' && (
         <div className="flex items-center gap-2 text-sm text-emerald-600 font-medium">
-          <span className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center text-xs">✓</span>
+          <span className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center text-xs"><Check className="h-3 w-3" aria-hidden="true" /></span>
           Applied to projection
         </div>
       )}
 
       {recommendation.status === 'rejected' && (
         <div className="flex items-center gap-2 text-sm text-red-600 font-medium">
-          <span className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center text-xs">✗</span>
+          <span className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center text-xs"><X className="h-3 w-3" aria-hidden="true" /></span>
           Rejected
         </div>
       )}

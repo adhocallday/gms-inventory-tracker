@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ProductCogsTable, type ProductCogsRow } from '@/components/cogs/ProductCogsTable';
 import { ShowCogsTable, type ShowCogsRow } from '@/components/cogs/ShowCogsTable';
 import { Button } from '@/components/ui/Button';
+import { ArrowLeft } from 'lucide-react';
 
 interface Tour {
   id: string;
@@ -115,7 +116,7 @@ export default function CogsReportPage() {
     <div className="g-container py-12">
       {/* Header */}
       <Link href={`/tours/${tourId}`} className="text-sm font-medium g-link">
-        ← Back to tour
+        <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to tour
       </Link>
 
       <div className="flex flex-col gap-4 mt-4 lg:flex-row lg:items-start lg:justify-between">

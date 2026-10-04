@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
 import { type ColumnDef } from '@tanstack/react-table';
-import { Calendar, Music, Search, X } from 'lucide-react';
+import { ArrowRight, Calendar, Music, Search, X } from 'lucide-react';
 import { DataTable, DateCell } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/Badge';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -124,7 +124,7 @@ export function ToursTable({ tours }: ToursTableProps) {
               href={`/admin/tours/${row.original.id}/edit`}
               className="text-sm text-[var(--color-red-primary)] hover:text-[var(--color-red-hover)] font-medium transition"
             >
-              Edit →
+              Edit <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
             </Link>
           </div>
         ),

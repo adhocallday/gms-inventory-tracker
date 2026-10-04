@@ -4,6 +4,7 @@ import { useCallback, useState, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useRouter } from 'next/navigation';
 import { buildUploadBody, readJsonResponse, stageLargeUpload } from '@/lib/upload/upload-client';
+import { Check, Lightbulb, Upload } from 'lucide-react';
 
 type DocType = 'po' | 'packing-list' | 'sales-report' | 'settlement';
 
@@ -235,9 +236,7 @@ export function FileDropzone({
           <div className="space-y-2">
             <div className="animate-pulse">
               <div className="h-12 w-12 mx-auto mb-2">
-                <svg className="text-[var(--color-red-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
+                <Lightbulb className="h-12 w-12 text-[var(--color-red-primary)]" aria-hidden="true" />
               </div>
               <p className="text-sm text-[var(--color-text-secondary)]">AI is parsing your document...</p>
               <p className="text-xs text-[var(--color-text-muted)] mt-1">This may take 10-30 seconds</p>
@@ -247,19 +246,7 @@ export function FileDropzone({
 
         {!uploading && !parsing && !detecting && !classification && (
           <div className="space-y-2">
-            <svg
-              className="mx-auto h-12 w-12 text-[var(--color-text-muted)]"
-              stroke="currentColor"
-              fill="none"
-              viewBox="0 0 48 48"
-            >
-              <path
-                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <Upload className="mx-auto h-12 w-12 text-[var(--color-text-muted)]" aria-hidden="true" />
             {isDragActive ? (
               <p className="text-sm text-[var(--color-text-secondary)]">Drop the PDF here</p>
             ) : (
@@ -395,7 +382,7 @@ export function FileDropzone({
       {parsedData && (
         <div className="mt-4 p-3 md:p-4 border border-white/10 rounded-lg bg-[var(--color-bg-surface)]">
           <p className="text-sm text-[var(--color-text-primary)] font-semibold mb-2">
-            ✓ Document parsed successfully!
+            <Check className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Document parsed successfully!
           </p>
           <pre className="text-xs bg-black/40 p-2 md:p-3 rounded border border-white/10 overflow-auto max-h-48 md:max-h-64 lg:max-h-96 text-[var(--color-text-secondary)]">
             {JSON.stringify(parsedData, null, 2)}

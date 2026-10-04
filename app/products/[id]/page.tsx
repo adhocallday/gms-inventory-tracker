@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createServiceClient } from '@/lib/supabase/client';
 import { ProductSalesTable } from '@/components/products/ProductSalesTable';
+import { ArrowLeft } from 'lucide-react';
 
 export const revalidate = 0;
 
@@ -81,7 +82,7 @@ export default async function ProductDetailPage({ params }: ProductDetailParams)
     <div className="g-container py-8">
       <div className="mb-6">
         <Link href="/" className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition">
-          ← Back to Tours
+          <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to Tours
         </Link>
       </div>
 

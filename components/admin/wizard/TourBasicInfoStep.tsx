@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { ArrowLeft, ArrowRight, Lightbulb } from 'lucide-react';
 
 interface TourData {
   name: string;
@@ -104,7 +105,7 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
               }}
               className="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
             >
-              ← Back to artist selection
+              <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to artist selection
             </button>
           </div>
         )}
@@ -154,7 +155,7 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
         </div>
       </div>
       <p className="text-xs text-[var(--color-text-muted)] -mt-2">
-        💡 Leave dates blank - they'll automatically populate based on show schedule in the next step
+        <Lightbulb className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Leave dates blank - they'll automatically populate based on show schedule in the next step
       </p>
 
       {/* Description */}
@@ -176,7 +177,7 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
           type="submit"
           className="px-6 py-2 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold"
         >
-          Next: Add Shows →
+          Next: Add Shows <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
         </button>
       </div>
     </form>

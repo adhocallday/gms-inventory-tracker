@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { FileText, Search, X, SortAsc } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, Search, SortAsc, X } from 'lucide-react';
 import { useFuzzySearch } from '@/hooks/useFuzzySearch';
 import { cn } from '@/lib/utils';
 
@@ -504,13 +504,13 @@ export default function ParsedDocumentsPage() {
       {totalCount > limit && (
         <div className="flex items-center justify-between mt-6 pt-6 border-t border-[var(--color-bg-border)]">
           <Button variant="outline" onClick={handlePrevPage} disabled={offset === 0}>
-            ← Previous
+            <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Previous
           </Button>
           <span className="text-sm text-[var(--color-text-secondary)]">
             Page {currentPage} of {totalPages}
           </span>
           <Button variant="outline" onClick={handleNextPage} disabled={offset + limit >= totalCount}>
-            Next →
+            Next <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
           </Button>
         </div>
       )}

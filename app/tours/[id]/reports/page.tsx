@@ -4,6 +4,7 @@ import { ReportBuilder } from '@/components/reports/ReportBuilder';
 import { ReportList } from '@/components/reports/ReportList';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
+import { Lightbulb } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,7 +69,7 @@ export default async function TourReportsPage({ params }: TourReportsPageProps) 
 
       {/* Info Box */}
       <div className="mb-8 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-        <h3 className="text-sm font-semibold text-blue-400 mb-2">💡 About Product Images</h3>
+        <h3 className="text-sm font-semibold text-blue-400 mb-2"><Lightbulb className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />About Product Images</h3>
         <p className="text-xs text-blue-400/80 mb-2">
           Product images (grab sheets) will automatically appear in reports once uploaded. To add images:
         </p>

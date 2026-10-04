@@ -8,6 +8,7 @@ import { SalesChartSection } from './sections/SalesChartSection';
 import { PerHeadsChartSection } from './sections/PerHeadsChartSection';
 import { ProductRatiosSection } from './sections/ProductRatiosSection';
 import { ProductPercentageSection } from './sections/ProductPercentageSection';
+import { ArrowLeft } from 'lucide-react';
 
 interface ReportViewerProps {
   report: any;
@@ -54,7 +55,7 @@ export function ReportViewer({
                   href={`/tours/${tour.id}/reports`}
                   className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
                 >
-                  ← Back to Reports
+                  <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to Reports
                 </Link>
                 <h1 className="text-xl font-semibold g-title">{report.title}</h1>
               </div>

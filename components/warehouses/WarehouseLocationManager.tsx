@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ArrowDown, ArrowUp, Lightbulb } from 'lucide-react';
 
 type WarehouseLocation = {
   id: string;
@@ -293,14 +294,14 @@ export function WarehouseLocationManager({
                       disabled={index === 0}
                       className="text-xs px-2 py-1 rounded border border-white/10 hover:border-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed"
                     >
-                      ↑
+                      <ArrowUp className="h-4 w-4" aria-hidden="true" />
                     </button>
                     <button
                       onClick={() => handleReorder(location.id, 'down')}
                       disabled={index === standardLocations.length - 1}
                       className="text-xs px-2 py-1 rounded border border-white/10 hover:border-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed"
                     >
-                      ↓
+                      <ArrowDown className="h-4 w-4" aria-hidden="true" />
                     </button>
                     <button
                       onClick={() => {
@@ -325,7 +326,7 @@ export function WarehouseLocationManager({
         </div>
 
         <p className="text-xs text-[var(--color-text-muted)] mt-3">
-          💡 Tip: Rename templates to match your workflow (e.g., "Road" → "Tour Truck", "Warehouse" → "Nashville Hub")
+          <Lightbulb className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Tip: Rename templates to match your workflow (e.g., "Road" → "Tour Truck", "Warehouse" → "Nashville Hub")
         </p>
       </div>
 
@@ -397,14 +398,14 @@ export function WarehouseLocationManager({
                       disabled={index === 0}
                       className="text-xs px-2 py-1 rounded border border-white/10 hover:border-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed"
                     >
-                      ↑
+                      <ArrowUp className="h-4 w-4" aria-hidden="true" />
                     </button>
                     <button
                       onClick={() => handleReorder(location.id, 'down')}
                       disabled={index === customLocations.length - 1}
                       className="text-xs px-2 py-1 rounded border border-white/10 hover:border-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed"
                     >
-                      ↓
+                      <ArrowDown className="h-4 w-4" aria-hidden="true" />
                     </button>
                     <button
                       onClick={() => {

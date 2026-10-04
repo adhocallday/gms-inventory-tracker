@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
 
 interface TourData {
   name: string;
@@ -375,7 +376,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
           disabled={submitting}
           className="px-6 py-2 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)] disabled:opacity-50"
         >
-          ← Previous
+          <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Previous
         </button>
         <button
           type="button"

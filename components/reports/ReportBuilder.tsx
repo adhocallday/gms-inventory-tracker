@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { BarChart3, Check, X } from 'lucide-react';
 
 interface ReportBuilderProps {
   tourId: string;
@@ -221,7 +222,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
         <div className="mt-4 p-5 bg-gradient-to-br from-emerald-50/80 to-white border-2 border-emerald-200 rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
-              <span className="text-emerald-600 text-lg">✓</span>
+              <Check className="h-5 w-5 shrink-0 text-emerald-600" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm font-semibold text-emerald-800">Report Generated</p>
@@ -235,7 +236,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
         <div className="mt-4 p-5 bg-gradient-to-br from-red-50/80 to-white border-2 border-red-200 rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
-              <span className="text-red-600 text-lg">✗</span>
+              <X className="h-5 w-5 shrink-0 text-red-600" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm font-semibold text-red-800">Error</p>
@@ -247,7 +248,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
 
       {/* Info Box */}
       <div className="mt-6 p-5 bg-gradient-to-br from-blue-50/80 to-white border-2 border-blue-200 rounded-2xl shadow-sm">
-        <p className="font-semibold text-blue-800 mb-2">📊 What's Included:</p>
+        <p className="font-semibold text-blue-800 mb-2"><BarChart3 className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />What's Included:</p>
         <ul className="list-disc list-inside space-y-1 text-xs text-blue-700">
           <li>Product images (grab sheets) with sales data</li>
           <li>Sales charts by city and venue</li>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { BarChart3, Brain, Sparkles } from 'lucide-react';
+import { BarChart3, Brain, Check, Sparkles, X } from 'lucide-react';
 import { ChatInterface } from './ChatInterface';
 import { AnalysisPanel } from './AnalysisPanel';
 import { SizeAnalysisPanel } from './SizeAnalysisPanel';
@@ -239,7 +239,7 @@ export function EnhancedAIAgentPanel({
         <div className="mb-4 p-5 bg-gradient-to-br from-emerald-50/80 to-white border-2 border-emerald-200 rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
-              <span className="text-emerald-600 text-lg">✓</span>
+              <Check className="h-5 w-5 shrink-0 text-emerald-600" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm font-semibold text-emerald-800">Projections Generated</p>
@@ -253,7 +253,7 @@ export function EnhancedAIAgentPanel({
         <div className="mb-4 p-5 bg-gradient-to-br from-red-50/80 to-white border-2 border-red-200 rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
-              <span className="text-red-600 text-lg">✗</span>
+              <X className="h-5 w-5 shrink-0 text-red-600" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm font-semibold text-red-800">Error</p>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { Badge } from '@/components/ui/Badge';
+import { BarChart3 } from 'lucide-react';
 
 interface AnalyticsData {
   summary: {
@@ -101,7 +102,7 @@ export default function AnalyticsPage() {
     return (
       <div className="g-container py-12">
         <div className="g-card p-12 text-center">
-          <div className="text-4xl mb-4">📊</div>
+          <BarChart3 className="block mx-auto h-10 w-10 mb-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
           <p className="text-[var(--color-text-secondary)]">Failed to load analytics data.</p>
         </div>
       </div>

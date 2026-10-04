@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { Camera } from 'lucide-react';
 
 interface ProductImage {
   id: string;
@@ -137,7 +138,7 @@ export function ProductImageUpload({
       >
         <input {...getInputProps()} />
         <div className="space-y-2">
-          <div className="text-4xl">📸</div>
+          <Camera className="mx-auto block h-10 w-10 text-[var(--color-text-secondary)]" aria-hidden="true" />
           {uploading ? (
             <p className="text-sm text-[var(--color-text-muted)]">Uploading...</p>
           ) : isDragActive ? (

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AlertTriangle, Check, ChevronDown, ChevronRight, Zap } from 'lucide-react';
 
 interface ValidationPanelProps {
   validation?: {
@@ -20,7 +21,7 @@ export default function ValidationPanel({ validation }: ValidationPanelProps) {
     return (
       <div className="g-card p-4 mb-6 border-green-500/30">
         <div className="flex items-center gap-2">
-          <span className="text-green-400 text-xl">✓</span>
+          <Check className="h-5 w-5 shrink-0 text-green-400" aria-hidden="true" />
           <span className="text-sm text-green-300 font-semibold">
             No validation issues found
           </span>
@@ -39,14 +40,14 @@ export default function ValidationPanel({ validation }: ValidationPanelProps) {
             onClick={() => setExpandedErrors(!expandedErrors)}
           >
             <div className="flex items-center gap-2">
-              <span className="text-[var(--color-red-primary)] text-xl">⚠️</span>
+              <AlertTriangle className="h-5 w-5 shrink-0 text-[var(--color-red-primary)]" aria-hidden="true" />
               <span className="text-sm font-semibold text-[var(--color-red-primary)]">
                 {missingFields.length} Required{' '}
                 {missingFields.length === 1 ? 'Field' : 'Fields'} Missing
               </span>
             </div>
             <span className="text-xs text-[var(--color-text-muted)]">
-              {expandedErrors ? '▼' : '▶'}
+              {expandedErrors ? <ChevronDown className="h-4 w-4" aria-hidden="true" /> : <ChevronRight className="h-4 w-4" aria-hidden="true" />}
             </span>
           </button>
 
@@ -75,14 +76,14 @@ export default function ValidationPanel({ validation }: ValidationPanelProps) {
             onClick={() => setExpandedWarnings(!expandedWarnings)}
           >
             <div className="flex items-center gap-2">
-              <span className="text-yellow-400 text-xl">⚡</span>
+              <Zap className="h-5 w-5 shrink-0 text-yellow-400" aria-hidden="true" />
               <span className="text-sm font-semibold text-yellow-300">
                 {warnings.length}{' '}
                 {warnings.length === 1 ? 'Warning' : 'Warnings'}
               </span>
             </div>
             <span className="text-xs text-[var(--color-text-muted)]">
-              {expandedWarnings ? '▼' : '▶'}
+              {expandedWarnings ? <ChevronDown className="h-4 w-4" aria-hidden="true" /> : <ChevronRight className="h-4 w-4" aria-hidden="true" />}
             </span>
           </button>
 

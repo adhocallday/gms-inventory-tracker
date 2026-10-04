@@ -9,6 +9,7 @@ import { useTours } from '@/hooks/useTours';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { Button } from '@/components/ui/Button';
+import { ArrowRight, Check } from 'lucide-react';
 
 type DocType = 'po' | 'packing-list' | 'sales-report' | 'settlement';
 
@@ -184,7 +185,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
       {autoDetectEnabled && detectedType && detectedClassification && (
         <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
           <div className="flex items-center gap-2">
-            <span className="text-green-400 text-sm">✓</span>
+            <Check className="h-4 w-4 shrink-0 text-green-400" aria-hidden="true" />
             <div className="flex-1">
               <p className="text-sm text-green-400 font-semibold">
                 Detected: {detectedClassification.typeName}
@@ -313,7 +314,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
                 href={`/dashboard/parsed-documents/${parsedId}`}
                 className="inline-flex items-center gap-2 text-xs font-semibold text-[var(--color-red-primary)]"
               >
-                Review draft →
+                Review draft <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
               </Link>
             </div>
           ) : (

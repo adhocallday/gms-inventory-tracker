@@ -1,4 +1,5 @@
 'use client';
+import { X } from 'lucide-react';
 
 interface POLineItem {
   sku: string;
@@ -394,7 +395,7 @@ export default function LineItemsTable({
                     onClick={() => removeLineItem(index)}
                     title="Remove"
                   >
-                    ✕
+                    <X className="h-4 w-4" aria-hidden="true" />
                   </button>
                 </td>
               </tr>

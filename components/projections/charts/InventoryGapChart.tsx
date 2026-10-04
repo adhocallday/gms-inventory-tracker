@@ -1,4 +1,5 @@
 'use client';
+import { Check } from 'lucide-react';
 
 interface InventoryGapChartProps {
   gaps: Array<{
@@ -26,7 +27,7 @@ export function InventoryGapChart({ gaps }: InventoryGapChartProps) {
     return (
       <div className="g-card p-4">
         <h4 className="text-sm font-semibold mb-3">Inventory Gaps & Stockout Risks</h4>
-        <p className="text-sm text-green-500">✓ No stockout risks detected. All forecasts can be met with current inventory + open orders.</p>
+        <p className="text-sm text-green-500"><Check className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />No stockout risks detected. All forecasts can be met with current inventory + open orders.</p>
       </div>
     );
   }

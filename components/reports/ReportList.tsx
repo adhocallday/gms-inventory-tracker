@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
+import { BarChart3 } from 'lucide-react';
 
 interface Report {
   id: string;
@@ -93,7 +94,7 @@ export function ReportList({ tourId, reports }: ReportListProps) {
   if (reports.length === 0) {
     return (
       <div className="g-card p-8 text-center">
-        <div className="text-4xl mb-4">📊</div>
+        <BarChart3 className="block mx-auto h-10 w-10 mb-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
         <h3 className="text-lg font-semibold g-title mb-2">No Reports Yet</h3>
         <p className="text-sm text-[var(--color-text-muted)]">
           Create your first report to get started

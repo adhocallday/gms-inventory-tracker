@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, ChevronDown, ChevronUp, CheckCircle, AlertTriangle, TrendingUp, Users } from 'lucide-react';
+import { AlertTriangle, ArrowDown, ArrowUp, CheckCircle, ChevronDown, ChevronUp, Sparkles, TrendingUp, Users } from 'lucide-react';
 
 interface SizeAnalysis {
   historicalCurve: Record<string, number>;
@@ -247,7 +247,7 @@ export function SizeAnalysisPanel({
                           {((pct || 0) * 100).toFixed(0)}%
                           {Math.abs(diff) > 0.02 && (
                             <span className="text-xs">
-                              {diff > 0 ? '↑' : '↓'}
+                              {diff > 0 ? <ArrowUp className="h-4 w-4" aria-hidden="true" /> : <ArrowDown className="h-4 w-4" aria-hidden="true" />}
                             </span>
                           )}
                         </div>

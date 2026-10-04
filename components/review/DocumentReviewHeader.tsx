@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const DOC_TYPE_LABELS: Record<string, string> = {
   po: 'Purchase Order',
@@ -50,14 +51,14 @@ export default function DocumentReviewHeader({
         <Link href="/" className="hover:text-[var(--color-red-primary)] transition">
           Dashboard
         </Link>
-        <span>→</span>
+        <ArrowRight className="h-4 w-4" aria-hidden="true" />
         <Link
           href="/dashboard/parsed-documents"
           className="hover:text-[var(--color-red-primary)] transition"
         >
           Parsed Documents
         </Link>
-        <span>→</span>
+        <ArrowRight className="h-4 w-4" aria-hidden="true" />
         <span className="text-[var(--color-text-primary)]">
           {DOC_TYPE_LABELS[docType] || docType}
         </span>
@@ -91,7 +92,7 @@ export default function DocumentReviewHeader({
             className="g-button g-button-outline"
             onClick={() => router.back()}
           >
-            ← Back
+            <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back
           </button>
         </div>
       </div>

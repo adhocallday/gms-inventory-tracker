@@ -5,6 +5,7 @@ import { SalesLinesTable } from '@/components/shows/SalesLinesTable';
 import { CompsTable } from '@/components/shows/CompsTable';
 import { InventoryImpactTable } from '@/components/shows/InventoryImpactTable';
 import { ReceivingContextTable } from '@/components/shows/ReceivingContextTable';
+import { ArrowLeft } from 'lucide-react';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -261,7 +262,7 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
   return (
     <div className="g-container py-12">
       <Link href={`/tours/${tour.id}`} className="text-sm font-medium g-link">
-        ← Back to tour
+        <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to tour
       </Link>
       <div className="flex flex-col gap-4 mt-4 lg:flex-row lg:items-start lg:justify-between">
         <div>

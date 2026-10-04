@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ScheduleChatAssistant from './wizard/ScheduleChatAssistant';
+import { ArrowLeft } from 'lucide-react';
 
 interface Tour {
   id: string;
@@ -161,7 +162,7 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
             href="/admin/tours"
             className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition"
           >
-            ← Back to tours
+            <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to tours
           </Link>
         </div>
         <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-text-muted)]">

@@ -6,6 +6,7 @@ import TourScheduleStep from './wizard/TourScheduleStep';
 import ProductCatalogStep from './wizard/ProductCatalogStep';
 import InitialInventoryStep from './wizard/InitialInventoryStep';
 import ReviewStep from './wizard/ReviewStep';
+import { Check } from 'lucide-react';
 
 type WizardStep = 'basic' | 'schedule' | 'products' | 'inventory' | 'review';
 
@@ -133,7 +134,7 @@ export default function TourCreationWizard() {
                     ${index < currentStepIndex ? 'cursor-pointer hover:opacity-80' : ''}
                   `}
                 >
-                  {index < currentStepIndex ? '✓' : index + 1}
+                  {index < currentStepIndex ? <Check className="h-4 w-4" aria-hidden="true" /> : index + 1}
                 </button>
                 <div className="mt-2 text-center">
                   <p className={`text-xs font-medium ${

@@ -10,6 +10,7 @@ import TopSellersPanel from '@/components/tours/TopSellersPanel';
 import { CogsTable, type CogsRow } from '@/components/tours/CogsTable';
 import { InventoryTable } from '@/components/tours/InventoryTable';
 import { Button } from '@/components/ui/Button';
+import { ArrowLeft, ArrowRight, BarChart3, DollarSign, Package, SettingsIcon, Tag, TrendingUp } from 'lucide-react';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -313,7 +314,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
             href="/"
             className="text-sm font-medium g-link"
           >
-            ← Back to dashboard
+            <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to dashboard
           </Link>
           <h1 className="text-3xl font-semibold g-title mt-3">
             {tour.name}
@@ -336,37 +337,37 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
           href={`/tours/${tour.id}/projections`}
           className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
         >
-          📊 Projections
+          <BarChart3 className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Projections
         </Link>
         <Link
           href={`/tours/${tour.id}/reports`}
           className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
         >
-          📈 Reports
+          <TrendingUp className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Reports
         </Link>
         <Link
           href={`/tours/${tour.id}/inventory`}
           className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
         >
-          📦 Inventory
+          <Package className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Inventory
         </Link>
         <Link
           href={`/tours/${tour.id}/cogs`}
           className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
         >
-          💰 COGS
+          <DollarSign className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> COGS
         </Link>
         <Link
           href={`/admin/tours/${tour.id}/products`}
           className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
         >
-          🏷️ Product Costs
+          <Tag className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Product Costs
         </Link>
         <Link
           href={`/tours/${tour.id}/settings/warehouses`}
           className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
         >
-          ⚙️ Warehouse Settings
+          <SettingsIcon className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Warehouse Settings
         </Link>
       </nav>
 
@@ -505,7 +506,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold g-title">COGS Report</h3>
             <Link href={`/tours/${tour.id}/cogs`} className="text-sm font-medium g-link">
-              View full report →
+              View full report <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
             </Link>
           </div>
           <CogsTable data={cogsSorted.slice(0, 10) as CogsRow[]} />
@@ -515,7 +516,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold g-title">Inventory Balances</h3>
             <Link href={`/tours/${tour.id}/inventory`} className="text-sm font-medium g-link">
-              View full report →
+              View full report <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
             </Link>
           </div>
           <InventoryTable
