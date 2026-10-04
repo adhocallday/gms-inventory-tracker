@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { LayoutGrid, Calendar, Copy, Maximize2, Minimize2, X } from 'lucide-react';
 import { EnhancedAIAgentPanel } from './AIAgentPanel';
 import { ProjectionVisualizations } from './ProjectionVisualizations';
@@ -104,7 +105,14 @@ export function ProjectionSheet({
   inventoryBalances: InventoryBalanceRow[];
   poOpenQuantities: PoOpenRow[];
 }) {
+  const router = useRouter();
   const [scenarioList, setScenarioList] = useState<Scenario[]>(scenarios);
+  // Bumped after bulk writes to re-fetch overrides without a full page reload
+  const [overridesVersion, setOverridesVersion] = useState(0);
+  const refreshData = () => {
+    setOverridesVersion((v) => v + 1);
+    router.refresh();
+  };
   const baselineScenario = scenarioList.find((scenario) => scenario.is_baseline);
   const [selectedScenarioId, setSelectedScenarioId] = useState(
     baselineScenario?.id ?? scenarioList[0]?.id ?? ''
@@ -201,7 +209,7 @@ export function ProjectionSheet({
         setOverrideMap(nextMap);
       })
       .finally(() => setIsLoadingOverrides(false));
-  }, [selectedScenarioId, tourId]);
+  }, [selectedScenarioId, tourId, overridesVersion]);
 
   const productIdToSku = useMemo(() => {
     const map = new Map<string, ProductRow>();
@@ -609,12 +617,12 @@ export function ProjectionSheet({
       return;
     }
 
-    console.log('✅ All recommendations applied, reloading page...');
+    console.log('✅ All recommendations applied, refreshing data...');
     setAiGenerated(true);
     setIsLoadingOverrides(false);
 
-    // Refresh page to show updated data
-    setTimeout(() => window.location.reload(), 500);
+    // Re-fetch overrides and server data to show the update
+    refreshData();
   }
 
   return (
@@ -699,8 +707,8 @@ export function ProjectionSheet({
             })
           });
 
-          // Reload page to show updated data
-          window.location.reload();
+          // Re-fetch overrides and server data to show the update
+          refreshData();
         }}
         currentInputs={{ expectedAttendance, expectedPerHead }}
         warehouseLocations={warehouseLocations}
@@ -1101,8 +1109,8 @@ export function ProjectionSheet({
           onClose={() => setShowCopyModal(false)}
           onCopyComplete={() => {
             setShowCopyModal(false);
-            // Trigger page refresh to show copied data
-            window.location.reload();
+            // Re-fetch overrides and server data to show copied data
+            refreshData();
           }}
         />
       )}

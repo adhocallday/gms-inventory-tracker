@@ -38,16 +38,16 @@ export default function CogsReportPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch tour info
-        const tourRes = await fetch(`/api/tours`);
+        // Tour info and page data load in parallel
+        const [tourRes, cogsRes] = await Promise.all([
+          fetch(`/api/tours/${tourId}`),
+          fetch(`/api/tours/${tourId}/cogs`),
+        ]);
         if (tourRes.ok) {
-          const toursData = await tourRes.json();
-          const currentTour = toursData.data?.find((t: Tour) => t.id === tourId);
-          setTour(currentTour || null);
+          const tourData = await tourRes.json();
+          setTour(tourData.data || null);
         }
 
-        // Fetch COGS data
-        const cogsRes = await fetch(`/api/tours/${tourId}/cogs`);
         if (cogsRes.ok) {
           const data = await cogsRes.json();
           setCogsData(data);

@@ -69,58 +69,76 @@ export const revalidate = 0;
 export default async function ShowDetailPage({ params }: ShowDetailParams) {
   const supabase = createServiceClient();
 
-  const { data: tour } = await supabase
-    .from('tours')
-    .select('id, name, artist')
-    .eq('id', params.id)
-    .maybeSingle();
-
-  const { data: show } = await supabase
-    .from('shows')
-    .select('id, tour_id, show_date, venue_name, city, state, attendance')
-    .eq('id', params.showId)
-    .maybeSingle();
+  // Independent queries run in parallel
+  const [
+    { data: tour },
+    { data: show },
+    { data: sales },
+    { data: comps },
+    { data: tourProducts },
+    { data: tourShows },
+    { data: receipts },
+    { data: settlementDocs },
+  ] = await Promise.all([
+    supabase
+      .from('tours')
+      .select('id, name, artist')
+      .eq('id', params.id)
+      .maybeSingle(),
+    supabase
+      .from('shows')
+      .select('id, tour_id, show_date, venue_name, city, state, attendance')
+      .eq('id', params.showId)
+      .maybeSingle(),
+    supabase
+      .from('sales')
+      .select(
+        'show_id, qty_sold, unit_price, gross_sales, tour_product:tour_products(id, size, product:products(sku, description))'
+      )
+      .eq('show_id', params.showId),
+    supabase
+      .from('comps')
+      .select(
+        'show_id, comp_type, quantity, tour_product:tour_products(id, size, product:products(sku, description))'
+      )
+      .eq('show_id', params.showId),
+    supabase
+      .from('tour_products')
+      .select('id, size, product:products(sku, description)')
+      .eq('tour_id', params.id),
+    supabase
+      .from('shows')
+      .select('id, show_date')
+      .eq('tour_id', params.id),
+    supabase
+      .from('stock_movement_view')
+      .select('received_date, delivery_number, sku, size, quantity_received, vendor')
+      .eq('tour_id', params.id),
+    supabase
+      .from('parsed_documents')
+      .select('id, status, normalized_json, ui_overrides, extracted_json, updated_at')
+      .eq('doc_type', 'settlement')
+      .eq('show_id', params.showId)
+      .order('updated_at', { ascending: false })
+      .limit(1),
+  ]);
 
   if (!tour || !show || show.tour_id !== tour.id) {
     notFound();
   }
 
-  const { data: sales } = await supabase
-    .from('sales')
-    .select(
-      'show_id, qty_sold, unit_price, gross_sales, tour_product:tour_products(id, size, product:products(sku, description))'
-    )
-    .eq('show_id', params.showId);
-
-  const { data: comps } = await supabase
-    .from('comps')
-    .select(
-      'show_id, comp_type, quantity, tour_product:tour_products(id, size, product:products(sku, description))'
-    )
-    .eq('show_id', params.showId);
-
-  const { data: tourProducts } = await supabase
-    .from('tour_products')
-    .select('id, size, product:products(sku, description)')
-    .eq('tour_id', params.id);
-
-  const { data: tourShows } = await supabase
-    .from('shows')
-    .select('id, show_date')
-    .eq('tour_id', params.id);
-
-  const { data: receipts } = await supabase
-    .from('stock_movement_view')
-    .select('received_date, delivery_number, sku, size, quantity_received, vendor')
-    .eq('tour_id', params.id);
-
-  const { data: settlementDocs } = await supabase
-    .from('parsed_documents')
-    .select('id, status, normalized_json, ui_overrides, extracted_json, updated_at')
-    .eq('doc_type', 'settlement')
-    .eq('show_id', params.showId)
-    .order('updated_at', { ascending: false })
-    .limit(1);
+  // Tour-wide sales and comps (for before/after balances) depend on the show list
+  const tourShowIds = (tourShows ?? []).map((row) => row.id);
+  const [{ data: allSalesData }, { data: allCompsData }] = await Promise.all([
+    supabase
+      .from('sales')
+      .select('show_id, qty_sold, tour_product_id')
+      .in('show_id', tourShowIds),
+    supabase
+      .from('comps')
+      .select('show_id, quantity, tour_product_id')
+      .in('show_id', tourShowIds),
+  ]);
 
   const settlementDoc = settlementDocs?.[0];
   const settlementSource =
@@ -153,10 +171,7 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
   const soldUpTo = new Map<string, number>();
   const compsUpTo = new Map<string, number>();
 
-  const allSales = (await supabase
-    .from('sales')
-    .select('show_id, qty_sold, tour_product_id')
-    .in('show_id', (tourShows ?? []).map((row) => row.id))).data ?? [];
+  const allSales = allSalesData ?? [];
 
   allSales.forEach((row) => {
     const key = row.tour_product_id;
@@ -176,10 +191,7 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
     }
   });
 
-  const allComps = (await supabase
-    .from('comps')
-    .select('show_id, quantity, tour_product_id')
-    .in('show_id', (tourShows ?? []).map((row) => row.id))).data ?? [];
+  const allComps = allCompsData ?? [];
 
   allComps.forEach((row) => {
     const key = row.tour_product_id;

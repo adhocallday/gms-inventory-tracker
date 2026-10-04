@@ -1,6 +1,17 @@
 import { useMemo } from 'react';
 import Fuse from 'fuse.js';
 
+/**
+ * Callers usually pass `keys` as an inline array literal, which is a new
+ * reference every render. Keying memos on its serialized value keeps the Fuse
+ * index from being rebuilt on every render.
+ */
+function useStableKeys<K>(keys: K): K {
+  const serialized = JSON.stringify(keys);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useMemo(() => keys, [serialized]);
+}
+
 interface UseFuzzySearchOptions<T> {
   /** Keys to search in the items */
   keys: Array<keyof T | string>;
@@ -29,12 +40,13 @@ export function useFuzzySearch<T>(
   options: UseFuzzySearchOptions<T>
 ): T[] {
   const {
-    keys,
+    keys: rawKeys,
     threshold = 0.3,
     minMatchCharLength = 2,
     includeScore = false,
     includeMatches = false,
   } = options;
+  const keys = useStableKeys(rawKeys);
 
   const fuse = useMemo(() => {
     return new Fuse(items, {
@@ -72,11 +84,12 @@ export function useFuzzySearchWithScore<T>(
   options: Omit<UseFuzzySearchOptions<T>, 'includeScore'>
 ): Array<{ item: T; score?: number }> {
   const {
-    keys,
+    keys: rawKeys,
     threshold = 0.3,
     minMatchCharLength = 2,
     includeMatches = false,
   } = options;
+  const keys = useStableKeys(rawKeys);
 
   const fuse = useMemo(() => {
     return new Fuse(items, {
@@ -115,9 +128,10 @@ export function useFuzzySearchWithScore<T>(
 export function useWeightedFuzzySearch<T>(
   items: T[],
   query: string,
-  keys: Array<{ key: keyof T | string; weight: number }>,
+  rawKeys: Array<{ key: keyof T | string; weight: number }>,
   threshold: number = 0.3
 ): T[] {
+  const keys = useStableKeys(rawKeys);
   const fuse = useMemo(() => {
     return new Fuse(items, {
       keys: keys.map((k) => ({ name: k.key as string, weight: k.weight })),

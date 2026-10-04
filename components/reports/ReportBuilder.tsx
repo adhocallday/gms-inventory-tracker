@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { BarChart3, Check, X } from 'lucide-react';
 
@@ -69,6 +70,7 @@ const DEFAULT_SECTIONS: ReportSection[] = [
 ];
 
 export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
+  const router = useRouter();
   const [reportType, setReportType] = useState('post_tour_breakdown');
   const [title, setTitle] = useState(`${tour.name} - Post-Tour Sales Report`);
   const [sections, setSections] = useState<ReportSection[]>(DEFAULT_SECTIONS);
@@ -112,7 +114,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
 
       // Refresh the page after 2 seconds to show new report
       setTimeout(() => {
-        window.location.reload();
+        router.refresh();
       }, 2000);
 
     } catch (err: any) {

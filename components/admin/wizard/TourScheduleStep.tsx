@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import ScheduleChatAssistant from './ScheduleChatAssistant';
-import { readJsonResponse } from '@/lib/upload/upload-client';
+import { readJsonResponse } from '@/lib/http/read-json';
 import { ArrowLeft, ArrowRight, UploadCloud } from 'lucide-react';
 
 interface TourData {

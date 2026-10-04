@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/client';
+import { revalidateDashboards } from '@/lib/cache/revalidate';
 
 /**
  * PATCH /api/admin/tours/[id]

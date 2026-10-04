@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/client';
 import { postParsedDocument } from '@/lib/posting/post-parsed-document';
+import { revalidateDashboards } from '@/lib/cache/revalidate';
 
 export async function POST(
   _request: NextRequest,
@@ -12,6 +13,7 @@ export async function POST(
       supabase,
       params.parsedDocId
     );
+    revalidateDashboards(updated?.tour_id);
     return NextResponse.json({ data: updated, receipt });
   } catch (error: any) {
     return NextResponse.json(

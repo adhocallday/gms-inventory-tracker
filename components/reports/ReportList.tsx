@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
@@ -26,6 +27,7 @@ interface ReportListProps {
 }
 
 export function ReportList({ tourId, reports }: ReportListProps) {
+  const router = useRouter();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const getStatusBadge = (status: Report['status']) => {
@@ -75,8 +77,8 @@ export function ReportList({ tourId, reports }: ReportListProps) {
         throw new Error('Failed to delete report');
       }
 
-      // Refresh page to update list
-      window.location.reload();
+      // Re-render the server-rendered list
+      router.refresh();
     } catch (error) {
       console.error('Delete error:', error);
       alert('Failed to delete report. Please try again.');

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/client';
+import { fetchAll } from '@/lib/supabase/fetch-all';
 
 /**
  * GET /api/admin/analytics
@@ -14,85 +15,68 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // Fetch all data in parallel
-    const [
-      toursResult,
-      showsResult,
-      salesResult,
-      productsResult
-    ] = await Promise.all([
-      // All tours with basic info
+    // Fetch all data in parallel. Shows and sales page through fetchAll:
+    // a plain select is capped at 1000 rows, which under-counted revenue.
+    const [toursResult, shows, sales] = await Promise.all([
       supabase
         .from('tours')
         .select('id, name, artist, status, start_date, end_date')
         .order('start_date', { ascending: false }),
-
-      // All shows with sales summary
-      supabase
-        .from('shows')
-        .select(`
-          id,
-          tour_id,
-          show_date,
-          venue_name,
-          city,
-          state,
-          attendance
-        `)
-        .order('show_date', { ascending: false }),
-
-      // All sales data
-      supabase
-        .from('sales')
-        .select(`
-          id,
-          show_id,
-          tour_product_id,
-          qty_sold,
-          gross_sales,
-          shows:show_id (
-            tour_id,
-            show_date,
-            venue_name
-          )
-        `),
-
-      // Product info with categories
-      supabase
-        .from('products')
-        .select('id, sku, description, category')
+      fetchAll<{
+        id: string;
+        tour_id: string;
+        show_date: string | null;
+        venue_name: string | null;
+        city: string | null;
+        state: string | null;
+        attendance: number | null;
+      }>((from, to) =>
+        supabase
+          .from('shows')
+          .select('id, tour_id, show_date, venue_name, city, state, attendance')
+          .order('show_date', { ascending: false })
+          .order('id')
+          .range(from, to)
+      ),
+      fetchAll<{ show_id: string; qty_sold: number | null; gross_sales: number | null }>((from, to) =>
+        supabase.from('sales').select('show_id, qty_sold, gross_sales').order('id').range(from, to)
+      ),
     ]);
 
     if (toursResult.error) throw toursResult.error;
-    if (showsResult.error) throw showsResult.error;
-    if (salesResult.error) throw salesResult.error;
-
     const tours = toursResult.data || [];
-    const shows = showsResult.data || [];
-    const sales = salesResult.data || [];
-    const products = productsResult.data || [];
+
+    // Aggregate sales per show in one pass
+    const byShow = new Map<string, { gross: number; units: number }>();
+    for (const sale of sales) {
+      const agg = byShow.get(sale.show_id) ?? { gross: 0, units: 0 };
+      agg.gross += Number(sale.gross_sales || 0);
+      agg.units += Number(sale.qty_sold || 0);
+      byShow.set(sale.show_id, agg);
+    }
+
+    // Roll shows up into tours
+    const byTour = new Map<string, { gross: number; units: number; attendance: number; showCount: number }>();
+    for (const show of shows) {
+      const showAgg = byShow.get(show.id) ?? { gross: 0, units: 0 };
+      const agg = byTour.get(show.tour_id) ?? { gross: 0, units: 0, attendance: 0, showCount: 0 };
+      agg.gross += showAgg.gross;
+      agg.units += showAgg.units;
+      agg.attendance += Number(show.attendance || 0);
+      agg.showCount += 1;
+      byTour.set(show.tour_id, agg);
+    }
 
     // Calculate summary metrics
-    const totalGross = sales.reduce((sum, s) => sum + (s.gross_sales || 0), 0);
-    const totalUnits = sales.reduce((sum, s) => sum + (s.qty_sold || 0), 0);
+    const totalGross = sales.reduce((sum, s) => sum + Number(s.gross_sales || 0), 0);
+    const totalUnits = sales.reduce((sum, s) => sum + Number(s.qty_sold || 0), 0);
     const totalShows = shows.length;
-    const totalAttendance = shows.reduce((sum, s) => sum + (s.attendance || 0), 0);
+    const totalAttendance = shows.reduce((sum, s) => sum + Number(s.attendance || 0), 0);
     const avgPerHead = totalAttendance > 0 ? totalGross / totalAttendance : 0;
 
     // Calculate tour-level metrics
     const tourMetrics = tours.map(tour => {
-      const tourShows = shows.filter(s => s.tour_id === tour.id);
-      const tourShowIds = new Set(tourShows.map(s => s.id));
-      const tourSales = sales.filter(s => {
-        const showData = s.shows as any;
-        return showData?.tour_id === tour.id;
-      });
-
-      const tourGross = tourSales.reduce((sum, s) => sum + (s.gross_sales || 0), 0);
-      const tourUnits = tourSales.reduce((sum, s) => sum + (s.qty_sold || 0), 0);
-      const tourAttendance = tourShows.reduce((sum, s) => sum + (s.attendance || 0), 0);
-      const tourPerHead = tourAttendance > 0 ? tourGross / tourAttendance : 0;
-
+      const agg = byTour.get(tour.id) ?? { gross: 0, units: 0, attendance: 0, showCount: 0 };
       return {
         id: tour.id,
         name: tour.name,
@@ -100,11 +84,11 @@ export async function GET(request: NextRequest) {
         status: tour.status,
         startDate: tour.start_date,
         endDate: tour.end_date,
-        showCount: tourShows.length,
-        totalGross: tourGross,
-        totalUnits: tourUnits,
-        totalAttendance: tourAttendance,
-        avgPerHead: tourPerHead
+        showCount: agg.showCount,
+        totalGross: agg.gross,
+        totalUnits: agg.units,
+        totalAttendance: agg.attendance,
+        avgPerHead: agg.attendance > 0 ? agg.gross / agg.attendance : 0
       };
     });
 
@@ -120,24 +104,9 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => b.avgPerHead - a.avgPerHead)
       .slice(0, 10);
 
-    // Calculate category breakdown
-    const categoryMap = new Map<string, { gross: number; units: number }>();
-    for (const sale of sales) {
-      // We'd need to join with tour_products to get category, simplified for now
-      const category = 'Unknown'; // Would need additional join
-      if (!categoryMap.has(category)) {
-        categoryMap.set(category, { gross: 0, units: 0 });
-      }
-      const current = categoryMap.get(category)!;
-      current.gross += sale.gross_sales || 0;
-      current.units += sale.qty_sold || 0;
-    }
-
     // Recent activity - last 10 shows
     const recentShows = shows.slice(0, 10).map(show => {
-      const showSales = sales.filter(s => s.show_id === show.id);
-      const showGross = showSales.reduce((sum, s) => sum + (s.gross_sales || 0), 0);
-      const showUnits = showSales.reduce((sum, s) => sum + (s.qty_sold || 0), 0);
+      const { gross: showGross, units: showUnits } = byShow.get(show.id) ?? { gross: 0, units: 0 };
       const tour = tours.find(t => t.id === show.tour_id);
 
       return {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/client';
+import { fetchAll } from '@/lib/supabase/fetch-all';
 
 export async function GET(
   request: NextRequest,
@@ -8,12 +9,26 @@ export async function GET(
   try {
     const supabase = createServiceClient();
 
-    // Get product-level COGS data
-    const { data: productData, error: productError } = await supabase
-      .from('product_summary_view')
-      .select('*')
-      .eq('tour_id', params.id)
-      .order('total_gross', { ascending: false });
+    const showIdsQuery = supabase.from('shows').select('id').eq('tour_id', params.id);
+
+    // Product summary, show summary and all sales for the tour, in parallel
+    const [
+      { data: productData, error: productError },
+      { data: showData, error: showError },
+      { data: tourShows },
+    ] = await Promise.all([
+      supabase
+        .from('product_summary_view')
+        .select('*')
+        .eq('tour_id', params.id)
+        .order('total_gross', { ascending: false }),
+      supabase
+        .from('show_summary_view')
+        .select('*')
+        .eq('tour_id', params.id)
+        .order('show_date', { ascending: true }),
+      showIdsQuery,
+    ]);
 
     if (productError) {
       console.error('Error fetching product COGS:', productError);
@@ -22,13 +37,6 @@ export async function GET(
         { status: 500 }
       );
     }
-
-    // Get show-level summary data
-    const { data: showData, error: showError } = await supabase
-      .from('show_summary_view')
-      .select('*')
-      .eq('tour_id', params.id)
-      .order('show_date', { ascending: true });
 
     if (showError) {
       console.error('Error fetching show summary:', showError);
@@ -59,41 +67,38 @@ export async function GET(
         ? (totals.total_margin / totals.total_revenue) * 100
         : 0;
 
-    // Calculate show-level COGS (we need to join with sales to get costs)
-    const showCogs = await Promise.all(
-      (showData || []).map(async (show) => {
-        const { data: showSales } = await supabase
-          .from('sales')
-          .select(
-            `
-            qty_sold,
-            tour_products!inner(
-              full_package_cost
-            )
-          `
-          )
-          .eq('show_id', show.show_id);
+    // Show-level COGS: one query for every sale on the tour, grouped in memory
+    // (previously one query per show)
+    const showIds = (tourShows ?? []).map((row) => row.id);
+    const tourSales = showIds.length
+      ? await fetchAll<{ show_id: string; qty_sold: number | null; tour_products: any }>((from, to) =>
+          supabase
+            .from('sales')
+            .select('id, show_id, qty_sold, tour_products!inner(full_package_cost)')
+            .in('show_id', showIds)
+            .order('id')
+            .range(from, to)
+        )
+      : [];
 
-        const showCogsCost = (showSales || []).reduce((sum, sale) => {
-          const cost =
-            (sale.qty_sold || 0) *
-            ((sale.tour_products as any)?.full_package_cost || 0);
-          return sum + cost;
-        }, 0);
+    const cogsByShow = new Map<string, number>();
+    for (const sale of tourSales) {
+      const cost = (sale.qty_sold || 0) * (sale.tour_products?.full_package_cost || 0);
+      cogsByShow.set(sale.show_id, (cogsByShow.get(sale.show_id) ?? 0) + cost);
+    }
 
-        return {
-          ...show,
-          cogs: showCogsCost,
-          margin: (show.total_gross || 0) - showCogsCost,
-          margin_percentage:
-            show.total_gross > 0
-              ? (((show.total_gross || 0) - showCogsCost) /
-                  (show.total_gross || 0)) *
-                100
-              : 0,
-        };
-      })
-    );
+    const showCogs = (showData || []).map((show) => {
+      const showCogsCost = cogsByShow.get(show.show_id) ?? 0;
+      return {
+        ...show,
+        cogs: showCogsCost,
+        margin: (show.total_gross || 0) - showCogsCost,
+        margin_percentage:
+          show.total_gross > 0
+            ? (((show.total_gross || 0) - showCogsCost) / (show.total_gross || 0)) * 100
+            : 0,
+      };
+    });
 
     return NextResponse.json({
       totals,

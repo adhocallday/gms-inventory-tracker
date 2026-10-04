@@ -46,16 +46,16 @@ export default function InventoryTrackerPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch tour info
-        const tourRes = await fetch(`/api/tours`);
+        // Tour info and page data load in parallel
+        const [tourRes, inventoryRes] = await Promise.all([
+          fetch(`/api/tours/${tourId}`),
+          fetch(`/api/tours/${tourId}/inventory`),
+        ]);
         if (tourRes.ok) {
-          const toursData = await tourRes.json();
-          const currentTour = toursData.data?.find((t: Tour) => t.id === tourId);
-          setTour(currentTour || null);
+          const tourData = await tourRes.json();
+          setTour(tourData.data || null);
         }
 
-        // Fetch inventory data
-        const inventoryRes = await fetch(`/api/tours/${tourId}/inventory`);
         if (inventoryRes.ok) {
           const inventoryData = await inventoryRes.json();
           setData(inventoryData);

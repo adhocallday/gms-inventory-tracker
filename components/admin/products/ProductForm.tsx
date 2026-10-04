@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { X, Upload, FileText, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { readJsonResponse } from '@/lib/upload/upload-client';
+import { readJsonResponse } from '@/lib/http/read-json';
 
 export interface ProductFormData {
   sku: string;

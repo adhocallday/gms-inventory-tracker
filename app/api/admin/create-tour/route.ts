@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/client';
+import { revalidateDashboards } from '@/lib/cache/revalidate';
 
 interface TourData {
   name: string;
@@ -241,6 +242,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Create Tour] Successfully created tour ${tourId} with ${shows.length} shows, ${products.length} products, ${initialInventory.length} inventory items`);
 
+    revalidateDashboards(tourId);
     return NextResponse.json({
       tourId,
       message: 'Tour created successfully',

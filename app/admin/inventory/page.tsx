@@ -10,7 +10,7 @@ import { SearchBar } from '@/components/ui/SearchBar';
 import { Badge } from '@/components/ui/Badge';
 import { DataTable, NumericCell } from '@/components/ui/DataTable';
 import { type ColumnDef } from '@tanstack/react-table';
-import { supabase } from '@/lib/supabase/client';
+import { readJsonResponse } from '@/lib/http/read-json';
 import { useFuzzySearch } from '@/hooks/useFuzzySearch';
 
 interface InventoryItem {
@@ -53,73 +53,14 @@ export default function AdminInventoryPage() {
     async function loadData() {
       setLoading(true);
 
-      // Fetch tours
-      const { data: toursData } = await supabase
-        .from('tours')
-        .select('id, name, artist, status')
-        .order('name');
-
-      // Fetch inventory balances with product info
-      const { data: inventoryData } = await supabase
-        .from('inventory_balances')
-        .select(`
-          tour_id,
-          product_id,
-          size,
-          total_received,
-          total_sold,
-          total_comps,
-          balance
-        `);
-
-      // Fetch products for SKU and description
-      const { data: products } = await supabase
-        .from('products')
-        .select('id, sku, description, product_type, full_package_cost');
-
-      // Fetch tour products for mapping
-      const { data: tourProducts } = await supabase
-        .from('tour_products')
-        .select('tour_id, product_id, size');
-
-      // Create lookup maps
-      const tourMap = new Map<string, Tour>();
-      for (const tour of toursData ?? []) {
-        tourMap.set(tour.id, tour);
+      try {
+        const response = await fetch('/api/admin/inventory');
+        const result = await readJsonResponse<{ tours: Tour[]; inventory: InventoryItem[] }>(response);
+        setTours(result.tours);
+        setInventory(result.inventory);
+      } catch (err) {
+        console.error('Failed to load inventory:', err);
       }
-
-      const productMap = new Map<string, any>();
-      for (const product of products ?? []) {
-        productMap.set(product.id, product);
-      }
-
-      // Transform inventory data
-      const enrichedInventory: InventoryItem[] = (inventoryData ?? [])
-        .map((item) => {
-          const tour = tourMap.get(item.tour_id);
-          const product = productMap.get(item.product_id);
-          if (!tour || !product) return null;
-
-          return {
-            tour_id: item.tour_id,
-            tour_name: tour.name,
-            artist: tour.artist,
-            product_id: item.product_id,
-            sku: product.sku,
-            description: product.description,
-            size: item.size,
-            product_type: product.product_type,
-            total_received: item.total_received,
-            total_sold: item.total_sold,
-            total_comps: item.total_comps,
-            balance: item.balance,
-            full_package_cost: product.full_package_cost ?? 0,
-          };
-        })
-        .filter((item): item is InventoryItem => item !== null);
-
-      setTours(toursData ?? []);
-      setInventory(enrichedInventory);
       setLoading(false);
     }
 

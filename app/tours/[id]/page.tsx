@@ -104,23 +104,87 @@ export const revalidate = 0;
 export default async function TourDetailPage({ params }: TourDetailParams) {
   const supabase = createServiceClient();
 
-  const { data: tour } = await supabase
-    .from('tours')
-    .select('id, name, artist, start_date, end_date, status')
-    .eq('id', params.id)
-    .maybeSingle();
+  // Independent queries run in parallel (they used to run one after another)
+  const [
+    { data: tour },
+    { data: showSummary },
+    { data: inventory },
+    { data: cogs },
+    { data: tourProducts },
+    { data: purchaseOrders },
+    { data: openQuantities },
+    { data: stockMovement },
+    { data: needsReview },
+    { data: baselineScenario },
+    { data: designs, error: designError },
+  ] = await Promise.all([
+    supabase
+      .from('tours')
+      .select('id, name, artist, start_date, end_date, status')
+      .eq('id', params.id)
+      .maybeSingle(),
+    supabase
+      .from('show_summary_view')
+      .select(
+        'show_id, show_date, venue_name, city, state, total_gross, attendance, per_head, total_comps'
+      )
+      .eq('tour_id', params.id)
+      .order('show_date', { ascending: true }),
+    supabase
+      .from('inventory_balances')
+      .select('product_id, size, total_received, total_sold, total_comps, balance')
+      .eq('tour_id', params.id),
+    supabase
+      .from('product_summary_view')
+      .select(
+        'product_id, sku, description, size, total_sold, total_gross, total_cogs, gross_margin, full_package_cost'
+      )
+      .eq('tour_id', params.id),
+    supabase
+      .from('tour_products')
+      .select('product_id, size, full_package_cost, suggested_retail')
+      .eq('tour_id', params.id),
+    supabase
+      .from('purchase_orders')
+      .select('id, po_number, vendor, status, order_date, expected_delivery, total_amount')
+      .eq('tour_id', params.id)
+      .order('order_date', { ascending: false }),
+    supabase
+      .from('po_open_qty_view')
+      .select(
+        'po_id, po_line_item_id, sku, description, size, quantity_ordered, quantity_received, open_quantity'
+      )
+      .eq('tour_id', params.id),
+    supabase
+      .from('stock_movement_view')
+      .select('received_date, delivery_number, sku, size, quantity_received, vendor')
+      .eq('tour_id', params.id)
+      .order('received_date', { ascending: false }),
+    supabase
+      .from('parsed_documents')
+      .select('id, doc_type, status, source_filename, updated_at')
+      .eq('tour_id', params.id)
+      .in('status', ['draft', 'error', 'approved'])
+      .order('updated_at', { ascending: false }),
+    supabase
+      .from('forecast_scenarios')
+      .select('id, name, is_baseline')
+      .eq('tour_id', params.id)
+      .eq('is_baseline', true)
+      .maybeSingle(),
+    supabase
+      .from('design_assets')
+      .select('id, tour_id, product_id, sku, storage_path, asset_type, is_primary')
+      .eq('tour_id', params.id),
+  ]);
 
   if (!tour) {
     notFound();
   }
 
-  const { data: showSummary } = await supabase
-    .from('show_summary_view')
-    .select(
-      'show_id, show_date, venue_name, city, state, total_gross, attendance, per_head, total_comps'
-    )
-    .eq('tour_id', params.id)
-    .order('show_date', { ascending: true });
+  const designAssets: any[] = designError ? [] : designs ?? [];
+
+
 
   const totalGross = (showSummary ?? []).reduce(
     (sum, row) => sum + Number(row.total_gross ?? 0),
@@ -132,17 +196,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
   );
   const perHead = totalAttendance ? totalGross / totalAttendance : 0;
 
-  const { data: inventory } = await supabase
-    .from('inventory_balances')
-    .select('product_id, size, total_received, total_sold, total_comps, balance')
-    .eq('tour_id', params.id);
 
-  const { data: cogs } = await supabase
-    .from('product_summary_view')
-    .select(
-      'product_id, sku, description, size, total_sold, total_gross, total_cogs, gross_margin, full_package_cost'
-    )
-    .eq('tour_id', params.id);
 
   const productIds = Array.from(
     new Set(
@@ -152,17 +206,23 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
     )
   ) as string[];
 
-  const { data: tourProducts } = await supabase
-    .from('tour_products')
-    .select('product_id, size, full_package_cost, suggested_retail')
-    .eq('tour_id', params.id);
 
-  const { data: products } = productIds.length
-    ? await supabase
-        .from('products')
-        .select('id, sku, description')
-        .in('id', productIds)
-    : { data: [] as ProductRow[] };
+
+  // Second wave: queries that depend on the first wave's results
+  const [{ data: products }, { data: forecastOverrides }] = await Promise.all([
+    productIds.length
+      ? supabase
+          .from('products')
+          .select('id, sku, description')
+          .in('id', productIds)
+      : Promise.resolve({ data: [] as ProductRow[] }),
+    baselineScenario
+      ? supabase
+          .from('forecast_overrides')
+          .select('sku, size, bucket, override_units')
+          .eq('scenario_id', baselineScenario.id)
+      : Promise.resolve({ data: [] as ForecastOverrideRow[] }),
+  ]);
 
   const productMap = new Map(
     (products ?? []).map((product) => [product.id, product])
@@ -213,55 +273,12 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
     };
   });
 
-  const { data: purchaseOrders } = await supabase
-    .from('purchase_orders')
-    .select('id, po_number, vendor, status, order_date, expected_delivery, total_amount')
-    .eq('tour_id', params.id)
-    .order('order_date', { ascending: false });
 
-  const { data: openQuantities } = await supabase
-    .from('po_open_qty_view')
-    .select(
-      'po_id, po_line_item_id, sku, description, size, quantity_ordered, quantity_received, open_quantity'
-    )
-    .eq('tour_id', params.id);
 
-  const { data: stockMovement } = await supabase
-    .from('stock_movement_view')
-    .select('received_date, delivery_number, sku, size, quantity_received, vendor')
-    .eq('tour_id', params.id)
-    .order('received_date', { ascending: false });
 
-  const { data: needsReview } = await supabase
-    .from('parsed_documents')
-    .select('id, doc_type, status, source_filename, updated_at')
-    .eq('tour_id', params.id)
-    .in('status', ['draft', 'error', 'approved'])
-    .order('updated_at', { ascending: false });
 
-  const { data: baselineScenario } = await supabase
-    .from('forecast_scenarios')
-    .select('id, name, is_baseline')
-    .eq('tour_id', params.id)
-    .eq('is_baseline', true)
-    .maybeSingle();
 
-  const { data: forecastOverrides } = baselineScenario
-    ? await supabase
-        .from('forecast_overrides')
-        .select('sku, size, bucket, override_units')
-        .eq('scenario_id', baselineScenario.id)
-    : { data: [] as ForecastOverrideRow[] };
 
-  let designAssets: any[] = [];
-  const { data: designs, error: designError } = await supabase
-    .from('design_assets')
-    .select('id, tour_id, product_id, sku, storage_path, asset_type, is_primary')
-    .eq('tour_id', params.id);
-
-  if (!designError) {
-    designAssets = designs ?? [];
-  }
 
   const totalBalance = (inventory ?? []).reduce(
     (sum, row) => sum + Number(row.balance ?? 0),

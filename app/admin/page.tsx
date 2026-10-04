@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/Button';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { ArrowRight, BarChart3, Calendar, ClipboardList, FileText, Folder, Music, Package, Plus, Settings, Tag } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
+// Stats can be up to 30s stale; mutation routes call revalidateDashboards()
+export const revalidate = 30;
 
 export default async function AdminDashboard() {
   const supabase = createServiceClient();

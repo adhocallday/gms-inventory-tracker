@@ -4,10 +4,23 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { CoverSection } from './sections/CoverSection';
 import { ProductBreakdownSection } from './sections/ProductBreakdownSection';
-import { SalesChartSection } from './sections/SalesChartSection';
-import { PerHeadsChartSection } from './sections/PerHeadsChartSection';
+import dynamic from 'next/dynamic';
 import { ProductRatiosSection } from './sections/ProductRatiosSection';
-import { ProductPercentageSection } from './sections/ProductPercentageSection';
+
+// recharts is the largest client chunk; load chart sections only when a report renders them
+const chartFallback = () => <div className="h-80 animate-pulse rounded-xl bg-[var(--color-bg-elevated)]" />;
+const SalesChartSection = dynamic(
+  () => import('./sections/SalesChartSection').then((m) => m.SalesChartSection),
+  { loading: chartFallback }
+);
+const PerHeadsChartSection = dynamic(
+  () => import('./sections/PerHeadsChartSection').then((m) => m.PerHeadsChartSection),
+  { loading: chartFallback }
+);
+const ProductPercentageSection = dynamic(
+  () => import('./sections/ProductPercentageSection').then((m) => m.ProductPercentageSection),
+  { loading: chartFallback }
+);
 import { ArrowLeft } from 'lucide-react';
 
 interface ReportViewerProps {

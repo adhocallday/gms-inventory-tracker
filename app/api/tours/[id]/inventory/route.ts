@@ -8,77 +8,57 @@ export async function GET(
   try {
     const supabase = createServiceClient();
 
-    // Get inventory balances with product details
-    const { data: inventoryData, error: inventoryError } = await supabase.rpc(
-      'get_inventory_with_products',
-      { p_tour_id: params.id }
-    );
-
-    // If the RPC doesn't exist, fall back to manual query
-    let inventory = inventoryData;
-    if (inventoryError || !inventoryData) {
-      // Manual join query
-      const { data: balances } = await supabase
+    // Balances, costs, movements and open POs are independent: fetch in parallel
+    const [
+      { data: balances },
+      { data: tourProducts },
+      { data: movements },
+      { data: openPOs },
+    ] = await Promise.all([
+      supabase
         .from('inventory_balances')
-        .select(
-          `
-          product_id,
-          size,
-          total_received,
-          total_sold,
-          total_comps,
-          balance
-        `
-        )
-        .eq('tour_id', params.id);
-
-      // Get product details
-      const productIds = Array.from(
-        new Set(balances?.map((b) => b.product_id) || [])
-      );
-
-      const { data: products } = await supabase
-        .from('products')
-        .select('id, sku, description, product_type')
-        .in('id', productIds);
-
-      // Get tour products for costs
-      const { data: tourProducts } = await supabase
+        .select('product_id, size, total_received, total_sold, total_comps, balance')
+        .eq('tour_id', params.id),
+      supabase
         .from('tour_products')
         .select('product_id, size, full_package_cost, suggested_retail')
-        .eq('tour_id', params.id);
+        .eq('tour_id', params.id),
+      supabase
+        .from('stock_movement_view')
+        .select('*')
+        .eq('tour_id', params.id)
+        .order('received_date', { ascending: false }),
+      supabase
+        .from('po_open_qty_view')
+        .select('*')
+        .eq('tour_id', params.id),
+    ]);
 
-      // Combine the data
-      inventory = (balances || []).map((bal) => {
-        const product = products?.find((p) => p.id === bal.product_id);
-        const tourProduct = tourProducts?.find(
-          (tp) =>
-            tp.product_id === bal.product_id && tp.size === bal.size
-        );
+    const productIds = Array.from(new Set((balances ?? []).map((b) => b.product_id)));
+    const { data: products } = productIds.length
+      ? await supabase
+          .from('products')
+          .select('id, sku, description, product_type')
+          .in('id', productIds)
+      : { data: [] as { id: string; sku: string; description: string; product_type: string }[] };
 
-        return {
-          ...bal,
-          sku: product?.sku,
-          description: product?.description,
-          product_type: product?.product_type,
-          full_package_cost: tourProduct?.full_package_cost || 0,
-          suggested_retail: tourProduct?.suggested_retail || 0,
-        };
-      });
-    }
+    const productById = new Map((products ?? []).map((p) => [p.id, p]));
+    const tourProductByKey = new Map(
+      (tourProducts ?? []).map((tp) => [`${tp.product_id}:${tp.size}`, tp])
+    );
 
-    // Get stock movements
-    const { data: movements } = await supabase
-      .from('stock_movement_view')
-      .select('*')
-      .eq('tour_id', params.id)
-      .order('received_date', { ascending: false });
-
-    // Get open PO quantities
-    const { data: openPOs } = await supabase
-      .from('po_open_qty_view')
-      .select('*')
-      .eq('tour_id', params.id);
+    const inventory = (balances ?? []).map((bal) => {
+      const product = productById.get(bal.product_id);
+      const tourProduct = tourProductByKey.get(`${bal.product_id}:${bal.size}`);
+      return {
+        ...bal,
+        sku: product?.sku,
+        description: product?.description,
+        product_type: product?.product_type,
+        full_package_cost: tourProduct?.full_package_cost || 0,
+        suggested_retail: tourProduct?.suggested_retail || 0,
+      };
+    });
 
     // Calculate summary statistics
     const summary = {

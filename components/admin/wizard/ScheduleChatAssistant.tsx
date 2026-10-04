@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { readJsonResponse } from '@/lib/upload/upload-client';
+import { readJsonResponse } from '@/lib/http/read-json';
 import { Check, Lightbulb } from 'lucide-react';
 
 interface Show {

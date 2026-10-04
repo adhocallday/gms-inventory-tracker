@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/client';
+import { revalidateDashboards } from '@/lib/cache/revalidate';
 
 interface Show {
   id?: string;
@@ -100,6 +101,7 @@ export async function POST(
       }
     }
 
+    revalidateDashboards(params.id);
     return NextResponse.json({
       message: 'Shows updated successfully',
       updated: showsToUpdate.length,
