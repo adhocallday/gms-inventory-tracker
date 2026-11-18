@@ -19,7 +19,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setMounted(true);
     let stored: string | null = null;
     try {
-      stored = localStorage.getItem('theme');
+      stored = localStorage.getItem('mf.theme');
     } catch {}
     const initial: Theme = stored === 'dark' ? 'dark' : 'light';
     setTheme(initial);
@@ -30,7 +30,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
     try {
-      localStorage.setItem('theme', newTheme);
+      localStorage.setItem('mf.theme', newTheme);
     } catch {}
     document.documentElement.setAttribute('data-theme', newTheme);
   };

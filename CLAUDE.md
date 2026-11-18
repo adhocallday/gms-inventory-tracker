@@ -292,7 +292,7 @@ lib/ai/
 
 ### Theme System (MerchFlow brand)
 - The app is **MerchFlow Tracker**, part of MerchFlow by Global Merchandising Services.
-- **Light is the default.** Dark is opt-in through the theme toggle (`localStorage.theme = 'dark'`).
+- **Light is the default.** Dark is opt-in through the theme toggle (`localStorage['mf.theme'] = 'dark'`; the old `theme` key is ignored).
 - Theme set via `data-theme` attribute on `<html>`; `:root` and `[data-theme="light"]` hold the light values, `[data-theme="dark"]` the dark ones.
 - Inline script in `<head>` sets it before hydration to prevent a flash.
 - Brand tokens (`--mf-*`) mirror `merchflow-brand/out/tokens.css`; the `--color-*` variables map onto them. Red `#E8003D` is an accent; white on it is 4.67:1 (AA), so red buttons with white text are fine. Hover/active go darker (`--color-red-hover` `#C70034`, `--color-red-active` `#A8002C`).
