@@ -55,10 +55,11 @@ export function ReceivingContextTable({ data, loading }: ReceivingContextTablePr
       {
         accessorKey: 'quantity_received',
         header: 'Received',
+        meta: { align: 'right' },
         cell: ({ row }) => {
           const value = row.getValue('quantity_received') as number;
           return (
-            <div className="text-right text-green-300 font-medium">
+            <div className="text-right font-medium tabular-nums">
               +{new Intl.NumberFormat('en-US').format(value)}
             </div>
           );

@@ -28,7 +28,7 @@ export function SalesLinesTable({ data, loading }: SalesLinesTableProps) {
         cell: ({ row }) => (
           <div>
             <div className="font-semibold text-[var(--color-text-primary)]">{row.getValue('sku')}</div>
-            <div className="text-xs text-[var(--color-text-muted)]">{row.original.description}</div>
+            <div className="text-xs text-[var(--color-text-secondary)]">{row.original.description}</div>
           </div>
         ),
         enableSorting: true,
@@ -43,19 +43,22 @@ export function SalesLinesTable({ data, loading }: SalesLinesTableProps) {
       },
       {
         accessorKey: 'qty_sold',
-        header: 'Qty Sold',
+        header: 'Qty sold',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('qty_sold')} format="number" />,
         enableSorting: true,
       },
       {
         accessorKey: 'unit_price',
-        header: 'Unit Price',
+        header: 'Unit price',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('unit_price')} format="currency" />,
         enableSorting: true,
       },
       {
         accessorKey: 'gross_sales',
         header: 'Gross',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('gross_sales')} format="currency" />,
         enableSorting: true,
       },

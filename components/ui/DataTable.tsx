@@ -188,7 +188,9 @@ export function DataTable<TData, TValue>({
                     key={cell.id}
                     className={cn(
                       'px-4 text-[var(--color-text-secondary)]',
-                      compact ? 'py-3' : 'py-4'
+                      compact ? 'py-3' : 'py-4',
+                      (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' &&
+                        'text-right'
                     )}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

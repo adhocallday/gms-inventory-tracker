@@ -7,6 +7,8 @@ import { CompsTable } from '@/components/shows/CompsTable';
 import { InventoryImpactTable } from '@/components/shows/InventoryImpactTable';
 import { ReceivingContextTable } from '@/components/shows/ReceivingContextTable';
 import { ArrowLeft } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge';
+import { formatDate as formatDay } from '@/lib/format';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -15,12 +17,21 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
 });
 
 function formatDate(value?: string | null) {
-  if (!value) return 'TBD';
-  return new Date(value).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
+  return formatDay(value, undefined, 'date not set');
+}
+
+/** Settlement documents, best first: a posted one is the settlement of record. */
+const SETTLEMENT_STATUS_RANK: Record<string, number> = { posted: 0, approved: 1, draft: 2, error: 3, rejected: 4 };
+
+/** A settlement figure, or null when the document does not contain it. */
+function settlementValue(source: Record<string, unknown>, ...keys: string[]): number | null {
+  for (const key of keys) {
+    const raw = source[key];
+    if (raw === null || raw === undefined || raw === '') continue;
+    const value = Number(raw);
+    if (Number.isFinite(value)) return value;
+  }
+  return null;
 }
 
 function normalizeProduct(
@@ -121,7 +132,7 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
       .eq('doc_type', 'settlement')
       .eq('show_id', params.showId)
       .order('updated_at', { ascending: false })
-      .limit(1),
+      .limit(10),
   ]);
 
   if (!tour || !show || show.tour_id !== tour.id) {
@@ -150,12 +161,23 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
     ),
   ]);
 
-  const settlementDoc = settlementDocs?.[0];
-  const settlementSource =
-    settlementDoc?.ui_overrides ??
+  // Prefer the posted settlement; fall back to the newest draft, and only
+  // then to a rejected one, which is labelled as such below.
+  const settlementDoc = [...(settlementDocs ?? [])].sort(
+    (a, b) => (SETTLEMENT_STATUS_RANK[a.status] ?? 9) - (SETTLEMENT_STATUS_RANK[b.status] ?? 9)
+  )[0];
+  const settlementSource = (settlementDoc?.ui_overrides ??
     settlementDoc?.normalized_json ??
     settlementDoc?.extracted_json ??
-    {};
+    {}) as Record<string, unknown>;
+  // Normalised keys first, then the parser's raw names.
+  const settlementFigures = [
+    { label: 'Gross sales', value: settlementValue(settlementSource, 'gross_sales_total', 'grossSales') },
+    { label: 'Sales tax', value: settlementValue(settlementSource, 'sales_tax_total', 'salesTax') },
+    { label: 'Card fees', value: settlementValue(settlementSource, 'credit_card_fees', 'ccFees') },
+    { label: 'Other fees', value: settlementValue(settlementSource, 'other_fees', 'otherFees') },
+    { label: 'Net settlement', value: settlementValue(settlementSource, 'net_settlement_amount', 'netSettlement') },
+  ];
 
   const salesRows = (sales ?? []) as unknown as SalesRow[];
   const compRows = (comps ?? []) as unknown as CompRow[];
@@ -264,12 +286,13 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
 
     return {
       sku: product?.sku ?? 'SKU',
-      description: product?.description ?? 'Description pending',
+      description: product?.description ?? 'No description',
       size: tp.size ?? '—',
       soldThisShow: currentSold.get(tp.id) ?? 0,
       compsThisShow: currentComps.get(tp.id) ?? 0,
       startingBalance,
-      endingBalance
+      endingBalance,
+      noReceipts: receivedUpToCurrent === 0,
     };
   });
 
@@ -281,34 +304,35 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
     return rowDate <= showDate;
   });
 
+  const settlementIsRecord = settlementDoc?.status === 'posted' || settlementDoc?.status === 'approved';
+
   return (
-    <div className="g-container py-12">
+    <div className="g-container py-6">
       <Link href={`/tours/${tour.id}`} className="text-sm font-medium g-link">
-        <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to tour
+        <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />
+        {tour.name}
       </Link>
-      <div className="flex flex-col gap-4 mt-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold g-title">
-            {tour.name} · {show.venue_name ?? 'Show Detail'}
-          </h1>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-            {show.city ?? '—'} {show.state ? `, ${show.state}` : ''}
-          </p>
-          <p className="text-sm text-[var(--color-text-muted)] mt-2">
-            {formatDate(show.show_date)} · {show.attendance ?? 0} attendance
-          </p>
-        </div>
-        <div className="g-kicker">{tour.artist}</div>
+      <div className="mt-3">
+        <h1 className="text-2xl font-semibold tracking-tight lg:text-[28px] lg:leading-9">
+          {show.venue_name ?? 'Venue not set'}
+        </h1>
+        <p className="mt-1 text-sm text-[var(--color-text-secondary)] tabular-nums">
+          {[show.city, show.state].filter(Boolean).join(', ') || 'City not set'} · {formatDate(show.show_date)} ·{' '}
+          {show.attendance === null || show.attendance === undefined
+            ? 'attendance not recorded'
+            : `${Number(show.attendance).toLocaleString()} attendance`}{' '}
+          · {tour.artist}
+        </p>
       </div>
 
-      <section data-tour="show-sales" className="g-card p-6 mt-10">
-        <h2 className="text-lg font-semibold g-title mb-4">Sales lines</h2>
+      <section data-tour="show-sales" className="g-card p-5 mt-6">
+        <h2 className="text-lg font-semibold mb-4">Sales lines</h2>
         <SalesLinesTable
           data={salesRows.map((row) => {
             const product = normalizeProduct(row.tour_product?.product);
             return {
               sku: product?.sku ?? 'SKU',
-              description: product?.description ?? 'Description pending',
+              description: product?.description ?? 'No description',
               size: row.tour_product?.size ?? '',
               qty_sold: row.qty_sold,
               unit_price: Number(row.unit_price ?? 0),
@@ -318,8 +342,8 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
         />
       </section>
 
-      <section data-tour="show-comps" className="g-card p-6 mt-10">
-        <h2 className="text-lg font-semibold g-title mb-4">Comps</h2>
+      <section data-tour="show-comps" className="g-card p-5 mt-6">
+        <h2 className="text-lg font-semibold mb-4">Comps</h2>
         <CompsTable
           data={compRows.map((row) => {
             const product = normalizeProduct(row.tour_product?.product);
@@ -333,48 +357,61 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
         />
       </section>
 
-      <section data-tour="show-settlement" className="g-card p-6 mt-10">
-        <h2 className="text-lg font-semibold g-title">Settlement summary</h2>
+      <section data-tour="show-settlement" className="g-card p-5 mt-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold">Settlement</h2>
+          {settlementDoc && (
+            <div className="flex items-center gap-3 text-sm">
+              <Badge variant={settlementDoc.status as never} size="sm">
+                {settlementDoc.status}
+              </Badge>
+              <Link href={`/dashboard/parsed-documents/${settlementDoc.id}`} className="g-link font-medium">
+                Open document
+              </Link>
+            </div>
+          )}
+        </div>
         {settlementDoc ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm">
-            <div className="border border-[var(--color-bg-border)] rounded-md p-3">
-              <p className="text-xs text-[var(--color-text-muted)]">Gross sales</p>
-              <p className="text-lg font-semibold mt-1">
-                {currencyFormatter.format(Number(settlementSource.gross_sales_total ?? 0))}
+          <>
+            {!settlementIsRecord && (
+              <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+                {settlementDoc.status === 'rejected'
+                  ? 'Only a rejected settlement document exists for this show. These figures were read from it and are not posted.'
+                  : 'This settlement has not been posted yet. Figures are from the parsed draft.'}
               </p>
-            </div>
-            <div className="border border-[var(--color-bg-border)] rounded-md p-3">
-              <p className="text-xs text-[var(--color-text-muted)]">Fees</p>
-              <p className="text-lg font-semibold mt-1">
-                {currencyFormatter.format(Number(settlementSource.other_fees ?? 0))}
-              </p>
-            </div>
-            <div className="border border-[var(--color-bg-border)] rounded-md p-3">
-              <p className="text-xs text-[var(--color-text-muted)]">Net settlement</p>
-              <p className="text-lg font-semibold mt-1">
-                {currencyFormatter.format(Number(settlementSource.net_settlement_amount ?? 0))}
-              </p>
-            </div>
-            <div className="text-xs text-[var(--color-text-muted)] md:col-span-3">
-              Status: {settlementDoc.status}
-            </div>
-          </div>
+            )}
+            <dl className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-4 text-sm">
+              {settlementFigures.map((figure) => (
+                <div key={figure.label} className="rounded-md border border-[var(--color-bg-border)] p-3">
+                  <dt className="text-xs font-medium text-[var(--color-text-secondary)]">{figure.label}</dt>
+                  {figure.value === null ? (
+                    <dd className="mt-1 text-sm text-[var(--color-text-secondary)]">Not in settlement</dd>
+                  ) : (
+                    <dd className="mt-1 text-lg font-semibold tabular-nums">{currencyFormatter.format(figure.value)}</dd>
+                  )}
+                </div>
+              ))}
+            </dl>
+          </>
         ) : (
-          <p className="text-sm text-[var(--color-text-muted)] mt-3">
-            No settlement document posted yet.
+          <p className="text-sm text-[var(--color-text-secondary)] mt-2">
+            No settlement document for this show yet. Upload the venue settlement to see gross, tax, fees and net.
           </p>
         )}
       </section>
 
-      <section data-tour="show-inventory" className="g-card p-6 mt-10">
-        <h2 className="text-lg font-semibold g-title mb-4">Inventory impact</h2>
+      <section data-tour="show-inventory" className="g-card p-5 mt-6">
+        <h2 className="text-lg font-semibold">Inventory impact</h2>
+        <p className="mt-1 mb-4 text-sm text-[var(--color-text-secondary)]">
+          Starting: stock received up to the previous show, less earlier sales and comps. Ending: stock received up to this show, less sales and comps up to and including it.
+        </p>
         <InventoryImpactTable data={inventoryImpact} />
       </section>
 
-      <section className="g-card p-6 mt-10">
-        <h2 className="text-lg font-semibold g-title mb-2">Receiving context</h2>
-        <p className="text-sm text-[var(--color-text-muted)] mb-4">
-          Receipts since the previous show.
+      <section className="g-card p-5 mt-6">
+        <h2 className="text-lg font-semibold mb-1">Stock received</h2>
+        <p className="text-sm text-[var(--color-text-secondary)] mb-4">
+          Deliveries received after the previous show, up to this one.
         </p>
         <ReceivingContextTable data={receiptsBetween} />
       </section>

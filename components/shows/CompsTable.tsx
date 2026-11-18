@@ -47,6 +47,7 @@ export function CompsTable({ data, loading }: CompsTableProps) {
       {
         accessorKey: 'quantity',
         header: 'Qty',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('quantity')} format="number" />,
         enableSorting: true,
       },
