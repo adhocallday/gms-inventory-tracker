@@ -474,6 +474,12 @@ export const CHAPTERS: Chapter[] = [
       },
       {
         page: 'pos',
+        anchor: 'pos-demo',
+        title: 'Try it',
+        body: 'The interactive demo runs the app in an iPad frame: setup, a sale by card or cash, comps, and closing the show. Nothing is saved.',
+      },
+      {
+        page: 'pos',
         anchor: 'pos-features',
         title: 'No export step',
         body: 'Sales and comps are recorded at the table and written straight to the database. The AtVenu export and the typing after it are gone.',

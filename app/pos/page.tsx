@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { PosLaunch } from '@/components/onboarding/PosLaunch';
 import { FLOW_URL } from '@/lib/apps';
 
@@ -34,6 +35,21 @@ export default function PosPage() {
       </header>
 
       <PosLaunch />
+
+      <section className="g-card p-6 space-y-3" data-tour="pos-demo">
+        <h2 className="text-lg font-semibold">Interactive demo</h2>
+        <p className="text-sm text-[var(--color-text-secondary)] max-w-3xl">
+          A clickable iPad mock of the app in your browser: setup, a sale by card, cash or split,
+          comps, and closing the show with count-out and settlement. It uses this tour&apos;s
+          products. Nothing is saved.
+        </p>
+        <Link
+          href="/pos/demo"
+          className="inline-flex items-center rounded-md bg-[var(--color-red-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-red-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+        >
+          Open the interactive demo
+        </Link>
+      </section>
 
       <section className="g-card p-6 space-y-3" data-tour="pos-features">
         <h2 className="text-lg font-semibold">What it does</h2>
