@@ -39,43 +39,26 @@ interface StatCardProps {
   className?: string;
 }
 
+// Counts are not states, so the decorative purple/green/blue/orange fills
+// all render as the neutral card. Only `red` (a problem) keeps colour.
+const neutral = {
+  bg: 'bg-[var(--color-bg-surface)]',
+  iconColor: 'text-[var(--color-text-secondary)]',
+  valueColor: 'text-[var(--color-text-primary)]',
+  borderColor: 'border-[var(--color-bg-border)]',
+};
 const colorVariants = {
-  purple: {
-    bg: 'bg-purple-500/10',
-    iconColor: 'text-purple-400',
-    valueColor: 'text-purple-400',
-    borderColor: 'border-purple-500/20',
-  },
-  green: {
-    bg: 'bg-green-500/10',
-    iconColor: 'text-green-400',
-    valueColor: 'text-green-400',
-    borderColor: 'border-green-500/20',
-  },
-  blue: {
-    bg: 'bg-blue-500/10',
-    iconColor: 'text-blue-400',
-    valueColor: 'text-blue-400',
-    borderColor: 'border-blue-500/20',
-  },
-  orange: {
-    bg: 'bg-orange-500/10',
-    iconColor: 'text-orange-400',
-    valueColor: 'text-orange-400',
-    borderColor: 'border-orange-500/20',
-  },
+  purple: neutral,
+  green: neutral,
+  blue: neutral,
+  orange: neutral,
   red: {
-    bg: 'bg-[var(--color-red-muted)]',
-    iconColor: 'text-[var(--color-red-primary)]',
-    valueColor: 'text-[var(--color-red-primary)]',
-    borderColor: 'border-[var(--color-red-primary)]/20',
+    bg: 'bg-danger-bg',
+    iconColor: 'text-danger',
+    valueColor: 'text-danger',
+    borderColor: 'border-danger-border',
   },
-  default: {
-    bg: 'bg-[var(--color-bg-elevated)]',
-    iconColor: 'text-[var(--color-text-secondary)]',
-    valueColor: 'text-[var(--color-text-primary)]',
-    borderColor: 'border-[var(--color-bg-border)]',
-  },
+  default: neutral,
 };
 
 export function StatCard({ label, value, icon: IconProp, iconName, trend, color = 'default', className }: StatCardProps) {
@@ -86,34 +69,29 @@ export function StatCard({ label, value, icon: IconProp, iconName, trend, color 
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl border p-6',
+        'relative overflow-hidden rounded-lg border p-4',
         colors.bg,
         colors.borderColor,
         className
       )}
     >
-      <div className="flex items-start justify-between mb-4">
-        {Icon && <Icon className={cn('w-8 h-8', colors.iconColor)} />}
-        <div className={cn('text-3xl font-bold', colors.valueColor)}>
-          {value}
-        </div>
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-[13px] font-medium text-[var(--color-text-secondary)]">{label}</div>
+        {Icon && <Icon className={cn('w-4 h-4', colors.iconColor)} aria-hidden="true" />}
       </div>
-
-      <div className="text-sm font-medium text-[var(--color-text-primary)] mb-1">
-        {label}
-      </div>
+      <div className={cn('mt-1 text-2xl font-semibold tabular-nums', colors.valueColor)}>{value}</div>
 
       {trend && (
         <div className="flex items-center gap-1 text-xs">
           {trend.isPositive !== false ? (
-            <TrendingUp className="w-3 h-3 text-green-400" />
+            <TrendingUp className="w-3 h-3 text-success" aria-hidden="true" />
           ) : (
-            <TrendingDown className="w-3 h-3 text-red-400" />
+            <TrendingDown className="w-3 h-3 text-danger" aria-hidden="true" />
           )}
-          <span className={trend.isPositive !== false ? 'text-green-400' : 'text-red-400'}>
+          <span className={trend.isPositive !== false ? 'text-success' : 'text-danger'}>
             {trend.value > 0 ? '+' : ''}{trend.value}%
           </span>
-          <span className="text-[var(--color-text-muted)]">
+          <span className="text-[var(--color-text-secondary)]">
             {trend.label}
           </span>
         </div>

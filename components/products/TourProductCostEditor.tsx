@@ -131,7 +131,7 @@ export function TourProductCostEditor({
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="p-1.5 text-green-400 hover:text-green-300 hover:bg-green-500/10 rounded transition"
+              className="p-1.5 text-success hover:text-success hover:bg-success-bg rounded transition"
               title="Save"
             >
               <Check className="w-4 h-4" />
@@ -139,7 +139,7 @@ export function TourProductCostEditor({
             <button
               onClick={handleCancel}
               disabled={isSaving}
-              className="p-1.5 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-surface)]/10 rounded transition"
+              className="p-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-surface)]/10 rounded transition"
               title="Cancel"
             >
               <X className="w-4 h-4" />
@@ -179,7 +179,7 @@ export function TourProductCostEditor({
         <div className="flex items-center justify-end gap-1">
           <button
             onClick={() => setIsEditing(true)}
-            className="p-1.5 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-surface)]/10 rounded transition"
+            className="p-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-surface)]/10 rounded transition"
             title="Edit costs"
           >
             <Pencil className="w-4 h-4" />
@@ -187,7 +187,7 @@ export function TourProductCostEditor({
           {inventoryBalance === 0 && (
             <button
               onClick={() => onRemove(tourProductId, sku, size)}
-              className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition"
+              className="p-1.5 text-danger hover:text-danger hover:bg-danger-bg rounded transition"
               title="Remove from tour"
             >
               <Trash2 className="w-4 h-4" />

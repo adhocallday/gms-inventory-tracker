@@ -56,13 +56,13 @@ export function ProductSalesTable({ data, loading }: ProductSalesTableProps) {
       },
       {
         accessorKey: 'qty_sold',
-        header: 'Qty Sold',
+        header: 'Qty sold',
         cell: ({ row }) => <NumericCell value={row.getValue('qty_sold')} format="number" />,
         enableSorting: true,
       },
       {
         accessorKey: 'gross_sales',
-        header: 'Gross Sales',
+        header: 'Gross sales',
         cell: ({ row }) => <NumericCell value={row.getValue('gross_sales')} format="currency" />,
         enableSorting: true,
       },
@@ -78,7 +78,7 @@ export function ProductSalesTable({ data, loading }: ProductSalesTableProps) {
       stickyHeader
       striped
       emptyState={{
-        icon: <ShoppingBag className="w-12 h-12 text-[var(--color-text-muted)]" />,
+        icon: <ShoppingBag className="w-12 h-12 text-[var(--color-text-secondary)]" />,
         title: 'No sales data yet',
         description: 'Sales will appear here as shows are completed',
       }}

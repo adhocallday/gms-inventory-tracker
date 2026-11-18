@@ -14,7 +14,7 @@ const filterOptions: FilterOption[] = [
   { value: 'apparel', label: 'Apparel' },
   { value: 'accessories', label: 'Accessories' },
   { value: 'media', label: 'Media' },
-  { value: 'paper-items', label: 'Paper Items' },
+  { value: 'paper-items', label: 'Paper items' },
   { value: 'other', label: 'Other' },
 ];
 
@@ -42,8 +42,8 @@ export function ProductFilters({
             className={cn(
               'px-3 py-1.5 text-sm font-medium rounded-lg transition-all border',
               isActive
-                ? 'bg-[var(--color-red-primary)] text-white border-[var(--color-red-primary)]'
-                : 'bg-[var(--color-bg-border)] text-[var(--color-text-muted)] border-[var(--color-bg-border)] hover:bg-[var(--color-bg-border)] hover:text-[var(--color-text-primary)]'
+                ? 'bg-[var(--color-text-primary)] text-[var(--color-bg-surface)] border-[var(--color-text-primary)]'
+                : 'bg-[var(--color-bg-border)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)] hover:bg-[var(--color-bg-border)] hover:text-[var(--color-text-primary)]'
             )}
           >
             {option.label}

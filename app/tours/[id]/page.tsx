@@ -194,6 +194,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
     0
   );
   const perHead = totalAttendance ? totalGross / totalAttendance : 0;
+  const showsWithSales = (showSummary ?? []).filter((row) => Number(row.total_gross ?? 0) > 0).length;
 
 
 
@@ -395,7 +396,8 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         <div className="g-card p-4">
           <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">Shows with sales</p>
           <p className="text-2xl font-semibold mt-1 tabular-nums">
-            {showSummary?.length ?? 0}
+            {showsWithSales}
+            <span className="ml-1 text-sm font-normal text-[var(--color-text-secondary)]">of {showSummary?.length ?? 0}</span>
           </p>
         </div>
         <div className="g-card p-4">

@@ -3,7 +3,7 @@ import { createServiceClient } from '@/lib/supabase/client';
 import { generateBreadcrumbs } from '@/lib/breadcrumbs';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { ToursTable } from '@/components/admin/ToursTable';
-import { Button } from '@/components/ui/Button';
+import { Button, buttonVariants } from '@/components/ui/Button';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,14 +25,11 @@ export default async function AdminToursPage() {
   return (
     <div className="g-container py-12">
       <PageHeader
-        title="Manage Tours"
+        title="Tours"
         subtitle="Edit existing tours, add shows, manage products, and extend tour dates"
-        kicker="Admin Panel"
         breadcrumbs={breadcrumbs}
         actions={
-          <Link href="/admin/tours/new">
-            <Button>+ Create New Tour</Button>
-          </Link>
+          <Link href="/admin/tours/new" className={buttonVariants()}>Create a tour</Link>
         }
       />
 

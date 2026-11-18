@@ -6,7 +6,7 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { Package, ExternalLink, Pencil, Trash2 } from 'lucide-react';
 import { DataTable } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
+import { Button, buttonVariants } from '@/components/ui/Button';
 
 export interface ProductRow {
   id: string;
@@ -24,13 +24,9 @@ interface ProductCatalogTableProps {
   onDelete?: (product: ProductRow) => void;
 }
 
-const productTypeBadgeVariant: Record<string, 'default' | 'active' | 'info' | 'warning'> = {
-  apparel: 'active',
-  accessories: 'info',
-  media: 'warning',
-  'paper-items': 'default',
-  other: 'default',
-};
+// Product type is a category, not a state, so every type uses the neutral
+// badge (success/warn colours would read as stock or error states).
+const productTypeBadgeVariant: Record<string, 'default'> = {};
 
 export function ProductCatalogTable({
   products,
@@ -82,7 +78,7 @@ export function ProductCatalogTable({
         cell: ({ row }) => {
           const count = row.getValue('tour_count') as number;
           return (
-            <span className={`text-sm ${count > 0 ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-muted)]'}`}>
+            <span className={`text-sm ${count > 0 ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)]'}`}>
               {count} {count === 1 ? 'tour' : 'tours'}
             </span>
           );
@@ -94,11 +90,9 @@ export function ProductCatalogTable({
         header: '',
         cell: ({ row }) => (
           <div className="flex items-center justify-end gap-2">
-            <Link href={`/products/${row.original.id}`}>
-              <Button variant="ghost" size="sm" title="View product">
-                <ExternalLink className="w-4 h-4" />
-              </Button>
-            </Link>
+            <Link href={`/products/${row.original.id}`} title="View product" aria-label="View product" className={buttonVariants({ variant: 'ghost', size: 'sm' })}>
+<ExternalLink className="w-4 h-4" />
+</Link>
             {onEdit && (
               <Button
                 variant="ghost"
@@ -115,7 +109,7 @@ export function ProductCatalogTable({
                 size="sm"
                 onClick={() => onDelete(row.original)}
                 title="Delete product"
-                className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                className="text-danger hover:text-danger hover:bg-danger-bg"
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
@@ -135,7 +129,7 @@ export function ProductCatalogTable({
       stickyHeader
       striped
       emptyState={{
-        icon: <Package className="w-12 h-12 text-[var(--color-text-muted)]" />,
+        icon: <Package className="w-12 h-12 text-[var(--color-text-secondary)]" />,
         title: 'No products found',
         description: 'Create a new product to get started',
       }}

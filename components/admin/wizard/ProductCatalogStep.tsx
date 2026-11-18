@@ -120,7 +120,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold g-title mb-4">Product Catalog</h2>
+        <h2 className="text-xl font-semibold mb-4">Product catalog</h2>
         <p className="text-sm text-[var(--color-text-secondary)]">
           Upload a product catalog or grab sheet (PDF/CSV/Excel), or add products manually.
           AI will extract SKUs, names, categories, and pricing.
@@ -148,19 +148,19 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
             </div>
           ) : (
             <div className="space-y-2">
-              <UploadCloud className="mx-auto h-10 w-10 text-[var(--color-text-muted)]" aria-hidden="true" />
+              <UploadCloud className="mx-auto h-10 w-10 text-[var(--color-text-secondary)]" aria-hidden="true" />
               <p className="text-sm text-[var(--color-text-secondary)]">
                 {isDragActive ? 'Drop the file here' : 'Drag & drop product catalog or grab sheet, or click to select'}
               </p>
-              <p className="text-xs text-[var(--color-text-muted)]">
+              <p className="text-xs text-[var(--color-text-secondary)]">
                 Supports PDF, CSV, Excel, or product images
               </p>
             </div>
           )}
         </div>
         {error && (
-          <div className="mt-3 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-            <p className="text-sm text-red-400">{error}</p>
+          <div className="mt-3 p-3 bg-danger-bg border border-danger-border rounded-lg">
+            <p className="text-sm text-danger">{error}</p>
           </div>
         )}
       </div>
@@ -186,7 +186,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
               <div key={index} className="border border-[var(--color-bg-border)] rounded-lg p-4 bg-[var(--color-bg-surface)]">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
-                    <label className="text-xs text-[var(--color-text-muted)] block mb-1">SKU *</label>
+                    <label className="text-xs text-[var(--color-text-secondary)] block mb-1">SKU *</label>
                     <input
                       type="text"
                       className="g-input text-sm w-full"
@@ -197,7 +197,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-[var(--color-text-muted)] block mb-1">Product Name *</label>
+                    <label className="text-xs text-[var(--color-text-secondary)] block mb-1">Product name *</label>
                     <input
                       type="text"
                       className="g-input text-sm w-full"
@@ -208,7 +208,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-[var(--color-text-muted)] block mb-1">Base Price *</label>
+                    <label className="text-xs text-[var(--color-text-secondary)] block mb-1">Base price *</label>
                     <input
                       type="number"
                       step="0.01"
@@ -222,7 +222,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
                 </div>
 
                 <div className="mb-4">
-                  <label className="text-xs text-[var(--color-text-muted)] block mb-2">Sizes Available</label>
+                  <label className="text-xs text-[var(--color-text-secondary)] block mb-2">Sizes available</label>
                   <div className="flex flex-wrap gap-2">
                     {allSizes.map(size => (
                       <button
@@ -247,9 +247,9 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
                   <button
                     type="button"
                     onClick={() => removeProduct(index)}
-                    className="text-xs text-red-400 hover:text-red-300"
+                    className="text-xs text-danger hover:text-danger"
                   >
-                    Remove Product
+                    Remove product
                   </button>
                 </div>
               </div>
@@ -257,7 +257,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
           </div>
         ) : (
           <div className="border border-[var(--color-bg-border)] rounded-lg p-8 text-center">
-            <p className="text-sm text-[var(--color-text-muted)]">
+            <p className="text-sm text-[var(--color-text-secondary)]">
               No products added yet. Upload a catalog or add products manually.
             </p>
           </div>

@@ -208,14 +208,13 @@ export default function AdminProductsPage() {
   return (
     <div className="g-container py-12">
       <PageHeader
-        title="Product Catalog"
+        title="Products"
         subtitle="Manage the global product catalog. Products can be assigned to multiple tours with tour-specific pricing."
-        kicker="Admin"
         breadcrumbs={breadcrumbs}
         actions={
           <Button onClick={() => setShowForm(true)}>
             <Plus className="w-4 h-4 mr-2" />
-            New Product
+            New product
           </Button>
         }
       />
@@ -223,7 +222,7 @@ export default function AdminProductsPage() {
       {/* Search and Filters */}
       <div className="flex flex-col gap-4 mb-6 md:flex-row md:items-center md:justify-between">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-secondary)]" />
           <input
             type="text"
             value={search}
@@ -234,7 +233,7 @@ export default function AdminProductsPage() {
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
             >
               <X className="w-4 h-4" />
             </button>
@@ -249,7 +248,7 @@ export default function AdminProductsPage() {
       </div>
 
       {/* Results count */}
-      <div className="mb-4 text-sm text-[var(--color-text-muted)]">
+      <div className="mb-4 text-sm text-[var(--color-text-secondary)]">
         {loading ? (
           'Loading...'
         ) : (
@@ -282,7 +281,7 @@ export default function AdminProductsPage() {
           >
             Previous
           </Button>
-          <span className="text-sm text-[var(--color-text-muted)]">
+          <span className="text-sm text-[var(--color-text-secondary)]">
             Page {page} of {pagination.totalPages}
           </span>
           <Button

@@ -51,7 +51,7 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold g-title mb-4">Basic Tour Information</h2>
+        <h2 className="text-xl font-semibold mb-4">Basic tour information</h2>
         <p className="text-sm text-[var(--color-text-secondary)]">
           Start by entering the basic details about this tour. Select an existing artist or add a new one.
         </p>
@@ -60,7 +60,7 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
       {/* Artist Selection */}
       <div>
         <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-          Artist <span className="text-[var(--color-red-primary)]">*</span>
+          Artist <span className="text-danger" aria-hidden="true">*</span>
         </label>
 
         {!showNewArtistField ? (
@@ -114,17 +114,17 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
       {/* Tour Name */}
       <div>
         <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-          Tour Name <span className="text-[var(--color-red-primary)]">*</span>
+          Tour name <span className="text-danger" aria-hidden="true">*</span>
         </label>
         <input
           type="text"
           className="g-input w-full"
-          placeholder="e.g., Skeletor Tour 2025, Re-Imperatour"
+          placeholder="e.g. SKELETOUR 2025, Re-Imperatour"
           value={tourData.name}
           onChange={(e) => onUpdate({ ...tourData, name: e.target.value })}
           required
         />
-        <p className="text-xs text-[var(--color-text-muted)] mt-1">
+        <p className="text-xs text-[var(--color-text-secondary)] mt-1">
           Organized under artist "{tourData.artist || '(select artist above)'}"
         </p>
       </div>
@@ -133,7 +133,7 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-            Start Date <span className="text-xs text-[var(--color-text-muted)]">(Optional - auto-fills from shows)</span>
+            Start date <span className="text-xs text-[var(--color-text-secondary)]">(Optional - auto-fills from shows)</span>
           </label>
           <input
             type="date"
@@ -144,7 +144,7 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
         </div>
         <div>
           <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-            End Date <span className="text-xs text-[var(--color-text-muted)]">(Optional - auto-fills from shows)</span>
+            End date <span className="text-xs text-[var(--color-text-secondary)]">(Optional - auto-fills from shows)</span>
           </label>
           <input
             type="date"
@@ -154,7 +154,7 @@ export default function TourBasicInfoStep({ tourData, onUpdate, onNext }: TourBa
           />
         </div>
       </div>
-      <p className="text-xs text-[var(--color-text-muted)] -mt-2">
+      <p className="text-xs text-[var(--color-text-secondary)] -mt-2">
         <Lightbulb className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Leave dates blank - they'll automatically populate based on show schedule in the next step
       </p>
 

@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { formatDate } from '@/lib/format';
 import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
+import { Button, buttonVariants } from '@/components/ui/Button';
 import { ChevronDown, ChevronRight, ClipboardList, DollarSign, FileText, Package, Receipt } from 'lucide-react';
 
 interface ParsedDocument {
@@ -90,7 +91,7 @@ export default function DocumentsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this document?')) return;
+    if (!confirm('Delete this document? This cannot be undone.')) return;
 
     setDeleting(id);
     try {
@@ -120,86 +121,84 @@ export default function DocumentsPage() {
     draft: documents.filter(d => d.status === 'draft').length,
     approved: documents.filter(d => d.status === 'approved').length,
     posted: documents.filter(d => d.status === 'posted').length,
+    rejected: documents.filter(d => d.status === 'rejected').length,
     error: documents.filter(d => d.status === 'error').length
   };
 
   return (
-    <div className="g-container py-12">
+    <div className="g-container py-6">
       <PageHeader
-        title="Document Management"
-        subtitle="View and manage all parsed documents including purchase orders, packing lists, sales reports, and settlements."
-        kicker="Admin"
+        title="Documents"
+        subtitle="Every parsed document across tours, with the data Claude read and the normalised version."
         breadcrumbs={breadcrumbs}
       />
 
       {/* Stats */}
-      <div data-tour="admin-documents" className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-        <div className="g-card p-4 text-center">
-          <div className="text-2xl font-bold text-[var(--color-text-primary)]">{stats.total}</div>
-          <div className="text-xs text-[var(--color-text-secondary)]">Total</div>
-        </div>
-        <div className="g-card p-4 text-center">
-          <div className="text-2xl font-bold text-amber-500">{stats.draft}</div>
-          <div className="text-xs text-[var(--color-text-secondary)]">Draft</div>
-        </div>
-        <div className="g-card p-4 text-center">
-          <div className="text-2xl font-bold text-blue-500">{stats.approved}</div>
-          <div className="text-xs text-[var(--color-text-secondary)]">Approved</div>
-        </div>
-        <div className="g-card p-4 text-center">
-          <div className="text-2xl font-bold text-green-500">{stats.posted}</div>
-          <div className="text-xs text-[var(--color-text-secondary)]">Posted</div>
-        </div>
-        <div className="g-card p-4 text-center">
-          <div className="text-2xl font-bold text-[var(--color-red-primary)]">{stats.error}</div>
-          <div className="text-xs text-[var(--color-text-secondary)]">Errors</div>
-        </div>
+      <div data-tour="admin-documents" className="grid grid-cols-3 md:grid-cols-6 gap-3 mt-6 mb-6">
+        {(
+          [
+            ['Total', stats.total, ''],
+            ['Draft', stats.draft, stats.draft > 0 ? 'text-warn' : ''],
+            ['Approved', stats.approved, ''],
+            ['Posted', stats.posted, ''],
+            ['Rejected', stats.rejected, ''],
+            ['Errors', stats.error, stats.error > 0 ? 'text-danger' : ''],
+          ] as const
+        ).map(([label, value, tone]) => (
+          <div key={label} className="g-card p-4">
+            <div className="text-[13px] font-medium text-[var(--color-text-secondary)]">{label}</div>
+            <div className={`mt-1 text-2xl font-semibold tabular-nums ${tone || 'text-[var(--color-text-primary)]'}`}>{value}</div>
+          </div>
+        ))}
       </div>
 
       {/* Filters */}
       <div className="g-card p-4 mb-6">
         <div className="flex flex-wrap gap-4">
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
+            <label htmlFor="adm-doc-tour" className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
               Tour
             </label>
             <select
+              id="adm-doc-tour"
               value={selectedTour}
               onChange={(e) => setSelectedTour(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
+              className="g-input w-full"
             >
-              <option value="all">All Tours</option>
+              <option value="all">All tours</option>
               {tours.map(tour => (
                 <option key={tour.id} value={tour.id}>{tour.name}</option>
               ))}
             </select>
           </div>
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-              Document Type
+            <label htmlFor="adm-doc-type" className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
+              Document type
             </label>
             <select
+              id="adm-doc-type"
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
+              className="g-input w-full"
             >
-              <option value="all">All Types</option>
-              <option value="po">Purchase Orders</option>
-              <option value="packing-list">Packing Lists</option>
-              <option value="sales-report">Sales Reports</option>
+              <option value="all">All types</option>
+              <option value="po">Purchase orders</option>
+              <option value="packing-list">Packing lists</option>
+              <option value="sales-report">Sales reports</option>
               <option value="settlement">Settlements</option>
             </select>
           </div>
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
+            <label htmlFor="adm-doc-status" className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
               Status
             </label>
             <select
+              id="adm-doc-status"
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
+              className="g-input w-full"
             >
-              <option value="all">All Statuses</option>
+              <option value="all">All statuses</option>
               <option value="draft">Draft</option>
               <option value="approved">Approved</option>
               <option value="posted">Posted</option>
@@ -213,7 +212,7 @@ export default function DocumentsPage() {
       {/* Document List */}
       {loading ? (
         <div className="g-card p-12 text-center">
-          <div className="animate-pulse text-[var(--color-text-secondary)]">Loading documents...</div>
+          <div className="animate-pulse text-[var(--color-text-secondary)]">Loading documents…</div>
         </div>
       ) : filteredDocuments.length === 0 ? (
         <div className="g-card p-12 text-center">
@@ -221,21 +220,21 @@ export default function DocumentsPage() {
           <p className="text-[var(--color-text-secondary)] mb-4">
             {documents.length === 0 ? 'No documents have been uploaded yet.' : 'No documents match your filters.'}
           </p>
-          <Link href="/upload">
-            <Button>Upload Documents</Button>
-          </Link>
+          <Link href="/upload" className={buttonVariants()}>Upload a document</Link>
         </div>
       ) : (
         <div className="space-y-3">
           {filteredDocuments.map(doc => (
             <div key={doc.id} className="g-card overflow-hidden">
-              <div
-                className="p-4 cursor-pointer hover:bg-[var(--color-bg-elevated)] transition"
+              <button
+                type="button"
+                aria-expanded={expandedDoc === doc.id}
+                className="block w-full text-left p-4 hover:bg-[var(--color-bg-elevated)] transition-colors"
                 onClick={() => setExpandedDoc(expandedDoc === doc.id ? null : doc.id)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="text-2xl">
+                    <div className="text-[var(--color-text-secondary)]">
                       {doc.doc_type === 'po' && <Package className="h-5 w-5" aria-hidden="true" />}
                       {doc.doc_type === 'packing-list' && <ClipboardList className="h-5 w-5" aria-hidden="true" />}
                       {doc.doc_type === 'sales-report' && <DollarSign className="h-5 w-5" aria-hidden="true" />}
@@ -259,7 +258,7 @@ export default function DocumentsPage() {
                           </span>
                         )}
                         {doc.tours?.name && (
-                          <span className="text-[var(--color-red-primary)]">{doc.tours.name}</span>
+                          <span className="text-[var(--color-text-primary)]">{doc.tours.name}</span>
                         )}
                         {doc.shows?.venue_name && (
                           <span>{doc.shows.venue_name}</span>
@@ -269,14 +268,14 @@ export default function DocumentsPage() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-xs text-[var(--color-text-secondary)]">
-                      {new Date(doc.created_at).toLocaleDateString()}
+                      {formatDate(doc.created_at)}
                     </div>
                     <div className="text-[var(--color-text-secondary)]">
                       {expandedDoc === doc.id ? <ChevronDown className="h-4 w-4" aria-hidden="true" /> : <ChevronRight className="h-4 w-4" aria-hidden="true" />}
                     </div>
                   </div>
                 </div>
-              </div>
+              </button>
 
               {/* Expanded View */}
               {expandedDoc === doc.id && (
@@ -310,11 +309,9 @@ export default function DocumentsPage() {
                       {deleting === doc.id ? 'Deleting...' : 'Delete'}
                     </Button>
                     {doc.tour_id && (
-                      <Link href={`/tours/${doc.tour_id}`}>
-                        <Button variant="secondary" size="sm">
-                          View Tour
-                        </Button>
-                      </Link>
+                      <Link href={`/tours/${doc.tour_id}`} className={buttonVariants({ variant: 'secondary', size: 'sm' })}>
+View tour
+</Link>
                     )}
                   </div>
                 </div>

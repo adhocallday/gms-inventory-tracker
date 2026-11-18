@@ -104,8 +104,12 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => b.avgPerHead - a.avgPerHead)
       .slice(0, 10);
 
-    // Recent activity - last 10 shows
-    const recentShows = shows.slice(0, 10).map(show => {
+    // Recent shows: the latest 10 shows with posted sales. The newest shows on
+    // a tour often have no sales report posted yet; listing them showed $0
+    // gross and 0 attendance under totals that came from posted sales.
+    const showsWithSales = shows.filter((show) => byShow.has(show.id));
+    const showsWithoutSales = shows.filter((show) => !byShow.has(show.id));
+    const recentShows = showsWithSales.slice(0, 10).map(show => {
       const { gross: showGross, units: showUnits } = byShow.get(show.id) ?? { gross: 0, units: 0 };
       const tour = tours.find(t => t.id === show.tour_id);
 
@@ -116,10 +120,11 @@ export async function GET(request: NextRequest) {
         city: show.city,
         state: show.state,
         showDate: show.show_date,
-        attendance: show.attendance,
+        // null, not 0, when the settlement or report has no attendance
+        attendance: show.attendance ?? null,
         totalGross: showGross,
         totalUnits: showUnits,
-        perHead: show.attendance ? showGross / show.attendance : 0
+        perHead: show.attendance ? showGross / show.attendance : null
       };
     });
 
@@ -131,7 +136,8 @@ export async function GET(request: NextRequest) {
         totalTours: tours.length,
         activeTours: tours.filter(t => t.status === 'active').length,
         totalAttendance,
-        avgPerHead
+        avgPerHead,
+        showsWithoutSales: showsWithoutSales.length
       },
       tourRankings: {
         byGross: topToursByGross,

@@ -34,7 +34,7 @@ const productTypes = [
   { value: 'apparel', label: 'Apparel' },
   { value: 'accessories', label: 'Accessories' },
   { value: 'media', label: 'Media' },
-  { value: 'paper-items', label: 'Paper Items' },
+  { value: 'paper-items', label: 'Paper items' },
   { value: 'other', label: 'Other' },
 ];
 
@@ -235,16 +235,16 @@ export function ProductForm({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim">
       <div className="bg-[var(--color-bg-base)] border border-[var(--color-bg-border)] rounded-xl w-full max-w-2xl mx-4 shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[var(--color-bg-border)]">
-          <h2 className="text-lg font-semibold g-title">
+          <h2 className="text-lg font-semibold">
             {isEditMode ? 'Edit Product' : 'Add Products'}
           </h2>
           <button
             onClick={onCancel}
-            className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition"
+            className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -259,11 +259,11 @@ export function ProductForm({
               className={`flex-1 px-4 py-3 text-sm font-medium transition ${
                 mode === 'upload'
                   ? 'text-[var(--color-red-primary)] border-b-2 border-[var(--color-red-primary)]'
-                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
               }`}
             >
               <Upload className="w-4 h-4 inline-block mr-2" />
-              AI Upload
+              Read from a file
             </button>
             <button
               type="button"
@@ -271,11 +271,11 @@ export function ProductForm({
               className={`flex-1 px-4 py-3 text-sm font-medium transition ${
                 mode === 'manual'
                   ? 'text-[var(--color-red-primary)] border-b-2 border-[var(--color-red-primary)]'
-                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
               }`}
             >
               <FileText className="w-4 h-4 inline-block mr-2" />
-              Manual Entry
+              Manual entry
             </button>
           </div>
         )}
@@ -283,7 +283,7 @@ export function ProductForm({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
           {error && (
-            <div className="mb-4 p-3 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg">
+            <div className="mb-4 p-3 text-sm text-danger bg-danger-bg border border-danger-border rounded-lg">
               {error}
             </div>
           )}
@@ -292,8 +292,8 @@ export function ProductForm({
             /* Manual Entry Form */
             <form onSubmit={handleManualSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">
-                  SKU <span className="text-red-400">*</span>
+                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+                  SKU <span className="text-danger">*</span>
                 </label>
                 <input
                   type="text"
@@ -306,22 +306,22 @@ export function ProductForm({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">
-                  Description <span className="text-red-400">*</span>
+                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+                  Description <span className="text-danger">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-3 py-2 bg-[var(--color-bg-surface)]/5 border border-[var(--color-bg-border)] rounded-lg text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
-                  placeholder="e.g., Black Tour T-Shirt"
+                  placeholder="e.g. Black tour tee"
                   disabled={isSubmitting}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">
-                  Product Type
+                <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+                  Product type
                 </label>
                 <select
                   value={formData.product_type}
@@ -379,13 +379,13 @@ export function ProductForm({
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <Upload className="mx-auto h-10 w-10 text-[var(--color-text-muted)]" />
+                    <Upload className="mx-auto h-10 w-10 text-[var(--color-text-secondary)]" />
                     <p className="text-sm text-[var(--color-text-secondary)]">
                       {isDragActive
                         ? 'Drop the file here'
                         : 'Drag & drop product catalog or grab sheet, or click to select'}
                     </p>
-                    <p className="text-xs text-[var(--color-text-muted)]">
+                    <p className="text-xs text-[var(--color-text-secondary)]">
                       Supports PDF, CSV, Excel, or product images
                     </p>
                   </div>
@@ -436,7 +436,7 @@ export function ProductForm({
                                 className="font-mono text-sm bg-transparent border-b border-transparent hover:border-[var(--color-text-muted)] focus:border-[var(--color-red-primary)] focus:outline-none text-[var(--color-text-primary)]"
                                 placeholder="SKU"
                               />
-                              <span className="text-xs px-2 py-0.5 bg-[var(--color-bg-surface)]/10 rounded text-[var(--color-text-muted)]">
+                              <span className="text-xs px-2 py-0.5 bg-[var(--color-bg-surface)]/10 rounded text-[var(--color-text-secondary)]">
                                 {product.category}
                               </span>
                             </div>
@@ -452,8 +452,8 @@ export function ProductForm({
 
                             {/* Sizes Row */}
                             <div>
-                              <label className="text-xs text-[var(--color-text-muted)] block mb-1.5">
-                                Available Sizes
+                              <label className="text-xs text-[var(--color-text-secondary)] block mb-1.5">
+                                Available sizes
                               </label>
                               <div className="flex flex-wrap gap-1.5">
                                 {allSizes.map((size) => (
@@ -479,7 +479,7 @@ export function ProductForm({
                           <button
                             type="button"
                             onClick={() => removeParsedProduct(index)}
-                            className="text-[var(--color-text-muted)] hover:text-red-400 transition"
+                            className="text-[var(--color-text-secondary)] hover:text-danger transition"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

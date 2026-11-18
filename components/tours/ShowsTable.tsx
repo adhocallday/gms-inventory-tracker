@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react';
 import { type ColumnDef } from '@tanstack/react-table';
 import { Calendar } from 'lucide-react';
 import { DataTable, NumericCell, DateCell } from '@/components/ui/DataTable';
-import { Button } from '@/components/ui/Button';
+import { Button, buttonVariants } from '@/components/ui/Button';
 
 export interface ShowSummaryRow {
   show_id: string;
@@ -112,11 +112,9 @@ export default function ShowsTable({ tourId, shows }: ShowsTableProps) {
     <section className="mt-12">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold g-title">Shows</h2>
-        <Link href={`/upload?docType=sales-report&tourId=${tourId}`}>
-          <Button variant="outline" size="sm">
-            Upload document
-          </Button>
-        </Link>
+        <Link href={`/upload?docType=sales-report&tourId=${tourId}`} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+Upload document
+</Link>
       </div>
 
       <DataTable

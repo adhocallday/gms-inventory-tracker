@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import { createServiceClient } from '@/lib/supabase/client';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
+import { buttonVariants } from '@/components/ui/Button';
+import { formatDate } from '@/lib/format';
 import { StatCard } from '@/components/dashboard/StatCard';
-import { ArrowRight, BarChart3, Calendar, ClipboardList, FileText, Folder, Music, Package, Plus, Settings, Tag } from 'lucide-react';
+import { ArrowRight, BarChart3, Calendar, ClipboardList, FileText, Folder, Music, Package, Plus, Tag } from 'lucide-react';
 
 // Stats can be up to 30s stale; mutation routes call revalidateDashboards()
 export const revalidate = 30;
@@ -32,32 +32,27 @@ export default async function AdminDashboard() {
       .limit(5)
   ]);
 
-  const breadcrumbs = generateBreadcrumbs([
-    { label: 'Admin' },
-    { label: 'Dashboard' },
-  ]);
-
   const stats = [
     {
-      label: 'Total Tours',
+      label: 'Tours',
       value: totalTours || 0,
       iconName: 'music' as const,
       color: 'purple' as const
     },
     {
-      label: 'Active Tours',
+      label: 'Active tours',
       value: activeTours || 0,
       iconName: 'sparkles' as const,
       color: 'green' as const
     },
     {
-      label: 'Total Shows',
+      label: 'Shows',
       value: totalShows || 0,
       iconName: 'mic' as const,
       color: 'blue' as const
     },
     {
-      label: 'Total Products',
+      label: 'Products',
       value: totalProducts || 0,
       iconName: 'package' as const,
       color: 'orange' as const
@@ -66,68 +61,66 @@ export default async function AdminDashboard() {
 
   const quickActions = [
     {
-      title: 'Create New Tour',
-      description: 'Set up a new tour with AI-assisted data entry',
+      title: 'Create a tour',
+      description: 'Dates, shows, products and opening stock, step by step',
       icon: Plus,
       href: '/admin/tours/new',
       color: 'bg-[var(--color-red-primary)]',
       hoverColor: 'hover:bg-[var(--color-red-hover)]',
       textColor: 'text-white',
-      descColor: 'text-white/80'
+      descColor: 'text-white'
     },
     {
-      title: 'Manage Tours',
-      description: 'Edit existing tours, add shows, extend dates',
+      title: 'Tours',
+      description: 'Edit tours, add shows, change dates',
       icon: ClipboardList,
       href: '/admin/tours',
-      color: 'bg-[var(--color-bg-elevated)]',
-      hoverColor: 'hover:bg-[var(--color-bg-border)]',
+      color: 'bg-[var(--color-bg-surface)]',
+      hoverColor: 'hover:bg-[var(--color-bg-elevated)]',
       textColor: 'text-[var(--color-text-primary)]',
       descColor: 'text-[var(--color-text-secondary)]'
     },
     {
-      title: 'Upload Documents',
-      description: 'Parse PDFs, CSVs, and sales reports',
+      title: 'Upload a document',
+      description: 'POs, packing lists, sales reports and settlements',
       icon: FileText,
       href: '/upload',
-      color: 'bg-[var(--color-bg-elevated)]',
-      hoverColor: 'hover:bg-[var(--color-bg-border)]',
+      color: 'bg-[var(--color-bg-surface)]',
+      hoverColor: 'hover:bg-[var(--color-bg-elevated)]',
       textColor: 'text-[var(--color-text-primary)]',
       descColor: 'text-[var(--color-text-secondary)]'
     },
     {
-      title: 'Product Catalog',
-      description: 'Manage global products and SKUs',
+      title: 'Products',
+      description: 'The product catalogue shared by all tours',
       icon: Tag,
       href: '/admin/products',
-      color: 'bg-[var(--color-bg-elevated)]',
-      hoverColor: 'hover:bg-[var(--color-bg-border)]',
+      color: 'bg-[var(--color-bg-surface)]',
+      hoverColor: 'hover:bg-[var(--color-bg-elevated)]',
       textColor: 'text-[var(--color-text-primary)]',
       descColor: 'text-[var(--color-text-secondary)]'
     },
     {
-      title: 'View Inventory',
-      description: 'Check stock levels across all tours',
+      title: 'Inventory',
+      description: 'Stock on hand across all tours',
       icon: Package,
       href: '/admin/inventory',
-      color: 'bg-[var(--color-bg-elevated)]',
-      hoverColor: 'hover:bg-[var(--color-bg-border)]',
+      color: 'bg-[var(--color-bg-surface)]',
+      hoverColor: 'hover:bg-[var(--color-bg-elevated)]',
       textColor: 'text-[var(--color-text-primary)]',
       descColor: 'text-[var(--color-text-secondary)]'
     }
   ];
 
   return (
-    <div className="g-container py-12">
+    <div className="g-container py-6">
       <PageHeader
-        title="Dashboard"
-        subtitle="Central hub for managing tours, shows, products, and inventory. Use AI-powered tools to streamline data entry and tour management."
-        kicker="Admin Portal"
-        breadcrumbs={breadcrumbs}
+        title="Admin"
+        subtitle="Set up tours and products, and check documents, inventory and analytics across all tours."
       />
 
       {/* Stats Grid */}
-      <div data-tour="admin-stats" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      <div data-tour="admin-stats" className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6 mb-10">
         {stats.map((stat, index) => (
           <StatCard
             key={index}
@@ -141,17 +134,17 @@ export default async function AdminDashboard() {
 
       {/* Quick Actions */}
       <section className="mb-12" data-tour="admin-actions">
-        <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-6">
-          Quick Actions
+        <h2 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">
+          Tasks
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {quickActions.map((action, index) => (
             <Link
               key={index}
               href={action.href}
-              className={`group p-6 rounded-xl border border-[var(--color-bg-border)] ${action.color} ${action.hoverColor} transition-all duration-200 hover:scale-105`}
+              className={`group p-5 rounded-lg border border-[var(--color-bg-border)] ${action.color} ${action.hoverColor} transition-colors`}
             >
-              <action.icon className={`block h-8 w-8 mb-3 ${action.textColor}`} aria-hidden="true" />
+              <action.icon className={`block h-5 w-5 mb-3 ${action.textColor}`} aria-hidden="true" />
               <h3 className={`text-sm font-semibold mb-2 ${action.textColor}`}>
                 {action.title}
               </h3>
@@ -165,13 +158,13 @@ export default async function AdminDashboard() {
 
       {/* Recent Tours */}
       <section>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
-            Recent Tours
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
+            Recently created tours
           </h2>
           <Link
             href="/admin/tours"
-            className="text-sm text-[var(--color-red-primary)] hover:underline font-medium"
+            className="text-sm text-[var(--color-red-text)] hover:underline font-medium"
           >
             View all <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
           </Link>
@@ -183,11 +176,11 @@ export default async function AdminDashboard() {
               <Link
                 key={tour.id}
                 href={`/admin/tours/${tour.id}/edit`}
-                className="flex items-center justify-between p-6 hover:bg-[var(--color-bg-elevated)] transition group"
+                className="flex items-center justify-between p-4 hover:bg-[var(--color-bg-elevated)] transition-colors group"
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-red-primary)] transition">
+                    <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
                       {tour.name}
                     </h3>
                     <Badge variant={tour.status}>{tour.status}</Badge>
@@ -196,9 +189,9 @@ export default async function AdminDashboard() {
                     <span><Music className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> {tour.artist}</span>
                     {tour.start_date && tour.end_date && (
                       <span>
-                        <Calendar className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> {new Date(tour.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        {' - '}
-                        {new Date(tour.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        <Calendar className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> {formatDate(tour.start_date, { month: 'short', day: 'numeric' })}
+                        {' – '}
+                        {formatDate(tour.end_date)}
                       </span>
                     )}
                   </div>
@@ -212,56 +205,36 @@ export default async function AdminDashboard() {
         ) : (
           <div className="g-card p-12 text-center">
             <p className="text-[var(--color-text-secondary)] mb-4">
-              No tours yet. Create your first tour to get started.
+              No tours yet. A tour holds its shows, products and documents.
             </p>
-            <Link href="/admin/tours/new">
-              <Button>+ Create New Tour</Button>
+            <Link href="/admin/tours/new" className={buttonVariants()}>
+              Create a tour
             </Link>
           </div>
         )}
       </section>
 
       {/* Admin Tools */}
-      <section className="mt-12">
-        <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-6">
-          Admin Tools
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <section className="mt-10">
+        <h2 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">Across all tours</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Link
             href="/admin/analytics"
-            className="group p-6 rounded-xl border border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-border)] transition-all duration-200 hover:scale-105"
+            className="group p-5 rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] hover:bg-[var(--color-bg-elevated)] transition-colors"
           >
-            <BarChart3 className="block h-8 w-8 mb-3 text-[var(--color-text-secondary)]" aria-hidden="true" />
-            <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-2 group-hover:text-[var(--color-red-primary)]">
-              Analytics Dashboard
-            </h3>
-            <p className="text-xs text-[var(--color-text-secondary)]">
-              Cross-tour revenue, per-head metrics, and rankings
-            </p>
+            <BarChart3 className="block h-5 w-5 mb-3 text-[var(--color-text-secondary)]" aria-hidden="true" />
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">Analytics</h3>
+            <p className="text-xs text-[var(--color-text-secondary)]">Gross, per head and rankings across tours</p>
           </Link>
 
           <Link
             href="/admin/documents"
-            className="group p-6 rounded-xl border border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-border)] transition-all duration-200 hover:scale-105"
+            className="group p-5 rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] hover:bg-[var(--color-bg-elevated)] transition-colors"
           >
-            <Folder className="block h-8 w-8 mb-3 text-[var(--color-text-secondary)]" aria-hidden="true" />
-            <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-2 group-hover:text-[var(--color-red-primary)]">
-              Document Management
-            </h3>
-            <p className="text-xs text-[var(--color-text-secondary)]">
-              View, manage, and re-parse uploaded documents
-            </p>
+            <Folder className="block h-5 w-5 mb-3 text-[var(--color-text-secondary)]" aria-hidden="true" />
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">Documents</h3>
+            <p className="text-xs text-[var(--color-text-secondary)]">Every parsed document, by tour, type and status</p>
           </Link>
-
-          <div className="p-6 rounded-xl border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] opacity-50">
-            <Settings className="block h-8 w-8 mb-3 text-[var(--color-text-secondary)]" aria-hidden="true" />
-            <h3 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-2">
-              User Management
-            </h3>
-            <p className="text-xs text-[var(--color-text-muted)]">
-              Coming soon
-            </p>
-          </div>
         </div>
       </section>
     </div>

@@ -56,7 +56,7 @@ export function ToursTable({ tours }: ToursTableProps) {
     () => [
       {
         accessorKey: 'name',
-        header: 'Tour Name',
+        header: 'Tour name',
         cell: ({ row }) => (
           <div className="font-medium text-[var(--color-text-primary)]">
             {row.getValue('name')}
@@ -69,7 +69,7 @@ export function ToursTable({ tours }: ToursTableProps) {
         header: 'Artist',
         cell: ({ row }) => (
           <div className="text-[var(--color-text-secondary)]">
-            {row.getValue('artist') || <span className="text-[var(--color-text-muted)]">—</span>}
+            {row.getValue('artist') || <span className="text-[var(--color-text-secondary)]">—</span>}
           </div>
         ),
         enableSorting: true,
@@ -82,7 +82,7 @@ export function ToursTable({ tours }: ToursTableProps) {
           const endDate = row.original.end_date;
 
           if (!startDate || !endDate) {
-            return <span className="text-[var(--color-text-muted)]">No dates set</span>;
+            return <span className="text-[var(--color-text-secondary)]">No dates set</span>;
           }
 
           return (
@@ -148,7 +148,7 @@ export function ToursTable({ tours }: ToursTableProps) {
       <div className="flex flex-col gap-4 mb-6 lg:flex-row lg:items-center lg:justify-between">
         {/* Search bar */}
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-secondary)]" />
           <input
             type="text"
             value={searchQuery}
@@ -159,7 +159,7 @@ export function ToursTable({ tours }: ToursTableProps) {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
             >
               <X className="w-4 h-4" />
             </button>
@@ -180,7 +180,7 @@ export function ToursTable({ tours }: ToursTableProps) {
                   flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap border
                   ${
                     isActive
-                      ? 'bg-[var(--color-red-primary)] text-white border-[var(--color-red-primary)]'
+                      ? 'bg-[var(--color-text-primary)] text-[var(--color-bg-surface)] border-[var(--color-text-primary)]'
                       : 'bg-[var(--color-bg-border)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)] hover:bg-[var(--color-bg-border)] hover:text-[var(--color-text-primary)]'
                   }
                 `}
@@ -202,7 +202,7 @@ export function ToursTable({ tours }: ToursTableProps) {
 
       {/* Results count and clear filters */}
       <div className="flex items-center justify-between mb-4">
-        <div className="text-sm text-[var(--color-text-muted)]">
+        <div className="text-sm text-[var(--color-text-secondary)]">
           Found {filteredTours.length} {filteredTours.length === 1 ? 'tour' : 'tours'}
           {searchQuery && ` matching "${searchQuery}"`}
           {statusFilter !== 'all' && ` with status "${statusFilter}"`}
@@ -220,7 +220,7 @@ export function ToursTable({ tours }: ToursTableProps) {
       {/* Tours Table */}
       {filteredTours.length === 0 ? (
         <EmptyState
-          icon={<Music className="w-12 h-12 text-[var(--color-text-muted)]" />}
+          icon={<Music className="w-12 h-12 text-[var(--color-text-secondary)]" />}
           title="No tours found"
           description={
             hasActiveFilters

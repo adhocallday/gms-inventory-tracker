@@ -56,7 +56,7 @@ export default function TourCreationWizard() {
   const [initialInventory, setInitialInventory] = useState<InventoryItem[]>([]);
 
   const steps: { id: WizardStep; label: string; description: string }[] = [
-    { id: 'basic', label: 'Tour Info', description: 'Basic tour details' },
+    { id: 'basic', label: 'Tour info', description: 'Basic tour details' },
     { id: 'schedule', label: 'Shows', description: 'Tour schedule & venues' },
     { id: 'products', label: 'Products', description: 'Merchandise catalog' },
     { id: 'inventory', label: 'Stock', description: 'Initial inventory levels' },
@@ -101,15 +101,12 @@ export default function TourCreationWizard() {
   };
 
   return (
-    <div className="g-container py-12">
+    <div className="g-container py-6">
       <header className="mb-8">
-        <p className="text-xs uppercase tracking-[0.3em] text-[var(--color-text-muted)]">
-          Admin Panel
-        </p>
-        <h1 className="text-3xl font-semibold g-title mt-2">Create New Tour</h1>
-        <p className="text-sm text-[var(--color-text-secondary)] mt-2 max-w-3xl">
-          Set up a new tour with AI-assisted data entry. Upload PDFs, CSVs, or images
-          to automatically populate tour schedules, shows, and product catalogs.
+        <h1 className="text-2xl font-semibold tracking-tight lg:text-[28px] lg:leading-9">Create a tour</h1>
+        <p className="text-sm text-[var(--color-text-secondary)] mt-1 max-w-3xl">
+          Five steps: tour details, shows, products, opening stock, then review. Schedules and product lists can be
+          pasted or read from a PDF, CSV or image; check what Claude fills in before creating the tour.
         </p>
       </header>
 
@@ -123,13 +120,16 @@ export default function TourCreationWizard() {
             >
               <div className="flex flex-col items-center flex-1">
                 <button
+                  type="button"
+                  aria-current={index === currentStepIndex ? 'step' : undefined}
+                  aria-label={`Step ${index + 1}: ${step.label}`}
                   onClick={() => goToStep(step.id)}
                   className={`
                     w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm
                     transition-all duration-200 border
                     ${index <= currentStepIndex
                       ? 'bg-[var(--color-red-primary)] text-white border-[var(--color-red-primary)]'
-                      : 'bg-[var(--color-bg-border)] text-[var(--color-text-muted)] border-[var(--color-bg-border)]'
+                      : 'bg-[var(--color-bg-border)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)]'
                     }
                     ${index < currentStepIndex ? 'cursor-pointer hover:opacity-80' : ''}
                   `}
@@ -138,11 +138,11 @@ export default function TourCreationWizard() {
                 </button>
                 <div className="mt-2 text-center">
                   <p className={`text-xs font-medium ${
-                    index <= currentStepIndex ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-muted)]'
+                    index <= currentStepIndex ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)]'
                   }`}>
                     {step.label}
                   </p>
-                  <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
+                  <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
                     {step.description}
                   </p>
                 </div>

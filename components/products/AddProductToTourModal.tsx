@@ -148,14 +148,14 @@ export function AddProductToTourModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim">
       <div className="bg-[var(--color-bg-base)] border border-[var(--color-bg-border)] rounded-xl w-full max-w-2xl mx-4 shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[var(--color-bg-border)]">
-          <h2 className="text-lg font-semibold g-title">Add Product to {tourName}</h2>
+          <h2 className="text-lg font-semibold">Add Product to {tourName}</h2>
           <button
             onClick={onClose}
-            className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition"
+            className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -164,7 +164,7 @@ export function AddProductToTourModal({
         {/* Content */}
         <div className="flex-1 overflow-y-auto">
           {error && (
-            <div className="mx-4 mt-4 p-3 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg">
+            <div className="mx-4 mt-4 p-3 text-sm text-danger bg-danger-bg border border-danger-border rounded-lg">
               {error}
             </div>
           )}
@@ -174,7 +174,7 @@ export function AddProductToTourModal({
             <div className="p-4">
               {/* Search */}
               <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-secondary)]" />
                 <input
                   type="text"
                   value={search}
@@ -192,8 +192,8 @@ export function AddProductToTourModal({
                 </div>
               ) : filteredProducts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <Package className="w-12 h-12 text-[var(--color-text-muted)] mb-4" />
-                  <p className="text-sm text-[var(--color-text-muted)]">
+                  <Package className="w-12 h-12 text-[var(--color-text-secondary)] mb-4" />
+                  <p className="text-sm text-[var(--color-text-secondary)]">
                     {search
                       ? 'No products found matching your search'
                       : 'All products have been added to this tour'}
@@ -219,7 +219,7 @@ export function AddProductToTourModal({
                           </div>
                           <p className="text-sm text-[var(--color-text-secondary)]">{product.description}</p>
                         </div>
-                        <span className="text-xs text-[var(--color-text-muted)]">
+                        <span className="text-xs text-[var(--color-text-secondary)]">
                           {product.tour_count} tour{product.tour_count !== 1 ? 's' : ''}
                         </span>
                       </div>
@@ -260,7 +260,7 @@ export function AddProductToTourModal({
               {/* Size Selection */}
               <div>
                 <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-                  Select Sizes
+                  Select sizes
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {allSizes.map((size) => (
@@ -286,11 +286,11 @@ export function AddProductToTourModal({
               {/* Cost Configuration */}
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">
-                    Blank Cost
+                  <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+                    Blank cost
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)]">
                       $
                     </span>
                     <input
@@ -306,11 +306,11 @@ export function AddProductToTourModal({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">
-                    Print Cost
+                  <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+                    Print cost
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)]">
                       $
                     </span>
                     <input
@@ -326,11 +326,11 @@ export function AddProductToTourModal({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">
-                    Suggested Retail
+                  <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+                    Suggested retail
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)]">
                       $
                     </span>
                     <input
@@ -350,7 +350,7 @@ export function AddProductToTourModal({
               {/* Total Cost Preview */}
               <div className="p-3 bg-[var(--color-bg-surface)]/5 border border-[var(--color-bg-border)] rounded-lg">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-[var(--color-text-muted)]">Total Package Cost:</span>
+                  <span className="text-[var(--color-text-secondary)]">Total package cost:</span>
                   <span className="font-semibold text-[var(--color-text-primary)]">
                     ${(costs.blank_unit_cost + costs.print_unit_cost).toFixed(2)}
                   </span>

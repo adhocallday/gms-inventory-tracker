@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Plus, Search, X, ChevronDown, ChevronRight, Package, ArrowLeft } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
-import { Button } from '@/components/ui/Button';
+import { Button, buttonVariants } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { TourProductCostEditor } from '@/components/products/TourProductCostEditor';
 import { AddProductToTourModal } from '@/components/products/AddProductToTourModal';
@@ -198,21 +198,18 @@ export default function TourProductsPage() {
   return (
     <div className="g-container py-12">
       <PageHeader
-        title="Tour Products"
+        title="Tour products"
         subtitle={tour ? `Manage products and costs for ${tour.name}` : 'Loading tour...'}
-        kicker={tour?.artist_name || 'Admin'}
         breadcrumbs={breadcrumbs}
         actions={
           <div className="flex items-center gap-3">
-            <Link href={`/tours/${tourId}`}>
-              <Button variant="outline">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Tour
-              </Button>
-            </Link>
+            <Link href={`/tours/${tourId}`} className={buttonVariants({ variant: 'outline' })}>
+<ArrowLeft className="w-4 h-4 mr-2" />
+                Back to tour
+</Link>
             <Button onClick={() => setShowAddModal(true)}>
               <Plus className="w-4 h-4 mr-2" />
-              Add Product
+              Add product
             </Button>
           </div>
         }
@@ -221,7 +218,7 @@ export default function TourProductsPage() {
       {/* Search and Controls */}
       <div className="flex flex-col gap-4 mb-6 md:flex-row md:items-center md:justify-between">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-secondary)]" />
           <input
             type="text"
             value={search}
@@ -232,7 +229,7 @@ export default function TourProductsPage() {
           {search && (
             <button
               onClick={() => setSearch('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition"
             >
               <X className="w-4 h-4" />
             </button>
@@ -241,16 +238,16 @@ export default function TourProductsPage() {
 
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={expandAll}>
-            Expand All
+            Expand all
           </Button>
           <Button variant="outline" size="sm" onClick={collapseAll}>
-            Collapse All
+            Collapse all
           </Button>
         </div>
       </div>
 
       {/* Results count */}
-      <div className="mb-4 text-sm text-[var(--color-text-muted)]">
+      <div className="mb-4 text-sm text-[var(--color-text-secondary)]">
         {loading ? (
           'Loading...'
         ) : (
@@ -269,11 +266,11 @@ export default function TourProductsPage() {
         </div>
       ) : filteredProducts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Package className="w-12 h-12 text-[var(--color-text-muted)] mb-4" />
+          <Package className="w-12 h-12 text-[var(--color-text-secondary)] mb-4" />
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">
             {search ? 'No products found' : 'No products added yet'}
           </h3>
-          <p className="text-sm text-[var(--color-text-muted)] mb-4">
+          <p className="text-sm text-[var(--color-text-secondary)] mb-4">
             {search
               ? 'Try a different search term'
               : 'Add products to this tour to manage costs and inventory'}
@@ -281,7 +278,7 @@ export default function TourProductsPage() {
           {!search && (
             <Button onClick={() => setShowAddModal(true)}>
               <Plus className="w-4 h-4 mr-2" />
-              Add First Product
+              Add first product
             </Button>
           )}
         </div>
@@ -304,9 +301,9 @@ export default function TourProductsPage() {
                 >
                   <div className="flex items-center gap-4">
                     {isExpanded ? (
-                      <ChevronDown className="w-5 h-5 text-[var(--color-text-muted)]" />
+                      <ChevronDown className="w-5 h-5 text-[var(--color-text-secondary)]" />
                     ) : (
-                      <ChevronRight className="w-5 h-5 text-[var(--color-text-muted)]" />
+                      <ChevronRight className="w-5 h-5 text-[var(--color-text-secondary)]" />
                     )}
                     <div className="text-left">
                       <div className="flex items-center gap-2">
@@ -320,13 +317,13 @@ export default function TourProductsPage() {
                   </div>
                   <div className="flex items-center gap-6 text-sm">
                     <div className="text-right">
-                      <span className="text-[var(--color-text-muted)]">Sizes:</span>{' '}
+                      <span className="text-[var(--color-text-secondary)]">Sizes:</span>{' '}
                       <span className="text-[var(--color-text-primary)]">
                         {activeCount}/{product.sizes.length}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[var(--color-text-muted)]">Inventory:</span>{' '}
+                      <span className="text-[var(--color-text-secondary)]">Inventory:</span>{' '}
                       <span className="text-[var(--color-text-primary)]">{totalInventory}</span>
                     </div>
                   </div>
@@ -337,11 +334,11 @@ export default function TourProductsPage() {
                   <div className="border-t border-[var(--color-bg-border)] p-4 bg-[var(--color-bg-elevated)]/50">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="text-left text-[var(--color-text-muted)]">
+                        <tr className="text-left text-[var(--color-text-secondary)]">
                           <th className="pb-2 font-medium">Size</th>
-                          <th className="pb-2 font-medium text-right">Blank Cost</th>
-                          <th className="pb-2 font-medium text-right">Print Cost</th>
-                          <th className="pb-2 font-medium text-right">Total Cost</th>
+                          <th className="pb-2 font-medium text-right">Blank cost</th>
+                          <th className="pb-2 font-medium text-right">Print cost</th>
+                          <th className="pb-2 font-medium text-right">Total cost</th>
                           <th className="pb-2 font-medium text-right">Retail</th>
                           <th className="pb-2 font-medium text-right">Inventory</th>
                           <th className="pb-2 font-medium text-center">Status</th>

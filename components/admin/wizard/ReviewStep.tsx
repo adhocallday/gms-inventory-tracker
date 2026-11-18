@@ -117,9 +117,9 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold g-title mb-4">Review & Create Tour</h2>
+        <h2 className="text-xl font-semibold mb-4">Review & create tour</h2>
         <p className="text-sm text-[var(--color-text-secondary)]">
-          Review all entered information below. Click "Create Tour" to finalize and set up the inventory tracker.
+          Review all entered information below. Click "Create tour" to finalize and set up the inventory tracker.
         </p>
       </div>
 
@@ -127,9 +127,9 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
       {(validation.missingFields.length > 0 || validation.warnings.length > 0) && (
         <div className="space-y-2">
           {validation.missingFields.length > 0 && (
-            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-              <p className="text-sm font-semibold text-red-400 mb-1">Missing Required Fields:</p>
-              <ul className="text-sm text-red-400 list-disc list-inside">
+            <div className="p-4 bg-danger-bg border border-danger-border rounded-lg">
+              <p className="text-sm font-semibold text-danger mb-1">Missing required fields:</p>
+              <ul className="text-sm text-danger list-disc list-inside">
                 {validation.missingFields.map((field, i) => (
                   <li key={i}>{field}</li>
                 ))}
@@ -137,9 +137,9 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
             </div>
           )}
           {validation.warnings.length > 0 && (
-            <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-              <p className="text-sm font-semibold text-yellow-400 mb-1">Warnings:</p>
-              <ul className="text-sm text-yellow-400 list-disc list-inside">
+            <div className="p-4 bg-warn-bg border border-warn-border rounded-lg">
+              <p className="text-sm font-semibold text-warn mb-1">Warnings:</p>
+              <ul className="text-sm text-warn list-disc list-inside">
                 {validation.warnings.map((warning, i) => (
                   <li key={i}>{warning}</li>
                 ))}
@@ -157,34 +157,34 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
           className="w-full flex items-center justify-between p-4 text-left hover:bg-[var(--color-bg-surface)]/5 transition"
         >
           <div>
-            <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Tour Information</h3>
-            <p className="text-xs text-[var(--color-text-muted)] mt-1">
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Tour information</h3>
+            <p className="text-xs text-[var(--color-text-secondary)] mt-1">
               {tourData.name} · {tourData.artist}
             </p>
           </div>
-          <span className="text-xl text-[var(--color-text-muted)]">
+          <span className="text-xl text-[var(--color-text-secondary)]">
             {expandedSections.tour ? '−' : '+'}
           </span>
         </button>
         {expandedSections.tour && (
           <div className="p-4 border-t border-[var(--color-bg-border)] space-y-3">
             <div>
-              <p className="text-xs text-[var(--color-text-muted)]">Tour Name</p>
+              <p className="text-xs text-[var(--color-text-secondary)]">Tour name</p>
               <p className="text-sm text-[var(--color-text-primary)] font-medium">{tourData.name || '—'}</p>
             </div>
             <div>
-              <p className="text-xs text-[var(--color-text-muted)]">Artist</p>
+              <p className="text-xs text-[var(--color-text-secondary)]">Artist</p>
               <p className="text-sm text-[var(--color-text-primary)] font-medium">{tourData.artist || '—'}</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <p className="text-xs text-[var(--color-text-muted)]">Start Date</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">Start date</p>
                 <p className="text-sm text-[var(--color-text-primary)] font-medium">
                   {tourData.startDate ? new Date(tourData.startDate).toLocaleDateString() : '—'}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-[var(--color-text-muted)]">End Date</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">End date</p>
                 <p className="text-sm text-[var(--color-text-primary)] font-medium">
                   {tourData.endDate ? new Date(tourData.endDate).toLocaleDateString() : '—'}
                 </p>
@@ -192,7 +192,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
             </div>
             {tourData.description && (
               <div>
-                <p className="text-xs text-[var(--color-text-muted)]">Description</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">Description</p>
                 <p className="text-sm text-[var(--color-text-primary)]">{tourData.description}</p>
               </div>
             )}
@@ -209,11 +209,11 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
         >
           <div>
             <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Shows</h3>
-            <p className="text-xs text-[var(--color-text-muted)] mt-1">
+            <p className="text-xs text-[var(--color-text-secondary)] mt-1">
               {shows.length} show{shows.length !== 1 ? 's' : ''} scheduled
             </p>
           </div>
-          <span className="text-xl text-[var(--color-text-muted)]">
+          <span className="text-xl text-[var(--color-text-secondary)]">
             {expandedSections.shows ? '−' : '+'}
           </span>
         </button>
@@ -224,10 +224,10 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
                 <table className="w-full text-sm">
                   <thead className="bg-[var(--color-bg-surface)]/5">
                     <tr>
-                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Date</th>
-                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Venue</th>
-                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Location</th>
-                      <th className="text-right px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Capacity</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-secondary)]">Date</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-secondary)]">Venue</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-secondary)]">Location</th>
+                      <th className="text-right px-3 py-2 text-xs font-semibold text-[var(--color-text-secondary)]">Capacity</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--color-bg-border)]">
@@ -249,7 +249,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
                 </table>
               </div>
             ) : (
-              <p className="text-sm text-[var(--color-text-muted)]">No shows added</p>
+              <p className="text-sm text-[var(--color-text-secondary)]">No shows added</p>
             )}
           </div>
         )}
@@ -264,11 +264,11 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
         >
           <div>
             <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Products</h3>
-            <p className="text-xs text-[var(--color-text-muted)] mt-1">
+            <p className="text-xs text-[var(--color-text-secondary)] mt-1">
               {products.length} product{products.length !== 1 ? 's' : ''} in catalog
             </p>
           </div>
-          <span className="text-xl text-[var(--color-text-muted)]">
+          <span className="text-xl text-[var(--color-text-secondary)]">
             {expandedSections.products ? '−' : '+'}
           </span>
         </button>
@@ -281,7 +281,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-[var(--color-text-primary)]">{product.name}</p>
-                        <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                        <p className="text-xs text-[var(--color-text-secondary)] mt-1">
                           SKU: {product.sku} · Category: {product.category} · Base Price: ${product.basePrice.toFixed(2)}
                         </p>
                         <div className="flex flex-wrap gap-1 mt-2">
@@ -304,7 +304,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-[var(--color-text-muted)]">No products added</p>
+              <p className="text-sm text-[var(--color-text-secondary)]">No products added</p>
             )}
           </div>
         )}
@@ -318,12 +318,12 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
           className="w-full flex items-center justify-between p-4 text-left hover:bg-[var(--color-bg-surface)]/5 transition"
         >
           <div>
-            <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Initial Inventory</h3>
-            <p className="text-xs text-[var(--color-text-muted)] mt-1">
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Initial inventory</h3>
+            <p className="text-xs text-[var(--color-text-secondary)] mt-1">
               {totalInventory} total units across {initialInventory.length} line item{initialInventory.length !== 1 ? 's' : ''}
             </p>
           </div>
-          <span className="text-xl text-[var(--color-text-muted)]">
+          <span className="text-xl text-[var(--color-text-secondary)]">
             {expandedSections.inventory ? '−' : '+'}
           </span>
         </button>
@@ -334,10 +334,10 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
                 <table className="w-full text-sm">
                   <thead className="bg-[var(--color-bg-surface)]/5">
                     <tr>
-                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">SKU</th>
-                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Size</th>
-                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Location</th>
-                      <th className="text-right px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Quantity</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-secondary)]">SKU</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-secondary)]">Size</th>
+                      <th className="text-left px-3 py-2 text-xs font-semibold text-[var(--color-text-secondary)]">Location</th>
+                      <th className="text-right px-3 py-2 text-xs font-semibold text-[var(--color-text-secondary)]">Quantity</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--color-bg-border)]">
@@ -353,7 +353,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
                 </table>
               </div>
             ) : (
-              <p className="text-sm text-[var(--color-text-muted)]">
+              <p className="text-sm text-[var(--color-text-secondary)]">
                 No initial inventory set. Starting with zero inventory.
               </p>
             )}
@@ -363,8 +363,8 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
 
       {/* Error Display */}
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="p-4 bg-danger-bg border border-danger-border rounded-lg">
+          <p className="text-sm text-danger">{error}</p>
         </div>
       )}
 

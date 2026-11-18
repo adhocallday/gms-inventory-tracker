@@ -112,7 +112,7 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold g-title mb-4">Tour Schedule & Shows</h2>
+        <h2 className="text-xl font-semibold mb-4">Tour schedule & shows</h2>
         <p className="text-sm text-[var(--color-text-secondary)]">
           Paste tour dates as text, upload a PDF/CSV, or add shows manually. AI will extract show dates, venues, and cities.
         </p>
@@ -129,7 +129,7 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
               : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
           }`}
         >
-          Paste Text
+          Paste text
         </button>
         <button
           type="button"
@@ -140,7 +140,7 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
               : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
           }`}
         >
-          Upload File
+          Upload file
         </button>
       </div>
 
@@ -159,7 +159,7 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
       {inputMode === 'upload' && (
         <div className="p-6 border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-elevated)]">
           <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
-            AI-Assisted File Upload
+            AI-Assisted File upload
           </h3>
           <div
             {...getRootProps()}
@@ -177,19 +177,19 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
               </div>
             ) : (
               <div className="space-y-2">
-                <UploadCloud className="mx-auto h-10 w-10 text-[var(--color-text-muted)]" aria-hidden="true" />
+                <UploadCloud className="mx-auto h-10 w-10 text-[var(--color-text-secondary)]" aria-hidden="true" />
                 <p className="text-sm text-[var(--color-text-secondary)]">
                   {isDragActive ? 'Drop the file here' : 'Drag & drop tour schedule PDF/CSV, or click to select'}
                 </p>
-                <p className="text-xs text-[var(--color-text-muted)]">
+                <p className="text-xs text-[var(--color-text-secondary)]">
                   Supports PDF, CSV, XLS, XLSX
                 </p>
               </div>
             )}
           </div>
           {error && (
-            <div className="mt-3 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-              <p className="text-sm text-red-400">{error}</p>
+            <div className="mt-3 p-3 bg-danger-bg border border-danger-border rounded-lg">
+              <p className="text-sm text-danger">{error}</p>
             </div>
           )}
         </div>
@@ -216,12 +216,12 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
               <table className="w-full text-sm">
                 <thead className="bg-[var(--color-bg-surface)]/5">
                   <tr>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Date</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Venue</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">City</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">State</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Country</th>
-                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Capacity</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-secondary)]">Date</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-secondary)]">Venue</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-secondary)]">City</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-secondary)]">State</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-secondary)]">Country</th>
+                    <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-secondary)]">Capacity</th>
                     <th className="px-4 py-3"></th>
                   </tr>
                 </thead>
@@ -288,7 +288,7 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
                         <button
                           type="button"
                           onClick={() => removeShow(index)}
-                          className="text-red-400 hover:text-red-300 text-xs"
+                          className="text-danger hover:text-danger text-xs"
                         >
                           Remove
                         </button>
@@ -301,7 +301,7 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
           </div>
         ) : (
           <div className="border border-[var(--color-bg-border)] rounded-lg p-8 text-center">
-            <p className="text-sm text-[var(--color-text-muted)]">
+            <p className="text-sm text-[var(--color-text-secondary)]">
               No shows added yet. Upload a schedule or add shows manually.
             </p>
           </div>

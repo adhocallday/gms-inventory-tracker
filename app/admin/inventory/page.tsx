@@ -114,7 +114,7 @@ export default function AdminInventoryPage() {
             >
               {row.original.tour_name}
             </Link>
-            <div className="text-xs text-[var(--color-text-muted)]">{row.original.artist}</div>
+            <div className="text-xs text-[var(--color-text-secondary)]">{row.original.artist}</div>
           </div>
         ),
         enableSorting: true,
@@ -126,18 +126,24 @@ export default function AdminInventoryPage() {
           const balance = row.original.balance;
           const isLowStock = balance > 0 && balance < 10;
           const isOutOfStock = balance === 0;
+          const noReceipts = balance < 0 && !row.original.total_received;
 
           return (
             <div>
               <div className="font-semibold text-[var(--color-text-primary)]">{row.getValue('sku')}</div>
-              <div className="text-xs text-[var(--color-text-muted)]">{row.original.description}</div>
+              <div className="text-xs text-[var(--color-text-secondary)]">{row.original.description}</div>
+              {noReceipts && (
+                <Badge variant="default" size="sm" className="mt-1">
+                  No received stock recorded
+                </Badge>
+              )}
               {isOutOfStock && (
-                <Badge variant="error" className="mt-1 text-xs">
+                <Badge variant="error" size="sm" className="mt-1">
                   Out of stock
                 </Badge>
               )}
               {isLowStock && (
-                <Badge variant="warning" className="mt-1 text-xs">
+                <Badge variant="warning" size="sm" className="mt-1">
                   Low stock
                 </Badge>
               )}
@@ -167,24 +173,28 @@ export default function AdminInventoryPage() {
       {
         accessorKey: 'total_received',
         header: 'Received',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('total_received')} format="number" />,
         enableSorting: true,
       },
       {
         accessorKey: 'total_sold',
         header: 'Sold',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('total_sold')} format="number" />,
         enableSorting: true,
       },
       {
         accessorKey: 'total_comps',
         header: 'Comps',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('total_comps')} format="number" />,
         enableSorting: true,
       },
       {
         accessorKey: 'balance',
         header: 'Balance',
+        meta: { align: 'right' },
         cell: ({ row }) => {
           const balance = row.getValue('balance') as number;
           const isLowStock = balance > 0 && balance < 10;
@@ -192,12 +202,14 @@ export default function AdminInventoryPage() {
 
           return (
             <div
-              className={`text-right font-semibold ${
-                isOutOfStock
-                  ? 'text-red-400'
+              className={`text-right font-semibold tabular-nums ${
+                balance < 0
+                  ? 'text-[var(--color-text-secondary)]'
+                  : isOutOfStock
+                  ? 'text-danger'
                   : isLowStock
-                  ? 'text-yellow-400'
-                  : 'text-green-400'
+                  ? 'text-warn'
+                  : 'text-[var(--color-text-primary)]'
               }`}
             >
               {new Intl.NumberFormat('en-US').format(balance)}
@@ -209,6 +221,7 @@ export default function AdminInventoryPage() {
       {
         id: 'value',
         header: 'Value',
+        meta: { align: 'right' },
         accessorFn: (row) => row.balance * row.full_package_cost,
         cell: ({ row }) => {
           const value = row.original.balance * row.original.full_package_cost;
@@ -228,46 +241,25 @@ export default function AdminInventoryPage() {
     }).format(value);
 
   return (
-    <div className="g-container py-12">
+    <div className="g-container py-6">
       <PageHeader
-        title="Inventory Overview"
-        subtitle="View and manage inventory levels across all tours. Monitor stock levels, identify low stock items, and track inventory movement."
-        kicker="Admin Portal"
+        title="Inventory"
+        subtitle="Stock by product and size across all tours. Balance = received − sold − comps."
         breadcrumbs={breadcrumbs}
       />
 
       {/* Stats Grid */}
-      <div data-tour="admin-inventory" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+      <div data-tour="admin-inventory" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mt-6 mb-6">
+        <StatCard label="Product lines" value={stats.totalItems.toLocaleString()} iconName="package" />
+        <StatCard label="Units on hand" value={stats.totalBalance.toLocaleString()} iconName="layers" />
+        <StatCard label="Low stock" value={stats.lowStockItems} iconName="alert-triangle" />
         <StatCard
-          label="Total Items"
-          value={stats.totalItems}
-          iconName="package"
-          color="purple"
-        />
-        <StatCard
-          label="Units on Hand"
-          value={stats.totalBalance}
-          iconName="layers"
-          color="blue"
-        />
-        <StatCard
-          label="Low Stock Items"
-          value={stats.lowStockItems}
-          iconName="alert-triangle"
-          color="orange"
-        />
-        <StatCard
-          label="Out of Stock"
+          label="Out of stock"
           value={stats.outOfStockItems}
           iconName="x-circle"
-          color="red"
+          color={stats.outOfStockItems > 0 ? 'red' : 'default'}
         />
-        <div className="g-card p-6">
-          <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide">
-            Total Inventory Value
-          </p>
-          <p className="text-2xl font-bold mt-2">{formatCurrency(stats.totalValue)}</p>
-        </div>
+        <StatCard label="Inventory value" value={formatCurrency(stats.totalValue)} iconName="package" />
       </div>
 
       {/* Filters */}
@@ -275,13 +267,14 @@ export default function AdminInventoryPage() {
         <div className="flex flex-wrap items-center gap-3">
           {/* Tour Filter */}
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-[var(--color-text-muted)]" />
+            <Filter className="w-4 h-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
             <select
               value={tourFilter}
               onChange={(e) => setTourFilter(e.target.value)}
-              className="px-3 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-bg-border)] text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]/50"
+              aria-label="Tour"
+              className="g-input"
             >
-              <option value="all">All Tours</option>
+              <option value="all">All tours</option>
               {tours.map((tour) => (
                 <option key={tour.id} value={tour.id}>
                   {tour.name}
@@ -295,18 +288,20 @@ export default function AdminInventoryPage() {
             {(['all', 'low', 'out'] as const).map((status) => {
               const isActive = stockFilter === status;
               const labels = {
-                all: 'All Stock',
-                low: 'Low Stock',
-                out: 'Out of Stock',
+                all: 'All stock',
+                low: 'Low stock',
+                out: 'Out of stock',
               };
               return (
                 <button
                   key={status}
+                  type="button"
+                  aria-pressed={isActive}
                   onClick={() => setStockFilter(status)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-3 py-1.5 rounded-md border text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-[var(--color-red-primary)] text-white'
-                      : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-surface)] hover:text-[var(--color-text-primary)]'
+                      ? 'bg-[var(--color-text-primary)] text-[var(--color-bg-surface)] border-[var(--color-text-primary)]'
+                      : 'bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)] hover:text-[var(--color-text-primary)]'
                   }`}
                 >
                   {labels[status]}
@@ -319,7 +314,7 @@ export default function AdminInventoryPage() {
         {/* Search */}
         <div className="flex-1 max-w-md">
           <SearchBar
-            placeholder="Search by SKU, product, tour..."
+            placeholder="Search by SKU, product or tour"
             onSearch={setSearchQuery}
             debounceMs={300}
           />
@@ -328,14 +323,14 @@ export default function AdminInventoryPage() {
 
       {/* Results count */}
       {(searchQuery || tourFilter !== 'all' || stockFilter !== 'all') && (
-        <div className="mb-4 text-sm text-[var(--color-text-muted)]">
+        <div className="mb-4 text-sm text-[var(--color-text-secondary)]">
           Showing {filteredInventory.length} of {inventory.length} items
           {searchQuery && ` matching "${searchQuery}"`}
         </div>
       )}
 
       {/* Data Table */}
-      <div className="g-card p-0 overflow-hidden">
+      <div>
         <DataTable
           columns={columns}
           data={filteredInventory}
@@ -343,11 +338,11 @@ export default function AdminInventoryPage() {
           stickyHeader
           striped
           emptyState={{
-            icon: <Package className="w-12 h-12 text-[var(--color-text-muted)]" />,
+            icon: <Package className="w-12 h-12 text-[var(--color-text-secondary)]" />,
             title: 'No inventory items found',
             description: stockFilter !== 'all' || tourFilter !== 'all' || searchQuery
-              ? 'Try adjusting your filters or search criteria'
-              : 'Upload packing lists or purchase orders to see inventory',
+              ? 'Nothing matches these filters. Clear the search or pick All stock.'
+              : 'Post a packing list to record received stock.',
           }}
         />
       </div>
@@ -355,9 +350,9 @@ export default function AdminInventoryPage() {
       {/* Totals Row */}
       {filteredInventory.length > 0 && (
         <div className="mt-4 p-4 g-card">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm tabular-nums">
             <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Received</p>
+              <p className="text-[var(--color-text-secondary)] text-xs mb-1">Total received</p>
               <p className="font-semibold">
                 {new Intl.NumberFormat('en-US').format(
                   filteredInventory.reduce((sum, i) => sum + i.total_received, 0)
@@ -365,7 +360,7 @@ export default function AdminInventoryPage() {
               </p>
             </div>
             <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Sold</p>
+              <p className="text-[var(--color-text-secondary)] text-xs mb-1">Total sold</p>
               <p className="font-semibold">
                 {new Intl.NumberFormat('en-US').format(
                   filteredInventory.reduce((sum, i) => sum + i.total_sold, 0)
@@ -373,7 +368,7 @@ export default function AdminInventoryPage() {
               </p>
             </div>
             <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Comps</p>
+              <p className="text-[var(--color-text-secondary)] text-xs mb-1">Total comps</p>
               <p className="font-semibold">
                 {new Intl.NumberFormat('en-US').format(
                   filteredInventory.reduce((sum, i) => sum + i.total_comps, 0)
@@ -381,15 +376,15 @@ export default function AdminInventoryPage() {
               </p>
             </div>
             <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Balance</p>
-              <p className="font-semibold text-green-400">
+              <p className="text-[var(--color-text-secondary)] text-xs mb-1">Total balance</p>
+              <p className="font-semibold">
                 {new Intl.NumberFormat('en-US').format(
                   filteredInventory.reduce((sum, i) => sum + i.balance, 0)
                 )}
               </p>
             </div>
             <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Filtered Value</p>
+              <p className="text-[var(--color-text-secondary)] text-xs mb-1">Filtered value</p>
               <p className="font-semibold">
                 {formatCurrency(
                   filteredInventory.reduce((sum, i) => sum + i.balance * i.full_package_cost, 0)

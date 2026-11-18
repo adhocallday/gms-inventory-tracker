@@ -140,7 +140,7 @@ export function ProductImageUpload({
         <div className="space-y-2">
           <Camera className="mx-auto block h-10 w-10 text-[var(--color-text-secondary)]" aria-hidden="true" />
           {uploading ? (
-            <p className="text-sm text-[var(--color-text-muted)]">Uploading...</p>
+            <p className="text-sm text-[var(--color-text-secondary)]">Uploading...</p>
           ) : isDragActive ? (
             <p className="text-sm text-[var(--color-text-primary)]">Drop images here</p>
           ) : (
@@ -148,7 +148,7 @@ export function ProductImageUpload({
               <p className="text-sm text-[var(--color-text-primary)]">
                 Drag & drop product images here, or click to select
               </p>
-              <p className="text-xs text-[var(--color-text-muted)]">
+              <p className="text-xs text-[var(--color-text-secondary)]">
                 PNG, JPG, GIF, WebP (max 10MB per file)
               </p>
             </>
@@ -158,7 +158,7 @@ export function ProductImageUpload({
 
       {/* Error Message */}
       {error && (
-        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded text-sm text-red-500">
+        <div className="p-3 bg-danger-bg border border-danger-border rounded text-sm text-danger">
           {error}
         </div>
       )}
@@ -194,12 +194,12 @@ export function ProductImageUpload({
                     onClick={() => handleSetPrimary(image.id)}
                     className="px-3 py-1.5 bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] text-sm font-medium rounded hover:bg-[var(--color-bg-elevated)] transition"
                   >
-                    Set Primary
+                    Set primary
                   </button>
                 )}
                 <button
                   onClick={() => handleDelete(image.id)}
-                  className="px-3 py-1.5 bg-red-500 text-white text-sm font-medium rounded hover:bg-red-600 transition"
+                  className="px-3 py-1.5 bg-danger text-white text-sm font-medium rounded hover:bg-danger transition"
                 >
                   Delete
                 </button>
@@ -217,7 +217,7 @@ export function ProductImageUpload({
       )}
 
       {images.length === 0 && !uploading && (
-        <div className="text-center text-sm text-[var(--color-text-muted)] py-8">
+        <div className="text-center text-sm text-[var(--color-text-secondary)] py-8">
           No images uploaded yet
         </div>
       )}

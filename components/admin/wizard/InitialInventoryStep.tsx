@@ -119,7 +119,7 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold g-title mb-4">Initial Inventory (Optional)</h2>
+        <h2 className="text-xl font-semibold mb-4">Initial inventory (Optional)</h2>
         <p className="text-sm text-[var(--color-text-secondary)]">
           Set starting inventory levels for products you already have in stock from previous tours.
           This step is optional - you can skip it and start with zero inventory.
@@ -147,19 +147,19 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
             </div>
           ) : (
             <div className="space-y-2">
-              <UploadCloud className="mx-auto h-10 w-10 text-[var(--color-text-muted)]" aria-hidden="true" />
+              <UploadCloud className="mx-auto h-10 w-10 text-[var(--color-text-secondary)]" aria-hidden="true" />
               <p className="text-sm text-[var(--color-text-secondary)]">
                 {isDragActive ? 'Drop the file here' : 'Drag & drop inventory spreadsheet (CSV/Excel), or click to select'}
               </p>
-              <p className="text-xs text-[var(--color-text-muted)]">
+              <p className="text-xs text-[var(--color-text-secondary)]">
                 Supports CSV, XLS, XLSX
               </p>
             </div>
           )}
         </div>
         {error && (
-          <div className="mt-3 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-            <p className="text-sm text-red-400">{error}</p>
+          <div className="mt-3 p-3 bg-danger-bg border border-danger-border rounded-lg">
+            <p className="text-sm text-danger">{error}</p>
           </div>
         )}
       </div>
@@ -169,26 +169,26 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
-              Inventory Summary
+              Inventory summary
             </h3>
             <button
               type="button"
               onClick={() => setShowAdvanced(true)}
               className="text-xs text-[var(--color-red-primary)] hover:underline"
             >
-              View Details
+              View details
             </button>
           </div>
           <div className="border border-[var(--color-bg-border)] rounded-lg overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-[var(--color-bg-surface)]/5">
                 <tr>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">SKU</th>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Product</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-secondary)]">SKU</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-secondary)]">Product</th>
                   {LOCATIONS.map(loc => (
-                    <th key={loc} className="text-right px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">{loc}</th>
+                    <th key={loc} className="text-right px-4 py-3 text-xs font-semibold text-[var(--color-text-secondary)]">{loc}</th>
                   ))}
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Total</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-[var(--color-text-secondary)]">Total</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--color-bg-border)]">
@@ -223,7 +223,7 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
                 onClick={() => setShowAdvanced(false)}
                 className="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
               >
-                Show Summary
+                Show summary
               </button>
               <button
                 type="button"
@@ -241,10 +241,10 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
                 <table className="w-full text-sm">
                   <thead className="bg-[var(--color-bg-surface)]/5">
                     <tr>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">SKU</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Size</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Location</th>
-                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-muted)]">Quantity</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-secondary)]">SKU</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-secondary)]">Size</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-secondary)]">Location</th>
+                      <th className="text-left px-4 py-3 text-xs font-semibold text-[var(--color-text-secondary)]">Quantity</th>
                       <th className="px-4 py-3"></th>
                     </tr>
                   </thead>
@@ -297,7 +297,7 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
                           <button
                             type="button"
                             onClick={() => removeItem(index)}
-                            className="text-red-400 hover:text-red-300 text-xs"
+                            className="text-danger hover:text-danger text-xs"
                           >
                             Remove
                           </button>
@@ -310,8 +310,8 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
             </div>
           ) : (
             <div className="border border-[var(--color-bg-border)] rounded-lg p-8 text-center">
-              <p className="text-sm text-[var(--color-text-muted)]">
-                No inventory items added. Click "+ Add Item" or upload a spreadsheet.
+              <p className="text-sm text-[var(--color-text-secondary)]">
+                No inventory items added. Click "+ Add item" or upload a spreadsheet.
               </p>
             </div>
           )}
@@ -320,8 +320,8 @@ export default function InitialInventoryStep({ products, inventory, onUpdate, on
 
       {/* Skip Option */}
       {inventory.length === 0 && (
-        <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-          <p className="text-sm text-blue-300">
+        <div className="p-4 bg-info-bg border border-info-border rounded-lg">
+          <p className="text-sm text-info">
             <Lightbulb className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> You can skip this step if you're starting fresh with no existing inventory.
             You'll be able to add inventory later through purchase orders and receipts.
           </p>
