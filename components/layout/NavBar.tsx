@@ -49,11 +49,15 @@ export function NavBar() {
     flow: Workflow,
   };
 
+  // Tour pages (/tours/...) belong under Tours; the review page under Documents.
   const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href);
+    href === '/'
+      ? pathname === '/' || pathname.startsWith('/tours') || pathname.startsWith('/products')
+      : pathname.startsWith(href) || (href === '/dashboard/parsed-documents' && pathname.startsWith('/review'));
 
   return (
     <nav
+      aria-label="Main"
       className={cn(
         // Sticky to the viewport, scrolling on its own when taller than it,
         // so the Upload button stays reachable on long pages.
@@ -62,7 +66,7 @@ export function NavBar() {
       )}
     >
       <div className="flex flex-col justify-between flex-1">
-        <div className={cn('py-6 space-y-8', collapsed ? 'px-2' : 'px-6')}>
+        <div className={cn('py-5 space-y-6', collapsed ? 'px-2' : 'px-4')}>
           {/* Logo and collapse toggle */}
           <div className="flex items-center justify-between gap-2">
             {!collapsed && (
@@ -84,60 +88,55 @@ export function NavBar() {
 
             {/* Collapse toggle button */}
             <button
+              type="button"
               onClick={toggleSidebar}
+              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-expanded={!collapsed}
               className={cn(
                 'p-1.5 rounded-md hover:bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition flex-shrink-0',
                 collapsed && 'mx-auto mt-2'
               )}
               title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             >
-              {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+              {collapsed ? <ChevronRight className="w-4 h-4" aria-hidden="true" /> : <ChevronLeft className="w-4 h-4" aria-hidden="true" />}
             </button>
           </div>
 
           <div className="space-y-6">
-            {['Tours', 'Documents', 'Admin'].map((section) => (
-              <div key={section}>
-                {!collapsed && (
-                  <p className="text-[11px] uppercase tracking-[0.4em] text-[var(--color-text-muted)] mb-3">
-                    {section}
-                  </p>
-                )}
-                <div className="space-y-1">
-                  {navItems
-                    .filter((item) => item.section === section)
-                    .map((item) => {
-                      const Icon = item.icon;
-                      const active = isActive(item.href);
+            {/* Each former section (Tours, Documents, Admin) held one item whose
+                label repeated the heading, so they form one unlabelled group. */}
+            <div className="space-y-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.href);
 
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          data-tour={item.tour}
-                          title={collapsed ? item.label : undefined}
-                          className={cn(
-                            'flex items-center gap-3 rounded-md text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red-primary)]',
-                            collapsed ? 'px-3 py-2 justify-center' : 'px-3 py-2',
-                            active
-                              ? 'text-[var(--color-text-primary)] border-l-3 border-[var(--color-red-primary)] bg-[var(--color-bg-elevated)]'
-                              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)]'
-                          )}
-                        >
-                          <Icon className="w-4 h-4 flex-shrink-0" />
-                          {!collapsed && item.label}
-                        </Link>
-                      );
-                    })}
-                </div>
-              </div>
-            ))}
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    data-tour={item.tour}
+                    title={collapsed ? item.label : undefined}
+                    aria-current={active ? 'page' : undefined}
+                    className={cn(
+                      'flex items-center gap-3 rounded-md text-sm font-medium transition-colors',
+                      collapsed ? 'px-3 py-2 justify-center' : 'px-3 py-2',
+                      active
+                        ? 'text-[var(--color-text-primary)] bg-[var(--color-bg-elevated)] shadow-[inset_2px_0_0_var(--color-red-primary)]'
+                        : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)]'
+                    )}
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                    {!collapsed && item.label}
+                  </Link>
+                );
+              })}
+            </div>
 
             {/* MerchFlow app switcher */}
             <div data-tour="app-switcher">
               {!collapsed && (
-                <p className="text-[11px] uppercase tracking-[0.4em] text-[var(--color-text-muted)] mb-3">
-                  MerchFlow
+                <p className="px-3 text-xs font-medium text-[var(--color-text-secondary)] mb-2">
+                  MerchFlow apps
                 </p>
               )}
               <div className="space-y-1">
@@ -152,7 +151,7 @@ export function NavBar() {
                       aria-current={current ? 'page' : undefined}
                       title={collapsed ? `${app.label}: ${app.note}` : app.note}
                       className={cn(
-                        'flex items-center gap-3 rounded-md text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red-primary)]',
+                        'flex items-center gap-3 rounded-md text-sm font-medium transition',
                         collapsed ? 'px-3 py-2 justify-center' : 'px-3 py-2',
                         current
                           ? 'text-[var(--color-text-primary)]'
@@ -164,8 +163,8 @@ export function NavBar() {
                         <span className="flex-1 flex items-center justify-between gap-2">
                           {app.label}
                           {current && (
-                            <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
-                              Here
+                            <span className="text-xs text-[var(--color-text-secondary)]">
+                              Current
                             </span>
                           )}
                         </span>
@@ -179,7 +178,7 @@ export function NavBar() {
             {/* Help */}
             <div>
               {!collapsed && (
-                <p className="text-[11px] uppercase tracking-[0.4em] text-[var(--color-text-muted)] mb-3">
+                <p className="px-3 text-xs font-medium text-[var(--color-text-secondary)] mb-2">
                   Help
                 </p>
               )}
@@ -188,7 +187,7 @@ export function NavBar() {
                   href="/welcome"
                   title={collapsed ? 'How MerchFlow works' : undefined}
                   className={cn(
-                    'flex items-center gap-3 rounded-md text-sm font-medium transition text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red-primary)]',
+                    'flex items-center gap-3 rounded-md text-sm font-medium transition text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)]',
                     collapsed ? 'px-3 py-2 justify-center' : 'px-3 py-2'
                   )}
                 >
@@ -201,7 +200,7 @@ export function NavBar() {
                   aria-haspopup="dialog"
                   title={collapsed ? 'Replay tour' : undefined}
                   className={cn(
-                    'w-full flex items-center gap-3 rounded-md text-sm font-medium transition text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red-primary)]',
+                    'w-full flex items-center gap-3 rounded-md text-sm font-medium transition text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)]',
                     collapsed ? 'px-3 py-2 justify-center' : 'px-3 py-2'
                   )}
                 >
@@ -213,17 +212,18 @@ export function NavBar() {
           </div>
         </div>
 
-        <div className={cn('pb-6', collapsed ? 'px-2' : 'px-6')}>
+        <div className={cn('pb-5', collapsed ? 'px-2' : 'px-4')}>
           <Link
             href="/upload"
             data-tour="upload"
-            title={collapsed ? 'Upload' : undefined}
+            title={collapsed ? 'Upload document' : undefined}
+            aria-label={collapsed ? 'Upload document' : undefined}
             className={cn(
-              'flex items-center justify-center text-sm font-semibold py-3 rounded-md bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] active:bg-[var(--color-red-active)] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red-primary)]',
+              'flex items-center justify-center text-sm font-semibold py-3 rounded-md bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] active:bg-[var(--color-red-active)] transition',
               collapsed ? 'px-3' : 'px-4'
             )}
           >
-            {collapsed ? <Upload className="w-4 h-4" /> : 'Upload'}
+            {collapsed ? <Upload className="w-4 h-4" aria-hidden="true" /> : 'Upload document'}
           </Link>
         </div>
       </div>

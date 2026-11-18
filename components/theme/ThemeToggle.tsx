@@ -15,20 +15,22 @@ export function ThemeToggle() {
   // Show placeholder during SSR to prevent hydration mismatch
   if (!mounted) {
     return (
-      <div className="p-2 w-8 h-8 rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)]" />
+      <div className="p-2 w-8 h-8 rounded-md border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)]" />
     );
   }
 
   return (
     <button
+      type="button"
       onClick={toggleTheme}
-      className="p-2 rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-border)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
+      title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+      className="p-2 rounded-md border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] hover:bg-[var(--color-bg-elevated)] transition-colors"
       aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
     >
       {theme === 'dark' ? (
-        <Sun className="w-4 h-4 text-[var(--color-text-secondary)]" />
+        <Sun className="w-4 h-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
       ) : (
-        <Moon className="w-4 h-4 text-[var(--color-text-secondary)]" />
+        <Moon className="w-4 h-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
       )}
     </button>
   );
