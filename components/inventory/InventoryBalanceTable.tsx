@@ -192,7 +192,7 @@ export function InventoryBalanceTable({ data, loading, showTotals = true }: Inve
             </div>
             <div>
               <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Balance</p>
-              <p className="font-semibold text-green-300">{formatNumber(totals.balance)}</p>
+              <p className="font-semibold tabular-nums">{formatNumber(totals.balance)}</p>
             </div>
             <div>
               <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Value</p>

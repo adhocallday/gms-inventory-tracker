@@ -179,7 +179,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
                 type="checkbox"
                 checked={section.enabled}
                 onChange={() => toggleSection(section.id)}
-                className="w-4 h-4 text-[var(--color-red-primary)] border-gray-300 rounded focus:ring-[var(--color-red-primary)]"
+                className="w-4 h-4 text-[var(--color-red-primary)] border-[var(--color-bg-border-strong)] rounded focus:ring-[var(--color-red-primary)]"
               />
               <div className="flex-1">
                 <div className="text-sm font-medium text-[var(--color-text-primary)]">
@@ -205,7 +205,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
 
       {/* Loading Progress */}
       {loading && (
-        <div className="mt-4 p-5 bg-gradient-to-br from-info-bg to-white border-2 border-info-border rounded-2xl shadow-sm">
+        <div className="mt-4 p-5 bg-info-bg border border-info-border rounded-2xl shadow-sm">
           <div className="flex items-center gap-3 mb-3">
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-info-border"></div>
             <span className="text-sm font-semibold text-info">Generating your report...</span>
@@ -221,7 +221,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
 
       {/* Status Messages */}
       {success && (
-        <div className="mt-4 p-5 bg-gradient-to-br from-success-bg to-white border-2 border-success-border rounded-2xl shadow-sm">
+        <div className="mt-4 p-5 bg-success-bg border border-success-border rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-[var(--color-bg-surface)] shadow-inner">
               <Check className="h-5 w-5 shrink-0 text-success" aria-hidden="true" />
@@ -235,7 +235,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
       )}
 
       {error && (
-        <div className="mt-4 p-5 bg-gradient-to-br from-danger-bg to-white border-2 border-danger-border rounded-2xl shadow-sm">
+        <div className="mt-4 p-5 bg-danger-bg border border-danger-border rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-[var(--color-bg-surface)] shadow-inner">
               <X className="h-5 w-5 shrink-0 text-danger" aria-hidden="true" />
@@ -249,7 +249,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
       )}
 
       {/* Info Box */}
-      <div className="mt-6 p-5 bg-gradient-to-br from-info-bg to-white border-2 border-info-border rounded-2xl shadow-sm">
+      <div className="mt-6 p-5 bg-info-bg border border-info-border rounded-2xl shadow-sm">
         <p className="font-semibold text-info mb-2"><BarChart3 className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />What's Included:</p>
         <ul className="list-disc list-inside space-y-1 text-xs text-info">
           <li>Product images (grab sheets) with sales data</li>

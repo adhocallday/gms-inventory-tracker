@@ -114,7 +114,7 @@ export function OverridePreview({
                 <div
                   key={`${override.sku}-${override.size || 'total'}-${index}`}
                   className={`flex items-start gap-3 px-4 py-3 border-b border-warn-border last:border-0 transition ${
-                    isSelected ? 'bg-white' : 'bg-warn-bg opacity-60'
+                    isSelected ? 'bg-[var(--color-bg-surface)]' : 'bg-warn-bg opacity-60'
                   }`}
                 >
                   <input

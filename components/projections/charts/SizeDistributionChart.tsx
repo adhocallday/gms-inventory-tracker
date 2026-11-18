@@ -23,12 +23,12 @@ export function SizeDistributionChart({ sku, sizeBreakdown }: SizeDistributionCh
 
   // Color palette for sizes
   const sizeColors: Record<string, string> = {
-    S: '#3b82f6',
-    M: '#8b5cf6',
-    L: '#ec4899',
-    XL: '#f59e0b',
-    '2XL': '#10b981',
-    '3XL': '#06b6d4'
+    S: '#0082F3',
+    M: '#9B5FC0',
+    L: '#E8003D',
+    XL: '#C77400',
+    '2XL': '#00A36F',
+    '3XL': '#4B5563'
   };
 
   // Simple CSS-based pie chart using conic-gradient

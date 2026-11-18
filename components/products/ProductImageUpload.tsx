@@ -188,7 +188,7 @@ export function ProductImageUpload({
               )}
 
               {/* Actions Overlay */}
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+              <div className="absolute inset-0 bg-scrim opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
                 {!image.is_primary && (
                   <button
                     onClick={() => handleSetPrimary(image.id)}
@@ -199,7 +199,7 @@ export function ProductImageUpload({
                 )}
                 <button
                   onClick={() => handleDelete(image.id)}
-                  className="px-3 py-1.5 bg-danger text-white text-sm font-medium rounded hover:bg-danger transition"
+                  className="px-3 py-1.5 bg-danger text-white text-sm font-medium rounded hover:opacity-90 transition"
                 >
                   Delete
                 </button>
@@ -207,7 +207,7 @@ export function ProductImageUpload({
 
               {/* Caption */}
               {image.caption && (
-                <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/80 text-white text-xs">
+                <div className="absolute bottom-0 left-0 right-0 p-2 bg-[var(--color-text-primary)] text-[var(--color-bg-surface)] text-xs">
                   {image.caption}
                 </div>
               )}

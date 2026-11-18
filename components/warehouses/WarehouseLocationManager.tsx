@@ -205,7 +205,7 @@ export function WarehouseLocationManager({
     <div className="space-y-6">
       {/* Messages */}
       {error && (
-        <div className="p-4 border border-[rgba(225,6,20,0.35)] rounded-lg bg-[rgba(225,6,20,0.08)]">
+        <div className="p-4 border border-danger-border rounded-lg bg-danger-bg">
           <p className="text-sm text-[var(--color-red-primary)]">
             <strong>Error:</strong> {error}
           </p>
@@ -213,8 +213,8 @@ export function WarehouseLocationManager({
       )}
 
       {success && (
-        <div className="p-4 border border-green-500/20 rounded-lg bg-green-500/10">
-          <p className="text-sm text-green-500">
+        <div className="p-4 border border-success-border rounded-lg bg-success-bg">
+          <p className="text-sm text-success">
             <strong>Success:</strong> {success}
           </p>
         </div>
@@ -229,7 +229,7 @@ export function WarehouseLocationManager({
               Suggested stock locations (fully editable)
             </p>
           </div>
-          <span className="text-xs px-2 py-1 rounded bg-blue-500/10 text-blue-500">
+          <span className="text-xs px-2 py-1 rounded bg-info-bg text-info">
             {standardLocations.filter(l => l.is_active).length} active
           </span>
         </div>

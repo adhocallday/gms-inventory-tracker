@@ -365,7 +365,7 @@ export function ProductForm({
                 {...getRootProps()}
                 className={`
                   border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition
-                  ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)]'}
+                  ${isDragActive ? 'border-[var(--color-red-primary)] bg-[var(--color-red-muted)]' : 'border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)]'}
                   ${parsing ? 'pointer-events-none opacity-50' : ''}
                 `}
               >

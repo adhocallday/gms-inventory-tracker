@@ -83,7 +83,7 @@ export function InlineDraftReview({
 
   if (postSuccess) {
     return (
-      <div className="bg-gradient-to-br from-success-bg to-white border-2 border-success-border rounded-2xl p-6 space-y-4">
+      <div className="bg-success-bg border border-success-border rounded-2xl p-6 space-y-4">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
             <Check className="w-5 h-5 text-success" />

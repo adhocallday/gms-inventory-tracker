@@ -259,7 +259,7 @@ export function CompBreakdownPanel({
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="px-4 py-2 text-sm rounded-lg bg-ai text-white hover:bg-ai disabled:opacity-50"
+            className="px-4 py-2 text-sm rounded-lg bg-ai text-white hover:opacity-90 disabled:opacity-50"
           >
             {isSaving ? 'Saving...' : 'Save Comps'}
           </button>
