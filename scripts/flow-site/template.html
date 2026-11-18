@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#F7F7F8">
+<title>MerchFlow Data Flow</title>
+<meta name="description" content="MerchFlow Data Flow: tour data flow, current state and options, for Global Merchandising Services.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/*
+ * MerchFlow brand tokens, copied from MerchFlow Tracker (app/globals.css,
+ * light theme). Keep the names and values in step with the tracker.
+ */
+:root {
+  --mf-red: #E8003D;
+  --mf-red-hover: #C70034;
+  --mf-red-active: #A8002C;
+  --mf-ink: #111214;
+  --mf-text: #1D1C1D;
+  --mf-text2: #4B5563;
+  --mf-muted: #6B7280;
+  --mf-border: #E5E7EB;
+  --mf-border-strong: #D1D5DB;
+  --mf-surface: #F7F7F8;
+  --mf-surface2: #F1F2F4;
+  --mf-card: #FFFFFF;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --color-bg-base: var(--mf-surface);
+  --color-bg-surface: var(--mf-card);
+  --color-bg-elevated: var(--mf-surface2);
+  --color-bg-border: var(--mf-border);
+  --color-text-primary: var(--mf-text);
+  --color-text-secondary: var(--mf-text2);
+  --color-text-muted: var(--mf-muted);
+  --color-red-primary: var(--mf-red);
+  --color-red-text: var(--mf-red-hover);
+  --color-focus-ring: var(--mf-red);
+  --color-card-shadow: rgba(17, 18, 20, 0.06);
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--color-bg-base); color: var(--color-text-primary); font-family: var(--font-sans); font-size: 14px; line-height: 1.5; font-feature-settings: "cv11"; }
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+a { color: inherit; }
+::selection { background: var(--color-red-primary); color: #FFFFFF; }
+:where(a, button, [tabindex]):focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+.top { background: var(--color-bg-surface); border-bottom: 1px solid var(--color-bg-border); }
+.top-inner, .wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.top-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; padding-top: 12px; padding-bottom: 12px; }
+.logo { display: block; height: 40px; width: auto; color: var(--mf-ink); }
+.apps { display: flex; flex-wrap: wrap; gap: 4px; }
+.apps a { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; font-size: 14px; font-weight: 500; color: var(--color-text-secondary); text-decoration: none; transition: color .15s ease, background-color .15s ease; }
+.apps a:hover { color: var(--color-text-primary); background: var(--color-bg-elevated); }
+.apps a[aria-current="page"] { color: var(--color-text-primary); font-weight: 600; box-shadow: inset 0 -2px 0 var(--color-red-primary); border-radius: 6px 6px 0 0; }
+.apps svg { width: 16px; height: 16px; flex: none; }
+@media (max-width: 480px) { .top-inner { justify-content: center; } .apps { gap: 0; } .apps a { padding: 8px 9px; gap: 6px; } }
+
+.wrap { padding-top: 32px; padding-bottom: 64px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+.views { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.intro h1 { font-size: 28px; line-height: 36px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 8px; }
+.intro p { font-size: 15px; color: var(--color-text-secondary); margin: 0; max-width: 72ch; }
+@media (max-width: 640px) { .wrap { padding-top: 24px; gap: 20px; } .intro h1 { font-size: 24px; line-height: 30px; } }
+
+.pos-demo { display: grid; gap: 8px; }
+.pos-demo h4 { font-size: 15px; font-weight: 600; margin: 0; }
+.pos-demo p { font-size: 14px; color: var(--color-text-secondary); margin: 0 0 4px; max-width: 75ch; }
+.pos-demo video { display: block; width: 100%; max-width: 420px; height: auto; border: 1px solid var(--color-bg-border); border-radius: 8px; background: #000; }
+footer { font-size: 13px; color: var(--color-text-secondary); border-top: 1px solid var(--color-bg-border); padding-top: 16px; }
+
+{{CSS}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <a href="/" aria-label="MerchFlow Data Flow, home"><svg class="logo" viewBox="0 0 300 64" role="img" aria-labelledby="logo-title" xmlns="http://www.w3.org/2000/svg">
+      <title id="logo-title">MerchFlow by Global Merchandising Services</title>
+      <g transform="translate(-1 4)" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 44 L10 12 L28 32 L46 12 L46 44" stroke="currentColor"/>
+        <path d="M46 44 L50 44 Q54 44 54 40 L54 32" stroke="#E8003D"/>
+        <circle cx="54" cy="28" r="4" fill="#E8003D" stroke="none"/>
+      </g>
+      <text x="66" y="36" font-family="Inter, system-ui, sans-serif" font-size="30" font-weight="700" letter-spacing="-0.6" fill="currentColor">Merch<tspan fill="#E8003D">Flow</tspan></text>
+      <text x="67" y="53" font-family="Inter, system-ui, sans-serif" font-size="10.5" font-weight="500" fill="currentColor" fill-opacity="0.7">by Global Merchandising Services</text>
+    </svg></a>
+    <nav class="apps" aria-label="MerchFlow apps">
+      <a href="https://gms-inventory-tracker.vercel.app" title="Tours, documents, inventory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Tracker</a>
+      <a href="https://merch-flow-charts.vercel.app" title="Sales chart reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>Charts</a>
+      <a href="https://gms-inventory-tracker.vercel.app/pos" title="iPad point of sale"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M12 18h.01"/></svg>POS</a>
+      <a href="/" aria-current="page" title="How the data moves"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Data Flow</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="intro">
+    <h1>Tour data flow: current process and options</h1>
+    <p>How tour data moves today, and two options for reducing manual entry. In both options, AI extracts fields from documents; validation and posting follow GMS business rules, with a review step for flagged items.</p>
+  </div>
+
+  {{TILES}}
+
+  <section class="views" aria-labelledby="views-heading">
+    <h2 id="views-heading" class="sr-only">Data flow views</h2>
+    {{LEGEND}}
+    <div>
+      <div role="tablist" aria-label="Data flow views" class="mfd-tabs">
+{{TABS}}
+      </div>
+{{PANELS}}
+    </div>
+  </section>
+
+  <aside class="mfd-ai mfd-s-ai" aria-labelledby="ai-heading">
+    <h3 id="ai-heading"><span class="mfd-marker" aria-hidden="true">AI</span>Role of AI</h3>
+    <p>{{AI}}</p>
+  </aside>
+
+  <footer>Systems: Inventory Tracker, MerchFlow Charts, MerchFlow iPad app, document parser. Shared database: Supabase.</footer>
+</main>
+
+<template id="pos-demo">
+  <div class="pos-demo">
+    <h4>MerchFlow POS demo</h4>
+    <p>A recorded walkthrough of the iPad app: setup, vendor and admin PINs, a sale at the table, and the show settlement calculated from the sales.</p>
+    <video controls muted playsinline preload="metadata" src="pos-demo.mp4">
+      <a href="pos-demo.mp4">Download the MerchFlow POS demo video</a>
+    </video>
+  </div>
+</template>
+
+<script>
+(function () {
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.mfd-tabs [role="tab"]'));
+  var ids = tabs.map(function (t) { return t.getAttribute('data-view'); });
+
+  // The POS demo belongs at the end of Option B.
+  var demo = document.getElementById('pos-demo');
+  var panelB = document.getElementById('mfd-panel-option-b');
+  if (demo && panelB) panelB.appendChild(demo.content.cloneNode(true));
+
+  function select(id, focus) {
+    if (ids.indexOf(id) === -1) id = ids[0];
+    tabs.forEach(function (tab) {
+      var on = tab.getAttribute('data-view') === id;
+      tab.setAttribute('aria-selected', on ? 'true' : 'false');
+      tab.tabIndex = on ? 0 : -1;
+      document.getElementById(tab.getAttribute('aria-controls')).hidden = !on;
+      if (on && focus) tab.focus();
+    });
+  }
+
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () {
+      var id = tab.getAttribute('data-view');
+      history.replaceState(null, '', '#' + id);
+      select(id);
+    });
+    tab.addEventListener('keydown', function (e) {
+      var next = e.key === 'ArrowRight' ? (i + 1) % tabs.length
+        : e.key === 'ArrowLeft' ? (i - 1 + tabs.length) % tabs.length
+        : e.key === 'Home' ? 0
+        : e.key === 'End' ? tabs.length - 1 : -1;
+      if (next < 0) return;
+      e.preventDefault();
+      var id = ids[next];
+      history.replaceState(null, '', '#' + id);
+      select(id, true);
+    });
+  });
+
+  window.addEventListener('hashchange', function () { select(location.hash.slice(1)); });
+  select(location.hash.slice(1));
+})();
+</script>
+</body>
+</html>
