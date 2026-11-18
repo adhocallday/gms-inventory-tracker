@@ -82,31 +82,33 @@ export default function ReviewFormPackingList({
     <div className="space-y-6">
       {/* Packing List Header Fields */}
       <div className="g-panel space-y-4">
-        <h3 className="text-lg font-semibold g-title">Packing List Details</h3>
+        <h3 className="text-lg font-semibold">Packing list details</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Delivery Number */}
           <div>
-            <label className="g-label block mb-1">
-              Delivery Number <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-delivery-number" className="g-label block mb-1">
+              Delivery number <span className="text-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id="review-delivery-number"
               type="text"
               className="g-input"
               value={data.delivery_number || ''}
               onChange={(e) => handleFieldChange('delivery_number', e.target.value)}
-              placeholder="Delivery Number"
+              placeholder="Delivery number"
               disabled={readOnly}
             />
           </div>
 
           {/* PO Number */}
           <div>
-            <label className="g-label block mb-1">
-              PO Number <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-po-number" className="g-label block mb-1">
+              PO number <span className="text-danger" aria-hidden="true">*</span>
             </label>
             {tourId && purchaseOrders.length > 0 ? (
               <select
+                id="review-po-number"
                 className="g-input"
                 value={data.po_number || ''}
                 onChange={(e) => handleFieldChange('po_number', e.target.value)}
@@ -127,12 +129,12 @@ export default function ReviewFormPackingList({
                 className="g-input"
                 value={data.po_number || ''}
                 onChange={(e) => handleFieldChange('po_number', e.target.value)}
-                placeholder="PO Number"
+                placeholder="PO number"
                 disabled={readOnly}
               />
             )}
             {!tourId && (
-              <p className="text-xs text-yellow-400 mt-1">
+              <p className="text-xs text-warn mt-1">
                 Select a tour above to choose from existing POs
               </p>
             )}
@@ -140,10 +142,11 @@ export default function ReviewFormPackingList({
 
           {/* Received Date */}
           <div>
-            <label className="g-label block mb-1">
-              Received Date <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-received-date" className="g-label block mb-1">
+              Received date <span className="text-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id="review-received-date"
               type="date"
               className="g-input"
               value={data.received_date || ''}
@@ -154,10 +157,11 @@ export default function ReviewFormPackingList({
 
           {/* Received Location */}
           <div>
-            <label className="g-label block mb-1">
-              Received Location <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-received-location" className="g-label block mb-1">
+              Received location <span className="text-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id="review-received-location"
               type="text"
               className="g-input"
               value={data.received_location || ''}
@@ -169,10 +173,11 @@ export default function ReviewFormPackingList({
 
           {/* Received By */}
           <div className="md:col-span-2">
-            <label className="g-label block mb-1">
-              Received By <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-received-by" className="g-label block mb-1">
+              Received by <span className="text-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id="review-received-by"
               type="text"
               className="g-input"
               value={data.received_by || ''}
@@ -196,7 +201,7 @@ export default function ReviewFormPackingList({
 
       {readOnly && (
         <div className="g-panel">
-          <h3 className="text-lg font-semibold g-title mb-4">Line Items</h3>
+          <h3 className="text-lg font-semibold mb-4">Line items</h3>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm g-table">
               <thead>
@@ -204,7 +209,7 @@ export default function ReviewFormPackingList({
                   <th className="text-left py-2 pr-2">SKU</th>
                   <th className="text-left py-2 pr-2">Description</th>
                   <th className="text-left py-2 pr-2">Size</th>
-                  <th className="text-right py-2 pr-2">Qty Received</th>
+                  <th className="text-right py-2 pr-2">Qty received</th>
                 </tr>
               </thead>
               <tbody>

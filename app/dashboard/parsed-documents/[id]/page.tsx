@@ -208,9 +208,9 @@ export default function ReviewDocumentPage({
 
   if (loading) {
     return (
-      <div className="g-container py-12">
+      <div className="g-container py-12" role="status">
         <div className="text-center text-[var(--color-text-secondary)]">
-          Loading document...
+          Loading the document…
         </div>
       </div>
     );
@@ -224,7 +224,7 @@ export default function ReviewDocumentPage({
   const isRejected = document.status === 'rejected';
 
   return (
-    <div className="g-container py-12">
+    <div className="g-container py-6">
       <DocumentReviewHeader
         docType={document.doc_type}
         status={document.status}
@@ -312,9 +312,14 @@ export default function ReviewDocumentPage({
 
       {/* Actions */}
       {!isPosted && !isRejected && (
-        <div data-tour="review-actions" className="flex items-center justify-between pt-6 border-t border-[var(--color-bg-border)]">
-          <div className="text-sm text-[var(--color-text-secondary)]">{statusMessage}</div>
-          <div className="flex gap-3">
+        <div data-tour="review-actions" className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-6 mt-6 border-t border-[var(--color-bg-border)]">
+          <div className="text-sm text-[var(--color-text-secondary)]" role="status">
+            {statusMessage ||
+              ((document.validation?.missing_fields?.length || 0) > 0
+                ? 'Fill the required fields above before posting.'
+                : 'Posting writes these figures to the tour. It cannot be undone here.')}
+          </div>
+          <div className="flex flex-wrap gap-3">
             <button
               type="button"
               onClick={handleReject}
@@ -329,7 +334,7 @@ export default function ReviewDocumentPage({
               disabled={saving || posting}
               className="g-button g-button-outline"
             >
-              {saving ? 'Saving...' : 'Save Draft'}
+              {saving ? 'Saving…' : 'Save draft'}
             </button>
             <button
               type="button"
@@ -337,24 +342,24 @@ export default function ReviewDocumentPage({
               disabled={saving || posting || (document.validation?.missing_fields?.length || 0) > 0}
               className="g-button"
             >
-              {posting ? 'Posting...' : 'Approve & Post'}
+              {posting ? 'Posting…' : 'Approve and post'}
             </button>
           </div>
         </div>
       )}
 
       {isPosted && (
-        <div data-tour="review-actions" className="g-card p-6 bg-green-500/10 border-green-500/30">
-          <p className="text-sm text-green-300">
-            <CheckIcon className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> This document has been posted to the database and cannot be edited.
+        <div data-tour="review-actions" className="mt-6 rounded-lg border p-4 bg-success-bg border-success-border">
+          <p className="text-sm text-success">
+            <CheckIcon className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Posted. These figures are in the tour and the draft can no longer be edited.
           </p>
         </div>
       )}
 
       {isRejected && (
-        <div data-tour="review-actions" className="g-card p-6 bg-red-500/10 border-red-500/30">
-          <p className="text-sm text-red-300">
-            <X className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> This document has been rejected.
+        <div data-tour="review-actions" className="mt-6 rounded-lg border p-4 bg-danger-bg border-danger-border">
+          <p className="text-sm text-danger">
+            <X className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Rejected. Nothing from this document was posted.
           </p>
         </div>
       )}

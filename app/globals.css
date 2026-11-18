@@ -314,6 +314,61 @@ a {
   }
 }
 
+/*
+ * Plain-class buttons and tables, used by pages that do not import
+ * components/ui/Button. In @layer components so utilities can override.
+ */
+@layer components {
+  .g-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.25rem;
+    padding: 0.375rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--color-red-primary);
+    background: var(--color-red-primary);
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: background-color var(--g-ease), border-color var(--g-ease);
+  }
+  .g-button:hover:not(:disabled) {
+    background: var(--color-red-hover);
+    border-color: var(--color-red-hover);
+  }
+  .g-button:active:not(:disabled) {
+    background: var(--color-red-active);
+  }
+  .g-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .g-button.g-button-outline {
+    background: var(--color-bg-surface);
+    border-color: var(--color-bg-border);
+    color: var(--color-text-primary);
+  }
+  .g-button.g-button-outline:hover:not(:disabled) {
+    background: var(--color-bg-elevated);
+    border-color: var(--color-bg-border);
+  }
+  .g-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+  .g-table th {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+  .g-table td {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
 /* Form inputs */
 .g-input {
   background: var(--color-bg-elevated);

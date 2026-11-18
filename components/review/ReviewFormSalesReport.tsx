@@ -69,15 +69,16 @@ export default function ReviewFormSalesReport({
     <div className="space-y-6">
       {/* Sales Report Header Fields */}
       <div className="g-panel space-y-4">
-        <h3 className="text-lg font-semibold g-title">Sales Report Details</h3>
+        <h3 className="text-lg font-semibold">Sales report details</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Show Date */}
           <div>
-            <label className="g-label block mb-1">
-              Show Date <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-show-date" className="g-label block mb-1">
+              Show date <span className="text-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id="review-show-date"
               type="date"
               className="g-input"
               value={data.show_date || ''}
@@ -88,23 +89,25 @@ export default function ReviewFormSalesReport({
 
           {/* Venue Name */}
           <div>
-            <label className="g-label block mb-1">
-              Venue Name <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-venue-name" className="g-label block mb-1">
+              Venue name <span className="text-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id="review-venue-name"
               type="text"
               className="g-input"
               value={data.venue_name || ''}
               onChange={(e) => handleFieldChange('venue_name', e.target.value)}
-              placeholder="Venue Name"
+              placeholder="Venue name"
               disabled={readOnly}
             />
           </div>
 
           {/* City */}
           <div>
-            <label className="g-label block mb-1">City</label>
+            <label htmlFor="review-city" className="g-label block mb-1">City</label>
             <input
+              id="review-city"
               type="text"
               className="g-input"
               value={data.city || ''}
@@ -116,8 +119,9 @@ export default function ReviewFormSalesReport({
 
           {/* State */}
           <div>
-            <label className="g-label block mb-1">State</label>
+            <label htmlFor="review-state" className="g-label block mb-1">State</label>
             <input
+              id="review-state"
               type="text"
               className="g-input"
               value={data.state || ''}
@@ -130,8 +134,9 @@ export default function ReviewFormSalesReport({
 
           {/* Attendance */}
           <div>
-            <label className="g-label block mb-1">Attendance</label>
+            <label htmlFor="review-attendance" className="g-label block mb-1">Attendance</label>
             <input
+              id="review-attendance"
               type="number"
               className="g-input"
               value={data.attendance || ''}
@@ -143,28 +148,28 @@ export default function ReviewFormSalesReport({
 
           {/* Per Head (Calculated) */}
           <div>
-            <label className="g-label block mb-1">Per Head</label>
-            <div className="g-input bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] cursor-not-allowed">
+            <p className="g-label block mb-1">Per head</p>
+            <div className="g-input bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] cursor-default tabular-nums" aria-readonly="true">
               {formatPerHead()}
             </div>
           </div>
 
           {/* Total Gross (Calculated vs Reported) */}
           <div className="md:col-span-2">
-            <label className="g-label block mb-1">Total Gross Sales</label>
+            <p className="g-label block mb-1">Total gross sales</p>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-xs text-[var(--color-text-muted)] mb-1">Calculated (Line Items)</p>
-                <div className={`g-input ${grossMismatch ? 'bg-yellow-500/10 border-yellow-500/30' : 'bg-[var(--color-bg-elevated)]'} text-[var(--color-text-secondary)] cursor-not-allowed`}>
+                <p className="text-xs text-[var(--color-text-secondary)] mb-1">Calculated from line items</p>
+                <div className={`g-input ${grossMismatch ? 'bg-warn-bg border-warn-border' : 'bg-[var(--color-bg-elevated)]'} text-[var(--color-text-secondary)] cursor-not-allowed`}>
                   {formatCurrency(calculatedGross)}
                 </div>
               </div>
               <div>
-                <p className="text-xs text-[var(--color-text-muted)] mb-1">Reported</p>
+                <p className="text-xs text-[var(--color-text-secondary)] mb-1">Reported</p>
                 <input
                   type="number"
                   step="0.01"
-                  className={`g-input ${grossMismatch ? 'border-yellow-500/30' : ''}`}
+                  className={`g-input ${grossMismatch ? 'border-warn-border' : ''}`}
                   value={data.total_gross || ''}
                   onChange={(e) => handleFieldChange('total_gross', parseFloat(e.target.value) || 0)}
                   disabled={readOnly}
@@ -172,7 +177,7 @@ export default function ReviewFormSalesReport({
               </div>
             </div>
             {grossMismatch && (
-              <p className="text-xs text-yellow-400 mt-2">
+              <p className="text-xs text-warn mt-2">
                 <AlertTriangle className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Warning: Calculated total ({formatCurrency(calculatedGross)}) differs from reported total ({formatCurrency(reportedGross)}) by {formatCurrency(Math.abs(calculatedGross - reportedGross))}
               </p>
             )}
@@ -192,7 +197,7 @@ export default function ReviewFormSalesReport({
 
       {readOnly && (
         <div className="g-panel">
-          <h3 className="text-lg font-semibold g-title mb-4">Line Items</h3>
+          <h3 className="text-lg font-semibold mb-4">Line items</h3>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm g-table">
               <thead>
@@ -200,9 +205,9 @@ export default function ReviewFormSalesReport({
                   <th className="text-left py-2 pr-2">SKU</th>
                   <th className="text-left py-2 pr-2">Description</th>
                   <th className="text-left py-2 pr-2">Size</th>
-                  <th className="text-right py-2 pr-2">Qty Sold</th>
-                  <th className="text-right py-2 pr-2">Unit Price</th>
-                  <th className="text-right py-2 pr-2">Gross Sales</th>
+                  <th className="text-right py-2 pr-2">Qty sold</th>
+                  <th className="text-right py-2 pr-2">Unit price</th>
+                  <th className="text-right py-2 pr-2">Gross sales</th>
                 </tr>
               </thead>
               <tbody>

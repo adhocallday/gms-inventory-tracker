@@ -2,16 +2,19 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
+import { Button, buttonVariants } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ArrowLeft, ArrowRight, FileText, Search, SortAsc, X } from 'lucide-react';
 import { useFuzzySearch } from '@/hooks/useFuzzySearch';
 import { cn } from '@/lib/utils';
+
+const FILTER_BUTTON = 'px-3 py-1.5 text-sm font-medium rounded-md border transition-colors';
+const FILTER_ON = 'bg-[var(--color-text-primary)] text-[var(--color-bg-surface)] border-[var(--color-text-primary)]';
+const FILTER_OFF =
+  'bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)]';
 
 interface Tour {
   id: string;
@@ -42,10 +45,10 @@ interface ParsedDocument {
 }
 
 const DOC_TYPE_OPTIONS = [
-  { value: 'all', label: 'All Types' },
+  { value: 'all', label: 'All types' },
   { value: 'po', label: 'PO' },
-  { value: 'packing-list', label: 'Packing List' },
-  { value: 'sales-report', label: 'Sales Report' },
+  { value: 'packing-list', label: 'Packing list' },
+  { value: 'sales-report', label: 'Sales report' },
   { value: 'settlement', label: 'Settlement' },
 ];
 
@@ -59,22 +62,21 @@ const STATUS_OPTIONS = [
 ];
 
 const SORT_OPTIONS = [
-  { value: 'newest', label: 'Newest First' },
-  { value: 'oldest', label: 'Oldest First' },
-  { value: 'updated', label: 'Recently Updated' },
-  { value: 'type', label: 'By Type' },
-  { value: 'status', label: 'By Status' },
+  { value: 'newest', label: 'Newest first' },
+  { value: 'oldest', label: 'Oldest first' },
+  { value: 'updated', label: 'Recently updated' },
+  { value: 'type', label: 'By type' },
+  { value: 'status', label: 'By status' },
 ];
 
 const DOC_TYPE_LABELS: Record<string, string> = {
-  po: 'Purchase Order',
-  'packing-list': 'Packing List',
-  'sales-report': 'Sales Report',
+  po: 'Purchase order',
+  'packing-list': 'Packing list',
+  'sales-report': 'Sales report',
   settlement: 'Settlement',
 };
 
 export default function ParsedDocumentsPage() {
-  const router = useRouter();
   const [documents, setDocuments] = useState<ParsedDocument[]>([]);
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
@@ -244,33 +246,34 @@ export default function ParsedDocumentsPage() {
     });
   };
 
-  const breadcrumbs = generateBreadcrumbs([
-    { label: 'Dashboard', href: '/' },
-    { label: 'Parsed Documents' },
-  ]);
-
   return (
-    <div className="g-container py-12">
+    <div className="g-container py-6">
       <PageHeader
-        title="Parsed Documents"
-        subtitle="Review and manage AI-parsed documents before posting"
-        kicker="Document Review"
-        breadcrumbs={breadcrumbs}
+        title="Documents"
+        subtitle="Every PDF Claude has read. Drafts wait here until someone checks them against the source and posts them."
+        actions={
+          <Link href="/upload" className={buttonVariants()}>
+            Upload document
+          </Link>
+        }
       />
 
       {/* Search Bar */}
-      <div className="mb-6">
+      <div className="mt-6 mb-4">
         <div className="relative max-w-xl">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-muted)]" />
           <input
             type="text"
             className="w-full pl-10 pr-10 py-2.5 bg-[var(--color-bg-elevated)] border border-[var(--color-bg-border)] rounded-lg text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
-            placeholder="Search by filename, tour name, venue..."
+            placeholder="Search by file name, tour or venue"
+            aria-label="Search documents"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           {search && (
             <button
+              type="button"
+              aria-label="Clear search"
               onClick={() => setSearch('')}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition"
             >
@@ -281,36 +284,26 @@ export default function ParsedDocumentsPage() {
       </div>
 
       {/* Filter Tabs Row */}
-      <div data-tour="docs-filters" className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+      <div data-tour="docs-filters" className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-3">
         {/* Document Type Tabs */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Document type">
           {DOC_TYPE_OPTIONS.map((option) => {
             const isActive = docTypeFilter === option.value;
             const count = typeCounts[option.value];
             return (
               <button
                 key={option.value}
+                type="button"
+                aria-pressed={isActive}
                 onClick={() => {
                   setDocTypeFilter(option.value);
                   setOffset(0);
                 }}
-                className={cn(
-                  'px-3 py-1.5 text-sm font-medium rounded-lg transition-all border',
-                  isActive
-                    ? 'bg-[var(--color-red-primary)] text-white border-[var(--color-red-primary)]'
-                    : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)] hover:bg-[var(--color-bg-border)] hover:text-[var(--color-text-primary)]'
-                )}
+                className={cn(FILTER_BUTTON, isActive ? FILTER_ON : FILTER_OFF)}
               >
                 {option.label}
                 {count !== undefined && option.value !== 'all' && docTypeFilter === 'all' && (
-                  <span
-                    className={cn(
-                      'ml-2 px-1.5 py-0.5 text-xs rounded',
-                      isActive ? 'bg-[var(--color-bg-surface)]/20' : 'bg-[var(--color-bg-border)]'
-                    )}
-                  >
-                    {count}
-                  </span>
+                  <span className="ml-2 text-xs tabular-nums opacity-80">{count}</span>
                 )}
               </button>
             );
@@ -321,9 +314,10 @@ export default function ParsedDocumentsPage() {
         <div className="flex items-center gap-3">
           {/* Sort Dropdown */}
           <div className="flex items-center gap-2">
-            <SortAsc className="w-4 h-4 text-[var(--color-text-muted)]" />
+            <SortAsc className="w-4 h-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
             <select
-              className="bg-[var(--color-bg-elevated)] border border-[var(--color-bg-border)] rounded-lg px-3 py-1.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
+              aria-label="Sort documents"
+              className="g-input py-1.5"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >
@@ -338,8 +332,9 @@ export default function ParsedDocumentsPage() {
           {/* Clear Filters */}
           {hasActiveFilters && (
             <button
+              type="button"
               onClick={clearAllFilters}
-              className="text-sm text-[var(--color-red-primary)] hover:underline flex items-center gap-1"
+              className="text-sm font-medium text-[var(--color-red-text)] hover:underline flex items-center gap-1"
             >
               <X className="w-3 h-3" />
               Clear filters
@@ -349,34 +344,24 @@ export default function ParsedDocumentsPage() {
       </div>
 
       {/* Status Tabs Row */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-3" role="group" aria-label="Status">
         {STATUS_OPTIONS.map((option) => {
           const isActive = statusFilter === option.value;
           const count = statusCounts[option.value];
           return (
             <button
               key={option.value}
+              type="button"
+              aria-pressed={isActive}
               onClick={() => {
                 setStatusFilter(option.value);
                 setOffset(0);
               }}
-              className={cn(
-                'px-3 py-1.5 text-sm font-medium rounded-lg transition-all border',
-                isActive
-                  ? 'bg-[var(--color-bg-border)] text-[var(--color-text-primary)] border-[var(--color-bg-border)]'
-                  : 'bg-[var(--color-bg-surface)] text-[var(--color-text-muted)] border-[var(--color-bg-border)] hover:bg-[var(--color-bg-elevated)] hover:text-[var(--color-text-secondary)]'
-              )}
+              className={cn(FILTER_BUTTON, isActive ? FILTER_ON : FILTER_OFF)}
             >
               {option.label}
               {count !== undefined && option.value !== 'all' && statusFilter === 'all' && (
-                <span
-                  className={cn(
-                    'ml-2 px-1.5 py-0.5 text-xs rounded',
-                    isActive ? 'bg-[var(--color-bg-elevated)]' : 'bg-[var(--color-bg-border)]'
-                  )}
-                >
-                  {count}
-                </span>
+                <span className="ml-2 text-xs tabular-nums opacity-80">{count}</span>
               )}
             </button>
           );
@@ -387,7 +372,8 @@ export default function ParsedDocumentsPage() {
       {tours.length > 0 && (
         <div className="mb-6">
           <select
-            className="bg-[var(--color-bg-elevated)] border border-[var(--color-bg-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
+            aria-label="Tour"
+            className="g-input"
             value={tourFilter}
             onChange={(e) => {
               setTourFilter(e.target.value);
@@ -407,7 +393,7 @@ export default function ParsedDocumentsPage() {
       {/* Results Count */}
       <div className="mb-4 text-sm text-[var(--color-text-secondary)]">
         {loading ? (
-          'Loading...'
+          'Loading documents…'
         ) : (
           <>
             Found {sortedDocuments.length} document{sortedDocuments.length !== 1 ? 's' : ''}
@@ -434,68 +420,61 @@ export default function ParsedDocumentsPage() {
       ) : sortedDocuments.length === 0 ? (
         <EmptyState
           icon={<FileText className="w-12 h-12 text-[var(--color-text-muted)]" />}
-          title="No documents found"
+          title={hasActiveFilters ? 'No documents match' : 'No documents yet'}
           description={
             hasActiveFilters
-              ? 'Try adjusting your filters or search term'
-              : 'Upload a PDF to get started'
+              ? 'Nothing matches this search and these filters.'
+              : 'Upload a purchase order, packing list, sales report or settlement and it appears here as a draft.'
           }
           action={
             hasActiveFilters
-              ? { label: 'Clear All Filters', onClick: clearAllFilters }
+              ? { label: 'Clear filters', onClick: clearAllFilters }
               : undefined
           }
         />
       ) : (
         <div className="space-y-3" data-tour="docs-list">
           {sortedDocuments.map((doc) => (
-            <div
+            <Link
               key={doc.id}
-              className="g-card p-4 hover:border-[var(--color-red-primary)] transition cursor-pointer"
-              onClick={() => router.push(`/dashboard/parsed-documents/${doc.id}`)}
+              href={`/dashboard/parsed-documents/${doc.id}`}
+              className="group block g-card p-4 transition-colors hover:border-[var(--color-text-muted)]"
             >
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-                {/* Left Section: Type, Filename, Tour/Show */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="g-kicker text-xs">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-xs font-medium text-[var(--color-text-secondary)]">
                       {DOC_TYPE_LABELS[doc.doc_type] || doc.doc_type}
                     </span>
-                    <Badge variant={doc.status}>{doc.status}</Badge>
+                    <Badge variant={doc.status} size="sm">{doc.status}</Badge>
                   </div>
-                  <p className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">
-                    {doc.source_filename || 'Untitled Document'}
+                  <p className="text-sm font-semibold text-[var(--color-text-primary)] mb-1 break-all">
+                    {doc.source_filename || 'Untitled document'}
                   </p>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--color-text-secondary)]">
                     {doc.tours && <span>Tour: {doc.tours.name}</span>}
                     {doc.shows && (
                       <span>
-                        Show: {doc.shows.venue_name} ({doc.shows.city}, {doc.shows.state})
+                        Show: {doc.shows.venue_name}
+                        {doc.shows.city ? ` (${[doc.shows.city, doc.shows.state].filter(Boolean).join(', ')})` : ''}
                       </span>
                     )}
                     {!doc.tours && !doc.shows && (
-                      <span className="text-[var(--color-status-warning)]">Not assigned to tour/show</span>
+                      <span className="font-medium text-warn">Not assigned to a tour or show</span>
                     )}
                   </div>
                 </div>
 
-                {/* Right Section: Date, Actions */}
                 <div className="flex items-center gap-4">
-                  <div className="text-xs text-[var(--color-text-muted)]">
+                  <div className="text-xs text-[var(--color-text-secondary)] tabular-nums">
                     {formatDate(doc.created_at)}
                   </div>
-                  <Button
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/dashboard/parsed-documents/${doc.id}`);
-                    }}
-                  >
-                    Review
-                  </Button>
+                  <span className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'group-hover:bg-[var(--color-bg-elevated)]')}>
+                    {doc.status === 'draft' || doc.status === 'error' ? 'Review' : 'Open'}
+                  </span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

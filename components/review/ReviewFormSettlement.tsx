@@ -66,14 +66,15 @@ export default function ReviewFormSettlement({
   return (
     <div className="space-y-6">
       <div className="g-panel space-y-4">
-        <h3 className="text-lg font-semibold g-title">Settlement Details</h3>
+        <h3 className="text-lg font-semibold">Settlement details</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="g-label block mb-1">
-              Show Date <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-show-date" className="g-label block mb-1">
+              Show date <span className="text-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id="review-show-date"
               type="date"
               className="g-input"
               value={data.show_date || ''}
@@ -83,24 +84,26 @@ export default function ReviewFormSettlement({
           </div>
 
           <div>
-            <label className="g-label block mb-1">
-              Venue Name <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-venue-name" className="g-label block mb-1">
+              Venue name <span className="text-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id="review-venue-name"
               type="text"
               className="g-input"
               value={data.venue_name || ''}
               onChange={(e) => handleFieldChange('venue_name', e.target.value)}
-              placeholder="Venue Name"
+              placeholder="Venue name"
               disabled={readOnly}
             />
           </div>
 
           <div>
-            <label className="g-label block mb-1">
-              Gross Sales Total <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-gross-sales-total" className="g-label block mb-1">
+              Gross sales total <span className="text-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id="review-gross-sales-total"
               type="number"
               step="0.01"
               className="g-input"
@@ -113,10 +116,11 @@ export default function ReviewFormSettlement({
           </div>
 
           <div>
-            <label className="g-label block mb-1">
-              Sales Tax Total <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-sales-tax-total" className="g-label block mb-1">
+              Sales tax total <span className="text-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id="review-sales-tax-total"
               type="number"
               step="0.01"
               className="g-input"
@@ -129,10 +133,11 @@ export default function ReviewFormSettlement({
           </div>
 
           <div>
-            <label className="g-label block mb-1">
-              Credit Card Fees <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-credit-card-fees" className="g-label block mb-1">
+              Credit card fees <span className="text-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id="review-credit-card-fees"
               type="number"
               step="0.01"
               className="g-input"
@@ -145,8 +150,9 @@ export default function ReviewFormSettlement({
           </div>
 
           <div>
-            <label className="g-label block mb-1">Other Fees</label>
+            <label htmlFor="review-other-fees" className="g-label block mb-1">Other fees</label>
             <input
+              id="review-other-fees"
               type="number"
               step="0.01"
               className="g-input"
@@ -160,8 +166,9 @@ export default function ReviewFormSettlement({
           </div>
 
           <div>
-            <label className="g-label block mb-1">Refunds</label>
+            <label htmlFor="review-refunds" className="g-label block mb-1">Refunds</label>
             <input
+              id="review-refunds"
               type="number"
               step="0.01"
               className="g-input"
@@ -173,46 +180,46 @@ export default function ReviewFormSettlement({
           </div>
 
           <div>
-            <label className="g-label block mb-1">Net Settlement Amount</label>
-            <div className="g-input bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] cursor-not-allowed">
+            <p className="g-label block mb-1">Net settlement</p>
+            <div className="g-input bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] cursor-default tabular-nums" aria-readonly="true">
               {formatCurrency(netSettlement)}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="g-card p-4 bg-[var(--color-bg-elevated)]">
+      <div className="rounded-lg border border-[var(--color-bg-border)] p-4 bg-[var(--color-bg-elevated)]">
         <h4 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3">
-          Settlement Calculation
+          Settlement calculation
         </h4>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-[var(--color-text-muted)]">Gross Sales:</span>
-            <span className="text-[var(--color-text-primary)]">{formatCurrency(data.gross_sales_total || 0)}</span>
+            <span className="text-[var(--color-text-secondary)]">Gross sales:</span>
+            <span className="text-[var(--color-text-primary)] tabular-nums">{formatCurrency(data.gross_sales_total || 0)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-[var(--color-text-muted)]">- Sales Tax:</span>
-            <span className="text-red-300">-{formatCurrency(data.sales_tax_total || 0)}</span>
+            <span className="text-[var(--color-text-secondary)]">− Sales tax:</span>
+            <span className="text-[var(--color-text-primary)] tabular-nums">−{formatCurrency(data.sales_tax_total || 0)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-[var(--color-text-muted)]">- Credit Card Fees:</span>
-            <span className="text-red-300">-{formatCurrency(data.credit_card_fees || 0)}</span>
+            <span className="text-[var(--color-text-secondary)]">− Card fees:</span>
+            <span className="text-[var(--color-text-primary)] tabular-nums">−{formatCurrency(data.credit_card_fees || 0)}</span>
           </div>
           {(data.other_fees || 0) > 0 && (
             <div className="flex justify-between">
-              <span className="text-[var(--color-text-muted)]">- Other Fees:</span>
-              <span className="text-red-300">-{formatCurrency(data.other_fees || 0)}</span>
+              <span className="text-[var(--color-text-secondary)]">− Other fees:</span>
+              <span className="text-[var(--color-text-primary)] tabular-nums">−{formatCurrency(data.other_fees || 0)}</span>
             </div>
           )}
           {(data.refunds || 0) > 0 && (
             <div className="flex justify-between">
-              <span className="text-[var(--color-text-muted)]">- Refunds:</span>
-              <span className="text-red-300">-{formatCurrency(data.refunds || 0)}</span>
+              <span className="text-[var(--color-text-secondary)]">− Refunds:</span>
+              <span className="text-[var(--color-text-primary)] tabular-nums">−{formatCurrency(data.refunds || 0)}</span>
             </div>
           )}
           <div className="border-t border-[var(--color-bg-border)] pt-2 mt-2 flex justify-between font-semibold">
-            <span className="text-[var(--color-text-primary)]">Net Settlement:</span>
-            <span className={netSettlement >= 0 ? 'text-green-300' : 'text-red-300'}>
+            <span className="text-[var(--color-text-primary)]">Net settlement:</span>
+            <span className={netSettlement >= 0 ? 'text-[var(--color-text-primary)] tabular-nums' : 'text-danger tabular-nums'}>
               {formatCurrency(netSettlement)}
             </span>
           </div>
@@ -230,14 +237,14 @@ export default function ReviewFormSettlement({
 
       {readOnly && (
         <div className="g-panel">
-          <h3 className="text-lg font-semibold g-title mb-4">Comps</h3>
+          <h3 className="text-lg font-semibold mb-4">Comps</h3>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm g-table">
               <thead>
                 <tr className="border-b border-[var(--color-bg-border)]">
                   <th className="text-left py-2 pr-2">Category</th>
                   <th className="text-left py-2 pr-2">Source</th>
-                  <th className="text-left py-2 pr-2">Comp Type</th>
+                  <th className="text-left py-2 pr-2">Comp type</th>
                   <th className="text-left py-2 pr-2">SKU</th>
                   <th className="text-left py-2 pr-2">Description</th>
                   <th className="text-left py-2 pr-2">Size</th>

@@ -99,10 +99,10 @@ export default function TourShowSelector({
   return (
     <div className="g-panel space-y-4">
       <div>
-        <h3 className="text-lg font-semibold g-title mb-4">
-          Tour & Show Assignment
+        <h3 className="text-lg font-semibold mb-4">
+          Tour and show
         </h3>
-        <p className="text-sm text-[var(--color-text-muted)] mb-4">
+        <p className="text-sm text-[var(--color-text-secondary)] mb-4">
           {requiresShow
             ? 'Select the tour and show this document belongs to.'
             : 'Select the tour this document belongs to.'}
@@ -112,10 +112,11 @@ export default function TourShowSelector({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Tour Selection */}
         <div>
-          <label className="g-label block mb-1">
-            Tour <span className="text-[var(--color-red-primary)]">*</span>
+          <label htmlFor="review-tour" className="g-label block mb-1">
+            Tour <span className="text-danger" aria-hidden="true">*</span>
           </label>
           <select
+            id="review-tour"
             className="g-input"
             value={selectedTourId}
             onChange={(e) => handleTourChange(e.target.value)}
@@ -133,10 +134,11 @@ export default function TourShowSelector({
         {/* Show Selection (only for sales-report and settlement) */}
         {requiresShow && (
           <div>
-            <label className="g-label block mb-1">
-              Show {requiresShow && <span className="text-[var(--color-red-primary)]">*</span>}
+            <label htmlFor="review-show" className="g-label block mb-1">
+              Show {requiresShow && <span className="text-danger" aria-hidden="true">*</span>}
             </label>
             <select
+              id="review-show"
               className="g-input"
               value={selectedShowId}
               onChange={(e) => handleShowChange(e.target.value)}

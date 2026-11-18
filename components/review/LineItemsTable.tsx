@@ -132,10 +132,10 @@ export default function LineItemsTable({
   return (
     <div className="g-panel space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold g-title">Line Items</h3>
+        <h3 className="text-lg font-semibold">Line items</h3>
         <button
           type="button"
-          className="g-button text-sm px-3 py-2"
+          className="g-button g-button-outline text-sm px-3 py-1.5"
           onClick={addLineItem}
         >
           + Add Row
@@ -150,7 +150,7 @@ export default function LineItemsTable({
                 <>
                   <th className="text-left py-2 pr-2">Category</th>
                   <th className="text-left py-2 pr-2">Source</th>
-                  <th className="text-left py-2 pr-2">Comp Type</th>
+                  <th className="text-left py-2 pr-2">Comp type</th>
                 </>
               )}
               <th className="text-left py-2 pr-2">SKU</th>
@@ -159,21 +159,21 @@ export default function LineItemsTable({
 
               {docType === 'po' && (
                 <>
-                  <th className="text-right py-2 pr-2">Qty Ordered</th>
-                  <th className="text-right py-2 pr-2">Unit Cost</th>
-                  <th className="text-right py-2 pr-2">Line Total</th>
+                  <th className="text-right py-2 pr-2">Qty ordered</th>
+                  <th className="text-right py-2 pr-2">Unit cost</th>
+                  <th className="text-right py-2 pr-2">Line total</th>
                 </>
               )}
 
               {docType === 'packing-list' && (
-                <th className="text-right py-2 pr-2">Qty Received</th>
+                <th className="text-right py-2 pr-2">Qty received</th>
               )}
 
               {docType === 'sales-report' && (
                 <>
-                  <th className="text-right py-2 pr-2">Qty Sold</th>
-                  <th className="text-right py-2 pr-2">Unit Price</th>
-                  <th className="text-right py-2 pr-2">Gross Sales</th>
+                  <th className="text-right py-2 pr-2">Qty sold</th>
+                  <th className="text-right py-2 pr-2">Unit price</th>
+                  <th className="text-right py-2 pr-2">Gross sales</th>
                 </>
               )}
 
@@ -233,7 +233,7 @@ export default function LineItemsTable({
                   <input
                     className={`w-32 g-input text-sm ${
                       isUnknownSku(item.sku)
-                        ? 'border-yellow-500 bg-yellow-500/10'
+                        ? 'border-warn-border bg-warn-bg'
                         : ''
                     }`}
                     value={item.sku}
@@ -405,8 +405,8 @@ export default function LineItemsTable({
       </div>
 
       {lineItems.length === 0 && (
-        <p className="text-center text-sm text-[var(--color-text-muted)] py-8">
-          No line items. Click "+ Add Row" to add an item.
+        <p className="text-center text-sm text-[var(--color-text-secondary)] py-8">
+          No line items. Click "Add row" to add an item.
         </p>
       )}
     </div>

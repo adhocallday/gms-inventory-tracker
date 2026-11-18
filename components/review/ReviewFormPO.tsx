@@ -60,45 +60,48 @@ export default function ReviewFormPO({
     <div className="space-y-6">
       {/* PO Header Fields */}
       <div className="g-panel space-y-4">
-        <h3 className="text-lg font-semibold g-title">Purchase Order Details</h3>
+        <h3 className="text-lg font-semibold">Purchase order details</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* PO Number */}
           <div>
-            <label className="g-label block mb-1">
-              PO Number <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-po-number" className="g-label block mb-1">
+              PO number <span className="text-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id="review-po-number"
               type="text"
               className="g-input"
               value={data.po_number || ''}
               onChange={(e) => handleFieldChange('po_number', e.target.value)}
-              placeholder="PO Number"
+              placeholder="PO number"
               disabled={readOnly}
             />
           </div>
 
           {/* Vendor */}
           <div>
-            <label className="g-label block mb-1">
-              Vendor <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-vendor" className="g-label block mb-1">
+              Vendor <span className="text-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id="review-vendor"
               type="text"
               className="g-input"
               value={data.vendor || ''}
               onChange={(e) => handleFieldChange('vendor', e.target.value)}
-              placeholder="Vendor Name"
+              placeholder="Vendor name"
               disabled={readOnly}
             />
           </div>
 
           {/* Order Date */}
           <div>
-            <label className="g-label block mb-1">
-              Order Date <span className="text-[var(--color-red-primary)]">*</span>
+            <label htmlFor="review-order-date" className="g-label block mb-1">
+              Order date <span className="text-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id="review-order-date"
               type="date"
               className="g-input"
               value={data.order_date || ''}
@@ -109,8 +112,9 @@ export default function ReviewFormPO({
 
           {/* Expected Delivery Date */}
           <div>
-            <label className="g-label block mb-1">Expected Delivery Date</label>
+            <label htmlFor="review-expected-delivery-date" className="g-label block mb-1">Expected delivery date</label>
             <input
+              id="review-expected-delivery-date"
               type="date"
               className="g-input"
               value={data.expected_delivery_date || ''}
@@ -121,8 +125,9 @@ export default function ReviewFormPO({
 
           {/* Status */}
           <div>
-            <label className="g-label block mb-1">PO Status</label>
+            <label htmlFor="review-po-status" className="g-label block mb-1">PO status</label>
             <select
+              id="review-po-status"
               className="g-input"
               value={data.status || 'open'}
               onChange={(e) => handleFieldChange('status', e.target.value)}
@@ -136,8 +141,8 @@ export default function ReviewFormPO({
 
           {/* Total Amount (Read-only) */}
           <div>
-            <label className="g-label block mb-1">Total Amount</label>
-            <div className="g-input bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] cursor-not-allowed">
+            <p className="g-label block mb-1">Total amount</p>
+            <div className="g-input bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] cursor-default tabular-nums" aria-readonly="true">
               {formatCurrency(totalAmount)}
             </div>
           </div>
@@ -156,7 +161,7 @@ export default function ReviewFormPO({
 
       {readOnly && (
         <div className="g-panel">
-          <h3 className="text-lg font-semibold g-title mb-4">Line Items</h3>
+          <h3 className="text-lg font-semibold mb-4">Line items</h3>
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm g-table">
               <thead>
@@ -164,9 +169,9 @@ export default function ReviewFormPO({
                   <th className="text-left py-2 pr-2">SKU</th>
                   <th className="text-left py-2 pr-2">Description</th>
                   <th className="text-left py-2 pr-2">Size</th>
-                  <th className="text-right py-2 pr-2">Qty Ordered</th>
-                  <th className="text-right py-2 pr-2">Unit Cost</th>
-                  <th className="text-right py-2 pr-2">Line Total</th>
+                  <th className="text-right py-2 pr-2">Qty ordered</th>
+                  <th className="text-right py-2 pr-2">Unit cost</th>
+                  <th className="text-right py-2 pr-2">Line total</th>
                 </tr>
               </thead>
               <tbody>
