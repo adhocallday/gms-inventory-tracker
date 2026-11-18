@@ -2,7 +2,7 @@ export type Category = 'Tees' | 'Hoodies & jerseys' | 'Headwear' | 'Accessories'
 
 export type Product = {
   sku: string;
-  /** Name as stored in the source (tracker Inventory tab or products.description). */
+  /** Name as it appears in the tracker's Inventory tab — the canonical one. */
   name: string;
   /** Printable name: colourway stripped, shorthand expanded. Editable. */
   displayName?: string;
@@ -10,14 +10,10 @@ export type Product = {
   unitsSold: number;
   /** Share of tour gross, as a fraction (0.146 = 14.6%). */
   shareOfGross: number;
-  /** Gross in USD, when the source stores it (the database does). */
-  grossUsd?: number;
   supplier?: string;
   unitCost?: number;
   closingStock?: number;
-  /** Units given away as comps, when the source records them. */
-  compUnits?: number;
-  /** Set once a POP file, grab sheet or product image supplies a photo. */
+  /** Set once a POP file or grab sheet supplies a photo. */
   imageKey?: string;
   /** Name from the POP file, kept for the review screen's side-by-side. */
   popName?: string;
@@ -29,22 +25,10 @@ export type Show = {
   grossUsd: number;
   grossSecondCurrency?: number;
   perHeadUsd?: number;
-  /** Attendance as stored, when the source has it. */
-  attendance?: number;
-  /** Set by flagShows(); surfaced for review, never silently corrected. */
+  /** Set by flagShows(); surfaced in the wizard, never silently corrected. */
   flag?: 'outsideRange' | 'perHeadSuspect';
   cityDisplay?: string;
   citySuggestion?: string;
-};
-
-/** The Charts app's tracker input: what a parsed tracker workbook (or the DB) yields. */
-export type TrackerData = {
-  artist: string;
-  tourDates: string;
-  products: Product[];
-  shows: Show[];
-  /** 0 when unknown. */
-  attendance: number;
 };
 
 export type ReportOptions = {

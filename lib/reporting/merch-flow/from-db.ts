@@ -1,16 +1,28 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { fetchAll } from '../../supabase/fetch-all';
-import { baseSku } from './sku';
-import { categoryOf } from './derive';
-import { buildMatchRows, buildReport, type MatchRow, type PhotoSource } from './build';
-import type { Category, Product, Show, TourReport, TrackerData } from './types';
+import { baseSku } from '@/lib/merch-flow-report/normalize/sku';
+import { gms } from '@/lib/merch-flow-report/brand/tokens';
+import type { TrackerData } from '@/lib/merch-flow-report/parse/tracker';
+import type { PopItem } from '@/lib/merch-flow-report/parse/pop';
+import {
+  DEFAULT_OPTIONS,
+  FULL_SECTIONS,
+  type Product,
+  type Show,
+  type TourReport,
+} from '@/lib/merch-flow-report/report/types';
+import { buildMatchRows, buildReport, type MatchRow } from '@/lib/merch-flow-report/report/build';
+import { findIssues, type Issue } from '@/lib/merch-flow-report/report/issues';
+import { inferTourStart } from '@/lib/merch-flow-report/report/derive';
 
 /**
- * Builds the MerchFlow Charts input from the tracker database for one tour.
+ * Builds MerchFlow Charts' report from the tracker database for one tour.
  *
- * The Charts app reads a tracker workbook; here the same TrackerData shape is
- * assembled from shows, sales, tour_products/products, comps and the
- * show_sales_per_head view. The mapping is pure (mapTourData) so it can be
+ * Charts reads a tracker workbook (or this app's /api/tours/[id]/merch-flow-data);
+ * here the same TrackerData is assembled from shows, sales, tour_products/
+ * products and the show_sales_per_head view, then turned into a TourReport by
+ * the engine vendored from Charts (lib/merch-flow-report), the same way the
+ * Charts wizard does it. mapTourData and assembleReport are pure so they can be
  * tested without a database; loadTourReport does the I/O.
  */
 
@@ -47,7 +59,7 @@ export type DbProductRow = {
   sku: string;
   description: string;
   product_type: string | null;
-  category: Embedded<{ name: string }>;
+  category?: Embedded<{ name: string }>;
 };
 
 export type DbTourProductRow = {
@@ -70,10 +82,13 @@ export type DbCompRow = {
   quantity: number | null;
 };
 
+/** Row of product_images_detail (product_images joined to products). */
 export type DbProductImageRow = {
   sku: string | null;
   product_description: string | null;
   file_url: string | null;
+  is_primary?: boolean | null;
+  display_order?: number | null;
 };
 
 export type RawTourData = {
@@ -87,21 +102,19 @@ export type RawTourData = {
 
 // ---------------------------------------------------------------- mapping
 
-/** A column the charts logic wants that the database does not supply for this tour. */
+/** Something the report cannot show for this tour because the database lacks it. */
 export type DataGap = {
-  field: 'attendance' | 'category' | 'sales' | 'gross' | 'cost';
+  field: 'attendance' | 'sales' | 'gross' | 'cost' | 'comps';
   message: string;
 };
 
+/** A product photo, in the shape Charts' buildMatchRows takes from POP files. */
+export type Photo = PopItem & { imageKey: string };
+
 export type TourInput = {
+  /** Exactly Charts' TrackerData: no tracker-only fields. */
   tracker: TrackerData;
-  photos: PhotoSource[];
-  totalComps: number;
-  /**
-   * Units per SKU sold at shows that have an attendance figure. 1-in-N ratios
-   * divide by these so a partly-entered attendance column does not skew them.
-   */
-  unitsAtCountedShows: Record<string, number>;
+  photos: Photo[];
   gaps: DataGap[];
 };
 
@@ -109,20 +122,6 @@ const num = (value: number | string | null | undefined) => {
   const n = Number(value ?? 0);
   return Number.isFinite(n) ? n : 0;
 };
-
-/**
- * Maps a free-form DB category name onto the Charts taxonomy. Generic names
- * ("Apparel", "Event Tees") fall through to name-based inference.
- */
-export function categoryFromDb(name: string | null | undefined): Category | undefined {
-  if (!name) return undefined;
-  const n = name.toLowerCase();
-  if (/hood|jersey|outerwear|jacket/.test(n)) return 'Hoodies & jerseys';
-  if (/hat|head|cap|beanie/.test(n)) return 'Headwear';
-  if (/tee|shirt/.test(n)) return 'Tees';
-  if (/accessor|paper|media|poster|flag|bandana|pin/.test(n)) return 'Accessories';
-  return undefined;
-}
 
 const formatRange = (start: string | null, end: string | null) => {
   const fmt = (iso: string) =>
@@ -136,14 +135,15 @@ const formatRange = (start: string | null, end: string | null) => {
   return start ? fmt(start) : end ? fmt(end) : '';
 };
 
+const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
+
 export function mapTourData(raw: RawTourData): TourInput {
   const gaps: DataGap[] = [];
 
-  // Products: one row per base SKU, sizes summed (the tracker reports at SKU level).
-  type Acc = Product & { costWeighted: number; costUnits: number; anyCost: number };
+  // Products: one row per base SKU, sizes summed (the tracker workbook reports at SKU level).
+  type Acc = { product: Product; gross: number; costWeighted: number; costUnits: number; anyCost: number };
   const bySku = new Map<string, Acc>();
   const skuByTourProduct = new Map<string, string>();
-  let uncategorised = 0;
 
   for (const tp of raw.tourProducts) {
     const product = one(tp.product);
@@ -151,17 +151,9 @@ export function mapTourData(raw: RawTourData): TourInput {
     const sku = baseSku(product.sku);
     skuByTourProduct.set(tp.id, sku);
     if (bySku.has(sku)) continue;
-    const name = product.description.trim();
-    const dbCategory = categoryFromDb(one(product.category)?.name);
-    if (!dbCategory) uncategorised += 1;
     bySku.set(sku, {
-      sku,
-      name,
-      category: dbCategory ?? categoryOf({ name, sku }),
-      unitsSold: 0,
-      shareOfGross: 0,
-      grossUsd: 0,
-      compUnits: 0,
+      product: { sku, name: product.description.trim(), unitsSold: 0, shareOfGross: 0 },
+      gross: 0,
       costWeighted: 0,
       costUnits: 0,
       anyCost: 0,
@@ -175,11 +167,6 @@ export function mapTourData(raw: RawTourData): TourInput {
     if (sku && cost > 0) bySku.get(sku)!.anyCost = cost;
   }
 
-  const countedShowIds = new Set(
-    raw.shows.filter((s) => (s.attendance ?? 0) > 0).map((s) => s.show_id),
-  );
-  const unitsAtCountedShows: Record<string, number> = {};
-
   // Shows with no sales yet (future dates, unposted reports) stay out of the report.
   const reportedShowIds = new Set<string>();
   let salesWithoutGross = 0;
@@ -187,44 +174,37 @@ export function mapTourData(raw: RawTourData): TourInput {
   for (const sale of raw.sales) {
     const sku = skuByTourProduct.get(sale.tour_product_id);
     if (!sku) continue;
-    const product = bySku.get(sku)!;
+    const acc = bySku.get(sku)!;
     const qty = num(sale.qty_sold);
+    const gross = num(sale.gross_sales);
     if (qty > 0) {
       salesWithUnits += 1;
-      if (num(sale.gross_sales) <= 0) salesWithoutGross += 1;
+      if (gross <= 0) salesWithoutGross += 1;
     }
-    product.unitsSold += qty;
-    product.grossUsd = (product.grossUsd ?? 0) + num(sale.gross_sales);
+    acc.product.unitsSold += qty;
+    acc.gross += gross;
     const cost = costByTourProduct.get(sale.tour_product_id) ?? 0;
     if (cost > 0) {
-      product.costWeighted += cost * qty;
-      product.costUnits += qty;
+      acc.costWeighted += cost * qty;
+      acc.costUnits += qty;
     }
-    if (qty > 0 || num(sale.gross_sales) > 0) reportedShowIds.add(sale.show_id);
-    if (countedShowIds.has(sale.show_id)) {
-      unitsAtCountedShows[sku] = (unitsAtCountedShows[sku] ?? 0) + qty;
-    }
+    if (qty > 0 || gross > 0) reportedShowIds.add(sale.show_id);
   }
 
-  let totalComps = 0;
-  for (const comp of raw.comps) {
-    const sku = skuByTourProduct.get(comp.tour_product_id);
-    const qty = num(comp.quantity);
-    totalComps += qty;
-    if (sku) bySku.get(sku)!.compUnits = (bySku.get(sku)!.compUnits ?? 0) + qty;
-  }
+  const compUnits = raw.comps
+    .filter((c) => skuByTourProduct.has(c.tour_product_id))
+    .reduce((sum, c) => sum + num(c.quantity), 0);
 
-  const productGross = Array.from(bySku.values()).reduce((sum, p) => sum + (p.grossUsd ?? 0), 0);
+  const productGross = Array.from(bySku.values()).reduce((sum, a) => sum + a.gross, 0);
   let missingCost = 0;
   const products: Product[] = Array.from(bySku.values())
-    .map(({ costWeighted, costUnits, anyCost, ...p }) => {
+    .map(({ product, gross, costWeighted, costUnits, anyCost }) => {
       const unitCost = costUnits > 0 ? costWeighted / costUnits : anyCost || undefined;
-      if (p.unitsSold > 0 && !unitCost) missingCost += 1;
+      if (product.unitsSold > 0 && !unitCost) missingCost += 1;
       return {
-        ...p,
-        shareOfGross: productGross > 0 ? (p.grossUsd ?? 0) / productGross : 0,
+        ...product,
+        shareOfGross: productGross > 0 ? gross / productGross : 0,
         unitCost,
-        compUnits: p.compUnits || undefined,
       };
     })
     .sort((a, b) => b.unitsSold - a.unitsSold || a.sku.localeCompare(b.sku));
@@ -233,63 +213,72 @@ export function mapTourData(raw: RawTourData): TourInput {
     (a, b) => a.show_date.localeCompare(b.show_date) || a.show_id.localeCompare(b.show_id),
   );
   const unreported = sortedShows.filter((s) => !reportedShowIds.has(s.show_id));
+  let attendance = 0;
+  let noAttendance = 0;
   const shows: Show[] = sortedShows
     .filter((s) => reportedShowIds.has(s.show_id))
     .map((s) => {
-      const attendance = s.attendance && s.attendance > 0 ? s.attendance : undefined;
+      const showAttendance = s.attendance && s.attendance > 0 ? s.attendance : 0;
+      attendance += showAttendance;
+      if (!showAttendance) noAttendance += 1;
       const gross = num(s.total_gross);
-      const perHead =
-        s.per_head !== null && s.per_head !== undefined && attendance
+      // The workbook's Tour P-Heads tab: only shows with a head count have one.
+      const perHead = showAttendance
+        ? s.per_head !== null && s.per_head !== undefined
           ? num(s.per_head)
-          : attendance
-            ? gross / attendance
-            : undefined;
+          : gross / showAttendance
+        : undefined;
       return {
         date: s.show_date.slice(0, 10),
         city: (s.city || s.venue_name || 'Unknown').trim(),
         grossUsd: gross,
-        attendance,
         perHeadUsd: perHead,
       };
     });
 
-  const attendance = shows.reduce((sum, s) => sum + (s.attendance ?? 0), 0);
-  const noAttendance = shows.filter((s) => s.attendance === undefined).length;
-
   if (unreported.length) {
     gaps.push({
       field: 'sales',
-      message: `${unreported.length} show${unreported.length === 1 ? ' has' : 's have'} no sales posted and ${unreported.length === 1 ? 'is' : 'are'} left out.`,
+      message: `${unreported.length} ${plural(unreported.length, 'show has', 'shows have')} no sales posted and ${plural(unreported.length, 'is', 'are')} left out.`,
     });
   }
   if (salesWithoutGross) {
     gaps.push({
       field: 'gross',
-      message: `${salesWithoutGross} of ${salesWithUnits} sales lines with units have no gross_sales, so gross, share of gross and gross rank undercount those products.`,
+      message: `${salesWithoutGross} of ${salesWithUnits} sales lines with units have no gross_sales, so share of gross and gross rank undercount those products.`,
     });
   }
   if (noAttendance) {
     gaps.push({
       field: 'attendance',
-      message: `shows.attendance is empty for ${noAttendance} of ${shows.length} reported shows, so per head, total attendance and 1-in-N ratios cover only the shows that have it.`,
-    });
-  }
-  if (uncategorised) {
-    gaps.push({
-      field: 'category',
-      message: `${uncategorised} product${uncategorised === 1 ? ' has' : 's have'} no usable products.category_id; the category is inferred from the name and SKU.`,
+      message: `shows.attendance is empty for ${noAttendance} of ${shows.length} reported shows. Per head averages only the shows that have it; total attendance and the 1-in-N ratios count only those shows' attendance against all units sold.`,
     });
   }
   if (missingCost) {
     gaps.push({
       field: 'cost',
-      message: `${missingCost} selling product${missingCost === 1 ? ' has' : 's have'} no full_package_cost.`,
+      message: `${missingCost} selling ${plural(missingCost, 'product has', 'products have')} no full_package_cost.`,
+    });
+  }
+  if (compUnits) {
+    gaps.push({
+      field: 'comps',
+      message: `${compUnits.toLocaleString('en-US')} comped ${plural(compUnits, 'unit is', 'units are')} not in units sold, as on the tracker workbook.`,
     });
   }
 
-  const photos: PhotoSource[] = [];
+  // One photo per SKU: the primary one, else the first by display order.
+  const photos: Photo[] = [];
   const seenPhoto = new Set<string>();
-  for (const image of raw.images) {
+  const images = raw.images
+    .map((image, i) => ({ image, i }))
+    .sort(
+      (a, b) =>
+        Number(Boolean(b.image.is_primary)) - Number(Boolean(a.image.is_primary)) ||
+        (a.image.display_order ?? 0) - (b.image.display_order ?? 0) ||
+        a.i - b.i,
+    );
+  for (const { image } of images) {
     if (!image.sku || !image.file_url) continue;
     const sku = baseSku(image.sku);
     if (seenPhoto.has(sku)) continue;
@@ -306,25 +295,74 @@ export function mapTourData(raw: RawTourData): TourInput {
       attendance,
     },
     photos,
-    totalComps,
-    unitsAtCountedShows,
     gaps,
   };
 }
 
-// ---------------------------------------------------------------- I/O
+// ---------------------------------------------------------------- report
 
-export type MerchFlowData = TourInput & {
-  tour: DbTour;
+export type AssembledReport = {
+  /** As Charts publishes it: imageKey stripped, photos in imageUrls. */
   report: TourReport;
+  /** Product photo URLs keyed by SKU, as Charts' loadReport returns them. */
+  imageUrls: Record<string, string>;
   rows: MatchRow[];
+  /** The wizard's review-step issues. */
+  issues: Issue[];
 };
 
-/** Reads one tour from the database and returns the report model, or null if the tour is unknown. */
-export async function loadTourReport(
+/**
+ * TrackerData → TourReport, mirroring MerchFlow Charts' wizard with its
+ * defaults: app/new/Wizard.tsx runParse() builds the match rows, publish()
+ * builds the report, and /api/publish moves the photos out of it into
+ * imageUrls. The tour name comes from the tour, as tracker-link.ts does.
+ */
+export function assembleReport(tourName: string, tracker: TrackerData, photos: Photo[] = []): AssembledReport {
+  const rows = buildMatchRows(tracker.products, photos);
+  // Wizard: attendance is prefilled from the tracker and kept as a string.
+  const attendance = Number(tracker.attendance ? String(tracker.attendance) : '') || 0;
+
+  const built = buildReport({
+    tracker: {
+      artist: tracker.artist,
+      tourDates: tracker.tourDates,
+      products: tracker.products,
+      shows: tracker.shows,
+      attendance,
+    },
+    rows,
+    artist: tracker.artist,
+    tourName: tourName || tracker.artist,
+    dateRange: tracker.tourDates,
+    attendance,
+    artistAccent: gms.red,
+    sections: [...FULL_SECTIONS],
+    options: { ...DEFAULT_OPTIONS },
+    cityOverrides: {},
+  });
+
+  const imageUrls = Object.fromEntries(
+    rows.filter((r) => r.imageKey).map((r) => [r.sku, r.imageKey!]),
+  );
+  const report: TourReport = {
+    ...built,
+    products: built.products.map((p) => ({ ...p, imageKey: undefined })),
+  };
+
+  const issues = findIssues({ rows, shows: tracker.shows, tourStart: inferTourStart(tracker.shows) });
+
+  return { report, imageUrls, rows, issues };
+}
+
+// ---------------------------------------------------------------- I/O
+
+export type MerchFlowData = TourInput & AssembledReport & { tour: DbTour };
+
+/** Reads one tour from the database; null if the tour is unknown. */
+export async function loadTourData(
   supabase: SupabaseClient,
   tourId: string,
-): Promise<MerchFlowData | null> {
+): Promise<(TourInput & { tour: DbTour }) | null> {
   const [tourResult, shows, tourProducts, sales, comps, images] = await Promise.all([
     supabase
       .from('tours')
@@ -343,9 +381,7 @@ export async function loadTourReport(
     fetchAll<DbTourProductRow>((from, to) =>
       supabase
         .from('tour_products')
-        .select(
-          'id, size, full_package_cost, product:products(id, sku, description, product_type, category:product_categories(name))',
-        )
+        .select('id, size, full_package_cost, product:products(id, sku, description, product_type)')
         .eq('tour_id', tourId)
         .order('id')
         .range(from, to),
@@ -369,9 +405,8 @@ export async function loadTourReport(
     fetchAll<DbProductImageRow>((from, to) =>
       supabase
         .from('product_images_detail')
-        .select('id, sku, product_description, file_url')
+        .select('id, sku, product_description, file_url, is_primary, display_order')
         .eq('tour_id', tourId)
-        .eq('is_primary', true)
         .order('id')
         .range(from, to),
     ),
@@ -381,14 +416,15 @@ export async function loadTourReport(
   const tour = tourResult.data as DbTour | null;
   if (!tour) return null;
 
-  const input = mapTourData({ tour, shows, tourProducts, sales, comps, images });
-  const rows = buildMatchRows(input.tracker.products, input.photos);
-  const report = buildReport({
-    tracker: input.tracker,
-    rows,
-    tourName: tour.name,
-    attendance: input.tracker.attendance,
-  });
+  return { ...mapTourData({ tour, shows, tourProducts, sales, comps, images }), tour };
+}
 
-  return { ...input, tour, report, rows };
+/** Reads one tour and builds its report; null if the tour is unknown. */
+export async function loadTourReport(
+  supabase: SupabaseClient,
+  tourId: string,
+): Promise<MerchFlowData | null> {
+  const data = await loadTourData(supabase, tourId);
+  if (!data) return null;
+  return { ...data, ...assembleReport(data.tour.name, data.tracker, data.photos) };
 }

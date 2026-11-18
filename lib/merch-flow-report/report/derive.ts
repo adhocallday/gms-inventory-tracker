@@ -1,23 +1,24 @@
-import { chartSeries } from './palette';
-import { units, percent, compactUsd } from './format';
-import { PER_HEAD_SUSPECT_BELOW, resolveConfig, type MerchFlowOptions } from './config';
+import { chartSeries } from '../brand/tokens';
+import { units, percent, compactUsd } from '../format';
 import type { Product, Show, TourReport, Category } from './types';
+import { CITY_TYPOS } from './issues';
 
 /**
- * Derived model shared by every rendering of the report.
+ * Derived model shared by the dashboard and the PDF.
  *
- * Pure functions over a TourReport so renderings agree by construction and
- * each piece can be unit-tested. Ported from MerchFlow Charts; tour-specific
- * vocabulary lives in ./config and can be overridden per call.
+ * Pure functions over a TourReport so both renderings agree by construction
+ * and each piece can be unit-tested against the real tour.
  */
 
-export function titleCase(value: string, options?: MerchFlowOptions): string {
-  const acronyms = new Set(resolveConfig(options).acronyms.map((a) => a.toUpperCase()));
-  return value
+/** Tokens that must survive title-casing intact. */
+const ACRONYMS = new Set(['USA', 'FFDP', 'XX', 'LS', 'DC', 'NY', 'LA', 'UK']);
+
+export const titleCase = (value: string) =>
+  value
     .split(/(\s+)/)
     .map((token) => {
       const bare = token.replace(/[^A-Za-z]/g, '');
-      if (bare && acronyms.has(bare.toUpperCase()) && token === token.toUpperCase()) {
+      if (bare && ACRONYMS.has(bare.toUpperCase()) && token === token.toUpperCase()) {
         return token;
       }
       return token
@@ -26,7 +27,6 @@ export function titleCase(value: string, options?: MerchFlowOptions): string {
         .replace(/'S\b/g, "'s");
     })
     .join('');
-}
 
 /** Category colours are fixed per category, never assigned by rank. */
 export const CATEGORY_COLORS: Record<Category, string> = {
@@ -39,32 +39,31 @@ export const CATEGORY_COLORS: Record<Category, string> = {
 export const CATEGORY_ORDER = Object.keys(CATEGORY_COLORS) as Category[];
 
 /**
- * Turns a stored product name into something printable.
+ * Turns a tracker name into something printable.
  *
  * Tracker names lead with the colourway and carry trade shorthand and typos:
  * "BLACK 2026 AMERICA ITIN TEE" → "2026 America Itinerary Tee", colour Black.
  */
-export function cleanName(
-  name: string,
-  options?: MerchFlowOptions,
-): { display: string; color?: string } {
-  const config = resolveConfig(options);
+export function cleanName(name: string): { display: string; color?: string } {
   let rest = name.trim();
   let color: string | undefined;
 
-  const colorPrefix = rest.match(config.colorPrefix);
-  // e.g. "BLACK AND YELLOW BANDANA" is the product's name, not a colourway.
-  if (colorPrefix && !config.keepColorPrefixIf.test(rest)) {
-    color = titleCase(colorPrefix[1], options);
+  const colorPrefix = rest.match(/^(BLACK AND YELLOW|BLACK|RED|WHITE|GREY|GRAY)\s+/i);
+  // "BLACK AND YELLOW BANDANA" is the product's name, not a colourway.
+  if (colorPrefix && !/BANDANA$/i.test(rest)) {
+    color = titleCase(colorPrefix[1]);
     rest = rest.slice(colorPrefix[0].length);
   }
 
-  rest = rest.replace(config.artistPrefix, '');
-  for (const [pattern, replacement] of config.shorthand) {
-    rest = rest.replace(pattern, replacement);
-  }
+  rest = rest
+    .replace(/^FFDP\s+/i, '')
+    .replace(/\bITIN\b/gi, 'Itinerary')
+    .replace(/\bCAPTIANS\b/gi, 'Captains')
+    .replace(/\bWOMENS\b/gi, "Women's")
+    .replace(/\bLONGSLEEVE\b/gi, 'Long Sleeve')
+    .replace(/\bWT\b/g, 'World Tour');
 
-  return { display: titleCase(rest, options).replace(/women's/i, "Women's"), color };
+  return { display: titleCase(rest).replace(/women's/i, "Women's"), color };
 }
 
 export function categoryOf(product: Pick<Product, 'name' | 'sku'>): Category {
@@ -72,48 +71,45 @@ export function categoryOf(product: Pick<Product, 'name' | 'sku'>): Category {
   if (/HOODIE|JERSEY/.test(name)) return 'Hoodies & jerseys';
   if (/\bHAT\b|BEANIE|\bCAP\b/.test(name)) return 'Headwear';
   if (/TEE|LONGSLEEVE|ITIN/.test(name)) return 'Tees';
-  // Class digit in the SKU: 2xx and 4xx are garments in the GMS SKU grammar.
+  // Class digit in the SKU: 2xx and 4xx are garments on this tracker.
   if (/^[A-Z]{4}..[24]/.test(product.sku)) return 'Tees';
   return 'Accessories';
 }
 
-export const decorate = (product: Product, options?: MerchFlowOptions): Product => ({
+export const decorate = (product: Product): Product => ({
   ...product,
-  displayName: product.displayName ?? cleanName(product.name, options).display,
+  displayName: product.displayName ?? cleanName(product.name).display,
   category: product.category ?? categoryOf(product),
 });
 
 // ---------------------------------------------------------------- shows
 
 /**
- * Flags source-data problems for review. Nothing is corrected here — a tour
- * that genuinely started early is not an error to silence.
+ * Flags source-data problems for the wizard to surface. Nothing is corrected
+ * here — a tour that genuinely started early is not an error to silence.
  */
-export function flagShows(shows: Show[], tourStart?: string, options?: MerchFlowOptions): Show[] {
-  const { cityTypos } = resolveConfig(options);
+export function flagShows(shows: Show[], tourStart?: string): Show[] {
   return shows.map((show) => {
     const outside = tourStart ? show.date < tourStart : false;
-    // A show with no per-head figure is missing data, not a suspect figure.
-    const suspect =
-      typeof show.perHeadUsd === 'number' && show.perHeadUsd < PER_HEAD_SUSPECT_BELOW;
+    const suspect = (show.perHeadUsd ?? 0) < PER_HEAD_SUSPECT_BELOW;
     return {
       ...show,
-      // Display only: a suggested spelling is applied by a person, never here.
-      cityDisplay: show.cityDisplay ?? titleCase(show.city, options),
-      citySuggestion: cityTypos[show.city.trim().toUpperCase()],
+      // Display only: a suggested spelling is applied in the wizard, never here.
+      cityDisplay: show.cityDisplay ?? titleCase(show.city),
+      citySuggestion: CITY_TYPOS[show.city.trim().toUpperCase()],
       flag: outside ? 'outsideRange' : suspect ? 'perHeadSuspect' : undefined,
     };
   });
 }
 
 /**
- * Start of the main leg: the first month that holds more than one show, so
- * isolated one-offs months before the tour proper are reported separately.
+ * Start of the main leg: the first month that holds more than one show. The
+ * 5FDP tour has two isolated one-offs months before it begins.
  */
 export function inferTourStart(shows: Show[]): string | undefined {
   const counts = new Map<string, number>();
   for (const show of shows) counts.set(show.date.slice(0, 7), (counts.get(show.date.slice(0, 7)) ?? 0) + 1);
-  const firstReal = Array.from(counts.entries())
+  const firstReal = [...counts.entries()]
     .sort((a, b) => a[0].localeCompare(b[0]))
     .find(([, count]) => count > 1);
   return firstReal ? `${firstReal[0]}-01` : undefined;
@@ -136,7 +132,7 @@ export function monthTotals(shows: Show[], tourStart?: string): MonthTotal[] {
     groups.get(key)!.push(show);
   }
 
-  return Array.from(groups.entries())
+  return [...groups.entries()]
     .sort((a, b) => (a[0] === 'pre' ? -1 : b[0] === 'pre' ? 1 : a[0].localeCompare(b[0])))
     .map(([key, groupShows]) => ({
       key,
@@ -162,7 +158,7 @@ export type ScorecardRow = Product & {
   rankShift: number;
 };
 
-export function scorecard(products: Product[], options?: MerchFlowOptions): ScorecardRow[] {
+export function scorecard(products: Product[]): ScorecardRow[] {
   const byUnits = [...products].sort((a, b) => b.unitsSold - a.unitsSold);
   const byGross = [...products].sort((a, b) => b.shareOfGross - a.shareOfGross);
 
@@ -171,7 +167,7 @@ export function scorecard(products: Product[], options?: MerchFlowOptions): Scor
   return byUnits.map((product, i) => {
     const rankByGross = grossRank.get(product.sku) ?? i + 1;
     return {
-      ...decorate(product, options),
+      ...decorate(product),
       rankByUnits: i + 1,
       rankByGross,
       rankShift: i + 1 - rankByGross,
@@ -198,15 +194,7 @@ export function rollUpTail(rows: ScorecardRow[], threshold: number): TailRollup 
   };
 }
 
-export type CategoryTotal = {
-  category: Category;
-  color: string;
-  units: number;
-  share: number;
-  products: number;
-};
-
-export function categoryTotals(products: Product[]): CategoryTotal[] {
+export function categoryTotals(products: Product[]) {
   const totalUnits = products.reduce((sum, p) => sum + p.unitsSold, 0) || 1;
 
   return CATEGORY_ORDER.map((category) => {
@@ -228,21 +216,20 @@ export type KeyFigure = { stat: string; text: string };
 
 /**
  * Factual statements only — no interpretation. Each is a number the reader
- * could verify from the tables on the same page.
+ * could verify from the tables on the following pages.
  */
-export function keyFigures(report: TourReport, options?: MerchFlowOptions): KeyFigure[] {
-  const { keyFigure } = resolveConfig(options);
+export function keyFigures(report: TourReport): KeyFigure[] {
   const figures: KeyFigure[] = [];
-  const rows = scorecard(report.products, options);
+  const rows = scorecard(report.products);
   const totalUnits = report.products.reduce((sum, p) => sum + p.unitsSold, 0);
 
-  const matching = rows.filter((r) => keyFigure.pattern.test(r.displayName ?? r.name));
-  if (matching.length >= keyFigure.topN && totalUnits > 0) {
-    const top = matching.slice(0, keyFigure.topN);
-    const sold = top.reduce((sum, r) => sum + r.unitsSold, 0);
+  const itineraryTees = rows.filter((r) => /itinerary/i.test(r.displayName ?? r.name));
+  if (itineraryTees.length >= 3 && totalUnits > 0) {
+    const top3 = itineraryTees.slice(0, 3);
+    const sold = top3.reduce((sum, r) => sum + r.unitsSold, 0);
     figures.push({
       stat: percent(sold / totalUnits, 0),
-      text: `of units sold were the ${top.length} ${keyFigure.label} (${units(sold)} units).`,
+      text: `of units sold were the ${top3.length} itinerary tees (${units(sold)} units).`,
     });
   }
 
@@ -253,7 +240,7 @@ export function keyFigures(report: TourReport, options?: MerchFlowOptions): KeyF
     if (average > 0) {
       figures.push({
         stat: `${(best.grossUsd / average).toFixed(1)}×`,
-        text: `the average show: ${titleCase(best.city, options)} grossed ${compactUsd(best.grossUsd)} against an average of ${compactUsd(average)}.`,
+        text: `the average show: ${titleCase(best.city)} grossed ${compactUsd(best.grossUsd)} against an average of ${compactUsd(average)}.`,
       });
     }
   }
@@ -299,12 +286,17 @@ export type DerivedAttendance = {
   suspectCount: number;
 };
 
+const PER_HEAD_SUSPECT_BELOW = 5;
+
 /**
- * Totals attendance from gross and spend per head.
+ * Totals attendance from the figures already uploaded.
  *
- * Each show's attendance is its gross divided by its spend per head. Shows
- * whose per-head looks wrong are included but flagged, since an implausibly
- * low per-head implies an impossible crowd and distorts the total.
+ * Each show's attendance is its gross divided by its spend per head, so the
+ * tour total falls out of the tracker without anyone typing it. On the real
+ * tour this lands within 0.07% of the published figure.
+ *
+ * Shows whose per-head looks wrong are included but flagged: Daytona's $1.11
+ * implies an impossible crowd and visibly distorts the total.
  */
 export function deriveAttendance(shows: Show[]): DerivedAttendance {
   const rows: ShowAttendance[] = [];
