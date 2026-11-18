@@ -114,7 +114,7 @@ export default function TourCreationWizard() {
       </header>
 
       {/* Progress Stepper */}
-      <div className="mb-8">
+      <div className="mb-8" data-tour="wizard-steps">
         <div className="flex items-center justify-between">
           {steps.map((step, index) => (
             <div

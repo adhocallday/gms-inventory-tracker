@@ -49,7 +49,8 @@ export function PosLaunch() {
           playsInline
           preload="metadata"
           onError={() => setVideoMissing(true)}
-          className="w-full max-w-3xl rounded-lg border border-[var(--color-bg-border)] bg-black"
+          data-tour="pos-video"
+          className="w-full max-w-sm rounded-lg border border-[var(--color-bg-border)] bg-black"
         >
           A walkthrough video of MerchFlow POS.
         </video>

@@ -128,7 +128,7 @@ export default function CogsReportPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+      <div data-tour="cogs-summary" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
         <div className="g-card p-4">
           <p className="text-xs text-[var(--color-text-muted)] mb-1">Total Revenue</p>
           <p className="text-2xl font-semibold text-[var(--color-text-primary)]">
@@ -238,7 +238,7 @@ export default function CogsReportPage() {
       </div>
 
       {/* View Toggle */}
-      <div className="flex items-center gap-3 mt-8 mb-6">
+      <div data-tour="cogs-table" className="flex items-center gap-3 mt-8 mb-6">
         <Button
           variant={view === 'products' ? 'primary' : 'outline'}
           onClick={() => setView('products')}

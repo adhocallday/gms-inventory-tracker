@@ -16,7 +16,7 @@ export function WelcomeActions() {
     <div className="flex flex-wrap items-center gap-3">
       <button
         type="button"
-        onClick={requestTour}
+        onClick={() => requestTour(0)}
         className="inline-flex items-center h-10 px-5 rounded-md text-sm font-semibold bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] active:bg-[var(--color-red-active)] transition"
       >
         Start the tour

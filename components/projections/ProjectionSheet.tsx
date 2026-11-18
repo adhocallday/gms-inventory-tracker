@@ -628,6 +628,7 @@ export function ProjectionSheet({
   return (
     <section className="g-container py-8">
       {/* 1. AI AGENT PANEL AT TOP */}
+      <div data-tour="proj-inputs">
       <EnhancedAIAgentPanel
         tourId={tourId}
         scenarioId={selectedScenarioId}
@@ -713,6 +714,7 @@ export function ProjectionSheet({
         currentInputs={{ expectedAttendance, expectedPerHead }}
         warehouseLocations={warehouseLocations}
       />
+      </div>
 
       {/* 2. REORDER ALERTS */}
       {selectedScenarioId && (
@@ -806,7 +808,7 @@ export function ProjectionSheet({
 
       {/* 6. AGGREGATE SPREADSHEET */}
       {viewMode === 'aggregate' && (
-      <div className={isFullscreen ? 'fullscreen-modal' : 'mt-6 g-card p-6'}>
+      <div data-tour="proj-sheet" className={isFullscreen ? 'fullscreen-modal' : 'mt-6 g-card p-6'}>
         {/* Fullscreen Header */}
         {isFullscreen && (
           <div className="fullscreen-modal-header mb-4">

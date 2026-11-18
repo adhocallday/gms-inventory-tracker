@@ -281,7 +281,7 @@ export default function ParsedDocumentsPage() {
       </div>
 
       {/* Filter Tabs Row */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+      <div data-tour="docs-filters" className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         {/* Document Type Tabs */}
         <div className="flex flex-wrap gap-2">
           {DOC_TYPE_OPTIONS.map((option) => {
@@ -447,7 +447,7 @@ export default function ParsedDocumentsPage() {
           }
         />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3" data-tour="docs-list">
           {sortedDocuments.map((doc) => (
             <div
               key={doc.id}

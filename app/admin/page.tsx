@@ -127,7 +127,7 @@ export default async function AdminDashboard() {
       />
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      <div data-tour="admin-stats" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {stats.map((stat, index) => (
           <StatCard
             key={index}
@@ -140,7 +140,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Quick Actions */}
-      <section className="mb-12">
+      <section className="mb-12" data-tour="admin-actions">
         <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-6">
           Quick Actions
         </h2>

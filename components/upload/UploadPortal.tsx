@@ -130,7 +130,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
       />
 
       {/* Auto-Detect Toggle */}
-      <div className="p-4 border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-surface)]">
+      <div data-tour="upload-detect" className="p-4 border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-surface)]">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
@@ -238,6 +238,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
         </div>
 
         {!showInlineReview && (
+          <div data-tour="upload-dropzone">
           <FileDropzone
             tourId={tourId || undefined}
             showId={showId || undefined}
@@ -264,6 +265,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
             onParseComplete={handleParseComplete}
             autoRedirect={false}
           />
+          </div>
         )}
 
         {/* Inline Draft Review - shown after parsing */}
@@ -279,7 +281,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
           />
         )}
 
-        <div className="space-y-3">
+        <div className="space-y-3" data-tour="upload-status">
           <div className="text-xs uppercase tracking-[0.3em] text-[var(--color-text-muted)]">
             Draft status
           </div>

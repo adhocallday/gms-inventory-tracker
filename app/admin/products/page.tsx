@@ -262,12 +262,14 @@ export default function AdminProductsPage() {
       </div>
 
       {/* Products Table */}
-      <ProductCatalogTable
-        products={products}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      <div data-tour="admin-products">
+        <ProductCatalogTable
+          products={products}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </div>
 
       {/* Pagination */}
       {pagination.totalPages > 1 && (

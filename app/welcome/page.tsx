@@ -3,6 +3,7 @@ import { BarChart3, LayoutGrid, Tablet } from 'lucide-react';
 import { MerchFlowWordmark } from '@/components/brand/MerchFlowLogo';
 import { FlowDiagrams } from '@/components/onboarding/FlowDiagrams';
 import { WelcomeActions } from '@/components/onboarding/WelcomeActions';
+import { TourChapterList } from '@/components/onboarding/TourChapterList';
 import { CHARTS_URL, FLOW_URL } from '@/lib/apps';
 
 export const metadata: Metadata = { title: 'How MerchFlow works · MerchFlow Tracker' };
@@ -44,6 +45,17 @@ export default function WelcomePage() {
         <WelcomeActions />
       </header>
 
+      <section aria-labelledby="chapters-heading" className="space-y-4">
+        <div className="space-y-1">
+          <h2 id="chapters-heading" className="text-xl font-semibold">Guided tour</h2>
+          <p className="text-sm text-[var(--color-text-secondary)] max-w-3xl">
+            The tour opens each screen in turn and names the manual work it replaces. Start at any
+            chapter.
+          </p>
+        </div>
+        <TourChapterList />
+      </section>
+
       <section aria-labelledby="apps-heading" className="space-y-4">
         <h2 id="apps-heading" className="text-xl font-semibold">The apps</h2>
         <div className="grid gap-4 md:grid-cols-3">
@@ -75,7 +87,7 @@ export default function WelcomePage() {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-3 rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] divide-y sm:divide-y-0 sm:divide-x divide-[var(--color-bg-border)]">
+        <div data-tour="welcome-counts" className="grid sm:grid-cols-3 rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] divide-y sm:divide-y-0 sm:divide-x divide-[var(--color-bg-border)]">
           <div className="p-4">
             <p className="text-4xl font-bold tabular-nums text-[var(--color-red-primary)]">10</p>
             <p className="text-sm text-[var(--color-text-secondary)]">Current: manual steps, including 2 AtVenu portal logins</p>
@@ -92,7 +104,7 @@ export default function WelcomePage() {
 
         <FlowDiagrams />
 
-        <aside className="border-l-4 border-[#9B5FC0] bg-[var(--color-bg-surface)] p-4 rounded-r-md max-w-3xl">
+        <aside data-tour="welcome-ai" className="border-l-4 border-[#9B5FC0] bg-[var(--color-bg-surface)] p-4 rounded-r-md max-w-3xl">
           <h3 className="font-semibold mb-1">Role of AI</h3>
           <p className="text-sm text-[var(--color-text-secondary)]">
             AI is used only to extract fields from documents, because document layouts vary.

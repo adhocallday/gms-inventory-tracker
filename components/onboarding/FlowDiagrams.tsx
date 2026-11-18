@@ -138,15 +138,16 @@ export function FlowDiagrams() {
           <h3 className="text-lg font-semibold">{view.title}</h3>
           <p className="text-sm text-[var(--color-text-secondary)] max-w-3xl">{view.intro}</p>
         </div>
-        <div className="mf-flow">
+        <div className="mf-flow" data-tour="flow-diagram">
           <view.Svg />
         </div>
         <div className="grid gap-4 md:grid-cols-2">
-          {view.notes.map((note) => {
+          {view.notes.map((note, index) => {
             const List = note.ordered ? 'ol' : 'ul';
             return (
               <div
                 key={note.title}
+                data-tour={`flow-${view.id}-note-${index}`}
                 className={cn(
                   'rounded-lg border p-4 bg-[var(--color-bg-surface)]',
                   note.tone === 'warn'

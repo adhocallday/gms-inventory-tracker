@@ -63,7 +63,7 @@ export function ReorderAlertBanner({ tourId, scenarioId }: ReorderAlertBannerPro
   };
 
   return (
-    <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg overflow-hidden">
+    <div data-tour="proj-reorder" className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg overflow-hidden">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 gap-3">
         <div className="flex items-center gap-3">

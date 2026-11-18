@@ -193,7 +193,7 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <div className="kpi-grid">
+      <div className="kpi-grid" data-tour="home-kpis">
         {kpiCards.map((card) => (
           <article
             key={card.label}
@@ -246,7 +246,7 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" data-tour="home-activity">
         <RecentActivityPanel documents={(recentDocs ?? []) as RecentDocument[]} />
         <UpcomingShowsPanel shows={upcomingShows} />
       </div>

@@ -121,7 +121,7 @@ export default function AnalyticsPage() {
       />
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
+      <div data-tour="admin-analytics" className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
         <div className="g-card p-4">
           <div className="text-xs text-[var(--color-text-secondary)] mb-1">Total Gross</div>
           <div className="text-xl font-bold text-[var(--color-text-primary)]">

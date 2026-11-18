@@ -19,7 +19,7 @@ const FEATURES = [
 export default function PosPage() {
   return (
     <div className="py-8 space-y-8 max-w-4xl">
-      <header className="space-y-3">
+      <header className="space-y-3" data-tour="pos-intro">
         <p className="g-kicker">MerchFlow</p>
         <h1 className="text-3xl font-bold">MerchFlow POS</h1>
         <p className="text-[15px] text-[var(--color-text-secondary)] max-w-3xl">
@@ -35,7 +35,7 @@ export default function PosPage() {
 
       <PosLaunch />
 
-      <section className="g-card p-6 space-y-3">
+      <section className="g-card p-6 space-y-3" data-tour="pos-features">
         <h2 className="text-lg font-semibold">What it does</h2>
         <ul className="list-disc pl-5 space-y-1.5 text-sm text-[var(--color-text-secondary)]">
           {FEATURES.map((f) => (

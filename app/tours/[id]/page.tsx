@@ -349,7 +349,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       </div>
 
       {/* Navigation Tabs */}
-      <nav className="flex gap-2 mt-8 border-b border-[var(--color-bg-border)] pb-0 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+      <nav data-tour="tour-tabs" className="flex gap-2 mt-8 border-b border-[var(--color-bg-border)] pb-0 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
         <Link
           href={`/tours/${tour.id}/projections`}
           className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
@@ -389,7 +389,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         </Link>
       </nav>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+      <div data-tour="tour-kpis" className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
         <div className="g-card p-4">
           <p className="text-xs text-[var(--color-text-muted)]">Total gross</p>
           <p className="text-2xl font-semibold mt-2">
@@ -416,9 +416,13 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         </div>
       </div>
 
-      <ShowsTable tourId={tour.id} shows={showSummary as ShowSummaryRow[]} />
+      <div data-tour="tour-shows">
+        <ShowsTable tourId={tour.id} shows={showSummary as ShowSummaryRow[]} />
+      </div>
 
-      <ProductGrid tourId={tour.id} products={productCards} />
+      <div data-tour="tour-products">
+        <ProductGrid tourId={tour.id} products={productCards} />
+      </div>
 
       {/* Business Insights Section */}
       <section className="mt-12">

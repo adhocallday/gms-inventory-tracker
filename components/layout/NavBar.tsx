@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { MerchFlowMark, MerchFlowWordmark } from '@/components/brand/MerchFlowLogo';
 import { MERCHFLOW_APPS, type AppId } from '@/lib/apps';
-import { requestTour } from '@/components/onboarding/tour-control';
+import { openTourMenu } from '@/components/onboarding/tour-control';
 import { cn } from '@/lib/utils';
 import { useSidebar } from './SidebarContext';
 
@@ -195,7 +195,8 @@ export function NavBar() {
                 </Link>
                 <button
                   type="button"
-                  onClick={requestTour}
+                  onClick={openTourMenu}
+                  aria-haspopup="dialog"
                   title={collapsed ? 'Replay tour' : undefined}
                   className={cn(
                     'w-full flex items-center gap-3 rounded-md text-sm font-medium transition text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red-primary)]',

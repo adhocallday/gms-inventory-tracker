@@ -232,7 +232,9 @@ export default function ReviewDocumentPage({
         createdAt={document.created_at}
       />
 
-      <ValidationPanel validation={document.validation} />
+      <div data-tour="review-validation">
+        <ValidationPanel validation={document.validation} />
+      </div>
 
       {!isPosted && !isRejected && (
         <div className="mb-6">
@@ -247,7 +249,7 @@ export default function ReviewDocumentPage({
 
       {/* Document-Specific Form */}
       {formData && !isPosted && !isRejected && (
-        <>
+        <div data-tour="review-form">
           {document.doc_type === 'po' && (
             <ReviewFormPO
               data={formData}
@@ -284,12 +286,12 @@ export default function ReviewDocumentPage({
               readOnly={false}
             />
           )}
-        </>
+        </div>
       )}
 
       {/* Read-only form for posted/rejected documents */}
       {formData && (isPosted || isRejected) && (
-        <>
+        <div data-tour="review-form">
           {document.doc_type === 'po' && (
             <ReviewFormPO data={formData} onChange={() => {}} readOnly={true} />
           )}
@@ -305,12 +307,12 @@ export default function ReviewDocumentPage({
           {document.doc_type === 'settlement' && (
             <ReviewFormSettlement data={formData} onChange={() => {}} readOnly={true} />
           )}
-        </>
+        </div>
       )}
 
       {/* Actions */}
       {!isPosted && !isRejected && (
-        <div className="flex items-center justify-between pt-6 border-t border-[var(--color-bg-border)]">
+        <div data-tour="review-actions" className="flex items-center justify-between pt-6 border-t border-[var(--color-bg-border)]">
           <div className="text-sm text-[var(--color-text-secondary)]">{statusMessage}</div>
           <div className="flex gap-3">
             <button
@@ -342,7 +344,7 @@ export default function ReviewDocumentPage({
       )}
 
       {isPosted && (
-        <div className="g-card p-6 bg-green-500/10 border-green-500/30">
+        <div data-tour="review-actions" className="g-card p-6 bg-green-500/10 border-green-500/30">
           <p className="text-sm text-green-300">
             <CheckIcon className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> This document has been posted to the database and cannot be edited.
           </p>
@@ -350,7 +352,7 @@ export default function ReviewDocumentPage({
       )}
 
       {isRejected && (
-        <div className="g-card p-6 bg-red-500/10 border-red-500/30">
+        <div data-tour="review-actions" className="g-card p-6 bg-red-500/10 border-red-500/30">
           <p className="text-sm text-red-300">
             <X className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> This document has been rejected.
           </p>

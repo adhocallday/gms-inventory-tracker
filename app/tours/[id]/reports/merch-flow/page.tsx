@@ -45,15 +45,18 @@ function Section({
   title,
   icon: Icon,
   description,
+  tour,
   children,
 }: {
   title: string;
   icon: LucideIcon;
   description?: string;
+  /** data-tour anchor for the guided tour. */
+  tour?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="g-card p-6">
+    <section className="g-card p-6" data-tour={tour}>
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
           <Icon className="inline-block h-5 w-5 align-[-0.2em] mr-2 text-[var(--color-text-secondary)]" aria-hidden="true" />
@@ -173,7 +176,7 @@ export default async function MerchFlowReportPage({ params }: MerchFlowPageProps
       />
 
       {/* KPI row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div data-tour="mf-kpis" className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Kpi icon={DollarSign} label="Gross" value={usd(gross)} note={`${report.shows.length} shows`} />
         <Kpi
           icon={ShoppingCart}
@@ -197,7 +200,7 @@ export default async function MerchFlowReportPage({ params }: MerchFlowPageProps
 
       {/* Key figures */}
       {figures.length > 0 && (
-        <Section title="Key figures" icon={Lightbulb}>
+        <Section title="Key figures" icon={Lightbulb} tour="mf-figures">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {figures.map((f) => (
               <div key={f.text} className="rounded-lg border border-[var(--color-bg-border)] p-4">
@@ -213,6 +216,7 @@ export default async function MerchFlowReportPage({ params }: MerchFlowPageProps
       <Section
         title="Product scorecard"
         icon={Trophy}
+        tour="mf-scorecard"
         description="Ranked by units sold. Shift is how many places higher (or lower) a product ranks by share of gross."
       >
         {head.length + tail.length === 0 ? (
@@ -266,7 +270,7 @@ export default async function MerchFlowReportPage({ params }: MerchFlowPageProps
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Category mix */}
-        <Section title="Category mix" icon={PieChart} description="Share of units sold by category.">
+        <Section title="Category mix" icon={PieChart} tour="mf-category" description="Share of units sold by category.">
           {categories.length ? (
             <>
               <CategoryMixChart
@@ -337,6 +341,7 @@ export default async function MerchFlowReportPage({ params }: MerchFlowPageProps
       <Section
         title="1-in-N ratios"
         icon={Users}
+        tour="mf-ratios"
         description={
           showsWithAttendance
             ? `How many attendees per unit sold, over the ${showsWithAttendance} show${showsWithAttendance === 1 ? '' : 's'} with attendance entered (${units(report.attendance)} people).`
@@ -372,7 +377,7 @@ export default async function MerchFlowReportPage({ params }: MerchFlowPageProps
       </Section>
 
       {/* Data quality */}
-      <Section title="Data quality" icon={AlertTriangle} description="Suggestions only. Nothing here changes the stored data.">
+      <Section title="Data quality" icon={AlertTriangle} tour="mf-quality" description="Suggestions only. Nothing here changes the stored data.">
         {issues.length === 0 && shownGaps.length === 0 ? (
           <p className="text-sm text-[var(--color-text-secondary)]">
             <CheckCircle className="inline-block h-4 w-4 align-[-0.125em] mr-1 text-green-400" aria-hidden="true" />

@@ -36,7 +36,7 @@ export default async function AdminToursPage() {
         }
       />
 
-      <div className="mt-8">
+      <div className="mt-8" data-tour="admin-tours">
         <ToursTable tours={tours || []} />
       </div>
     </div>

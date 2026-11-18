@@ -301,7 +301,7 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
         <div className="g-kicker">{tour.artist}</div>
       </div>
 
-      <section className="g-card p-6 mt-10">
+      <section data-tour="show-sales" className="g-card p-6 mt-10">
         <h2 className="text-lg font-semibold g-title mb-4">Sales lines</h2>
         <SalesLinesTable
           data={salesRows.map((row) => {
@@ -318,7 +318,7 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
         />
       </section>
 
-      <section className="g-card p-6 mt-10">
+      <section data-tour="show-comps" className="g-card p-6 mt-10">
         <h2 className="text-lg font-semibold g-title mb-4">Comps</h2>
         <CompsTable
           data={compRows.map((row) => {
@@ -333,7 +333,7 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
         />
       </section>
 
-      <section className="g-card p-6 mt-10">
+      <section data-tour="show-settlement" className="g-card p-6 mt-10">
         <h2 className="text-lg font-semibold g-title">Settlement summary</h2>
         {settlementDoc ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm">
@@ -366,7 +366,7 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
         )}
       </section>
 
-      <section className="g-card p-6 mt-10">
+      <section data-tour="show-inventory" className="g-card p-6 mt-10">
         <h2 className="text-lg font-semibold g-title mb-4">Inventory impact</h2>
         <InventoryImpactTable data={inventoryImpact} />
       </section>

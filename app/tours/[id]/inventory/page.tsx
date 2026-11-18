@@ -200,7 +200,7 @@ export default function InventoryTrackerPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-8">
+      <div data-tour="inv-summary" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-8">
         <div className="g-card p-4">
           <p className="text-xs text-[var(--color-text-muted)] mb-1">Products</p>
           <p className="text-2xl font-semibold">{data.summary.total_products}</p>
@@ -271,7 +271,7 @@ export default function InventoryTrackerPage() {
       )}
 
       {/* Filters */}
-      <div className="g-card p-4 mt-6">
+      <div data-tour="inv-controls" className="g-card p-4 mt-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label className="g-label block mb-1">Search SKU</label>
@@ -340,7 +340,7 @@ export default function InventoryTrackerPage() {
 
       {/* Inventory Balance Table */}
       {view === 'balance' && (
-        <div className="g-card p-6 mt-6">
+        <div data-tour="inv-balance" className="g-card p-6 mt-6">
           <h3 className="text-lg font-semibold g-title mb-4">
             Inventory Balance ({filteredInventory.length} items)
           </h3>

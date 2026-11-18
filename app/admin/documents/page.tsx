@@ -133,7 +133,7 @@ export default function DocumentsPage() {
       />
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+      <div data-tour="admin-documents" className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         <div className="g-card p-4 text-center">
           <div className="text-2xl font-bold text-[var(--color-text-primary)]">{stats.total}</div>
           <div className="text-xs text-[var(--color-text-secondary)]">Total</div>
