@@ -1,171 +1,81 @@
 'use client';
 
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
-import { CurrentFlowSvg, OptionAFlowSvg, OptionBFlowSvg } from './flow-svgs';
+import { useRef, useState, type KeyboardEvent } from 'react';
+import { VIEWS, type StageId, type ViewId } from './flow-data';
+import { FlowPanelBody, StageLegend } from './FlowFigures';
 
 /**
- * Current process vs Option A vs Option B, with the diagrams and copy from the
- * Data Flow site (gms-merch-flow-intelligence/index.html).
+ * Current process vs Option A vs Option B vs a comparison table, as tabs.
+ * Same data and styles (mfd-*) as the Data Flow site.
  */
 
-type ViewId = 'current' | 'option-a' | 'option-b';
-
-const VIEWS: {
-  id: ViewId;
-  tab: string;
-  title: string;
-  intro: string;
-  Svg: () => JSX.Element;
-  notes: { title: string; tone?: 'warn' | 'ok'; ordered?: boolean; items: string[] }[];
-}[] = [
-  {
-    id: 'current',
-    tab: 'Current',
-    title: 'Current tour data flow',
-    intro: 'Red numbers mark manual steps: downloads, portal logins and re-entry.',
-    Svg: CurrentFlowSvg,
-    notes: [
-      {
-        title: 'Manual steps',
-        tone: 'warn',
-        ordered: true,
-        items: [
-          'Packing lists typed into AtVenu',
-          'Purchase orders typed into the Tracker',
-          'Packing lists typed into Business Central',
-          'Packing lists typed into the Tracker',
-          'Sales and settlement downloaded and typed into the Tracker',
-          'Sales and settlement downloaded and typed into Business Central',
-          'Log into AtVenu for comps',
-          'Comps typed into the Tracker',
-          'Log into AtVenu again',
-          'Comps typed into Business Central',
-        ],
-      },
-      {
-        title: 'Effects',
-        items: [
-          'Packing lists are typed three times',
-          'Sales and comps are entered into two systems separately',
-          'Sales data is available only after downloads are entered',
-          'Reports, grab sheets and sales charts are built manually in Excel',
-        ],
-      },
-    ],
-  },
-  {
-    id: 'option-a',
-    tab: 'Option A · Keep AtVenu',
-    title: 'Option A: Keep AtVenu',
-    intro:
-      'Documents are uploaded once. AI extracts the fields, GMS business rules validate them, flagged items go to review, and the data is written to one database used by all systems.',
-    Svg: OptionAFlowSvg,
-    notes: [
-      {
-        title: 'Remaining manual steps',
-        tone: 'ok',
-        ordered: true,
-        items: [
-          'Export the sales report and settlement from AtVenu after each show (or schedule the export)',
-          'Review and approve flagged documents',
-        ],
-      },
-      {
-        title: 'Removed',
-        items: [
-          'Manual entry into the Tracker and Business Central',
-          'Both AtVenu portal logins for comps',
-          'Duplicate packing list entry (3 times to 1)',
-          'Manual report and grab sheet builds',
-        ],
-      },
-    ],
-  },
-  {
-    id: 'option-b',
-    tab: 'Option B · MerchFlow POS',
-    title: 'Option B: Replace AtVenu with MerchFlow POS',
-    intro:
-      'Sales, comps and stock counts are recorded in the MerchFlow iPad app and written directly to the database. Vendor documents follow the same process as Option A.',
-    Svg: OptionBFlowSvg,
-    notes: [
-      {
-        title: 'Remaining manual steps',
-        tone: 'ok',
-        items: ['Review and approve flagged vendor documents', 'Resolve count-out variances at settlement'],
-      },
-      {
-        title: 'Differences from current',
-        items: [
-          'No AtVenu portal access, exports or fees',
-          'Sales data available per transaction',
-          'Settlements calculated by the system',
-        ],
-      },
-    ],
-  },
-];
+const COUNT_TONE: Record<number, StageId> = { 10: 'manual', 1: 'review', 0: 'outputs' };
 
 export function FlowDiagrams() {
   const [active, setActive] = useState<ViewId>('current');
+  const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   const view = VIEWS.find((v) => v.id === active)!;
+
+  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    const index = VIEWS.findIndex((v) => v.id === active);
+    const next =
+      event.key === 'ArrowRight'
+        ? (index + 1) % VIEWS.length
+        : event.key === 'ArrowLeft'
+          ? (index - 1 + VIEWS.length) % VIEWS.length
+          : event.key === 'Home'
+            ? 0
+            : event.key === 'End'
+              ? VIEWS.length - 1
+              : -1;
+    if (next < 0) return;
+    event.preventDefault();
+    setActive(VIEWS[next].id);
+    tabs.current[next]?.focus();
+  }
 
   return (
     <div className="space-y-4">
-      <div role="tablist" aria-label="Data flow views" className="flex flex-wrap gap-1 border-b-2 border-[var(--color-text-primary)]">
-        {VIEWS.map((v) => (
-          <button
-            key={v.id}
-            type="button"
-            role="tab"
-            aria-selected={v.id === active}
-            onClick={() => setActive(v.id)}
-            className={cn(
-              'px-3 py-2 text-sm font-semibold rounded-t-md transition',
-              v.id === active
-                ? 'bg-[var(--color-red-primary)] text-white'
-                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
-            )}
-          >
-            {v.tab}
-          </button>
-        ))}
-      </div>
-
-      <div role="tabpanel" className="space-y-4">
-        <div>
-          <h3 className="text-lg font-semibold">{view.title}</h3>
-          <p className="text-sm text-[var(--color-text-secondary)] max-w-3xl">{view.intro}</p>
-        </div>
-        <div className="mf-flow" data-tour="flow-diagram">
-          <view.Svg />
-        </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          {view.notes.map((note, index) => {
-            const List = note.ordered ? 'ol' : 'ul';
+      <StageLegend />
+      <div>
+        <div role="tablist" aria-label="Data flow views" className="mfd-tabs" onKeyDown={onKeyDown}>
+          {VIEWS.map((v, i) => {
+            const selected = v.id === active;
             return (
-              <div
-                key={note.title}
-                data-tour={`flow-${view.id}-note-${index}`}
-                className={cn(
-                  'rounded-lg border p-4 bg-[var(--color-bg-surface)]',
-                  note.tone === 'warn'
-                    ? 'border-[var(--color-red-primary)]'
-                    : note.tone === 'ok'
-                      ? 'border-success'
-                      : 'border-[var(--color-bg-border)]'
-                )}
+              <button
+                key={v.id}
+                ref={(el) => {
+                  tabs.current[i] = el;
+                }}
+                type="button"
+                role="tab"
+                id={`mfd-tab-${v.id}`}
+                aria-selected={selected}
+                aria-controls={`mfd-panel-${v.id}`}
+                tabIndex={selected ? 0 : -1}
+                onClick={() => setActive(v.id)}
+                className="mfd-tab"
               >
-                <h4 className="text-sm font-semibold mb-2">{note.title}</h4>
-                <List className={cn('pl-5 space-y-1 text-sm text-[var(--color-text-secondary)]', note.ordered ? 'list-decimal' : 'list-disc')}>
-                  {note.items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </List>
-              </div>
+                {v.tab}
+                {v.count !== undefined && (
+                  <span className={`mfd-count mfd-s-${COUNT_TONE[v.count]}`} aria-label={`${v.count} manual steps`}>
+                    {v.count}
+                  </span>
+                )}
+              </button>
             );
           })}
+        </div>
+
+        <div
+          key={view.id}
+          role="tabpanel"
+          id={`mfd-panel-${view.id}`}
+          aria-labelledby={`mfd-tab-${view.id}`}
+          tabIndex={0}
+          className="mfd-panel"
+        >
+          <FlowPanelBody view={view} />
         </div>
       </div>
     </div>

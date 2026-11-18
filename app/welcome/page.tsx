@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { BarChart3, LayoutGrid, Tablet } from 'lucide-react';
 import { MerchFlowWordmark } from '@/components/brand/MerchFlowLogo';
 import { FlowDiagrams } from '@/components/onboarding/FlowDiagrams';
+import { FlowTiles } from '@/components/onboarding/FlowFigures';
+import { AI_NOTE } from '@/components/onboarding/flow-data';
 import { WelcomeActions } from '@/components/onboarding/WelcomeActions';
 import { TourChapterList } from '@/components/onboarding/TourChapterList';
 import { CHARTS_URL, FLOW_URL } from '@/lib/apps';
@@ -87,31 +89,18 @@ export default function WelcomePage() {
           </p>
         </div>
 
-        <div data-tour="welcome-counts" className="grid sm:grid-cols-3 rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] divide-y sm:divide-y-0 sm:divide-x divide-[var(--color-bg-border)]">
-          <div className="p-4">
-            <p className="text-4xl font-bold tabular-nums text-[var(--color-red-primary)]">10</p>
-            <p className="text-sm text-[var(--color-text-secondary)]">Current: manual steps, including 2 AtVenu portal logins</p>
-          </div>
-          <div className="p-4">
-            <p className="text-4xl font-bold tabular-nums">1</p>
-            <p className="text-sm text-[var(--color-text-secondary)]">Option A: AtVenu export per show, plus review of flagged items</p>
-          </div>
-          <div className="p-4">
-            <p className="text-4xl font-bold tabular-nums text-success">0</p>
-            <p className="text-sm text-[var(--color-text-secondary)]">Option B: no manual entry; review of flagged items only</p>
-          </div>
-        </div>
+        <FlowTiles data-tour="welcome-counts" />
 
         <FlowDiagrams />
 
-        <aside data-tour="welcome-ai" className="rounded-lg border border-ai-border bg-ai-bg p-4 max-w-3xl">
-          <h3 className="font-semibold mb-1 text-ai">Role of AI</h3>
-          <p className="text-sm text-[var(--color-text-secondary)]">
-            AI is used only to extract fields from documents, because document layouts vary.
-            Validation, inventory balances and settlement calculations use fixed GMS business rules.
-            Data is written to the database only after the rules pass and, for flagged items, after
-            review.
-          </p>
+        <aside data-tour="welcome-ai" className="mfd-ai mfd-s-ai">
+          <h3>
+            <span className="mfd-marker" aria-hidden="true">
+              AI
+            </span>
+            Role of AI
+          </h3>
+          <p>{AI_NOTE}</p>
         </aside>
 
         <p className="text-sm text-[var(--color-text-secondary)]">
