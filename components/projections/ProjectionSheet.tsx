@@ -731,28 +731,28 @@ export function ProjectionSheet({
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition ${
               viewMode === 'aggregate'
                 ? 'bg-[var(--color-bg-surface)] shadow-sm text-[var(--color-text-primary)]'
-                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
             }`}
           >
             <LayoutGrid className="w-4 h-4" />
-            Tour Summary
+            Tour summary
           </button>
           <button
             onClick={() => setViewMode('by-show')}
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition ${
               viewMode === 'by-show'
                 ? 'bg-[var(--color-bg-surface)] shadow-sm text-[var(--color-text-primary)]'
-                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
             }`}
           >
             <Calendar className="w-4 h-4" />
-            By Show
+            By show
           </button>
         </div>
         {viewMode === 'by-show' && (
           <button
             onClick={() => setShowCopyModal(true)}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-border)] rounded-lg transition"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-border)] rounded-lg transition"
           >
             <Copy className="w-4 h-4" />
             Copy from Tour
@@ -812,7 +812,7 @@ export function ProjectionSheet({
         {/* Fullscreen Header */}
         {isFullscreen && (
           <div className="fullscreen-modal-header mb-4">
-            <h2 className="text-lg font-semibold">Projection Sheet - Full View</h2>
+            <h2 className="text-lg font-semibold">Projection sheet - Full view</h2>
             <button
               onClick={() => setIsFullscreen(false)}
               className="p-2 hover:bg-[var(--color-bg-elevated)] rounded-lg transition"
@@ -824,7 +824,7 @@ export function ProjectionSheet({
 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap items-center gap-3">
-            <label className="text-xs text-[var(--color-text-muted)]">Scenario</label>
+            <label className="text-xs text-[var(--color-text-secondary)]">Scenario</label>
             <select
               className="g-input"
               value={selectedScenarioId}
@@ -863,7 +863,7 @@ export function ProjectionSheet({
               href={`/tours/${tourId}/projections/compare`}
               className="g-button g-button-outline text-xs"
             >
-              Compare Scenarios
+              Compare scenarios
             </Link>
             <button type="button" className="g-button g-button-outline text-xs" onClick={exportCsv}>
               Export CSV
@@ -904,7 +904,7 @@ export function ProjectionSheet({
 
         <div className="spreadsheet-container mt-6">
           {isLoadingOverrides ? (
-            <p className="text-sm text-[var(--color-text-muted)] p-4">Loading overrides…</p>
+            <p className="text-sm text-[var(--color-text-secondary)] p-4">Loading overrides…</p>
           ) : (
             <table className="spreadsheet">
               <thead>
@@ -913,8 +913,8 @@ export function ProjectionSheet({
                   <th className="sticky-col sticky-col-2">Design</th>
                   <th>Price</th>
                   <th>% Gross</th>
-                  <th>On Hand</th>
-                  <th>On Order</th>
+                  <th>On hand</th>
+                  <th>On order</th>
                   <th>Forecast</th>
                   {sizeOrder.map((size) => (
                     <th key={size}>{size}</th>
@@ -1018,7 +1018,7 @@ export function ProjectionSheet({
                           maximumFractionDigits: 0
                         })}
                       </td>
-                      <td className={row.forecastMargin > 0 ? 'text-green-600' : 'text-red-600'}>
+                      <td className={row.forecastMargin > 0 ? 'text-success' : 'text-danger'}>
                         {row.forecastMargin.toLocaleString('en-US', {
                           style: 'currency',
                           currency: 'USD',

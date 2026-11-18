@@ -107,13 +107,13 @@ export function CompBreakdownPanel({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-[var(--color-bg-surface)] rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim p-4">
+      <div className="bg-[var(--color-bg-surface)] rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[var(--color-bg-border)]">
           <div className="flex items-center gap-2">
-            <Gift className="w-5 h-5 text-purple-600" />
-            <h2 className="font-semibold">Comp Breakdown</h2>
+            <Gift className="w-5 h-5 text-ai" />
+            <h2 className="font-semibold">Comp breakdown</h2>
           </div>
           <button onClick={onClose} className="p-1 rounded-lg hover:bg-[var(--color-bg-border)]">
             <X className="w-5 h-5" />
@@ -125,7 +125,7 @@ export function CompBreakdownPanel({
           {/* Show info */}
           <div className="bg-[var(--color-bg-elevated)] rounded-lg p-3">
             <div className="text-sm font-medium">{showInfo.venue || 'TBD'}</div>
-            <div className="text-xs text-[var(--color-text-muted)]">
+            <div className="text-xs text-[var(--color-text-secondary)]">
               {showInfo.city} · {showInfo.date}
             </div>
           </div>
@@ -134,10 +134,10 @@ export function CompBreakdownPanel({
           <div className="bg-[var(--color-bg-elevated)] rounded-lg p-3 flex items-center justify-between">
             <div>
               <div className="text-sm font-medium font-mono">{sku}</div>
-              {size && <div className="text-xs text-[var(--color-text-muted)]">Size: {size}</div>}
+              {size && <div className="text-xs text-[var(--color-text-secondary)]">Size: {size}</div>}
             </div>
             <div className="text-right">
-              <div className="text-sm font-semibold text-purple-600">Total: {totalComps}</div>
+              <div className="text-sm font-semibold text-ai">Total: {totalComps}</div>
             </div>
           </div>
 
@@ -154,14 +154,14 @@ export function CompBreakdownPanel({
                     activeTab === type.value
                       ? 'bg-[var(--color-bg-surface)] shadow-sm text-[var(--color-text-primary)]'
                       : hasValue
-                        ? 'text-purple-600'
-                        : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
+                        ? 'text-ai'
+                        : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5 flex-shrink-0" />
                   <span className="hidden sm:inline truncate">{type.label}</span>
                   {hasValue && (
-                    <span className="ml-0.5 text-[10px] bg-purple-100 text-purple-700 px-1 rounded flex-shrink-0">
+                    <span className="ml-0.5 text-[10px] bg-ai-bg text-ai px-1 rounded flex-shrink-0">
                       {compValues[type.value]}
                     </span>
                   )}
@@ -179,10 +179,10 @@ export function CompBreakdownPanel({
                 return (
                   <div key={type.value} className="space-y-3">
                     <div className="flex items-center gap-2">
-                      <Icon className="w-5 h-5 text-purple-600" />
+                      <Icon className="w-5 h-5 text-ai" />
                       <div>
                         <div className="font-medium">{type.label} Comps</div>
-                        <div className="text-xs text-[var(--color-text-muted)]">
+                        <div className="text-xs text-[var(--color-text-secondary)]">
                           {type.description}
                         </div>
                       </div>
@@ -203,7 +203,7 @@ export function CompBreakdownPanel({
                         onChange={(e) =>
                           handleValueChange(type.value, parseInt(e.target.value, 10) || 0)
                         }
-                        className="flex-1 px-3 py-2 text-center text-lg font-mono bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="flex-1 px-3 py-2 text-center text-lg font-mono bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-ai focus:border-transparent"
                         min="0"
                       />
                       <button
@@ -221,15 +221,15 @@ export function CompBreakdownPanel({
           </div>
 
           {/* Summary */}
-          <div className="bg-purple-50 rounded-lg p-3">
-            <div className="text-xs font-medium text-purple-800 mb-2">Comp Summary</div>
+          <div className="bg-ai-bg rounded-lg p-3">
+            <div className="text-xs font-medium text-ai mb-2">Comp summary</div>
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 text-center">
               {compTypes.map((type) => (
                 <div key={type.value}>
-                  <div className="text-lg font-semibold text-purple-700">
+                  <div className="text-lg font-semibold text-ai">
                     {compValues[type.value]}
                   </div>
-                  <div className="text-[10px] text-purple-600">{type.label}</div>
+                  <div className="text-[10px] text-ai">{type.label}</div>
                 </div>
               ))}
             </div>
@@ -241,7 +241,7 @@ export function CompBreakdownPanel({
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] border border-[var(--color-bg-border)] rounded-lg focus:outline-none focus:ring-2 focus:ring-ai focus:border-transparent resize-none"
               rows={2}
               placeholder="Recipients, reason, etc..."
             />
@@ -259,7 +259,7 @@ export function CompBreakdownPanel({
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="px-4 py-2 text-sm rounded-lg bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50"
+            className="px-4 py-2 text-sm rounded-lg bg-ai text-white hover:bg-ai disabled:opacity-50"
           >
             {isSaving ? 'Saving...' : 'Save Comps'}
           </button>

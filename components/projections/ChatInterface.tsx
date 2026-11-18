@@ -225,7 +225,7 @@ export function ChatInterface({
     <div className="flex flex-col h-96">
       <div className="flex-1 overflow-y-auto space-y-3 mb-4">
         {messages.length === 0 && !isStreaming && (
-          <div className="text-sm text-[var(--color-text-muted)] text-center py-8">
+          <div className="text-sm text-[var(--color-text-secondary)] text-center py-8">
             Ask me anything about your projections, historical sales, or inventory strategy.
             <div className="mt-4 space-y-2">
               <div className="text-xs">Try asking:</div>
@@ -248,8 +248,8 @@ export function ChatInterface({
                 : 'bg-[var(--color-bg-border)] mr-8'
             }`}
           >
-            <div className="text-xs text-[var(--color-text-muted)] mb-1">
-              {msg.role === 'user' ? 'You' : 'AI Assistant'}
+            <div className="text-xs text-[var(--color-text-secondary)] mb-1">
+              {msg.role === 'user' ? 'You' : 'Claude'}
             </div>
             <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
           </div>
@@ -258,7 +258,7 @@ export function ChatInterface({
         {/* Streaming response */}
         {isStreaming && streamingContent && (
           <div className="p-3 rounded-lg bg-[var(--color-bg-border)] mr-8">
-            <div className="text-xs text-[var(--color-text-muted)] mb-1">AI Assistant</div>
+            <div className="text-xs text-[var(--color-text-secondary)] mb-1">Claude</div>
             <StreamingText
               content={streamingContent}
               isStreaming={true}
@@ -282,7 +282,7 @@ export function ChatInterface({
         {/* Legacy loading state */}
         {loading && !isStreaming && !streamingContent && (
           <div className="p-3 rounded-lg bg-[var(--color-bg-border)] mr-8">
-            <div className="text-xs text-[var(--color-text-muted)] mb-1">AI Assistant</div>
+            <div className="text-xs text-[var(--color-text-secondary)] mb-1">Claude</div>
             <div className="text-sm flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[var(--color-red-primary)] animate-pulse" />
               Thinking...

@@ -63,20 +63,20 @@ export function ReorderAlertBanner({ tourId, scenarioId }: ReorderAlertBannerPro
   };
 
   return (
-    <div data-tour="proj-reorder" className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg overflow-hidden">
+    <div data-tour="proj-reorder" className="bg-warn-bg border border-warn-border rounded-lg overflow-hidden">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 gap-3">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-amber-100 flex-shrink-0">
-            <AlertTriangle className="w-4 h-4 text-amber-600" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-warn-bg flex-shrink-0">
+            <AlertTriangle className="w-4 h-4 text-warn" />
           </div>
           <div>
-            <h3 className="font-semibold text-amber-900">
+            <h3 className="font-semibold text-warn">
               {alerts.length} Product{alerts.length !== 1 ? 's' : ''} Need Attention
             </h3>
-            <p className="text-sm text-amber-700">
+            <p className="text-sm text-warn">
               {criticalAlerts.length > 0 && (
-                <span className="text-red-600 font-medium">
+                <span className="text-danger font-medium">
                   {criticalAlerts.length} projected stockout{criticalAlerts.length !== 1 ? 's' : ''}
                 </span>
               )}
@@ -90,7 +90,7 @@ export function ReorderAlertBanner({ tourId, scenarioId }: ReorderAlertBannerPro
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="flex-1 sm:flex-initial flex items-center justify-center gap-1 px-3 py-1.5 text-sm font-medium text-amber-700 hover:bg-amber-100 rounded-lg transition"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-1 px-3 py-1.5 text-sm font-medium text-warn hover:bg-warn-bg rounded-lg transition"
           >
             {isExpanded ? 'Hide' : 'Show'} Details
             {isExpanded ? (
@@ -101,7 +101,7 @@ export function ReorderAlertBanner({ tourId, scenarioId }: ReorderAlertBannerPro
           </button>
           <button
             onClick={() => setIsDismissed(true)}
-            className="p-1.5 text-amber-600 hover:bg-amber-100 rounded-lg transition"
+            className="p-1.5 text-warn hover:bg-warn-bg rounded-lg transition"
             title="Dismiss"
           >
             <X className="w-4 h-4" />
@@ -111,34 +111,34 @@ export function ReorderAlertBanner({ tourId, scenarioId }: ReorderAlertBannerPro
 
       {/* Expanded content */}
       {isExpanded && (
-        <div className="border-t border-amber-200 p-4 bg-[var(--color-bg-surface)]/50">
+        <div className="border-t border-warn-border p-4 bg-[var(--color-bg-surface)]/50">
           <div className="space-y-2">
             {/* Critical alerts first */}
             {criticalAlerts.map((alert) => (
               <div
                 key={`${alert.sku}:${alert.size ?? ''}`}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-red-50 border border-red-100 rounded-lg gap-2"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-danger-bg border border-danger-border rounded-lg gap-2"
               >
                 <div className="flex items-center gap-3">
-                  <Package className="w-4 h-4 text-red-600 flex-shrink-0" />
+                  <Package className="w-4 h-4 text-danger flex-shrink-0" />
                   <div>
-                    <div className="font-mono text-sm font-medium text-red-900">
+                    <div className="font-mono text-sm font-medium text-danger">
                       {alert.sku}
                       {alert.size && (
-                        <span className="text-red-600 ml-1">({alert.size})</span>
+                        <span className="text-danger ml-1">({alert.size})</span>
                       )}
                     </div>
-                    <div className="text-xs text-red-700">
+                    <div className="text-xs text-danger">
                       Stockout projected at Show #{alert.first_stockout_show} (
                       {formatDate(alert.first_stockout_date)})
                     </div>
                   </div>
                 </div>
                 <div className="text-left sm:text-right pl-7 sm:pl-0">
-                  <div className="text-sm font-semibold text-red-700">
+                  <div className="text-sm font-semibold text-danger">
                     {alert.current_projected_balance} units
                   </div>
-                  <div className="text-xs text-red-600">
+                  <div className="text-xs text-danger">
                     Min: {alert.minimum_balance}
                     {alert.reorder_quantity && ` · Reorder: ${alert.reorder_quantity}`}
                   </div>
@@ -150,28 +150,28 @@ export function ReorderAlertBanner({ tourId, scenarioId }: ReorderAlertBannerPro
             {warningAlerts.map((alert) => (
               <div
                 key={`${alert.sku}:${alert.size ?? ''}`}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-amber-50 border border-amber-100 rounded-lg gap-2"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-warn-bg border border-warn-border rounded-lg gap-2"
               >
                 <div className="flex items-center gap-3">
-                  <Package className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                  <Package className="w-4 h-4 text-warn flex-shrink-0" />
                   <div>
-                    <div className="font-mono text-sm font-medium text-amber-900">
+                    <div className="font-mono text-sm font-medium text-warn">
                       {alert.sku}
                       {alert.size && (
-                        <span className="text-amber-600 ml-1">({alert.size})</span>
+                        <span className="text-warn ml-1">({alert.size})</span>
                       )}
                     </div>
-                    <div className="text-xs text-amber-700">
+                    <div className="text-xs text-warn">
                       Falls below threshold at Show #{alert.first_stockout_show} (
                       {formatDate(alert.first_stockout_date)})
                     </div>
                   </div>
                 </div>
                 <div className="text-left sm:text-right pl-7 sm:pl-0">
-                  <div className="text-sm font-semibold text-amber-700">
+                  <div className="text-sm font-semibold text-warn">
                     {alert.current_projected_balance} units
                   </div>
-                  <div className="text-xs text-amber-600">
+                  <div className="text-xs text-warn">
                     Min: {alert.minimum_balance}
                     {alert.reorder_quantity && ` · Reorder: ${alert.reorder_quantity}`}
                   </div>
@@ -182,11 +182,11 @@ export function ReorderAlertBanner({ tourId, scenarioId }: ReorderAlertBannerPro
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">
-            <button className="px-3 py-2 sm:py-1.5 text-sm font-medium text-amber-700 hover:bg-amber-100 rounded-lg transition">
-              Configure Thresholds
+            <button className="px-3 py-2 sm:py-1.5 text-sm font-medium text-warn hover:bg-warn-bg rounded-lg transition">
+              Configure thresholds
             </button>
-            <button className="px-3 py-2 sm:py-1.5 text-sm font-medium bg-amber-600 text-white hover:bg-amber-700 rounded-lg transition">
-              Create Reorder
+            <button className="px-3 py-2 sm:py-1.5 text-sm font-medium bg-warn text-white hover:bg-warn rounded-lg transition">
+              Create reorder
             </button>
           </div>
         </div>

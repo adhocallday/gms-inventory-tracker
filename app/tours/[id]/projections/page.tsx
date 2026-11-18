@@ -74,19 +74,15 @@ export default async function ProjectionPage({ params }: ProjectionParams) {
     : { data: [] };
 
   return (
-    <div className="g-container py-12">
+    <div className="g-container py-6">
       <Link href={`/tours/${tour.id}`} className="text-sm font-medium g-link">
-        <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to tour
+        <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />
+        {tour.name}
       </Link>
-      <div className="flex flex-col gap-4 mt-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <p className="g-kicker">Projection sheet</p>
-          <h1 className="text-3xl font-semibold g-title mt-2">
-            {tour.name}
-          </h1>
-          <p className="text-sm text-[var(--color-text-secondary)]">{tour.artist}</p>
-        </div>
-      </div>
+      <h1 className="mt-3 text-2xl font-semibold tracking-tight lg:text-[28px] lg:leading-9">Projections</h1>
+      <p className="mt-1 mb-6 text-sm text-[var(--color-text-secondary)]">
+        {tour.artist}. Planned units per product and size for the shows ahead, by scenario.
+      </p>
 
       <ProjectionSheet
         tourId={tour.id}

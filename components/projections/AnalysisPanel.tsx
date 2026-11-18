@@ -6,20 +6,20 @@ interface AnalysisPanelProps {
 }
 
 const sectionCard =
-  'bg-gradient-to-br from-white/80 to-slate-50 border border-[var(--color-bg-border)] rounded-[1.5rem] shadow-sm p-6 space-y-4';
+  'bg-[var(--color-bg-surface)] border border-[var(--color-bg-border)] rounded-lg p-6 space-y-4';
 
 const statisticCard =
-  'bg-[var(--color-bg-surface)]/80 border border-[var(--color-bg-border)] rounded-2xl p-4 shadow-sm shadow-slate-200/60';
+  'bg-[var(--color-bg-surface)] border border-[var(--color-bg-border)] rounded-lg p-4 shadow-sm';
 
 export function AnalysisPanel({ analysis, loading }: AnalysisPanelProps) {
   if (loading) {
-    return <div className="text-center py-8 text-[var(--color-text-muted)]">Analyzing...</div>;
+    return <div className="text-center py-8 text-[var(--color-text-secondary)]">Analyzing...</div>;
   }
 
   if (!analysis) {
     return (
-      <div className="text-center py-8 text-[var(--color-text-muted)]">
-        No analysis available. Click "Generate AI Projections" to generate.
+      <div className="text-center py-8 text-[var(--color-text-secondary)]">
+        No analysis available. Generate projections to see the analysis.
       </div>
     );
   }
@@ -29,17 +29,17 @@ export function AnalysisPanel({ analysis, loading }: AnalysisPanelProps) {
       {/* Product Performance */}
       <section className={sectionCard}>
         <div className="flex items-center justify-between gap-4">
-          <h3 className="text-xl font-semibold g-title text-[var(--color-text-primary)]">
-            Product Performance
+          <h3 className="text-xl font-semibold text-[var(--color-text-primary)]">
+            Product performance
           </h3>
-          <span className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+          <span className="text-xs font-semibold text-[var(--color-text-secondary)]">
             Updated in real time
           </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div className={statisticCard}>
-            <p className="text-sm font-medium text-[var(--color-text-muted)] mb-3">Top Performers</p>
+            <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-3">Top performers</p>
             <div className="space-y-2">
               {analysis.productPerformance?.topPerformers?.slice(0, 3).map((p: any) => (
                 <div key={p.sku} className="space-y-1">
@@ -53,7 +53,7 @@ export function AnalysisPanel({ analysis, loading }: AnalysisPanelProps) {
           </div>
 
           <div className={statisticCard}>
-            <p className="text-sm font-medium text-[var(--color-text-muted)] mb-3">Underperformers</p>
+            <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-3">Underperformers</p>
             <div className="space-y-2">
               {analysis.productPerformance?.underperformers?.slice(0, 3).map((p: any) => (
                 <div key={p.sku} className="space-y-1">
@@ -67,7 +67,7 @@ export function AnalysisPanel({ analysis, loading }: AnalysisPanelProps) {
           </div>
 
           <div className={statisticCard}>
-            <p className="text-sm font-medium text-[var(--color-text-muted)] mb-3">Opportunities</p>
+            <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-3">Opportunities</p>
             <div className="space-y-2">
               {analysis.productPerformance?.opportunities?.slice(0, 3).map((p: any) => (
                 <div key={p.sku} className="space-y-1">
@@ -83,22 +83,22 @@ export function AnalysisPanel({ analysis, loading }: AnalysisPanelProps) {
       {/* Stockout Risks */}
       {analysis.stockoutRisks?.length > 0 && (
         <section className={sectionCard}>
-          <h3 className="text-xl font-semibold g-title text-[var(--color-text-primary)]">Stockout Risks</h3>
+          <h3 className="text-xl font-semibold text-[var(--color-text-primary)]">Stockout risks</h3>
           <div className="space-y-3">
             {analysis.stockoutRisks.map((risk: any, idx: number) => (
               <div
                 key={idx}
-                className={`rounded-2xl border p-4 shadow-sm ${
+                className={`rounded-lg border p-4 shadow-sm ${
                   risk.riskLevel === 'critical'
-                    ? 'bg-red-50/60 border-red-100 text-red-700'
+                    ? 'bg-danger-bg border-danger-border text-danger'
                     : risk.riskLevel === 'high'
-                    ? 'bg-orange-50/70 border-orange-100 text-orange-700'
-                    : 'bg-yellow-50/70 border-amber-100 text-amber-700'
+                    ? 'bg-warn-bg border-warn-border text-warn'
+                    : 'bg-warn-bg border-warn-border text-warn'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm font-semibold">{risk.sku}{risk.size ? ` · ${risk.size}` : ''}</span>
-                  <span className="text-[0.65rem] uppercase tracking-[0.3em]">
+                  <span className="text-xs font-semibold">
                     {risk.riskLevel} risk
                   </span>
                 </div>
@@ -116,24 +116,24 @@ export function AnalysisPanel({ analysis, loading }: AnalysisPanelProps) {
       {analysis.sizeCurveRecommendations?.length > 0 && (
         <section className={sectionCard}>
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold g-title text-[var(--color-text-primary)]">
-              Size Distribution Recommendations
+            <h3 className="text-xl font-semibold text-[var(--color-text-primary)]">
+              Size distribution recommendations
             </h3>
-            <span className="text-xs uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+            <span className="text-xs font-semibold text-[var(--color-text-secondary)]">
               {analysis.sizeCurveRecommendations.length} SKUs
             </span>
           </div>
           <div className="space-y-4">
             {analysis.sizeCurveRecommendations.slice(0, 5).map((curve: any) => (
-              <div key={curve.sku} className="bg-[var(--color-bg-surface)] border border-[var(--color-bg-border)] rounded-2xl p-4 shadow-sm">
+              <div key={curve.sku} className="bg-[var(--color-bg-surface)] border border-[var(--color-bg-border)] rounded-lg p-4 shadow-sm">
                 <div className="flex items-center justify-between mb-2">
                   <div className="text-sm font-semibold text-[var(--color-text-primary)]">{curve.sku}</div>
-                  <span className="text-xs text-[var(--color-text-muted)]">Confidence: {curve.confidence ? `${Math.round(curve.confidence * 100)}%` : 'n/a'}</span>
+                  <span className="text-xs text-[var(--color-text-secondary)]">Confidence: {curve.confidence ? `${Math.round(curve.confidence * 100)}%` : 'n/a'}</span>
                 </div>
                 <div className="grid grid-cols-6 gap-2 text-xs mb-2">
                   {Object.entries(curve.recommendedCurve).map(([size, pct]: [string, any]) => (
                     <div key={size} className="text-center">
-                      <div className="text-[var(--color-text-muted)]">{size}</div>
+                      <div className="text-[var(--color-text-secondary)]">{size}</div>
                       <div className="font-semibold">{Math.round(pct * 100)}%</div>
                     </div>
                   ))}

@@ -205,59 +205,60 @@ export function EnhancedAIAgentPanel({
   }
 
   return (
-    <div className="g-card p-6">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+    <div className="g-card p-5">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-5">
         <div>
-          <h2 className="text-2xl font-bold g-title flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-[var(--color-red-primary)]" />
-            AI Projection Assistant
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-ai" aria-hidden="true" />
+            Projection assistant
           </h2>
-          <p className="text-sm text-[var(--color-text-muted)] mt-1">
-            Generate complete projections with visible AI reasoning
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+            Claude drafts units per product and size from this tour&apos;s sales so far, and shows its reasoning. Nothing is saved until you apply it.
           </p>
         </div>
         <button
+          type="button"
           onClick={handleGenerate}
           disabled={loading}
-          className="px-6 py-3 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition disabled:opacity-50 font-semibold text-lg whitespace-nowrap flex items-center gap-2"
+          className="px-4 py-2.5 bg-[var(--color-red-primary)] text-white rounded-md hover:bg-[var(--color-red-hover)] active:bg-[var(--color-red-active)] transition-colors disabled:opacity-60 font-semibold text-sm whitespace-nowrap flex items-center gap-2"
         >
           {loading ? (
             <>
-              <Brain className="w-5 h-5 animate-pulse" />
-              AI Thinking...
+              <Brain className="w-4 h-4 animate-pulse" aria-hidden="true" />
+              Generating…
             </>
           ) : (
             <>
-              <Sparkles className="w-5 h-5" />
-              Generate AI Projections
+              <Sparkles className="w-4 h-4" aria-hidden="true" />
+              Generate projections
             </>
           )}
         </button>
       </div>
 
       {generated && !isStreaming && (
-        <div className="mb-4 p-5 bg-gradient-to-br from-emerald-50/80 to-white border-2 border-emerald-200 rounded-2xl shadow-sm">
+        <div className="mb-4 p-5 bg-success-bg border border-success-border rounded-lg shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
-              <Check className="h-5 w-5 shrink-0 text-emerald-600" aria-hidden="true" />
+            <div className="p-2 rounded-lg bg-[var(--color-bg-surface)] shadow-inner">
+              <Check className="h-5 w-5 shrink-0 text-success" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-emerald-800">Projections Generated</p>
-              <p className="text-xs text-emerald-600">All data has been populated in the spreadsheet below.</p>
+              <p className="text-sm font-semibold text-success">Projections generated</p>
+              <p className="text-xs text-success">All data has been populated in the spreadsheet below.</p>
             </div>
           </div>
         </div>
       )}
 
       {error && (
-        <div className="mb-4 p-5 bg-gradient-to-br from-red-50/80 to-white border-2 border-red-200 rounded-2xl shadow-sm">
+        <div className="mb-4 p-5 bg-danger-bg border border-danger-border rounded-lg shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
-              <X className="h-5 w-5 shrink-0 text-red-600" aria-hidden="true" />
+            <div className="p-2 rounded-lg bg-[var(--color-bg-surface)] shadow-inner">
+              <X className="h-5 w-5 shrink-0 text-danger" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-red-800">Error</p>
-              <p className="text-xs text-red-600">{error}</p>
+              <p className="text-sm font-semibold text-danger">Error</p>
+              <p className="text-xs text-danger">{error}</p>
             </div>
           </div>
         </div>
@@ -266,28 +267,28 @@ export function EnhancedAIAgentPanel({
       <div className="flex gap-2 mb-4 border-b border-[var(--color-bg-border)]">
         <button
           onClick={() => setActiveTab('thinking')}
-          className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'thinking' ? 'border-b-2 border-[var(--color-red-primary)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-muted)]'}`}
+          className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'thinking' ? 'border-b-2 border-[var(--color-red-primary)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)]'}`}
         >
           <Brain className="w-4 h-4" />
-          AI Thinking
-          {isStreaming && <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />}
+          Reasoning
+          {isStreaming && <span className="w-2 h-2 rounded-full bg-success animate-pulse" />}
         </button>
         <button
           onClick={() => setActiveTab('analysis')}
-          className={`px-4 py-2 ${activeTab === 'analysis' ? 'border-b-2 border-[var(--color-red-primary)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-muted)]'}`}
+          className={`px-4 py-2 ${activeTab === 'analysis' ? 'border-b-2 border-[var(--color-red-primary)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)]'}`}
         >
           Analysis
         </button>
         <button
           onClick={() => setActiveTab('sizes')}
-          className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'sizes' ? 'border-b-2 border-[var(--color-red-primary)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-muted)]'}`}
+          className={`flex items-center gap-2 px-4 py-2 ${activeTab === 'sizes' ? 'border-b-2 border-[var(--color-red-primary)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)]'}`}
         >
           <BarChart3 className="w-4 h-4" />
-          Size Analysis
+          Size analysis
         </button>
         <button
           onClick={() => setActiveTab('chat')}
-          className={`px-4 py-2 ${activeTab === 'chat' ? 'border-b-2 border-[var(--color-red-primary)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-muted)]'}`}
+          className={`px-4 py-2 ${activeTab === 'chat' ? 'border-b-2 border-[var(--color-red-primary)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)]'}`}
         >
           Chat
         </button>
@@ -300,7 +301,7 @@ export function EnhancedAIAgentPanel({
             phase={streamPhase}
             progress={streamProgress}
             isActive={isStreaming}
-            variant="dark"
+            variant="light"
           />
         )}
         {activeTab === 'analysis' && (
@@ -310,15 +311,15 @@ export function EnhancedAIAgentPanel({
           <div className="space-y-4">
             {!sizeAnalysis && !sizeLoading && (
               <div className="text-center py-8">
-                <BarChart3 className="w-12 h-12 mx-auto mb-3 text-[var(--color-text-muted)] opacity-50" />
-                <p className="text-[var(--color-text-muted)] mb-4">
+                <BarChart3 className="w-12 h-12 mx-auto mb-3 text-[var(--color-text-secondary)] opacity-50" />
+                <p className="text-[var(--color-text-secondary)] mb-4">
                   Analyze historical sales data to optimize size distribution for each product.
                 </p>
                 <button
                   onClick={handleAnalyzeSizes}
                   className="px-6 py-3 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-medium"
                 >
-                  Analyze Size Distribution
+                  Analyze size distribution
                 </button>
               </div>
             )}

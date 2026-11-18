@@ -30,30 +30,30 @@ export function ProductPerformanceChart({ products, historicalData }: ProductPer
 
   return (
     <div className="g-card p-4">
-      <h4 className="text-sm font-semibold mb-3">Forecast vs Historical Performance</h4>
+      <h4 className="text-sm font-semibold mb-3">Forecast vs historical performance</h4>
       <div className="space-y-3 max-h-96 overflow-y-auto">
         {mergedData.slice(0, 10).map(p => (
           <div key={p.sku}>
             <div className="text-xs font-medium mb-1">{p.sku}</div>
             <div className="flex gap-2">
               <div className="flex-1">
-                <div className="text-xs text-[var(--color-text-muted)] mb-1">
+                <div className="text-xs text-[var(--color-text-secondary)] mb-1">
                   Historical: {p.historicalUnits.toLocaleString()}
                 </div>
-                <div className="h-4 bg-blue-500/20 rounded-full overflow-hidden">
+                <div className="h-4 bg-info-bg rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-blue-500 transition-all"
+                    className="h-full bg-info transition-all"
                     style={{ width: `${(p.historicalUnits / maxUnits) * 100}%` }}
                   />
                 </div>
               </div>
               <div className="flex-1">
-                <div className="text-xs text-[var(--color-text-muted)] mb-1">
+                <div className="text-xs text-[var(--color-text-secondary)] mb-1">
                   Forecast: {p.forecastUnits.toLocaleString()}
                 </div>
-                <div className="h-4 bg-green-500/20 rounded-full overflow-hidden">
+                <div className="h-4 bg-success-bg rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-green-500 transition-all"
+                    className="h-full bg-success transition-all"
                     style={{ width: `${(p.forecastUnits / maxUnits) * 100}%` }}
                   />
                 </div>

@@ -304,7 +304,7 @@ export function ShowProjectionGrid({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-sm text-[var(--color-text-muted)]">Loading show projections...</div>
+        <div className="text-sm text-[var(--color-text-secondary)]">Loading show projections...</div>
       </div>
     );
   }
@@ -312,9 +312,9 @@ export function ShowProjectionGrid({
   if (shows.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <Package className="w-10 h-10 text-[var(--color-text-muted)] mb-3" />
-        <p className="text-sm text-[var(--color-text-muted)]">No shows found for this tour</p>
-        <p className="text-xs text-[var(--color-text-muted)] mt-1">
+        <Package className="w-10 h-10 text-[var(--color-text-secondary)] mb-3" />
+        <p className="text-sm text-[var(--color-text-secondary)]">No shows found for this tour</p>
+        <p className="text-xs text-[var(--color-text-secondary)] mt-1">
           Add shows to start creating projections
         </p>
       </div>
@@ -325,7 +325,7 @@ export function ShowProjectionGrid({
     <div className="overflow-hidden">
       {/* Navigation */}
       <div className="flex items-center justify-between mb-4">
-        <div className="text-sm text-[var(--color-text-muted)]">
+        <div className="text-sm text-[var(--color-text-secondary)]">
           Showing shows {visibleStartIndex + 1}-
           {Math.min(visibleStartIndex + VISIBLE_SHOWS, shows.length)} of {shows.length}
         </div>
@@ -375,7 +375,7 @@ export function ShowProjectionGrid({
                   }`}
                 >
                   <div className="text-xs font-semibold">{formatDate(show.show_date)}</div>
-                  <div className="text-[10px] text-[var(--color-text-muted)] truncate max-w-[90px]">
+                  <div className="text-[10px] text-[var(--color-text-secondary)] truncate max-w-[90px]">
                     {show.city || show.venue_name || 'TBD'}
                   </div>
                 </th>
@@ -406,7 +406,7 @@ export function ShowProjectionGrid({
                     {isFirstOfSku ? (
                       <div>
                         <div className="font-mono text-xs font-medium">{row.sku}</div>
-                        <div className="text-[10px] text-[var(--color-text-muted)] truncate max-w-[110px]">
+                        <div className="text-[10px] text-[var(--color-text-secondary)] truncate max-w-[110px]">
                           {row.description}
                         </div>
                       </div>
@@ -483,7 +483,7 @@ export function ShowProjectionGrid({
                           {deliveryTotal !== 0 && (
                             <button
                               onClick={() => onDeliveryClick?.(show.id, row.sku, row.size)}
-                              className="flex items-center justify-center gap-0.5 text-[10px] text-green-600 hover:bg-green-50 rounded px-1"
+                              className="flex items-center justify-center gap-0.5 text-[10px] text-success hover:bg-success-bg rounded px-1"
                             >
                               <Truck className="w-3 h-3" />
                               <span>{deliveryTotal > 0 ? '+' : ''}{deliveryTotal}</span>
@@ -494,7 +494,7 @@ export function ShowProjectionGrid({
                           {compTotal > 0 && (
                             <button
                               onClick={() => onCompClick?.(show.id, row.sku, row.size)}
-                              className="flex items-center justify-center gap-0.5 text-[10px] text-purple-600 hover:bg-purple-50 rounded px-1"
+                              className="flex items-center justify-center gap-0.5 text-[10px] text-ai hover:bg-ai-bg rounded px-1"
                             >
                               <Gift className="w-3 h-3" />
                               <span>-{compTotal}</span>
@@ -505,10 +505,10 @@ export function ShowProjectionGrid({
                           <div
                             className={`text-[10px] text-center font-medium ${
                               belowThreshold
-                                ? 'text-red-600 bg-red-50 rounded'
+                                ? 'text-danger bg-danger-bg rounded'
                                 : balance < 0
-                                  ? 'text-orange-600'
-                                  : 'text-[var(--color-text-muted)]'
+                                  ? 'text-warn'
+                                  : 'text-[var(--color-text-secondary)]'
                             }`}
                           >
                             {belowThreshold && (
@@ -528,17 +528,17 @@ export function ShowProjectionGrid({
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 mt-4 text-xs text-[var(--color-text-muted)]">
+      <div className="flex items-center gap-4 mt-4 text-xs text-[var(--color-text-secondary)]">
         <div className="flex items-center gap-1">
-          <Truck className="w-3 h-3 text-green-600" />
+          <Truck className="w-3 h-3 text-success" />
           <span>Delivery</span>
         </div>
         <div className="flex items-center gap-1">
-          <Gift className="w-3 h-3 text-purple-600" />
+          <Gift className="w-3 h-3 text-ai" />
           <span>Comp</span>
         </div>
         <div className="flex items-center gap-1">
-          <AlertTriangle className="w-3 h-3 text-red-600" />
+          <AlertTriangle className="w-3 h-3 text-danger" />
           <span>Below threshold</span>
         </div>
       </div>

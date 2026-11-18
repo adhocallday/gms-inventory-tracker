@@ -82,8 +82,8 @@ export function ProjectionVisualizations({
 
   if (!projectionData || projectionData.length === 0) {
     return (
-      <div className="g-card p-8 text-center text-[var(--color-text-muted)]">
-        <p>Generate AI projections to see visualizations</p>
+      <div className="g-card p-8 text-center text-[var(--color-text-secondary)]">
+        <p>Generate projections to see charts here.</p>
       </div>
     );
   }
@@ -92,7 +92,7 @@ export function ProjectionVisualizations({
     <div className="space-y-6">
       {/* Size distribution charts for top products */}
       <div>
-        <h3 className="text-lg font-semibold g-title mb-4">Size Distributions</h3>
+        <h3 className="text-lg font-semibold mb-4">Size distributions</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {projectionData.slice(0, 4).map((proj) => (
             <SizeDistributionChart

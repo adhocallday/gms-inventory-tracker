@@ -160,25 +160,22 @@ export default function CompareScenariosPage() {
   }, [comparisonData]);
 
   return (
-    <div className="g-container py-12">
-      <Link href={`/tours/${tourId}/projections`} className="text-sm font-medium g-link flex items-center gap-1">
-        <ArrowLeft className="w-4 h-4" />
-        Back to projections
+    <div className="g-container py-6">
+      <Link href={`/tours/${tourId}/projections`} className="text-sm font-medium g-link inline-flex items-center gap-1">
+        <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+        Projections
       </Link>
 
-      <div className="mt-4">
-        <p className="g-kicker">Compare scenarios</p>
-        <h1 className="text-3xl font-semibold g-title mt-2">
-          {tourInfo?.name || 'Loading...'}
-        </h1>
-        {tourInfo?.artist && (
-          <p className="text-sm text-[var(--color-text-secondary)]">{tourInfo.artist}</p>
-        )}
+      <div className="mt-3">
+        <h1 className="text-2xl font-semibold tracking-tight lg:text-[28px] lg:leading-9">Compare scenarios</h1>
+        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          {tourInfo ? [tourInfo.name, tourInfo.artist].filter(Boolean).join(' · ') : 'Loading tour…'}
+        </p>
       </div>
 
       {/* Scenario Selection */}
-      <div className="g-card p-6 mt-6">
-        <h2 className="text-lg font-semibold mb-4">Select Scenarios to Compare (2-4)</h2>
+      <div className="g-card p-5 mt-6">
+        <h2 className="text-lg font-semibold mb-4">Select scenarios to compare (2-4)</h2>
 
         <div className="flex flex-wrap gap-2">
           {scenarios.map(scenario => (
@@ -201,7 +198,7 @@ export default function CompareScenariosPage() {
         </div>
 
         {scenarios.length === 0 && (
-          <p className="text-[var(--color-text-muted)] text-sm">No scenarios found for this tour.</p>
+          <p className="text-[var(--color-text-secondary)] text-sm">No scenarios found for this tour.</p>
         )}
 
         <div className="mt-4 flex items-center gap-4">
@@ -214,20 +211,20 @@ export default function CompareScenariosPage() {
             {loading ? 'Loading...' : 'Compare Selected'}
           </button>
 
-          <span className="text-sm text-[var(--color-text-muted)]">
+          <span className="text-sm text-[var(--color-text-secondary)]">
             {selectedIds.length} of 4 selected
           </span>
         </div>
 
         {error && (
-          <p className="mt-4 text-sm text-red-600">{error}</p>
+          <p className="mt-4 text-sm text-danger">{error}</p>
         )}
       </div>
 
       {/* Comparison Grid */}
       {comparisonData && (
-        <div className="g-card p-6 mt-6 overflow-x-auto">
-          <h2 className="text-lg font-semibold mb-4">Comparison Results</h2>
+        <div className="g-card p-5 mt-6 overflow-x-auto">
+          <h2 className="text-lg font-semibold mb-4">Comparison results</h2>
 
           <table className="w-full border-collapse text-sm">
             <thead>
@@ -237,16 +234,16 @@ export default function CompareScenariosPage() {
                 {comparisonData.scenarios.map(s => (
                   <th key={s.scenario.id} colSpan={sizeOrder.length} className="text-center py-2 px-3 font-medium border-l border-[var(--color-bg-border)]">
                     {s.scenario.name}
-                    {s.scenario.is_baseline && <span className="ml-1 text-xs text-[var(--color-text-muted)]">(Base)</span>}
+                    {s.scenario.is_baseline && <span className="ml-1 text-xs text-[var(--color-text-secondary)]">(Base)</span>}
                   </th>
                 ))}
               </tr>
-              <tr className="border-b border-[var(--color-bg-border)] bg-[var(--color-bg-muted)]">
-                <th className="sticky left-0 bg-[var(--color-bg-muted)]"></th>
+              <tr className="border-b border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)]">
+                <th className="sticky left-0 bg-[var(--color-bg-elevated)]"></th>
                 <th></th>
                 {comparisonData.scenarios.map(s => (
                   sizeOrder.map(size => (
-                    <th key={`${s.scenario.id}-${size}`} className="text-center py-1 px-2 text-xs font-medium text-[var(--color-text-muted)]">
+                    <th key={`${s.scenario.id}-${size}`} className="text-center py-1 px-2 text-xs font-medium text-[var(--color-text-secondary)]">
                       {size}
                     </th>
                   ))
@@ -255,7 +252,7 @@ export default function CompareScenariosPage() {
             </thead>
             <tbody>
               {comparisonGrid.map(row => (
-                <tr key={row.sku} className="border-b border-[var(--color-bg-border)] hover:bg-[var(--color-bg-muted)]">
+                <tr key={row.sku} className="border-b border-[var(--color-bg-border)] hover:bg-[var(--color-bg-elevated)]">
                   <td className="py-2 px-3 font-mono text-xs sticky left-0 bg-[var(--color-bg-surface)]">{row.sku}</td>
                   <td className="py-2 px-3 text-xs truncate max-w-[200px]">{row.description}</td>
                   {comparisonData.scenarios.map((s, sIdx) => (
@@ -268,8 +265,8 @@ export default function CompareScenariosPage() {
                         <td
                           key={`${s.scenario.id}-${size}`}
                           className={`text-center py-2 px-2 text-xs ${
-                            sIdx > 0 && diff > 0 ? 'text-emerald-600' :
-                            sIdx > 0 && diff < 0 ? 'text-red-600' : ''
+                            sIdx > 0 && diff > 0 ? 'text-success' :
+                            sIdx > 0 && diff < 0 ? 'text-danger' : ''
                           }`}
                         >
                           {value > 0 ? value : '-'}
@@ -288,7 +285,7 @@ export default function CompareScenariosPage() {
           </table>
 
           {comparisonGrid.length === 0 && (
-            <p className="text-center text-[var(--color-text-muted)] py-8">
+            <p className="text-center text-[var(--color-text-secondary)] py-8">
               No forecast data found in selected scenarios.
             </p>
           )}
@@ -303,9 +300,9 @@ export default function CompareScenariosPage() {
 
                 return (
                   <div key={s.scenario.id} className="g-panel">
-                    <p className="text-xs text-[var(--color-text-muted)]">{s.scenario.name}</p>
+                    <p className="text-xs text-[var(--color-text-secondary)]">{s.scenario.name}</p>
                     <p className="text-xl font-semibold">{totalUnits.toLocaleString()}</p>
-                    <p className="text-xs text-[var(--color-text-muted)]">total units</p>
+                    <p className="text-xs text-[var(--color-text-secondary)]">total units</p>
                   </div>
                 );
               })}

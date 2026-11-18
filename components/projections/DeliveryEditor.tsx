@@ -69,13 +69,13 @@ export function DeliveryEditor({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-[var(--color-bg-surface)] rounded-xl shadow-xl w-full max-w-md mx-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim">
+      <div className="bg-[var(--color-bg-surface)] rounded-lg shadow-xl w-full max-w-md mx-4">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[var(--color-bg-border)]">
           <div className="flex items-center gap-2">
             <Truck className="w-5 h-5 text-[var(--color-red-primary)]" />
-            <h2 className="font-semibold">Add Delivery/Adjustment</h2>
+            <h2 className="font-semibold">Add a delivery or adjustment</h2>
           </div>
           <button
             onClick={onClose}
@@ -90,7 +90,7 @@ export function DeliveryEditor({
           {/* Show info */}
           <div className="bg-[var(--color-bg-elevated)] rounded-lg p-3">
             <div className="text-sm font-medium">{showInfo.venue || 'TBD'}</div>
-            <div className="text-xs text-[var(--color-text-muted)]">
+            <div className="text-xs text-[var(--color-text-secondary)]">
               {showInfo.city} · {showInfo.date}
             </div>
           </div>
@@ -98,7 +98,7 @@ export function DeliveryEditor({
           {/* Product info */}
           <div className="bg-[var(--color-bg-elevated)] rounded-lg p-3">
             <div className="text-sm font-medium font-mono">{sku}</div>
-            {size && <div className="text-xs text-[var(--color-text-muted)]">Size: {size}</div>}
+            {size && <div className="text-xs text-[var(--color-text-secondary)]">Size: {size}</div>}
           </div>
 
           {/* Type selection */}
@@ -140,7 +140,7 @@ export function DeliveryEditor({
               placeholder="Enter quantity"
               min="0"
             />
-            <p className="text-xs text-[var(--color-text-muted)] mt-1">
+            <p className="text-xs text-[var(--color-text-secondary)] mt-1">
               {deliveryType === 'delivery' && 'Units being received at this show'}
               {deliveryType === 'return' && 'Units being sent back/returned'}
               {deliveryType === 'adjustment' && 'Positive = add stock, Negative = remove stock'}

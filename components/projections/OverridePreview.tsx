@@ -68,23 +68,23 @@ export function OverridePreview({
   if (overrides.length === 0) return null;
 
   return (
-    <div className="border border-amber-200 bg-gradient-to-br from-amber-50/80 to-white rounded-xl overflow-hidden shadow-sm">
+    <div className="border border-warn-border bg-warn-bg rounded-lg overflow-hidden shadow-sm">
       {/* Header */}
       <div
-        className="flex items-center justify-between px-4 py-3 bg-amber-100/50 cursor-pointer"
+        className="flex items-center justify-between px-4 py-3 bg-warn-bg cursor-pointer"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-          <span className="text-sm font-semibold text-amber-900">
+          <div className="w-2 h-2 rounded-full bg-warn animate-pulse" />
+          <span className="text-sm font-semibold text-warn">
             Suggested Changes ({overrides.length})
           </span>
         </div>
-        <button className="p-1 hover:bg-amber-200/50 rounded transition">
+        <button className="p-1 hover:bg-warn-bg rounded transition">
           {expanded ? (
-            <ChevronUp className="w-4 h-4 text-amber-700" />
+            <ChevronUp className="w-4 h-4 text-warn" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-amber-700" />
+            <ChevronDown className="w-4 h-4 text-warn" />
           )}
         </button>
       </div>
@@ -92,14 +92,14 @@ export function OverridePreview({
       {expanded && (
         <>
           {/* Select All */}
-          <div className="px-4 py-2 border-b border-amber-100 flex items-center gap-2">
+          <div className="px-4 py-2 border-b border-warn-border flex items-center gap-2">
             <input
               type="checkbox"
               checked={selectedIds.size === overrides.length}
               onChange={toggleAll}
-              className="rounded border-amber-300 text-amber-600 focus:ring-amber-500"
+              className="rounded border-warn-border text-warn focus:ring-warn"
             />
-            <span className="text-xs text-amber-700">
+            <span className="text-xs text-warn">
               {selectedIds.size === overrides.length ? 'Deselect all' : 'Select all'}
             </span>
           </div>
@@ -113,15 +113,15 @@ export function OverridePreview({
               return (
                 <div
                   key={`${override.sku}-${override.size || 'total'}-${index}`}
-                  className={`flex items-start gap-3 px-4 py-3 border-b border-amber-50 last:border-0 transition ${
-                    isSelected ? 'bg-white' : 'bg-amber-50/30 opacity-60'
+                  className={`flex items-start gap-3 px-4 py-3 border-b border-warn-border last:border-0 transition ${
+                    isSelected ? 'bg-white' : 'bg-warn-bg opacity-60'
                   }`}
                 >
                   <input
                     type="checkbox"
                     checked={isSelected}
                     onChange={() => toggleSelection(index)}
-                    className="mt-1 rounded border-amber-300 text-amber-600 focus:ring-amber-500"
+                    className="mt-1 rounded border-warn-border text-warn focus:ring-warn"
                   />
 
                   <div className="flex-1 min-w-0">
@@ -130,33 +130,33 @@ export function OverridePreview({
                         {override.productName}
                       </span>
                       {override.size && (
-                        <span className="px-1.5 py-0.5 text-xs bg-[var(--color-bg-muted)] rounded">
+                        <span className="px-1.5 py-0.5 text-xs bg-[var(--color-bg-elevated)] rounded">
                           {override.size}
                         </span>
                       )}
-                      <span className="text-xs text-[var(--color-text-muted)]">
+                      <span className="text-xs text-[var(--color-text-secondary)]">
                         {override.bucket.replace(/_/g, ' ')}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm text-[var(--color-text-muted)]">
+                      <span className="text-sm text-[var(--color-text-secondary)]">
                         {override.currentValue.toLocaleString()}
                       </span>
-                      <ArrowRight className="w-3 h-3 text-[var(--color-text-muted)]" />
+                      <ArrowRight className="w-3 h-3 text-[var(--color-text-secondary)]" />
                       <span className="text-sm font-semibold text-[var(--color-text-primary)]">
                         {override.suggestedValue.toLocaleString()}
                       </span>
                       <span
                         className={`text-xs font-medium ${
-                          change.isPositive ? 'text-emerald-600' : 'text-red-600'
+                          change.isPositive ? 'text-success' : 'text-danger'
                         }`}
                       >
                         {change.diff} ({change.percent})
                       </span>
                     </div>
 
-                    <p className="text-xs text-[var(--color-text-muted)] mt-1 line-clamp-1">
+                    <p className="text-xs text-[var(--color-text-secondary)] mt-1 line-clamp-1">
                       {override.reason}
                     </p>
                   </div>
@@ -166,14 +166,14 @@ export function OverridePreview({
           </div>
 
           {/* Summary & Actions */}
-          <div className="flex items-center justify-between px-4 py-3 bg-amber-50/50 border-t border-amber-100">
-            <div className="text-xs text-amber-700">
+          <div className="flex items-center justify-between px-4 py-3 bg-warn-bg border-t border-warn-border">
+            <div className="text-xs text-warn">
               <span className="font-medium">{selectedIds.size}</span> of{' '}
               <span className="font-medium">{overrides.length}</span> selected
               {selectedIds.size > 0 && (
                 <span className="ml-2">
                   (Net change:{' '}
-                  <span className={totalChange >= 0 ? 'text-emerald-600' : 'text-red-600'}>
+                  <span className={totalChange >= 0 ? 'text-success' : 'text-danger'}>
                     {totalChange >= 0 ? '+' : ''}{totalChange.toLocaleString()} units
                   </span>
                   )
@@ -185,7 +185,7 @@ export function OverridePreview({
               <button
                 onClick={onReject}
                 disabled={isApplying}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-muted)] rounded-lg transition disabled:opacity-50"
+                className="flex items-center gap-1 px-3 py-1.5 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)] rounded-lg transition disabled:opacity-50"
               >
                 <X className="w-4 h-4" />
                 Reject
@@ -193,11 +193,11 @@ export function OverridePreview({
               <button
                 onClick={handleApply}
                 disabled={isApplying || selectedIds.size === 0}
-                className="flex items-center gap-1 px-4 py-1.5 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition disabled:opacity-50"
+                className="flex items-center gap-1 px-4 py-1.5 text-sm font-medium bg-success text-white rounded-lg hover:bg-success transition disabled:opacity-50"
               >
                 {isApplying ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-[var(--color-bg-border)] border-t-white rounded-full animate-spin" />
+                    <span className="w-4 h-4 border border-[var(--color-bg-border)] border-t-white rounded-full animate-spin" />
                     Applying...
                   </>
                 ) : (
