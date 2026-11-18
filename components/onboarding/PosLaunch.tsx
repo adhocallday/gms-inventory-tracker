@@ -10,32 +10,17 @@ function isAppleTouchDevice() {
   return /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
 }
 
-/** "Open MerchFlow POS" on iPad/iPhone; TestFlight note and the demo video elsewhere. */
+/**
+ * The demo video on every device. Reviewers don't have the app installed, so
+ * the merchflow:// link is only an extra line on iPad/iPhone, for testers who do.
+ */
 export function PosLaunch() {
-  const [device, setDevice] = useState<'unknown' | 'ios' | 'desktop'>('unknown');
+  const [isAppleTouch, setIsAppleTouch] = useState(false);
   const [videoMissing, setVideoMissing] = useState(false);
 
   useEffect(() => {
-    setDevice(isAppleTouchDevice() ? 'ios' : 'desktop');
+    setIsAppleTouch(isAppleTouchDevice());
   }, []);
-
-  if (device === 'unknown') return <div className="h-10" aria-hidden="true" />;
-
-  if (device === 'ios') {
-    return (
-      <div className="space-y-2">
-        <a
-          href={POS_APP_SCHEME}
-          className="inline-flex items-center h-11 px-5 rounded-md text-sm font-semibold bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] active:bg-[var(--color-red-active)] transition"
-        >
-          Open MerchFlow POS
-        </a>
-        <p className="text-sm text-[var(--color-text-muted)]">
-          Opens the app if it is installed on this device. It is available to testers soon via TestFlight.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4">
@@ -54,6 +39,15 @@ export function PosLaunch() {
         >
           A walkthrough video of MerchFlow POS.
         </video>
+      )}
+      {isAppleTouch && (
+        <p className="text-sm text-[var(--color-text-muted)]">
+          Testers with the app installed can{' '}
+          <a href={POS_APP_SCHEME} className="underline hover:text-[var(--color-text-primary)]">
+            open MerchFlow POS
+          </a>
+          .
+        </p>
       )}
     </div>
   );
