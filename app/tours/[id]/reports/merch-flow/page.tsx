@@ -65,8 +65,8 @@ export default async function MerchFlowReportPage({ params }: MerchFlowPageProps
           </p>
         ) : (
           <ul className="mt-3 grid gap-2 md:grid-cols-2">
-            {gaps.map((gap) => (
-              <li key={`gap-${gap.field}`} className="rounded-lg border border-info-border bg-info-bg p-3">
+            {gaps.map((gap, index) => (
+              <li key={`gap-${gap.field}`} data-tour={index === 0 ? 'mf-gaps' : undefined} className="rounded-lg border border-info-border bg-info-bg p-3">
                 <p className="text-sm font-semibold text-[var(--color-text-primary)]">
                   <Info className="inline-block h-4 w-4 align-[-0.125em] mr-1 text-info" aria-hidden="true" />
                   Missing data: {gap.field}

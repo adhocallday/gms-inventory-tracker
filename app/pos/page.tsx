@@ -60,11 +60,11 @@ export default function PosPage() {
         </ul>
       </section>
 
-      <section className="g-card p-5 space-y-3">
+      <section className="g-card p-5 space-y-3" data-tour="pos-status">
         <h2 className="text-lg font-semibold">Status</h2>
         <ul className="list-disc pl-5 space-y-1.5 text-sm text-[var(--color-text-secondary)]">
           <li>In testing. Distribution to testers will be through Apple TestFlight.</li>
-          <li>Card payments (Stripe Terminal) and offline sync are still to be built.</li>
+          <li>Sync from the POS to the tracker, card payments (Stripe Terminal) and offline sync are still to be built.</li>
           <li>The plan is a pilot on one tour leg alongside AtVenu.</li>
         </ul>
       </section>

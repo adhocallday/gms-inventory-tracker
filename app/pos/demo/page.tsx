@@ -16,7 +16,9 @@ export default function PosDemoPage() {
           It uses the tour catalog from the tracker (read-only). Nothing you do here is saved.
         </p>
       </header>
-      <PosMockDemo />
+      <div data-tour="pos-demo-app">
+        <PosMockDemo />
+      </div>
     </div>
   );
 }

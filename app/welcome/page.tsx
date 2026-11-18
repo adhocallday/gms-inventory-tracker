@@ -5,7 +5,7 @@ import { FlowDiagrams } from '@/components/onboarding/FlowDiagrams';
 import { FlowTiles } from '@/components/onboarding/FlowFigures';
 import { AI_NOTE } from '@/components/onboarding/flow-data';
 import { WelcomeActions } from '@/components/onboarding/WelcomeActions';
-import { TourChapterList } from '@/components/onboarding/TourChapterList';
+import { TourChoices } from '@/components/onboarding/TourChapterList';
 import { CHARTS_URL, FLOW_URL } from '@/lib/apps';
 
 export const metadata: Metadata = { title: 'How MerchFlow works · MerchFlow Tracker' };
@@ -34,6 +34,29 @@ const APPS = [
   },
 ];
 
+/** What runs today and what is designed but not built. */
+const STATUS = [
+  {
+    title: 'Live today',
+    items: [
+      'Upload of POs, packing lists, sales reports and settlements',
+      'AI extraction, GMS rule checks, review and posting',
+      'One central database for every tour',
+      'Inventory balances, COGS and margin, show settlements',
+      'Tour reports and PDFs through MerchFlow Charts',
+    ],
+  },
+  {
+    title: 'Planned',
+    items: [
+      'Business Central connection through its API',
+      'MerchFlow POS sync to the tracker',
+      'Card payments at the merch table (Stripe Terminal)',
+      'Email-in address and iPad scan capture',
+    ],
+  },
+];
+
 export default function WelcomePage() {
   return (
     <div className="py-8 space-y-12 max-w-6xl">
@@ -49,13 +72,13 @@ export default function WelcomePage() {
 
       <section aria-labelledby="chapters-heading" className="space-y-4">
         <div className="space-y-1">
-          <h2 id="chapters-heading" className="text-xl font-semibold">Guided tour</h2>
+          <h2 id="chapters-heading" className="text-xl font-semibold">Guided tours</h2>
           <p className="text-sm text-[var(--color-text-secondary)] max-w-3xl">
-            The tour opens each screen in turn and names the manual work it replaces. Start at any
-            chapter.
+            Each tour opens the real screens in turn. Start from the beginning or at any chapter; use
+            ← and → to move and Esc to end.
           </p>
         </div>
-        <TourChapterList />
+        <TourChoices />
       </section>
 
       <section aria-labelledby="apps-heading" className="space-y-4">
@@ -102,6 +125,19 @@ export default function WelcomePage() {
           </h3>
           <p>{AI_NOTE}</p>
         </aside>
+
+        <div data-tour="welcome-status" className="grid gap-4 md:grid-cols-2">
+          {STATUS.map((group) => (
+            <div key={group.title} className="g-card p-5 space-y-2">
+              <h3 className="font-semibold">{group.title}</h3>
+              <ul className="list-disc pl-5 space-y-1 text-sm text-[var(--color-text-secondary)]">
+                {group.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
 
         <p className="text-sm text-[var(--color-text-secondary)]">
           Full comparison:{' '}

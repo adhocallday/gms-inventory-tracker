@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { driver, type Driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
 import {
-  CHAPTERS,
+  TOURS,
   chapterLabel,
   gapPath,
   isAtPath,
@@ -16,12 +16,15 @@ import {
   pickShow,
   previousPosition,
   resolvePath,
+  stepAt,
   type DocumentOption,
   type ShowOption,
   type TourIds,
   type TourPosition,
   type TourStep,
 } from './tour-chapters';
+import { fillFacts, type TourFacts } from './tour-facts';
+import { TourChoices } from './TourChapterList';
 import {
   TOUR_EVENT,
   TOUR_MENU_EVENT,
@@ -41,9 +44,13 @@ import {
  * waits up to 5 s for its data-tour anchor. A missing anchor shows the step's
  * data-gap text (or is skipped if it has none), so the tour never stalls.
  *
- * Closing the popover (×, Escape, End tour, overlay click) clears the state.
- * Start it with requestTour(chapter) or open the chapter menu with
- * openTourMenu(), both from ./tour-control.
+ * There are two tours (./tour-chapters TOURS): the overview for leadership
+ * and finance, and the full walkthrough. Step text may carry live figures
+ * ({tokens}, ./tour-facts) loaded once when the tour starts.
+ *
+ * ← and → move back and forward; closing the popover (×, Escape, End tour,
+ * overlay click) clears the state. Start a tour with requestTour(tour,
+ * chapter) or open the tour menu with openTourMenu(), both from ./tour-control.
  */
 
 const ANCHOR_TIMEOUT_MS = 5000;
@@ -81,9 +88,16 @@ async function resolveIds(): Promise<TourIds> {
   return ids;
 }
 
+/** Live figures for the overview, summed from the resolved tour's posted records. */
+async function resolveFacts(tourId: string | null): Promise<TourFacts | null> {
+  if (!tourId) return null;
+  return (await getJson<{ data?: TourFacts }>(`/api/tours/${tourId}/overview-facts`))?.data ?? null;
+}
+
+/** The first visible element with this anchor (the sidebar and the phone bottom bar share some). */
 function findAnchor(name: string): HTMLElement | null {
-  const el = document.querySelector<HTMLElement>(`[data-tour="${name}"]`);
-  return el && el.getClientRects().length > 0 ? el : null;
+  const all = document.querySelectorAll<HTMLElement>(`[data-tour="${name}"]`);
+  return Array.from(all).find((el) => el.getClientRects().length > 0) ?? null;
 }
 
 /** Polls for the step's anchor; settles for the fallback anchor, or null after the timeout. */
@@ -116,9 +130,19 @@ function waitForAnchor(
 const escapeHtml = (text: string) =>
   text.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
-function describe(step: TourStep, showGap: boolean): string {
-  const text = showGap && step.gap ? step.gap : step.body;
-  let html = `<p>${escapeHtml(text)}</p>`;
+/** The step's text: its gap text when data is missing, else the body with live figures filled in. */
+export function stepText(step: TourStep, showGap: boolean, facts: TourFacts | null | undefined): string {
+  if (showGap && step.gap) return step.gap;
+  return fillFacts(step.body, facts) ?? step.bodyWithoutFigures ?? step.gap ?? step.body.replace(/\{\w+\}/g, '');
+}
+
+/** The step's title with figures filled in, or without the {token} part. */
+export function stepTitle(step: TourStep, facts: TourFacts | null | undefined): string {
+  return fillFacts(step.title, facts) ?? step.title.replace(/:?\s*\{\w+\}/g, '');
+}
+
+function describe(step: TourStep, showGap: boolean, facts: TourFacts | null | undefined): string {
+  let html = `<p>${escapeHtml(stepText(step, showGap, facts))}</p>`;
   if (step.links?.length) {
     html += `<ul class="mf-tour-links">${step.links
       .map(
@@ -132,7 +156,7 @@ function describe(step: TourStep, showGap: boolean): string {
 
 function currentTarget(state: TourState): string | null {
   if (!state.ids || !isValidPosition(state)) return null;
-  const step = CHAPTERS[state.chapter].steps[state.step];
+  const step = stepAt(state);
   return resolvePath(step.page, state.ids) ?? gapPath(step.page);
 }
 
@@ -185,9 +209,9 @@ export function GuidedTour() {
   const show = useCallback(
     (state: TourState, element: HTMLElement | null, showGap: boolean) => {
       teardown();
-      const chapter = CHAPTERS[state.chapter];
+      const chapter = TOURS[state.tour].chapters[state.chapter];
       const step = chapter.steps[state.step];
-      const pos: TourPosition = { chapter: state.chapter, step: state.step };
+      const pos: TourPosition = { tour: state.tour, chapter: state.chapter, step: state.step };
       const isFirst = previousPosition(pos) === null;
       const isLast = nextPosition(pos) === null;
 
@@ -209,8 +233,8 @@ export function GuidedTour() {
           {
             element: element ?? undefined,
             popover: {
-              title: step.title,
-              description: describe(step, showGap),
+              title: escapeHtml(stepTitle(step, state.facts)),
+              description: describe(step, showGap, state.facts),
               showButtons: ['next', 'previous', 'close'],
               disableButtons: isFirst ? ['previous'] : [],
               showProgress: true,
@@ -218,6 +242,7 @@ export function GuidedTour() {
               nextBtnText: isLast ? 'Finish' : 'Next',
               prevBtnText: 'Back',
               onNextClick: () => moveTo(nextPosition(pos), 1),
+              // driver.js maps → to onNextClick and ← to onPrevClick (allowKeyboardControl).
               // ArrowLeft also lands here, even when Back is disabled.
               onPrevClick: () => {
                 if (!isFirst) moveTo(previousPosition(pos), -1);
@@ -226,8 +251,13 @@ export function GuidedTour() {
               onPopoverRender: (popover) => {
                 const label = document.createElement('p');
                 label.className = 'mf-tour-chapter';
-                label.textContent = chapterLabel(state.chapter);
+                label.textContent = chapterLabel(state.tour, state.chapter);
                 popover.wrapper.insertBefore(label, popover.title);
+
+                const keys = document.createElement('p');
+                keys.className = 'mf-tour-keys';
+                keys.textContent = '← → to move · Esc to end';
+                popover.description.after(keys);
 
                 const extra = document.createElement('div');
                 extra.className = 'mf-tour-extra';
@@ -253,7 +283,7 @@ export function GuidedTour() {
         ],
       });
       driverRef.current = instance;
-      shownKeyRef.current = `${state.chapter}:${state.step}`;
+      shownKeyRef.current = `${state.tour}:${state.chapter}:${state.step}`;
       instance.drive(0);
     },
     [endTour, moveTo, teardown],
@@ -272,17 +302,18 @@ export function GuidedTour() {
       endTour();
       return;
     }
-    if (!state.ids) {
-      const ids = await resolveIds();
+    if (!state.ids || state.facts === undefined) {
+      const ids = state.ids ?? (await resolveIds());
+      const facts = await resolveFacts(ids.tourId);
       if (cancelled()) return;
-      state = { ...(readTourState() ?? state), ids };
+      state = { ...(readTourState() ?? state), ids, facts };
       writeTourState(state);
     }
 
-    const step = CHAPTERS[state.chapter].steps[state.step];
+    const step = stepAt(state);
     const path = resolvePath(step.page, state.ids!);
     const target = path ?? gapPath(step.page);
-    const key = `${state.chapter}:${state.step}`;
+    const key = `${state.tour}:${state.chapter}:${state.step}`;
     const here = isAtPath(target, window.location.pathname, window.location.search);
 
     if (here && shownKeyRef.current === key && driverRef.current?.isActive()) return;
@@ -319,7 +350,7 @@ export function GuidedTour() {
       return;
     }
     // Nothing to highlight and nothing to say: skip it in the direction of travel.
-    const pos = { chapter: state.chapter, step: state.step };
+    const pos = { tour: state.tour, chapter: state.chapter, step: state.step };
     moveTo(directionRef.current === 1 ? nextPosition(pos) : previousPosition(pos), directionRef.current);
   }, [endTour, moveTo, router, show, teardown]);
 
@@ -379,7 +410,8 @@ export function GuidedTour() {
   return <TourChapterMenu open={menuOpen} onClose={() => setMenuOpen(false)} />;
 }
 
-/** The chapter menu: a modal list of chapters, opened from the NavBar's "Replay tour". */
+
+/** The tour menu: both tours and their chapters in a modal, opened from the NavBar's "Replay tour". */
 function TourChapterMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
 
@@ -398,16 +430,16 @@ function TourChapterMenu({ open, onClose }: { open: boolean; onClose: () => void
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="mf-tour-menu w-[min(560px,calc(100vw-32px))] max-h-[85vh] rounded-xl border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] p-0 shadow-xl"
+      className="mf-tour-menu w-[min(860px,calc(100vw-32px))] max-h-[85vh] rounded-xl border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] p-0 shadow-xl"
     >
       <div className="p-5 space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 id="mf-tour-menu-title" className="text-lg font-semibold">
-              Guided tour
+              Guided tours
             </h2>
             <p className="text-sm text-[var(--color-text-secondary)]">
-              {CHAPTERS.length} chapters. Start from the beginning or pick a chapter.
+              Start a tour from the beginning or pick a chapter. Use ← and → to move, Esc to end.
             </p>
           </div>
           <button
@@ -419,38 +451,7 @@ function TourChapterMenu({ open, onClose }: { open: boolean; onClose: () => void
             ×
           </button>
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            onClose();
-            requestTour(0);
-          }}
-          className="inline-flex items-center h-10 px-5 rounded-md text-sm font-semibold bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] active:bg-[var(--color-red-active)] transition"
-        >
-          Start from the beginning
-        </button>
-        <ol className="space-y-1">
-          {CHAPTERS.map((chapter, index) => (
-            <li key={chapter.id}>
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  requestTour(index);
-                }}
-                className="w-full text-left rounded-md px-3 py-2 hover:bg-[var(--color-bg-elevated)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-red-primary)]"
-              >
-                <span className="text-sm font-semibold">
-                  <span className="tabular-nums text-[var(--color-text-muted)] mr-2">{index}</span>
-                  {chapter.title}
-                </span>
-                <span className="block text-xs text-[var(--color-text-secondary)] ml-6">
-                  {chapter.summary} {chapter.steps.length} steps.
-                </span>
-              </button>
-            </li>
-          ))}
-        </ol>
+        <TourChoices compact onStart={onClose} />
       </div>
     </dialog>
   );

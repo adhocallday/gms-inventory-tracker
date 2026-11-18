@@ -5,6 +5,7 @@ import { ReportBuilder } from '@/components/reports/ReportBuilder';
 import { ReportList } from '@/components/reports/ReportList';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { MakeSalesChartButton } from '@/components/reports/MakeSalesChartButton';
+import { BusinessCentralCard } from '@/components/reports/BusinessCentralCard';
 import { ArrowLeft, BarChart3, Info } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -80,7 +81,9 @@ export default async function TourReportsPage({ params }: TourReportsPageProps) 
         }
       />
 
-      <div className="mt-6 mb-6 rounded-lg border border-info-border bg-info-bg p-4 text-sm">
+      <BusinessCentralCard />
+
+      <div className="mb-6 rounded-lg border border-info-border bg-info-bg p-4 text-sm">
         <p className="flex items-center gap-1.5 font-semibold text-info">
           <Info className="h-4 w-4 shrink-0" aria-hidden="true" />
           Product images

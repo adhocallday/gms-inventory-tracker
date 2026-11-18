@@ -284,6 +284,11 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
           />
         )}
 
+        <p data-tour="upload-channels" className="text-sm text-[var(--color-text-secondary)]">
+          <span className="font-semibold text-[var(--color-text-primary)]">Ways in:</span> upload here (live). An
+          email-in address and iPad scan at receiving are planned and will feed this same intake.
+        </p>
+
         <div className="space-y-3" data-tour="upload-status">
           <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Draft</h2>
           {parsedId ? (

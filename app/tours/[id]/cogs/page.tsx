@@ -152,7 +152,7 @@ export default function CogsReportPage() {
         ))}
       </div>
       {noCostCount > 0 && (
-        <p className="mt-3 text-sm text-warn">
+        <p data-tour="cogs-missing" className="mt-3 text-sm text-warn">
           {noCostCount} product sizes with sales have no unit cost, so their COGS counts as $0 and the totals
           overstate margin. Set costs under Product costs.
         </p>

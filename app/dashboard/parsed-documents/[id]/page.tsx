@@ -225,12 +225,15 @@ export default function ReviewDocumentPage({
 
   return (
     <div className="g-container py-6">
-      <DocumentReviewHeader
-        docType={document.doc_type}
-        status={document.status}
-        filename={document.source_filename}
-        createdAt={document.created_at}
-      />
+      {/* Posted records keep this document's id (source_doc_id): the audit trail back to the file. */}
+      <div data-tour="review-source">
+        <DocumentReviewHeader
+          docType={document.doc_type}
+          status={document.status}
+          filename={document.source_filename}
+          createdAt={document.created_at}
+        />
+      </div>
 
       <div data-tour="review-validation">
         <ValidationPanel validation={document.validation} />

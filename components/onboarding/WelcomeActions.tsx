@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { markOnboardingSeen, requestTour } from './tour-control';
 
-/** "Start the tour" and "Skip". Viewing /welcome counts as the first visit. */
+/** "Start the overview" and "Skip". Viewing /welcome counts as the first visit. */
 export function WelcomeActions() {
   const router = useRouter();
 
@@ -16,10 +16,10 @@ export function WelcomeActions() {
     <div className="flex flex-wrap items-center gap-3">
       <button
         type="button"
-        onClick={() => requestTour(0)}
+        onClick={() => requestTour('overview')}
         className="inline-flex items-center h-10 px-5 rounded-md text-sm font-semibold bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] active:bg-[var(--color-red-active)] transition"
       >
-        Start the tour
+        Start the overview
       </button>
       <button
         type="button"
