@@ -41,6 +41,7 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "recharts": "^2.10.4",
+    "sharp": "0.33.5",
     "tailwind-merge": "^3.4.0",
     "tesseract.js": "^7.0.0"
   },

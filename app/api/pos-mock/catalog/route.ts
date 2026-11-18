@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/client';
+import { productImageUrl } from '@/lib/reporting/merch-flow/from-db';
 import { buildCatalogItems, displayName, type Catalog, type TourProductRow } from '@/components/pos-mock/catalog';
 
 /**
@@ -41,7 +42,13 @@ export async function GET(request: NextRequest) {
         .eq('tour_id', tour.id)
         .order('created_at', { ascending: true })
         .limit(1000),
-      supabase.from('product_images').select('product_id').eq('tour_id', tour.id).limit(1000),
+      supabase
+        .from('product_images')
+        .select('id, product_id')
+        .eq('tour_id', tour.id)
+        .order('is_primary', { ascending: false })
+        .order('display_order', { ascending: true })
+        .limit(1000),
       supabase
         .from('shows')
         .select('venue_name, city, state')
@@ -51,10 +58,17 @@ export async function GET(request: NextRequest) {
     ]);
     if (productsRes.error) throw productsRes.error;
 
-    const withImage = new Set((imagesRes.data ?? []).map((r) => r.product_id as string));
+    // First image per product (primary first), served resized by /api/product-images.
+    const imageByProduct = new Map<string, string>();
+    for (const r of imagesRes.data ?? []) {
+      if (!imageByProduct.has(r.product_id as string)) imageByProduct.set(r.product_id as string, r.id as string);
+    }
     const items = buildCatalogItems(
       (productsRes.data ?? []) as unknown as TourProductRow[],
-      (id) => (withImage.has(id) ? `/api/pos-mock/catalog?image=${id}` : null)
+      (id) => {
+        const imageId = imageByProduct.get(id);
+        return imageId ? productImageUrl(imageId, 320) : null;
+      }
     );
 
     const show = showsRes.data?.[0];

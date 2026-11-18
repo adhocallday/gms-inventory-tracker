@@ -84,9 +84,12 @@ export type DbCompRow = {
 
 /** Row of product_images_detail (product_images joined to products). */
 export type DbProductImageRow = {
+  /** product_images.id; served resized by /api/product-images/[id]. */
+  id?: string | null;
   sku: string | null;
   product_description: string | null;
-  file_url: string | null;
+  /** Not selected from the database (photos are data URLs of ~400 KB); fixtures may set it. */
+  file_url?: string | null;
   is_primary?: boolean | null;
   display_order?: number | null;
 };
@@ -99,6 +102,11 @@ export type RawTourData = {
   comps: DbCompRow[];
   images: DbProductImageRow[];
 };
+
+/** Resized, cached product photo (app/api/product-images/[id]/route.ts). */
+export function productImageUrl(imageId: string, width = 480) {
+  return `/api/product-images/${imageId}?w=${width}`;
+}
 
 // ---------------------------------------------------------------- mapping
 
@@ -279,11 +287,12 @@ export function mapTourData(raw: RawTourData): TourInput {
         a.i - b.i,
     );
   for (const { image } of images) {
-    if (!image.sku || !image.file_url) continue;
+    const imageKey = image.id ? productImageUrl(image.id) : image.file_url;
+    if (!image.sku || !imageKey) continue;
     const sku = baseSku(image.sku);
     if (seenPhoto.has(sku)) continue;
     seenPhoto.add(sku);
-    photos.push({ sku, itemName: image.product_description ?? sku, imageKey: image.file_url });
+    photos.push({ sku, itemName: image.product_description ?? sku, imageKey });
   }
 
   return {
@@ -405,7 +414,7 @@ export async function loadTourData(
     fetchAll<DbProductImageRow>((from, to) =>
       supabase
         .from('product_images_detail')
-        .select('id, sku, product_description, file_url, is_primary, display_order')
+        .select('id, sku, product_description, is_primary, display_order')
         .eq('tour_id', tourId)
         .order('id')
         .range(from, to),
