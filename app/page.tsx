@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { ToursGrid, type TourWithStats } from '@/components/tours/ToursGrid';
-import { Button } from '@/components/ui/Button';
+import { Upload } from 'lucide-react';
+import { buttonVariants } from '@/components/ui/Button';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { formatNumber } from '@/lib/format';
 import { RecentActivityPanel, type RecentDocument } from '@/components/dashboard/RecentActivityPanel';
 import { UpcomingShowsPanel, type UpcomingShow } from '@/components/dashboard/UpcomingShowsPanel';
-import { InsightCard } from '@/components/dashboard/InsightCard';
 import { cn } from '@/lib/utils';
 import { fetchAll } from '@/lib/supabase/fetch-all';
 import { FirstVisitRedirect } from '@/components/onboarding/FirstVisitRedirect';
@@ -153,106 +155,87 @@ export default async function DashboardPage() {
   );
   const pendingDocs = pendingDocsCount ?? 0;
 
-  const kpiCards = [
+  const kpiCards: { label: string; value: string; note: string; href?: string; attention?: boolean }[] = [
     {
-      label: 'Tours tracked',
-      value: tourList.length,
-      trend: 'Live tours',
+      label: 'Tours',
+      value: formatNumber(tourList.length),
+      note: `${tourList.filter((t) => t.status === 'active').length} active`,
     },
     {
-      label: 'Total gross sales',
+      label: 'Gross sales',
       value: currencyFormatter.format(totalGross),
-      trend: 'Revenue across tours',
-      primary: true,
+      note: 'All tours, posted sales',
     },
     {
-      label: 'Active tour products',
-      value: totalProductsCount,
-      trend: 'Cataloged SKUs',
+      label: 'Tour products',
+      value: formatNumber(totalProductsCount),
+      note: 'SKU and size lines',
     },
     {
-      label: 'Pending documents',
-      value: pendingDocs,
-      trend: 'Needs approval',
+      label: 'Documents to review',
+      value: formatNumber(pendingDocs),
+      note: pendingDocs > 0 ? 'Drafts and parse errors. Review →' : 'Nothing waiting',
+      href: '/dashboard/parsed-documents',
+      attention: pendingDocs > 0,
     },
   ];
 
   return (
-    <div className="space-y-10 py-6">
+    <div className="space-y-8 py-6">
       <FirstVisitRedirect />
-      <header className="space-y-3">
-        <p className="g-kicker">Tour operations</p>
-        <h1 className="text-4xl font-semibold g-title">Tour Dashboard</h1>
-        <p className="text-sm text-[var(--color-text-secondary)] max-w-3xl">
-          Live view of active tours, inventory status, and quick access to document review workflows.
-        </p>
-        <div className="pt-2">
-          <Link href="/upload">
-            <Button>Upload document</Button>
+      <PageHeader
+        title="Tours"
+        subtitle="Every tour with its posted sales, and the documents waiting for review."
+        actions={
+          <Link href="/upload" className={buttonVariants()}>
+            <Upload className="h-4 w-4" aria-hidden="true" />
+            Upload document
           </Link>
-        </div>
-      </header>
+        }
+      />
 
-      <div className="kpi-grid" data-tour="home-kpis">
-        {kpiCards.map((card) => (
-          <article
-            key={card.label}
-            className={cn('kpi-card', { 'kpi-primary': card.primary })}
-          >
-            <div className="kpi-label">{card.label}</div>
-            <div className="kpi-value font-mono">{card.value}</div>
-            <div className="kpi-trend flex items-center gap-2">
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{
-                  background:
-                    card.label === 'Pending documents'
-                      ? 'var(--color-status-warning)'
-                      : 'var(--color-text-secondary)',
-                }}
-              />
-              <span>{card.trend}</span>
-            </div>
-          </article>
-        ))}
-      </div>
-
-      {(pendingDocs > 0 || upcomingShows.length > 0) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {pendingDocs > 0 && (
-            <InsightCard
-              type="warning"
-              title="Documents need review"
-              description={`${pendingDocs} document${pendingDocs !== 1 ? 's' : ''} waiting for approval or have errors`}
-              linkText="Review documents"
-              linkHref="/dashboard/parsed-documents"
-              className="insight-alert"
-            />
-          )}
-          {upcomingShows.length > 0 && (
-            <InsightCard
-              type="info"
-              title={`${upcomingShows.length} upcoming show${upcomingShows.length !== 1 ? 's' : ''}`}
-              description={`Next: ${upcomingShows[0].venue_name || 'TBD'} on ${new Date(
-                upcomingShows[0].show_date
-              ).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-              })}`}
-              linkText="View show"
-              linkHref={`/tours/${upcomingShows[0].tour_id}/shows/${upcomingShows[0].id}`}
-            />
-          )}
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" data-tour="home-activity">
-        <RecentActivityPanel documents={(recentDocs ?? []) as RecentDocument[]} />
-        <UpcomingShowsPanel shows={upcomingShows} />
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4" data-tour="home-kpis">
+        {kpiCards.map((card) => {
+          const body = (
+            <>
+              <div className="text-[13px] font-medium text-[var(--color-text-secondary)]">{card.label}</div>
+              <div className="mt-1 text-2xl font-semibold tabular-nums text-[var(--color-text-primary)]">
+                {card.value}
+              </div>
+              <div
+                className={cn(
+                  'mt-1 text-xs',
+                  card.attention ? 'font-medium text-warn' : 'text-[var(--color-text-secondary)]'
+                )}
+              >
+                {card.note}
+              </div>
+            </>
+          );
+          const base = 'rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] p-4';
+          return card.href ? (
+            <Link
+              key={card.label}
+              href={card.href}
+              className={cn(base, 'transition-colors hover:border-[var(--color-text-muted)]')}
+            >
+              {body}
+            </Link>
+          ) : (
+            <article key={card.label} className={base}>
+              {body}
+            </article>
+          );
+        })}
       </div>
 
       <div data-tour="tours-dashboard">
         <ToursGrid tours={toursWithStats} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" data-tour="home-activity">
+        <RecentActivityPanel documents={(recentDocs ?? []) as RecentDocument[]} />
+        <UpcomingShowsPanel shows={upcomingShows} />
       </div>
     </div>
   );

@@ -17,10 +17,11 @@ interface RecentActivityPanelProps {
 }
 
 const statusIcons: Record<string, React.ReactNode> = {
-  draft: <Clock className="w-4 h-4 text-yellow-400" />,
-  approved: <CheckCircle className="w-4 h-4 text-green-400" />,
-  posted: <CheckCircle className="w-4 h-4 text-blue-400" />,
-  error: <AlertCircle className="w-4 h-4 text-red-400" />,
+  draft: <Clock className="w-4 h-4 text-warn" aria-hidden="true" />,
+  approved: <CheckCircle className="w-4 h-4 text-info" aria-hidden="true" />,
+  posted: <CheckCircle className="w-4 h-4 text-success" aria-hidden="true" />,
+  rejected: <AlertCircle className="w-4 h-4 text-danger" aria-hidden="true" />,
+  error: <AlertCircle className="w-4 h-4 text-danger" aria-hidden="true" />,
 };
 
 function formatRelativeTime(dateString: string): string {
@@ -41,8 +42,11 @@ function formatRelativeTime(dateString: string): string {
 function formatDocType(docType: string): string {
   const typeMap: Record<string, string> = {
     settlement: 'Settlement',
-    po: 'Purchase Order',
-    'packing-list': 'Packing List',
+    po: 'Purchase order',
+    'packing-list': 'Packing list',
+    packing_list: 'Packing list',
+    'sales-report': 'Sales report',
+    sales_report: 'Sales report',
     invoice: 'Invoice',
   };
   return typeMap[docType] || docType;
@@ -52,7 +56,7 @@ export function RecentActivityPanel({ documents }: RecentActivityPanelProps) {
   return (
     <div className="g-card p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold g-title">Recent Activity</h2>
+        <h2 className="text-lg font-semibold">Recent documents</h2>
         <Link
           href="/dashboard/parsed-documents"
           className="text-sm font-medium g-link"
@@ -63,10 +67,10 @@ export function RecentActivityPanel({ documents }: RecentActivityPanelProps) {
 
       {documents.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-center">
-          <FileQuestion className="w-10 h-10 text-[var(--color-text-muted)] mb-3" />
-          <p className="text-sm text-[var(--color-text-muted)]">No recent documents</p>
-          <p className="text-xs text-[var(--color-text-muted)] mt-1">
-            Upload a document to get started
+          <FileQuestion className="w-8 h-8 text-[var(--color-text-muted)] mb-3" aria-hidden="true" />
+          <p className="text-sm font-medium text-[var(--color-text-primary)]">No documents yet</p>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+            Upload a PO, packing list, sales report or settlement and it appears here.
           </p>
         </div>
       ) : (
@@ -75,25 +79,25 @@ export function RecentActivityPanel({ documents }: RecentActivityPanelProps) {
             <Link
               key={doc.id}
               href={`/dashboard/parsed-documents/${doc.id}`}
-              className="flex items-start gap-3 p-3 rounded-lg border border-[var(--color-bg-border)] hover:border-[var(--color-red-primary)]/50 hover:bg-[var(--color-bg-elevated)] transition group"
+              className="flex items-start gap-3 p-3 rounded-lg border border-[var(--color-bg-border)] hover:bg-[var(--color-bg-elevated)] transition-colors group"
             >
               <div className="mt-0.5">
                 {statusIcons[doc.status] || <FileText className="w-4 h-4 text-[var(--color-text-muted)]" />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-[var(--color-text-primary)] truncate group-hover:text-[var(--color-red-primary)] transition">
+                <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
                   {doc.source_filename || 'Untitled document'}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant={doc.status as any} size="sm">
                     {doc.status}
                   </Badge>
-                  <span className="text-xs text-[var(--color-text-muted)]">
+                  <span className="text-xs text-[var(--color-text-secondary)]">
                     {formatDocType(doc.doc_type)}
                   </span>
                 </div>
               </div>
-              <span className="text-xs text-[var(--color-text-muted)] whitespace-nowrap">
+              <span className="text-xs text-[var(--color-text-secondary)] whitespace-nowrap tabular-nums">
                 {formatRelativeTime(doc.created_at)}
               </span>
             </Link>

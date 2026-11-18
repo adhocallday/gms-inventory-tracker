@@ -21,38 +21,10 @@ interface InsightCardProps {
 }
 
 const typeConfig = {
-  info: {
-    border: 'border-blue-200',
-    bg: 'bg-gradient-to-br from-blue-50/80 to-white',
-    icon: Info,
-    iconColor: 'text-blue-600',
-    textColor: 'text-blue-800',
-    iconBg: 'bg-[var(--color-bg-surface)] shadow-inner',
-  },
-  success: {
-    border: 'border-emerald-200',
-    bg: 'bg-gradient-to-br from-emerald-50/80 to-white',
-    icon: CheckCircle,
-    iconColor: 'text-emerald-600',
-    textColor: 'text-emerald-800',
-    iconBg: 'bg-[var(--color-bg-surface)] shadow-inner',
-  },
-  warning: {
-    border: 'border-amber-200',
-    bg: 'bg-gradient-to-br from-amber-50/80 to-white',
-    icon: AlertTriangle,
-    iconColor: 'text-amber-600',
-    textColor: 'text-amber-800',
-    iconBg: 'bg-[var(--color-bg-surface)] shadow-inner',
-  },
-  error: {
-    border: 'border-red-200',
-    bg: 'bg-gradient-to-br from-red-50/80 to-white',
-    icon: AlertCircle,
-    iconColor: 'text-red-600',
-    textColor: 'text-red-800',
-    iconBg: 'bg-[var(--color-bg-surface)] shadow-inner',
-  },
+  info: { box: 'border-info-border bg-info-bg', icon: Info, iconColor: 'text-info' },
+  success: { box: 'border-success-border bg-success-bg', icon: CheckCircle, iconColor: 'text-success' },
+  warning: { box: 'border-warn-border bg-warn-bg', icon: AlertTriangle, iconColor: 'text-warn' },
+  error: { box: 'border-danger-border bg-danger-bg', icon: AlertCircle, iconColor: 'text-danger' },
 };
 
 export function InsightCard({
@@ -69,29 +41,16 @@ export function InsightCard({
   const Icon = CustomIcon || config.icon;
 
   return (
-    <div
-      className={cn(
-        'g-card border-2 p-5 rounded-2xl space-y-3 shadow-sm',
-        config.bg,
-        config.border,
-        className
-      )}
-    >
-      <div className="flex items-center gap-3">
-        <div className={cn('p-2 rounded-xl', config.iconBg)}>
-          <Icon className={cn('w-5 h-5', config.iconColor)} />
-        </div>
-        <h3 className={cn('text-lg font-semibold tracking-tight', config.textColor)}>
-          {title}
-        </h3>
+    <div className={cn('rounded-lg border p-4 space-y-2', config.box, className)}>
+      <div className="flex items-center gap-2">
+        <Icon className={cn('w-4 h-4 flex-shrink-0', config.iconColor)} aria-hidden="true" />
+        <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">{title}</h3>
       </div>
-      <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
-        {description}
-      </p>
+      <p className="text-sm text-[var(--color-text-secondary)]">{description}</p>
       {action && (
         <button
           onClick={action.onClick}
-          className="text-sm font-semibold text-[var(--color-red-primary)] underline-offset-2 hover:underline transition"
+          className="text-sm font-semibold text-[var(--color-red-text)] underline-offset-2 hover:underline"
         >
           {action.label} <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
         </button>
@@ -99,7 +58,7 @@ export function InsightCard({
       {linkText && linkHref && (
         <Link
           href={linkHref}
-          className="text-sm font-semibold text-[var(--color-red-primary)] underline-offset-2 hover:underline transition"
+          className="inline-block text-sm font-semibold text-[var(--color-red-text)] underline-offset-2 hover:underline"
         >
           {linkText} <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
         </Link>
