@@ -238,7 +238,7 @@ export function WarehouseLocationManager({
           {standardLocations.map((location, index) => (
             <div
               key={location.id}
-              className="flex items-center justify-between p-3 border border-white/10 rounded-lg bg-[var(--color-bg-surface)]"
+              className="flex items-center justify-between p-3 border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-surface)]"
             >
               <div className="flex items-center gap-3 flex-1">
                 {editing === location.id ? (
@@ -282,7 +282,7 @@ export function WarehouseLocationManager({
                         setEditing(null);
                         setEditName('');
                       }}
-                      className="text-xs px-3 py-1 rounded border border-white/10 hover:border-white/30 transition"
+                      className="text-xs px-3 py-1 rounded border border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)] transition"
                     >
                       Cancel
                     </button>
@@ -292,14 +292,14 @@ export function WarehouseLocationManager({
                     <button
                       onClick={() => handleReorder(location.id, 'up')}
                       disabled={index === 0}
-                      className="text-xs px-2 py-1 rounded border border-white/10 hover:border-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="text-xs px-2 py-1 rounded border border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)] transition disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <ArrowUp className="h-4 w-4" aria-hidden="true" />
                     </button>
                     <button
                       onClick={() => handleReorder(location.id, 'down')}
                       disabled={index === standardLocations.length - 1}
-                      className="text-xs px-2 py-1 rounded border border-white/10 hover:border-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="text-xs px-2 py-1 rounded border border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)] transition disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <ArrowDown className="h-4 w-4" aria-hidden="true" />
                     </button>
@@ -308,13 +308,13 @@ export function WarehouseLocationManager({
                         setEditing(location.id);
                         setEditName(location.name);
                       }}
-                      className="text-xs px-3 py-1 rounded border border-white/10 hover:border-white/30 transition"
+                      className="text-xs px-3 py-1 rounded border border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)] transition"
                     >
                       Rename
                     </button>
                     <button
                       onClick={() => handleToggleActive(location)}
-                      className="text-xs px-3 py-1 rounded border border-white/10 hover:border-white/30 transition"
+                      className="text-xs px-3 py-1 rounded border border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)] transition"
                     >
                       {location.is_active ? 'Deactivate' : 'Activate'}
                     </button>
@@ -343,7 +343,7 @@ export function WarehouseLocationManager({
           {customLocations.map((location, index) => (
             <div
               key={location.id}
-              className="flex items-center justify-between p-3 border border-white/10 rounded-lg bg-[var(--color-bg-surface)]"
+              className="flex items-center justify-between p-3 border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-surface)]"
             >
               <div className="flex items-center gap-3 flex-1">
                 {editing === location.id ? (
@@ -386,7 +386,7 @@ export function WarehouseLocationManager({
                         setEditing(null);
                         setEditName('');
                       }}
-                      className="text-xs px-3 py-1 rounded border border-white/10 hover:border-white/30 transition"
+                      className="text-xs px-3 py-1 rounded border border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)] transition"
                     >
                       Cancel
                     </button>
@@ -396,14 +396,14 @@ export function WarehouseLocationManager({
                     <button
                       onClick={() => handleReorder(location.id, 'up')}
                       disabled={index === 0}
-                      className="text-xs px-2 py-1 rounded border border-white/10 hover:border-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="text-xs px-2 py-1 rounded border border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)] transition disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <ArrowUp className="h-4 w-4" aria-hidden="true" />
                     </button>
                     <button
                       onClick={() => handleReorder(location.id, 'down')}
                       disabled={index === customLocations.length - 1}
-                      className="text-xs px-2 py-1 rounded border border-white/10 hover:border-white/30 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="text-xs px-2 py-1 rounded border border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)] transition disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <ArrowDown className="h-4 w-4" aria-hidden="true" />
                     </button>
@@ -412,13 +412,13 @@ export function WarehouseLocationManager({
                         setEditing(location.id);
                         setEditName(location.name);
                       }}
-                      className="text-xs px-3 py-1 rounded border border-white/10 hover:border-white/30 transition"
+                      className="text-xs px-3 py-1 rounded border border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)] transition"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleToggleActive(location)}
-                      className="text-xs px-3 py-1 rounded border border-white/10 hover:border-white/30 transition"
+                      className="text-xs px-3 py-1 rounded border border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)] transition"
                     >
                       {location.is_active ? 'Deactivate' : 'Activate'}
                     </button>
@@ -442,7 +442,7 @@ export function WarehouseLocationManager({
         </div>
 
         {/* Add New Location */}
-        <div className="border-t border-white/10 pt-4">
+        <div className="border-t border-[var(--color-bg-border)] pt-4">
           <label className="text-xs text-[var(--color-text-muted)] block mb-2">
             Add Custom Location
           </label>

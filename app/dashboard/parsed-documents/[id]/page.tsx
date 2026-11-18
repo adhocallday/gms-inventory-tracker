@@ -310,7 +310,7 @@ export default function ReviewDocumentPage({
 
       {/* Actions */}
       {!isPosted && !isRejected && (
-        <div className="flex items-center justify-between pt-6 border-t border-white/10">
+        <div className="flex items-center justify-between pt-6 border-t border-[var(--color-bg-border)]">
           <div className="text-sm text-[var(--color-text-secondary)]">{statusMessage}</div>
           <div className="flex gap-3">
             <button

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>.m{stroke:#0A0A0A}@media (prefers-color-scheme: dark){.m{stroke:#FFFFFF}}</style>
+  <g transform="translate(-1.6 4.6) scale(1.2)" fill="none" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round">
+    <path class="m" d="M10 44 L10 12 L28 32 L46 12 L46 44"/>
+    <path d="M46 44 L50 44 Q54 44 54 40 L54 32" stroke="#E8003D"/>
+    <circle cx="54" cy="28" r="4.4" fill="#E8003D" stroke="none"/>
+  </g>
+</svg>

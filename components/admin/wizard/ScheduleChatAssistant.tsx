@@ -87,7 +87,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
   };
 
   return (
-    <div className="border border-white/10 rounded-lg bg-[var(--color-bg-elevated)] p-6">
+    <div className="border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-elevated)] p-6">
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">
           AI Chat Assistant
@@ -105,7 +105,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Paste tour dates here...&#10;&#10;Example:&#10;January 15 Tampa, FL at Amalie Arena&#10;Jan 17 Atlanta, GA&#10;1/19 Nashville TN - Bridgestone Arena"
-                className="w-full h-32 px-4 py-3 bg-[var(--color-bg-surface)] border border-white/10 rounded-lg text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-red-primary)] resize-y"
+                className="w-full h-32 px-4 py-3 bg-[var(--color-bg-surface)] border border-[var(--color-bg-border)] rounded-lg text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-red-primary)] resize-y"
                 disabled={processing}
               />
             </div>
@@ -133,7 +133,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
             </button>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-white/10">
+          <div className="mt-4 pt-4 border-t border-[var(--color-bg-border)]">
             <p className="text-xs text-[var(--color-text-muted)]">
               <strong><Lightbulb className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Tips:</strong> You can paste dates in any format (1/15, Jan 15, January 15th). Include city and state. Venue names are optional.
             </p>
@@ -147,7 +147,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
             </p>
           </div>
 
-          <div className="border border-white/10 rounded-lg overflow-hidden">
+          <div className="border border-[var(--color-bg-border)] rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-[var(--color-bg-surface)]/5">
@@ -160,7 +160,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
                     <th className="px-3 py-2"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/10">
+                <tbody className="divide-y divide-[var(--color-bg-border)]">
                   {pendingShows.map((show, index) => (
                     <tr key={index} className="hover:bg-[var(--color-bg-surface)]/5">
                       <td className="px-3 py-2">
@@ -234,7 +234,7 @@ export default function ScheduleChatAssistant({ tourName, artist, onShowsExtract
             <button
               type="button"
               onClick={cancelReview}
-              className="px-4 py-2 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)] text-sm"
+              className="px-4 py-2 border border-[var(--color-bg-border)] rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)] text-sm"
             >
               Cancel
             </button>

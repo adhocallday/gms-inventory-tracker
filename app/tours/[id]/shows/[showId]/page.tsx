@@ -337,19 +337,19 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
         <h2 className="text-lg font-semibold g-title">Settlement summary</h2>
         {settlementDoc ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm">
-            <div className="border border-white/10 rounded-md p-3">
+            <div className="border border-[var(--color-bg-border)] rounded-md p-3">
               <p className="text-xs text-[var(--color-text-muted)]">Gross sales</p>
               <p className="text-lg font-semibold mt-1">
                 {currencyFormatter.format(Number(settlementSource.gross_sales_total ?? 0))}
               </p>
             </div>
-            <div className="border border-white/10 rounded-md p-3">
+            <div className="border border-[var(--color-bg-border)] rounded-md p-3">
               <p className="text-xs text-[var(--color-text-muted)]">Fees</p>
               <p className="text-lg font-semibold mt-1">
                 {currencyFormatter.format(Number(settlementSource.other_fees ?? 0))}
               </p>
             </div>
-            <div className="border border-white/10 rounded-md p-3">
+            <div className="border border-[var(--color-bg-border)] rounded-md p-3">
               <p className="text-xs text-[var(--color-text-muted)]">Net settlement</p>
               <p className="text-lg font-semibold mt-1">
                 {currencyFormatter.format(Number(settlementSource.net_settlement_amount ?? 0))}

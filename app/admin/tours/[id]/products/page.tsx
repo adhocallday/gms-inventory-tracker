@@ -348,7 +348,7 @@ export default function TourProductsPage() {
                           <th className="pb-2 font-medium text-right">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-white/5">
+                      <tbody className="divide-y divide-[var(--color-bg-border)]">
                         {product.sizes.map((sizeData) => (
                           <TourProductCostEditor
                             key={sizeData.tour_product_id}

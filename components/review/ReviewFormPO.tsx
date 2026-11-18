@@ -137,7 +137,7 @@ export default function ReviewFormPO({
           {/* Total Amount (Read-only) */}
           <div>
             <label className="g-label block mb-1">Total Amount</label>
-            <div className="g-input bg-black/20 text-[var(--color-text-secondary)] cursor-not-allowed">
+            <div className="g-input bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] cursor-not-allowed">
               {formatCurrency(totalAmount)}
             </div>
           </div>
@@ -160,7 +160,7 @@ export default function ReviewFormPO({
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm g-table">
               <thead>
-                <tr className="border-b border-white/10">
+                <tr className="border-b border-[var(--color-bg-border)]">
                   <th className="text-left py-2 pr-2">SKU</th>
                   <th className="text-left py-2 pr-2">Description</th>
                   <th className="text-left py-2 pr-2">Size</th>
@@ -171,7 +171,7 @@ export default function ReviewFormPO({
               </thead>
               <tbody>
                 {data.line_items.map((item, index) => (
-                  <tr key={index} className="border-b border-white/10">
+                  <tr key={index} className="border-b border-[var(--color-bg-border)]">
                     <td className="py-2 pr-2">{item.sku}</td>
                     <td className="py-2 pr-2">{item.description}</td>
                     <td className="py-2 pr-2">{item.size}</td>

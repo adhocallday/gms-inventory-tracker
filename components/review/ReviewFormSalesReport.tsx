@@ -144,7 +144,7 @@ export default function ReviewFormSalesReport({
           {/* Per Head (Calculated) */}
           <div>
             <label className="g-label block mb-1">Per Head</label>
-            <div className="g-input bg-black/20 text-[var(--color-text-secondary)] cursor-not-allowed">
+            <div className="g-input bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] cursor-not-allowed">
               {formatPerHead()}
             </div>
           </div>
@@ -155,7 +155,7 @@ export default function ReviewFormSalesReport({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-xs text-[var(--color-text-muted)] mb-1">Calculated (Line Items)</p>
-                <div className={`g-input ${grossMismatch ? 'bg-yellow-500/10 border-yellow-500/30' : 'bg-black/20'} text-[var(--color-text-secondary)] cursor-not-allowed`}>
+                <div className={`g-input ${grossMismatch ? 'bg-yellow-500/10 border-yellow-500/30' : 'bg-[var(--color-bg-elevated)]'} text-[var(--color-text-secondary)] cursor-not-allowed`}>
                   {formatCurrency(calculatedGross)}
                 </div>
               </div>
@@ -196,7 +196,7 @@ export default function ReviewFormSalesReport({
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm g-table">
               <thead>
-                <tr className="border-b border-white/10">
+                <tr className="border-b border-[var(--color-bg-border)]">
                   <th className="text-left py-2 pr-2">SKU</th>
                   <th className="text-left py-2 pr-2">Description</th>
                   <th className="text-left py-2 pr-2">Size</th>
@@ -207,7 +207,7 @@ export default function ReviewFormSalesReport({
               </thead>
               <tbody>
                 {data.line_items.map((item, index) => (
-                  <tr key={index} className="border-b border-white/10">
+                  <tr key={index} className="border-b border-[var(--color-bg-border)]">
                     <td className="py-2 pr-2">{item.sku}</td>
                     <td className="py-2 pr-2">{item.description}</td>
                     <td className="py-2 pr-2">{item.size}</td>

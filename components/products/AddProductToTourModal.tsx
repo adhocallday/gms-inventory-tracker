@@ -149,9 +149,9 @@ export function AddProductToTourModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-[var(--color-bg-base)] border border-white/10 rounded-xl w-full max-w-2xl mx-4 shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-[var(--color-bg-base)] border border-[var(--color-bg-border)] rounded-xl w-full max-w-2xl mx-4 shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/10">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--color-bg-border)]">
           <h2 className="text-lg font-semibold g-title">Add Product to {tourName}</h2>
           <button
             onClick={onClose}
@@ -180,7 +180,7 @@ export function AddProductToTourModal({
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search products by SKU or description..."
-                  className="w-full pl-10 pr-4 py-2 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 bg-[var(--color-bg-surface)]/5 border border-[var(--color-bg-border)] rounded-lg text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
                   autoFocus
                 />
               </div>
@@ -205,7 +205,7 @@ export function AddProductToTourModal({
                     <button
                       key={product.id}
                       onClick={() => handleSelectProduct(product)}
-                      className="w-full text-left p-3 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 hover:border-white/20 transition"
+                      className="w-full text-left p-3 border border-[var(--color-bg-border)] rounded-lg hover:bg-[var(--color-bg-surface)]/5 hover:border-[var(--color-text-muted)] transition"
                     >
                       <div className="flex items-center justify-between">
                         <div>
@@ -273,7 +273,7 @@ export function AddProductToTourModal({
                         ${
                           selectedSizes.has(size)
                             ? 'bg-[var(--color-red-primary)] border-[var(--color-red-primary)] text-white'
-                            : 'border-white/20 text-[var(--color-text-secondary)] hover:border-white/40'
+                            : 'border-[var(--color-bg-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-muted)]'
                         }
                       `}
                     >
@@ -300,7 +300,7 @@ export function AddProductToTourModal({
                       onChange={(e) =>
                         setCosts({ ...costs, blank_unit_cost: parseFloat(e.target.value) || 0 })
                       }
-                      className="w-full pl-7 pr-3 py-2 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
+                      className="w-full pl-7 pr-3 py-2 bg-[var(--color-bg-surface)]/5 border border-[var(--color-bg-border)] rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
                       placeholder="0.00"
                     />
                   </div>
@@ -320,7 +320,7 @@ export function AddProductToTourModal({
                       onChange={(e) =>
                         setCosts({ ...costs, print_unit_cost: parseFloat(e.target.value) || 0 })
                       }
-                      className="w-full pl-7 pr-3 py-2 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
+                      className="w-full pl-7 pr-3 py-2 bg-[var(--color-bg-surface)]/5 border border-[var(--color-bg-border)] rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
                       placeholder="0.00"
                     />
                   </div>
@@ -340,7 +340,7 @@ export function AddProductToTourModal({
                       onChange={(e) =>
                         setCosts({ ...costs, suggested_retail: parseFloat(e.target.value) || 0 })
                       }
-                      className="w-full pl-7 pr-3 py-2 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
+                      className="w-full pl-7 pr-3 py-2 bg-[var(--color-bg-surface)]/5 border border-[var(--color-bg-border)] rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)]"
                       placeholder="0.00"
                     />
                   </div>
@@ -348,7 +348,7 @@ export function AddProductToTourModal({
               </div>
 
               {/* Total Cost Preview */}
-              <div className="p-3 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg">
+              <div className="p-3 bg-[var(--color-bg-surface)]/5 border border-[var(--color-bg-border)] rounded-lg">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-[var(--color-text-muted)]">Total Package Cost:</span>
                   <span className="font-semibold text-[var(--color-text-primary)]">
@@ -361,7 +361,7 @@ export function AddProductToTourModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 p-4 border-t border-white/10">
+        <div className="flex justify-end gap-3 p-4 border-t border-[var(--color-bg-border)]">
           <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
             Cancel
           </Button>

@@ -60,7 +60,7 @@ export default function ValidationPanel({ validation }: ValidationPanelProps) {
           )}
 
           {expandedErrors && (
-            <p className="mt-3 text-xs text-[var(--color-text-muted)] border-t border-white/10 pt-3">
+            <p className="mt-3 text-xs text-[var(--color-text-muted)] border-t border-[var(--color-bg-border)] pt-3">
               These fields must be filled before the document can be posted to
               the database.
             </p>
@@ -96,7 +96,7 @@ export default function ValidationPanel({ validation }: ValidationPanelProps) {
           )}
 
           {expandedWarnings && (
-            <p className="mt-3 text-xs text-[var(--color-text-muted)] border-t border-white/10 pt-3">
+            <p className="mt-3 text-xs text-[var(--color-text-muted)] border-t border-[var(--color-bg-border)] pt-3">
               These warnings won't prevent posting, but you should review them
               carefully.
             </p>

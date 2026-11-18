@@ -18,6 +18,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { createServiceClient } from '@/lib/supabase/client';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { MakeSalesChartButton } from '@/components/reports/MakeSalesChartButton';
 import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { CategoryMixChart, MonthlyTotalsChart } from '@/components/reports/merch-flow/MerchFlowCharts';
 import { loadTourReport } from '@/lib/reporting/merch-flow/from-db';
@@ -163,7 +164,13 @@ export default async function MerchFlowReportPage({ params }: MerchFlowPageProps
 
   return (
     <div className="g-container py-12 space-y-8">
-      <PageHeader title="Merch Flow Report" subtitle={subtitle} kicker="Reporting" breadcrumbs={breadcrumbs} />
+      <PageHeader
+        title="Merch Flow Report"
+        subtitle={subtitle}
+        kicker="Reporting"
+        breadcrumbs={breadcrumbs}
+        actions={<MakeSalesChartButton tourId={params.id} />}
+      />
 
       {/* KPI row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

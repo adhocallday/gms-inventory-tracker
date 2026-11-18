@@ -88,7 +88,7 @@ export function TourProductCostEditor({
             onChange={(e) =>
               setEditValues({ ...editValues, blank_unit_cost: parseFloat(e.target.value) || 0 })
             }
-            className="w-20 px-2 py-1 text-right bg-[var(--color-bg-surface)]/10 border border-white/20 rounded text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-red-primary)]"
+            className="w-20 px-2 py-1 text-right bg-[var(--color-bg-surface)]/10 border border-[var(--color-bg-border)] rounded text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-red-primary)]"
             disabled={isSaving}
           />
         </td>
@@ -100,7 +100,7 @@ export function TourProductCostEditor({
             onChange={(e) =>
               setEditValues({ ...editValues, print_unit_cost: parseFloat(e.target.value) || 0 })
             }
-            className="w-20 px-2 py-1 text-right bg-[var(--color-bg-surface)]/10 border border-white/20 rounded text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-red-primary)]"
+            className="w-20 px-2 py-1 text-right bg-[var(--color-bg-surface)]/10 border border-[var(--color-bg-border)] rounded text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-red-primary)]"
             disabled={isSaving}
           />
         </td>
@@ -115,7 +115,7 @@ export function TourProductCostEditor({
             onChange={(e) =>
               setEditValues({ ...editValues, suggested_retail: parseFloat(e.target.value) || 0 })
             }
-            className="w-20 px-2 py-1 text-right bg-[var(--color-bg-surface)]/10 border border-white/20 rounded text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-red-primary)]"
+            className="w-20 px-2 py-1 text-right bg-[var(--color-bg-surface)]/10 border border-[var(--color-bg-border)] rounded text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-red-primary)]"
             placeholder="-"
             disabled={isSaving}
           />

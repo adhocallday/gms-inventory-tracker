@@ -11,10 +11,10 @@ const buttonVariants = cva(
         primary:
           'bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] active:scale-95',
         secondary:
-          'border border-[var(--color-bg-border)] text-[var(--color-text-secondary)] hover:border-white hover:text-white',
+          'border border-[var(--color-bg-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-primary)] hover:text-[var(--color-text-primary)]',
         outline:
-          'border border-[var(--color-bg-border)] text-[var(--color-text-secondary)] hover:border-white hover:text-white',
-        ghost: 'bg-transparent text-[var(--color-text-secondary)] hover:text-white',
+          'border border-[var(--color-bg-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-primary)] hover:text-[var(--color-text-primary)]',
+        ghost: 'bg-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]',
         destructive:
           'bg-[var(--color-red-muted)] text-[var(--color-red-primary)] hover:bg-[var(--color-red-primary)] hover:text-white active:scale-95',
       },

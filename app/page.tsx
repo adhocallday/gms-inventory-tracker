@@ -7,6 +7,7 @@ import { UpcomingShowsPanel, type UpcomingShow } from '@/components/dashboard/Up
 import { InsightCard } from '@/components/dashboard/InsightCard';
 import { cn } from '@/lib/utils';
 import { fetchAll } from '@/lib/supabase/fetch-all';
+import { FirstVisitRedirect } from '@/components/onboarding/FirstVisitRedirect';
 
 type TourRow = {
   id: string;
@@ -178,6 +179,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-10 py-6">
+      <FirstVisitRedirect />
       <header className="space-y-3">
         <p className="g-kicker">Tour operations</p>
         <h1 className="text-4xl font-semibold g-title">Tour Dashboard</h1>
@@ -249,7 +251,9 @@ export default async function DashboardPage() {
         <UpcomingShowsPanel shows={upcomingShows} />
       </div>
 
-      <ToursGrid tours={toursWithStats} />
+      <div data-tour="tours-dashboard">
+        <ToursGrid tours={toursWithStats} />
+      </div>
     </div>
   );
 }

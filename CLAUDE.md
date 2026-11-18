@@ -1,4 +1,4 @@
-# Claude Code Guidelines for GMS Inventory Tracker
+# Claude Code Guidelines for MerchFlow Tracker (GMS Inventory Tracker)
 
 This document provides guidelines for AI assistants (Claude Code, Cursor, etc.) working on this codebase.
 
@@ -187,6 +187,8 @@ Set these in Vercel Dashboard → Project → Settings → Environment Variables
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `ANTHROPIC_API_KEY`
 - `NEXT_PUBLIC_APP_URL`
+- `MERCHFLOW_LINK_SECRET` (shared with MerchFlow Charts)
+- `NEXT_PUBLIC_TRACKER_URL`, `NEXT_PUBLIC_CHARTS_URL`, `NEXT_PUBLIC_FLOW_URL`, `NEXT_PUBLIC_POS_URL` (optional; defaults in `lib/apps.ts`)
 
 **Important:** Set different values for Production vs Preview environments.
 
@@ -288,10 +290,20 @@ lib/ai/
 
 ## UI Patterns
 
-### Theme System
-- Dark/light mode with CSS variables in `globals.css`
-- Theme set via `data-theme` attribute on `<html>`
-- Use inline script in `<head>` to prevent flash of wrong theme
+### Theme System (MerchFlow brand)
+- The app is **MerchFlow Tracker**, part of MerchFlow by Global Merchandising Services.
+- **Light is the default.** Dark is opt-in through the theme toggle (`localStorage.theme = 'dark'`).
+- Theme set via `data-theme` attribute on `<html>`; `:root` and `[data-theme="light"]` hold the light values, `[data-theme="dark"]` the dark ones.
+- Inline script in `<head>` sets it before hydration to prevent a flash.
+- Brand tokens (`--mf-*`) mirror `merchflow-brand/out/tokens.css`; the `--color-*` variables map onto them. Red `#E8003D` is an accent; white on it is 4.67:1 (AA), so red buttons with white text are fine. Hover/active go darker (`--color-red-hover` `#C70034`, `--color-red-active` `#A8002C`).
+- Fonts: Inter (`--font-sans`) and Inconsolata (`--font-mono`).
+- Don't hard-code dark-only classes (`border-white/10`, `bg-black/20`, `text-white` on surfaces); use the CSS variables.
+- Logo: `components/brand/MerchFlowLogo.tsx` (inline, follows `currentColor`).
+
+### MerchFlow links and onboarding
+- App URLs live in `lib/apps.ts` (`NEXT_PUBLIC_TRACKER_URL`, `NEXT_PUBLIC_CHARTS_URL`, `NEXT_PUBLIC_FLOW_URL`, `NEXT_PUBLIC_POS_URL`).
+- `GET /api/tours/[id]/merch-flow-data` serves TrackerData to MerchFlow Charts; it requires header `x-merchflow-link: $MERCHFLOW_LINK_SECRET` (same value set in both apps).
+- First visit: `/` redirects to `/welcome` once (localStorage `mf.onboarding.v1`). The guided tour (driver.js) is `components/onboarding/GuidedTour.tsx`; steps anchor on `data-tour="…"` attributes, so keep those when editing the NavBar, dashboard, tour page and reports page.
 
 ### Collapsible Sidebar
 - State managed via `SidebarContext`

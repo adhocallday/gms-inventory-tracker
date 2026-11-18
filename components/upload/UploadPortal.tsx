@@ -130,7 +130,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
       />
 
       {/* Auto-Detect Toggle */}
-      <div className="p-4 border border-white/10 rounded-lg bg-[var(--color-bg-surface)]">
+      <div className="p-4 border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-surface)]">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
@@ -284,7 +284,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
             Draft status
           </div>
           {parsedId ? (
-            <div className="border border-white/10 rounded-md p-4 bg-[var(--color-bg-elevated)] space-y-2">
+            <div className="border border-[var(--color-bg-border)] rounded-md p-4 bg-[var(--color-bg-elevated)] space-y-2">
               <p className="text-sm text-[var(--color-text-primary)] font-semibold">
                 Draft created · ID {parsedId}
               </p>

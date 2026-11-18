@@ -4,6 +4,7 @@ import { createServiceClient } from '@/lib/supabase/client';
 import { ReportBuilder } from '@/components/reports/ReportBuilder';
 import { ReportList } from '@/components/reports/ReportList';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { MakeSalesChartButton } from '@/components/reports/MakeSalesChartButton';
 import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { BarChart3, Lightbulb } from 'lucide-react';
 
@@ -67,13 +68,17 @@ export default async function TourReportsPage({ params }: TourReportsPageProps) 
         kicker="Reporting"
         breadcrumbs={breadcrumbs}
         actions={
-          <Link
-            href={`/tours/${tourId}/reports/merch-flow`}
-            className="inline-flex items-center gap-2 h-10 px-4 rounded-md text-sm font-semibold bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] transition-all"
-          >
-            <BarChart3 className="h-4 w-4" aria-hidden="true" />
-            Merch flow report
-          </Link>
+          <>
+            <MakeSalesChartButton tourId={tourId} />
+            <Link
+              href={`/tours/${tourId}/reports/merch-flow`}
+              data-tour="merch-flow-report"
+              className="inline-flex items-center gap-2 h-10 px-4 rounded-md text-sm font-semibold bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] active:bg-[var(--color-red-active)] transition-all"
+            >
+              <BarChart3 className="h-4 w-4" aria-hidden="true" />
+              Merch flow report
+            </Link>
+          </>
         }
       />
 

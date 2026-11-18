@@ -197,7 +197,7 @@ export function OverridePreview({
               >
                 {isApplying ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span className="w-4 h-4 border-2 border-[var(--color-bg-border)] border-t-white rounded-full animate-spin" />
                     Applying...
                   </>
                 ) : (

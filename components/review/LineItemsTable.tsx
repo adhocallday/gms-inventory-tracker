@@ -145,7 +145,7 @@ export default function LineItemsTable({
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm g-table">
           <thead>
-            <tr className="border-b border-white/10">
+            <tr className="border-b border-[var(--color-bg-border)]">
               {docType === 'settlement' && (
                 <>
                   <th className="text-left py-2 pr-2">Category</th>
@@ -186,7 +186,7 @@ export default function LineItemsTable({
           </thead>
           <tbody>
             {lineItems.map((item, index) => (
-              <tr key={index} className="border-b border-white/10">
+              <tr key={index} className="border-b border-[var(--color-bg-border)]">
                 {/* Comp Type (Settlement only) */}
                 {docType === 'settlement' && (
                   <>

@@ -200,7 +200,7 @@ export default function ReviewFormPackingList({
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm g-table">
               <thead>
-                <tr className="border-b border-white/10">
+                <tr className="border-b border-[var(--color-bg-border)]">
                   <th className="text-left py-2 pr-2">SKU</th>
                   <th className="text-left py-2 pr-2">Description</th>
                   <th className="text-left py-2 pr-2">Size</th>
@@ -209,7 +209,7 @@ export default function ReviewFormPackingList({
               </thead>
               <tbody>
                 {data.line_items.map((item, index) => (
-                  <tr key={index} className="border-b border-white/10">
+                  <tr key={index} className="border-b border-[var(--color-bg-border)]">
                     <td className="py-2 pr-2">{item.sku}</td>
                     <td className="py-2 pr-2">{item.description}</td>
                     <td className="py-2 pr-2">{item.size}</td>

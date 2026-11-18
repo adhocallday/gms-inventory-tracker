@@ -174,14 +174,14 @@ export default function ReviewFormSettlement({
 
           <div>
             <label className="g-label block mb-1">Net Settlement Amount</label>
-            <div className="g-input bg-black/20 text-[var(--color-text-secondary)] cursor-not-allowed">
+            <div className="g-input bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] cursor-not-allowed">
               {formatCurrency(netSettlement)}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="g-card p-4 bg-black/20">
+      <div className="g-card p-4 bg-[var(--color-bg-elevated)]">
         <h4 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3">
           Settlement Calculation
         </h4>
@@ -210,7 +210,7 @@ export default function ReviewFormSettlement({
               <span className="text-red-300">-{formatCurrency(data.refunds || 0)}</span>
             </div>
           )}
-          <div className="border-t border-white/10 pt-2 mt-2 flex justify-between font-semibold">
+          <div className="border-t border-[var(--color-bg-border)] pt-2 mt-2 flex justify-between font-semibold">
             <span className="text-[var(--color-text-primary)]">Net Settlement:</span>
             <span className={netSettlement >= 0 ? 'text-green-300' : 'text-red-300'}>
               {formatCurrency(netSettlement)}
@@ -234,7 +234,7 @@ export default function ReviewFormSettlement({
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm g-table">
               <thead>
-                <tr className="border-b border-white/10">
+                <tr className="border-b border-[var(--color-bg-border)]">
                   <th className="text-left py-2 pr-2">Category</th>
                   <th className="text-left py-2 pr-2">Source</th>
                   <th className="text-left py-2 pr-2">Comp Type</th>
@@ -246,7 +246,7 @@ export default function ReviewFormSettlement({
               </thead>
               <tbody>
                 {data.comps.map((item, index) => (
-                  <tr key={index} className="border-b border-white/10">
+                  <tr key={index} className="border-b border-[var(--color-bg-border)]">
                     <td className="py-2 pr-2">{item.comp_category}</td>
                     <td className="py-2 pr-2">{item.comp_source}</td>
                     <td className="py-2 pr-2">{item.comp_type}</td>

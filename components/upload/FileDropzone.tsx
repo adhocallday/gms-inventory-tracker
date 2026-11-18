@@ -211,7 +211,7 @@ export function FileDropzone({
         className={`
           border-2 border-dashed rounded-lg p-4 md:p-8 lg:p-12 text-center cursor-pointer
           transition-colors duration-200
-          ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
+          ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)]'}
           ${uploading || parsing ? 'pointer-events-none opacity-50' : ''}
         `}
       >
@@ -266,7 +266,7 @@ export function FileDropzone({
         <div className="mt-6 space-y-4">
           {/* PDF Preview (if available) */}
           {pdfPreview && (
-            <div className="border border-white/10 rounded-lg overflow-hidden bg-black/40">
+            <div className="border border-[var(--color-bg-border)] rounded-lg overflow-hidden bg-[var(--color-bg-elevated)]">
               <iframe
                 src={pdfPreview}
                 className="w-full h-48 md:h-64 lg:h-96"
@@ -276,7 +276,7 @@ export function FileDropzone({
           )}
 
           {/* Detection Results */}
-          <div className="p-4 border border-white/10 rounded-lg bg-[var(--color-bg-surface)]">
+          <div className="p-4 border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-surface)]">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <p className="text-sm font-semibold text-[var(--color-text-primary)]">
@@ -362,7 +362,7 @@ export function FileDropzone({
                   setDetectedType(null);
                   setCurrentFile(null);
                 }}
-                className="px-3 py-2.5 md:px-4 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)] text-sm md:text-base"
+                className="px-3 py-2.5 md:px-4 border border-[var(--color-bg-border)] rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)] text-sm md:text-base"
               >
                 Cancel
               </button>
@@ -380,11 +380,11 @@ export function FileDropzone({
       )}
 
       {parsedData && (
-        <div className="mt-4 p-3 md:p-4 border border-white/10 rounded-lg bg-[var(--color-bg-surface)]">
+        <div className="mt-4 p-3 md:p-4 border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-surface)]">
           <p className="text-sm text-[var(--color-text-primary)] font-semibold mb-2">
             <Check className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Document parsed successfully!
           </p>
-          <pre className="text-xs bg-black/40 p-2 md:p-3 rounded border border-white/10 overflow-auto max-h-48 md:max-h-64 lg:max-h-96 text-[var(--color-text-secondary)]">
+          <pre className="text-xs bg-[var(--color-bg-elevated)] p-2 md:p-3 rounded border border-[var(--color-bg-border)] overflow-auto max-h-48 md:max-h-64 lg:max-h-96 text-[var(--color-text-secondary)]">
             {JSON.stringify(parsedData, null, 2)}
           </pre>
         </div>

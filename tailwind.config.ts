@@ -8,37 +8,15 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      // Map CSS custom properties to Tailwind utilities
-      spacing: {
-        'g-1': 'var(--g-1)',
-        'g-2': 'var(--g-2)',
-        'g-3': 'var(--g-3)',
-        'g-4': 'var(--g-4)',
-        'g-5': 'var(--g-5)',
-        'g-6': 'var(--g-6)',
-        'g-8': 'var(--g-8)',
-        'g-10': 'var(--g-10)',
-        'g-12': 'var(--g-12)',
-        'g-16': 'var(--g-16)',
-      },
-      fontSize: {
-        'g-h1': 'var(--g-h1)',
-        'g-h2': 'var(--g-h2)',
-        'g-h3': 'var(--g-h3)',
-        'g-body': 'var(--g-body)',
-        'g-small': 'var(--g-small)',
+      // Theme values live as CSS variables in app/globals.css (--color-*,
+      // --mf-*). The unused --g-* spacing/type/color utilities were removed.
+      fontFamily: {
+        sans: ['var(--font-sans)'],
+        mono: ['var(--font-mono)'],
       },
       colors: {
-        'g-bg': 'var(--g-bg)',
-        'g-bg-muted': 'var(--g-bg-muted)',
-        'g-surface': 'var(--g-surface)',
-        'g-surface-2': 'var(--g-surface-2)',
-        'g-text': 'var(--g-text)',
-        'g-text-muted': 'var(--g-text-muted)',
-        'g-text-dim': 'var(--g-text-dim)',
-        'g-accent': 'var(--g-accent)',
-        'g-accent-2': 'var(--g-accent-2)',
-        'g-border': 'var(--g-border)',
+        'mf-red': 'var(--mf-red)',
+        'mf-ink': 'var(--mf-ink)',
       },
       animation: {
         'fade-in': 'fadeIn 0.2s ease-in-out',

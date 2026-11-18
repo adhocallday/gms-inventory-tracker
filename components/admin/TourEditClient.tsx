@@ -177,7 +177,7 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
       </header>
 
       {/* Tabs */}
-      <div className="border-b border-white/10 mb-8">
+      <div className="border-b border-[var(--color-bg-border)] mb-8">
         <div className="flex gap-6">
           <button
             onClick={() => setActiveTab('info')}
@@ -297,7 +297,7 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
             />
           </div>
 
-          <div className="flex justify-end pt-4 border-t border-white/10">
+          <div className="flex justify-end pt-4 border-t border-[var(--color-bg-border)]">
             <button
               onClick={saveTourInfo}
               disabled={saving}
@@ -330,14 +330,14 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
               <button
                 type="button"
                 onClick={addManualShow}
-                className="px-4 py-2 text-sm bg-[var(--color-bg-surface)]/10 hover:bg-[var(--color-bg-surface)]/20 text-white rounded-lg transition font-medium"
+                className="px-4 py-2 text-sm bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-border)] text-[var(--color-text-primary)] rounded-lg transition font-medium"
               >
                 + Add Show
               </button>
             </div>
 
             {shows.length > 0 ? (
-              <div className="border border-white/10 rounded-lg overflow-hidden">
+              <div className="border border-[var(--color-bg-border)] rounded-lg overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead className="bg-[var(--color-bg-surface)]/5">
@@ -350,7 +350,7 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
                         <th className="px-4 py-3"></th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/10">
+                    <tbody className="divide-y divide-[var(--color-bg-border)]">
                       {shows.map((show, index) => (
                         <tr key={show.id || index} className="hover:bg-[var(--color-bg-surface)]/5">
                           <td className="px-4 py-2">
@@ -409,14 +409,14 @@ export default function TourEditClient({ tour, initialShows, initialProducts }: 
                 </div>
               </div>
             ) : (
-              <div className="border border-white/10 rounded-lg p-8 text-center">
+              <div className="border border-[var(--color-bg-border)] rounded-lg p-8 text-center">
                 <p className="text-sm text-[var(--color-text-muted)]">
                   No shows added yet. Use the AI chat assistant above or add manually.
                 </p>
               </div>
             )}
 
-            <div className="flex justify-end pt-4 border-t border-white/10 mt-6">
+            <div className="flex justify-end pt-4 border-t border-[var(--color-bg-border)] mt-6">
               <button
                 onClick={saveShows}
                 disabled={saving}

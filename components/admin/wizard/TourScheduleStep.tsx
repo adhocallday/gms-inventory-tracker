@@ -119,7 +119,7 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
       </div>
 
       {/* AI Input Mode Toggle */}
-      <div className="flex gap-2 p-1 bg-[var(--color-bg-surface)] border border-white/10 rounded-lg w-fit">
+      <div className="flex gap-2 p-1 bg-[var(--color-bg-surface)] border border-[var(--color-bg-border)] rounded-lg w-fit">
         <button
           type="button"
           onClick={() => setInputMode('chat')}
@@ -157,7 +157,7 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
 
       {/* AI File Upload */}
       {inputMode === 'upload' && (
-        <div className="p-6 border border-white/10 rounded-lg bg-[var(--color-bg-elevated)]">
+        <div className="p-6 border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-elevated)]">
           <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
             AI-Assisted File Upload
           </h3>
@@ -165,7 +165,7 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
             {...getRootProps()}
             className={`
               border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition
-              ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
+              ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)]'}
               ${parsing ? 'pointer-events-none opacity-50' : ''}
             `}
           >
@@ -204,14 +204,14 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
           <button
             type="button"
             onClick={addManualShow}
-            className="px-3 py-1.5 text-xs bg-[var(--color-bg-surface)]/10 hover:bg-[var(--color-bg-surface)]/20 text-white rounded-lg transition font-medium"
+            className="px-3 py-1.5 text-xs bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-border)] text-[var(--color-text-primary)] rounded-lg transition font-medium"
           >
             + Add Show Manually
           </button>
         </div>
 
         {shows.length > 0 ? (
-          <div className="border border-white/10 rounded-lg overflow-hidden">
+          <div className="border border-[var(--color-bg-border)] rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-[var(--color-bg-surface)]/5">
@@ -225,7 +225,7 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
                     <th className="px-4 py-3"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/10">
+                <tbody className="divide-y divide-[var(--color-bg-border)]">
                   {shows.map((show, index) => (
                     <tr key={index} className="hover:bg-[var(--color-bg-surface)]/5">
                       <td className="px-4 py-2">
@@ -300,7 +300,7 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
             </div>
           </div>
         ) : (
-          <div className="border border-white/10 rounded-lg p-8 text-center">
+          <div className="border border-[var(--color-bg-border)] rounded-lg p-8 text-center">
             <p className="text-sm text-[var(--color-text-muted)]">
               No shows added yet. Upload a schedule or add shows manually.
             </p>
@@ -309,11 +309,11 @@ export default function TourScheduleStep({ tourData, shows, onUpdate, onNext, on
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between pt-6 border-t border-white/10">
+      <div className="flex justify-between pt-6 border-t border-[var(--color-bg-border)]">
         <button
           type="button"
           onClick={onPrev}
-          className="px-6 py-2 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)]"
+          className="px-6 py-2 border border-[var(--color-bg-border)] rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)]"
         >
           <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Previous
         </button>

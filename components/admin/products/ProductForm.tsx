@@ -236,9 +236,9 @@ export function ProductForm({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-[var(--color-bg-base)] border border-white/10 rounded-xl w-full max-w-2xl mx-4 shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-[var(--color-bg-base)] border border-[var(--color-bg-border)] rounded-xl w-full max-w-2xl mx-4 shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/10">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--color-bg-border)]">
           <h2 className="text-lg font-semibold g-title">
             {isEditMode ? 'Edit Product' : 'Add Products'}
           </h2>
@@ -252,7 +252,7 @@ export function ProductForm({
 
         {/* Mode Toggle (only for create) */}
         {!isEditMode && (
-          <div className="flex border-b border-white/10">
+          <div className="flex border-b border-[var(--color-bg-border)]">
             <button
               type="button"
               onClick={() => setMode('upload')}
@@ -299,7 +299,7 @@ export function ProductForm({
                   type="text"
                   value={formData.sku}
                   onChange={(e) => setFormData({ ...formData, sku: e.target.value.toUpperCase() })}
-                  className="w-full px-3 py-2 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
+                  className="w-full px-3 py-2 bg-[var(--color-bg-surface)]/5 border border-[var(--color-bg-border)] rounded-lg text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
                   placeholder="e.g., TSHIRT-BLK-001"
                   disabled={isSubmitting}
                 />
@@ -313,7 +313,7 @@ export function ProductForm({
                   type="text"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3 py-2 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
+                  className="w-full px-3 py-2 bg-[var(--color-bg-surface)]/5 border border-[var(--color-bg-border)] rounded-lg text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
                   placeholder="e.g., Black Tour T-Shirt"
                   disabled={isSubmitting}
                 />
@@ -326,7 +326,7 @@ export function ProductForm({
                 <select
                   value={formData.product_type}
                   onChange={(e) => setFormData({ ...formData, product_type: e.target.value })}
-                  className="w-full px-3 py-2 bg-[var(--color-bg-surface)]/5 border border-white/10 rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
+                  className="w-full px-3 py-2 bg-[var(--color-bg-surface)]/5 border border-[var(--color-bg-border)] rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-red-primary)] focus:border-transparent"
                   disabled={isSubmitting}
                 >
                   {productTypes.map((type) => (
@@ -365,7 +365,7 @@ export function ProductForm({
                 {...getRootProps()}
                 className={`
                   border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition
-                  ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
+                  ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)]'}
                   ${parsing ? 'pointer-events-none opacity-50' : ''}
                 `}
               >
@@ -414,7 +414,7 @@ export function ProductForm({
                         key={index}
                         className={`
                           border rounded-lg p-4 transition
-                          ${selectedProducts.has(index) ? 'border-[var(--color-red-primary)]/50 bg-[var(--color-red-primary)]/5' : 'border-white/10 bg-[var(--color-bg-surface)]/5'}
+                          ${selectedProducts.has(index) ? 'border-[var(--color-red-primary)]/50 bg-[var(--color-red-primary)]/5' : 'border-[var(--color-bg-border)] bg-[var(--color-bg-surface)]/5'}
                         `}
                       >
                         <div className="flex items-start gap-3">
@@ -422,7 +422,7 @@ export function ProductForm({
                             type="checkbox"
                             checked={selectedProducts.has(index)}
                             onChange={() => toggleProduct(index)}
-                            className="mt-1 rounded border-white/20"
+                            className="mt-1 rounded border-[var(--color-bg-border)]"
                           />
                           <div className="flex-1 min-w-0 space-y-3">
                             {/* SKU and Category Row */}
@@ -433,7 +433,7 @@ export function ProductForm({
                                 onChange={(e) =>
                                   updateParsedProduct(index, 'sku', e.target.value.toUpperCase())
                                 }
-                                className="font-mono text-sm bg-transparent border-b border-transparent hover:border-white/20 focus:border-[var(--color-red-primary)] focus:outline-none text-[var(--color-text-primary)]"
+                                className="font-mono text-sm bg-transparent border-b border-transparent hover:border-[var(--color-text-muted)] focus:border-[var(--color-red-primary)] focus:outline-none text-[var(--color-text-primary)]"
                                 placeholder="SKU"
                               />
                               <span className="text-xs px-2 py-0.5 bg-[var(--color-bg-surface)]/10 rounded text-[var(--color-text-muted)]">
@@ -446,7 +446,7 @@ export function ProductForm({
                               type="text"
                               value={product.name}
                               onChange={(e) => updateParsedProduct(index, 'name', e.target.value)}
-                              className="w-full text-sm bg-transparent border-b border-transparent hover:border-white/20 focus:border-[var(--color-red-primary)] focus:outline-none text-[var(--color-text-secondary)]"
+                              className="w-full text-sm bg-transparent border-b border-transparent hover:border-[var(--color-text-muted)] focus:border-[var(--color-red-primary)] focus:outline-none text-[var(--color-text-secondary)]"
                               placeholder="Product name"
                             />
 
@@ -466,7 +466,7 @@ export function ProductForm({
                                       ${
                                         product.sizes.includes(size)
                                           ? 'bg-[var(--color-red-primary)] border-[var(--color-red-primary)] text-white'
-                                          : 'border-white/20 text-[var(--color-text-secondary)] hover:border-white/40'
+                                          : 'border-[var(--color-bg-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-muted)]'
                                       }
                                     `}
                                   >
@@ -488,7 +488,7 @@ export function ProductForm({
                     ))}
                   </div>
 
-                  <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                  <div className="flex justify-end gap-3 pt-4 border-t border-[var(--color-bg-border)]">
                     <Button variant="outline" onClick={onCancel} disabled={isSubmitting}>
                       Cancel
                     </Button>

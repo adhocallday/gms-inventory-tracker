@@ -3,18 +3,24 @@ import { NavBar } from '@/components/layout/NavBar';
 import { SidebarProvider } from '@/components/layout/SidebarContext';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { GuidedTour } from '@/components/onboarding/GuidedTour';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'GMS Inventory Tracker',
-  description: 'Multi-tour inventory management system for Global Merch Services',
+  title: 'MerchFlow Tracker',
+  description:
+    'MerchFlow Tracker: tour inventory, documents and sales for Global Merchandising Services.',
+  manifest: '/site.webmanifest',
+  applicationName: 'MerchFlow Tracker',
+  appleWebApp: { title: 'Tracker' },
 };
 
-// Script to set theme before hydration to prevent flash
+// Light is the default. Dark is opt-in through the toggle, stored as
+// localStorage theme=dark. Runs before hydration to prevent a flash.
 const themeScript = `
   (function() {
     try {
-      var theme = localStorage.getItem('theme') || 'dark';
+      var theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', theme);
     } catch (e) {}
   })();
@@ -45,6 +51,7 @@ export default function RootLayout({
                 </div>
               </main>
             </div>
+            <GuidedTour />
           </SidebarProvider>
         </ThemeProvider>
       </body>

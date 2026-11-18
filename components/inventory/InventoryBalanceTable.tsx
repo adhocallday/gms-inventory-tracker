@@ -162,7 +162,7 @@ export function InventoryBalanceTable({ data, loading, showTotals = true }: Inve
       />
 
       {showTotals && data.length > 0 && (
-        <div className="mt-4 p-4 bg-[var(--color-bg-surface)]/5 rounded-lg border border-white/10">
+        <div className="mt-4 p-4 bg-[var(--color-bg-surface)]/5 rounded-lg border border-[var(--color-bg-border)]">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
             <div>
               <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Received</p>

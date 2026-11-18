@@ -349,7 +349,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       </div>
 
       {/* Navigation Tabs */}
-      <nav className="flex gap-2 mt-8 border-b border-white/10 pb-0 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+      <nav className="flex gap-2 mt-8 border-b border-[var(--color-bg-border)] pb-0 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
         <Link
           href={`/tours/${tour.id}/projections`}
           className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
@@ -364,6 +364,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         </Link>
         <Link
           href={`/tours/${tour.id}/inventory`}
+          data-tour="inventory"
           className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
         >
           <Package className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Inventory
@@ -438,14 +439,14 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
           {baselineScenario ? (
             <div className="mt-4 space-y-3 text-sm">
               <p className="text-[var(--color-text-muted)]">
-                Baseline scenario: <span className="text-white">{baselineScenario.name}</span>
+                Baseline scenario: <span className="text-[var(--color-text-primary)]">{baselineScenario.name}</span>
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="border border-white/10 rounded-md p-3">
+                <div className="border border-[var(--color-bg-border)] rounded-md p-3">
                   <p className="text-xs text-[var(--color-text-muted)]">Forecast units</p>
                   <p className="text-lg font-semibold mt-1">{formatNumber(forecastUnits)}</p>
                 </div>
-                <div className="border border-white/10 rounded-md p-3">
+                <div className="border border-[var(--color-bg-border)] rounded-md p-3">
                   <p className="text-xs text-[var(--color-text-muted)]">Forecast gross</p>
                   <p className="text-lg font-semibold mt-1">
                     {currencyFormatter.format(forecastGross)}
@@ -471,7 +472,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
               )}
             </div>
           ) : (
-            <div className="mt-4 p-4 border border-dashed border-white/10 rounded-md text-sm text-[var(--color-text-muted)]">
+            <div className="mt-4 p-4 border border-dashed border-[var(--color-bg-border)] rounded-md text-sm text-[var(--color-text-muted)]">
               No projection scenarios yet. Add a scenario to compare forecasted units and revenue.
             </div>
           )}
@@ -484,7 +485,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
             {designAssets.length === 0 ? (
-              <div className="sm:col-span-2 text-sm text-[var(--color-text-muted)] border border-dashed border-white/10 rounded-md p-4">
+              <div className="sm:col-span-2 text-sm text-[var(--color-text-muted)] border border-dashed border-[var(--color-bg-border)] rounded-md p-4">
                 No design assets uploaded yet.
               </div>
             ) : (
@@ -493,9 +494,9 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
                 return (
                   <div
                     key={asset.id}
-                    className="border border-white/10 rounded-md overflow-hidden"
+                    className="border border-[var(--color-bg-border)] rounded-md overflow-hidden"
                   >
-                    <div className="h-28 bg-black/40 flex items-center justify-center text-xs text-[var(--color-text-muted)]">
+                    <div className="h-28 bg-[var(--color-bg-elevated)] flex items-center justify-center text-xs text-[var(--color-text-muted)]">
                       {asset.storage_path}
                     </div>
                     <div className="p-2">

@@ -128,7 +128,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
       </div>
 
       {/* AI Upload Area */}
-      <div className="p-6 border border-white/10 rounded-lg bg-[var(--color-bg-elevated)]">
+      <div className="p-6 border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-elevated)]">
         <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
           AI-Assisted Upload
         </h3>
@@ -136,7 +136,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
           {...getRootProps()}
           className={`
             border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition
-            ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-white/15 hover:border-white/30'}
+            ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)]'}
             ${parsing ? 'pointer-events-none opacity-50' : ''}
           `}
         >
@@ -174,7 +174,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
           <button
             type="button"
             onClick={addManualProduct}
-            className="px-3 py-1.5 text-xs bg-[var(--color-bg-surface)]/10 hover:bg-[var(--color-bg-surface)]/20 text-white rounded-lg transition font-medium"
+            className="px-3 py-1.5 text-xs bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-border)] text-[var(--color-text-primary)] rounded-lg transition font-medium"
           >
             + Add Product Manually
           </button>
@@ -183,7 +183,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
         {products.length > 0 ? (
           <div className="space-y-4">
             {products.map((product, index) => (
-              <div key={index} className="border border-white/10 rounded-lg p-4 bg-[var(--color-bg-surface)]">
+              <div key={index} className="border border-[var(--color-bg-border)] rounded-lg p-4 bg-[var(--color-bg-surface)]">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
                     <label className="text-xs text-[var(--color-text-muted)] block mb-1">SKU *</label>
@@ -233,7 +233,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
                           px-3 py-1 text-xs rounded-lg border transition
                           ${product.sizes.includes(size)
                             ? 'bg-[var(--color-red-primary)] border-[var(--color-red-primary)] text-white'
-                            : 'border-white/20 text-[var(--color-text-secondary)] hover:border-white/40'
+                            : 'border-[var(--color-bg-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-muted)]'
                           }
                         `}
                       >
@@ -256,7 +256,7 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
             ))}
           </div>
         ) : (
-          <div className="border border-white/10 rounded-lg p-8 text-center">
+          <div className="border border-[var(--color-bg-border)] rounded-lg p-8 text-center">
             <p className="text-sm text-[var(--color-text-muted)]">
               No products added yet. Upload a catalog or add products manually.
             </p>
@@ -265,11 +265,11 @@ export default function ProductCatalogStep({ tourData, products, onUpdate, onNex
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between pt-6 border-t border-white/10">
+      <div className="flex justify-between pt-6 border-t border-[var(--color-bg-border)]">
         <button
           type="button"
           onClick={onPrev}
-          className="px-6 py-2 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)]"
+          className="px-6 py-2 border border-[var(--color-bg-border)] rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)]"
         >
           <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Previous
         </button>

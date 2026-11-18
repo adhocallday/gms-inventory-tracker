@@ -150,7 +150,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
       )}
 
       {/* Tour Info Section */}
-      <div className="border border-white/10 rounded-lg bg-[var(--color-bg-elevated)]">
+      <div className="border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-elevated)]">
         <button
           type="button"
           onClick={() => toggleSection('tour')}
@@ -167,7 +167,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
           </span>
         </button>
         {expandedSections.tour && (
-          <div className="p-4 border-t border-white/10 space-y-3">
+          <div className="p-4 border-t border-[var(--color-bg-border)] space-y-3">
             <div>
               <p className="text-xs text-[var(--color-text-muted)]">Tour Name</p>
               <p className="text-sm text-[var(--color-text-primary)] font-medium">{tourData.name || '—'}</p>
@@ -201,7 +201,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
       </div>
 
       {/* Shows Section */}
-      <div className="border border-white/10 rounded-lg bg-[var(--color-bg-elevated)]">
+      <div className="border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-elevated)]">
         <button
           type="button"
           onClick={() => toggleSection('shows')}
@@ -218,7 +218,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
           </span>
         </button>
         {expandedSections.shows && (
-          <div className="p-4 border-t border-white/10">
+          <div className="p-4 border-t border-[var(--color-bg-border)]">
             {shows.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -230,7 +230,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
                       <th className="text-right px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Capacity</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/10">
+                  <tbody className="divide-y divide-[var(--color-bg-border)]">
                     {shows.map((show, index) => (
                       <tr key={index} className="hover:bg-[var(--color-bg-surface)]/5">
                         <td className="px-3 py-2 text-xs">
@@ -256,7 +256,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
       </div>
 
       {/* Products Section */}
-      <div className="border border-white/10 rounded-lg bg-[var(--color-bg-elevated)]">
+      <div className="border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-elevated)]">
         <button
           type="button"
           onClick={() => toggleSection('products')}
@@ -273,11 +273,11 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
           </span>
         </button>
         {expandedSections.products && (
-          <div className="p-4 border-t border-white/10">
+          <div className="p-4 border-t border-[var(--color-bg-border)]">
             {products.length > 0 ? (
               <div className="space-y-3">
                 {products.map((product, index) => (
-                  <div key={index} className="border border-white/10 rounded-lg p-3">
+                  <div key={index} className="border border-[var(--color-bg-border)] rounded-lg p-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-[var(--color-text-primary)]">{product.name}</p>
@@ -311,7 +311,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
       </div>
 
       {/* Inventory Section */}
-      <div className="border border-white/10 rounded-lg bg-[var(--color-bg-elevated)]">
+      <div className="border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-elevated)]">
         <button
           type="button"
           onClick={() => toggleSection('inventory')}
@@ -328,7 +328,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
           </span>
         </button>
         {expandedSections.inventory && (
-          <div className="p-4 border-t border-white/10">
+          <div className="p-4 border-t border-[var(--color-bg-border)]">
             {initialInventory.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -340,7 +340,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
                       <th className="text-right px-3 py-2 text-xs font-semibold text-[var(--color-text-muted)]">Quantity</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/10">
+                  <tbody className="divide-y divide-[var(--color-bg-border)]">
                     {initialInventory.map((item, index) => (
                       <tr key={index} className="hover:bg-[var(--color-bg-surface)]/5">
                         <td className="px-3 py-2 text-xs font-mono">{item.sku}</td>
@@ -369,12 +369,12 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
       )}
 
       {/* Navigation */}
-      <div className="flex justify-between pt-6 border-t border-white/10">
+      <div className="flex justify-between pt-6 border-t border-[var(--color-bg-border)]">
         <button
           type="button"
           onClick={onPrev}
           disabled={submitting}
-          className="px-6 py-2 border border-white/10 rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)] disabled:opacity-50"
+          className="px-6 py-2 border border-[var(--color-bg-border)] rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)] disabled:opacity-50"
         >
           <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Previous
         </button>
