@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { buttonVariants } from '@/components/ui/Button';
 import { PosLaunch } from '@/components/onboarding/PosLaunch';
 import { FLOW_URL } from '@/lib/apps';
 
@@ -21,12 +22,11 @@ export default function PosPage() {
   return (
     <div className="py-8 space-y-8 max-w-4xl">
       <header className="space-y-3" data-tour="pos-intro">
-        <p className="g-kicker">MerchFlow</p>
-        <h1 className="text-3xl font-bold">MerchFlow POS</h1>
+        <h1 className="text-2xl font-semibold tracking-tight lg:text-[28px] lg:leading-9">MerchFlow POS</h1>
         <p className="text-[15px] text-[var(--color-text-secondary)] max-w-3xl">
           MerchFlow POS is an iPad point-of-sale app for tour merch tables. It replaces AtVenu in
           Option B of the{' '}
-          <a href={`${FLOW_URL}/#option-b`} className="underline hover:text-[var(--color-text-primary)]">
+          <a href={`${FLOW_URL}/#option-b`} className="underline underline-offset-2 hover:text-[var(--color-text-primary)]">
             data flow
           </a>
           : sales, comps and stock counts go straight into the database instead of being exported
@@ -36,7 +36,7 @@ export default function PosPage() {
 
       <PosLaunch />
 
-      <section className="g-card p-6 space-y-3" data-tour="pos-demo">
+      <section className="g-card p-5 space-y-3" data-tour="pos-demo">
         <h2 className="text-lg font-semibold">Interactive demo</h2>
         <p className="text-sm text-[var(--color-text-secondary)] max-w-3xl">
           A clickable iPad mock of the app in your browser: setup, a sale by card, cash or split,
@@ -45,13 +45,13 @@ export default function PosPage() {
         </p>
         <Link
           href="/pos/demo"
-          className="inline-flex items-center rounded-md bg-[var(--color-red-primary)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-red-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+          className={buttonVariants()}
         >
           Open the interactive demo
         </Link>
       </section>
 
-      <section className="g-card p-6 space-y-3" data-tour="pos-features">
+      <section className="g-card p-5 space-y-3" data-tour="pos-features">
         <h2 className="text-lg font-semibold">What it does</h2>
         <ul className="list-disc pl-5 space-y-1.5 text-sm text-[var(--color-text-secondary)]">
           {FEATURES.map((f) => (
@@ -60,7 +60,7 @@ export default function PosPage() {
         </ul>
       </section>
 
-      <section className="g-card p-6 space-y-3">
+      <section className="g-card p-5 space-y-3">
         <h2 className="text-lg font-semibold">Status</h2>
         <ul className="list-disc pl-5 space-y-1.5 text-sm text-[var(--color-text-secondary)]">
           <li>In testing. Distribution to testers will be through Apple TestFlight.</li>

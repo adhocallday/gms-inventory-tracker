@@ -41,7 +41,7 @@ export function PosLaunch() {
         </video>
       )}
       {isAppleTouch && (
-        <p className="text-sm text-[var(--color-text-muted)]">
+        <p className="text-sm text-[var(--color-text-secondary)]">
           Testers with the app installed can{' '}
           <a href={POS_APP_SCHEME} className="underline hover:text-[var(--color-text-primary)]">
             open MerchFlow POS

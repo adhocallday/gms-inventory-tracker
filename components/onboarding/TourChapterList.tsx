@@ -19,7 +19,7 @@ export function TourChapterList() {
                 <span className="tabular-nums text-[var(--color-red-primary)] mr-2">{index}</span>
                 {chapter.title}
               </span>
-              <span className="text-xs text-[var(--color-text-muted)] whitespace-nowrap">
+              <span className="text-xs text-[var(--color-text-secondary)] whitespace-nowrap tabular-nums">
                 {chapter.steps.length} steps
               </span>
             </span>

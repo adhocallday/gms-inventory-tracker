@@ -37,8 +37,8 @@ export default function WelcomePage() {
     <div className="py-8 space-y-12 max-w-6xl">
       <header className="space-y-4">
         <MerchFlowWordmark className="h-14 w-auto text-[var(--color-text-primary)]" />
-        <h1 className="text-3xl font-bold">How MerchFlow works</h1>
-        <p className="text-[15px] text-[var(--color-text-secondary)] max-w-3xl">
+        <h1 className="text-2xl font-semibold tracking-tight lg:text-[28px] lg:leading-9">How MerchFlow works</h1>
+        <p className="text-[15px] text-[var(--color-text-secondary)] max-w-[70ch]">
           MerchFlow is three apps for Global Merchandising Services tours. They share one database, so
           data entered or uploaded in one is available in the others.
         </p>
@@ -65,7 +65,7 @@ export default function WelcomePage() {
               <a
                 key={app.name}
                 href={app.href}
-                className="g-card p-5 block space-y-2 hover:border-[var(--color-text-muted)]"
+                className="g-card p-5 block space-y-2 transition-colors hover:border-[var(--color-text-muted)]"
               >
                 <h3 className="font-semibold flex items-center gap-2">
                   <Icon className="h-4 w-4 text-[var(--color-red-primary)]" aria-hidden="true" />
@@ -97,15 +97,15 @@ export default function WelcomePage() {
             <p className="text-sm text-[var(--color-text-secondary)]">Option A: AtVenu export per show, plus review of flagged items</p>
           </div>
           <div className="p-4">
-            <p className="text-4xl font-bold tabular-nums text-[#00A36F]">0</p>
+            <p className="text-4xl font-bold tabular-nums text-success">0</p>
             <p className="text-sm text-[var(--color-text-secondary)]">Option B: no manual entry; review of flagged items only</p>
           </div>
         </div>
 
         <FlowDiagrams />
 
-        <aside data-tour="welcome-ai" className="border-l-4 border-[#9B5FC0] bg-[var(--color-bg-surface)] p-4 rounded-r-md max-w-3xl">
-          <h3 className="font-semibold mb-1">Role of AI</h3>
+        <aside data-tour="welcome-ai" className="rounded-lg border border-ai-border bg-ai-bg p-4 max-w-3xl">
+          <h3 className="font-semibold mb-1 text-ai">Role of AI</h3>
           <p className="text-sm text-[var(--color-text-secondary)]">
             AI is used only to extract fields from documents, because document layouts vary.
             Validation, inventory balances and settlement calculations use fixed GMS business rules.
@@ -114,9 +114,9 @@ export default function WelcomePage() {
           </p>
         </aside>
 
-        <p className="text-sm text-[var(--color-text-muted)]">
+        <p className="text-sm text-[var(--color-text-secondary)]">
           Full comparison:{' '}
-          <a href={FLOW_URL} className="underline hover:text-[var(--color-text-primary)]">
+          <a href={FLOW_URL} className="underline underline-offset-2 hover:text-[var(--color-text-primary)]">
             MerchFlow Data Flow
           </a>
         </p>

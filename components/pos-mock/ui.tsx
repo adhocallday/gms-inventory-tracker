@@ -103,7 +103,7 @@ export function AppHeader({
   right?: ReactNode;
 }) {
   return (
-    <header className="flex h-[72px] shrink-0 items-center gap-4 border-b border-[#d9dadd] bg-[var(--card)] px-6">
+    <header className="flex h-[72px] shrink-0 items-center gap-4 border-b border-[var(--border)] bg-[var(--card)] px-6">
       <MerchFlowMark className="h-9 w-9 text-[var(--ink)]" title="MerchFlow" />
       <div className="min-w-0">
         <p className="truncate text-[18px] font-semibold leading-tight">{title}</p>

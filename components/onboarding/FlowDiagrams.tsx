@@ -153,7 +153,7 @@ export function FlowDiagrams() {
                   note.tone === 'warn'
                     ? 'border-[var(--color-red-primary)]'
                     : note.tone === 'ok'
-                      ? 'border-[#00A36F]'
+                      ? 'border-success'
                       : 'border-[var(--color-bg-border)]'
                 )}
               >

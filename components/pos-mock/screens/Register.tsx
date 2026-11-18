@@ -17,7 +17,7 @@ export function RegisterTopBar({
   dispatch: Dispatch<Action>;
 }) {
   return (
-    <header className="flex h-[64px] shrink-0 items-center gap-4 border-b border-[#d9dadd] bg-[var(--card)] px-5">
+    <header className="flex h-[64px] shrink-0 items-center gap-4 border-b border-[var(--border)] bg-[var(--card)] px-5">
       <MerchFlowMark className="h-9 w-9 shrink-0 text-[var(--ink)]" title="MerchFlow" />
       <div className="min-w-0">
         <p className="truncate text-[17px] font-semibold leading-tight">{catalog.tourName}</p>
