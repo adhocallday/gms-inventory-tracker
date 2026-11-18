@@ -79,7 +79,7 @@ export function StatCard({ label, value, icon: IconProp, iconName, trend, color 
         <div className="text-[13px] font-medium text-[var(--color-text-secondary)]">{label}</div>
         {Icon && <Icon className={cn('w-4 h-4', colors.iconColor)} aria-hidden="true" />}
       </div>
-      <div className={cn('mt-1 text-2xl font-semibold tabular-nums', colors.valueColor)}>{value}</div>
+      <div className={cn('mt-1 text-xl sm:text-2xl font-semibold tabular-nums', colors.valueColor)}>{value}</div>
 
       {trend && (
         <div className="flex items-center gap-1 text-xs">

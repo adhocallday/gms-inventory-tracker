@@ -383,26 +383,26 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       <div data-tour="tour-kpis" className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
         <div className="g-card p-4">
           <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">Gross sales</p>
-          <p className="text-2xl font-semibold mt-1 tabular-nums">
+          <p className="text-xl sm:text-2xl font-semibold mt-1 tabular-nums">
             {currencyFormatter.format(totalGross)}
           </p>
         </div>
         <div className="g-card p-4">
           <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">Per head</p>
-          <p className="text-2xl font-semibold mt-1 tabular-nums">
+          <p className="text-xl sm:text-2xl font-semibold mt-1 tabular-nums">
             {currencyFormatter.format(perHead)}
           </p>
         </div>
         <div className="g-card p-4">
           <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">Shows with sales</p>
-          <p className="text-2xl font-semibold mt-1 tabular-nums">
+          <p className="text-xl sm:text-2xl font-semibold mt-1 tabular-nums">
             {showsWithSales}
             <span className="ml-1 text-sm font-normal text-[var(--color-text-secondary)]">of {showSummary?.length ?? 0}</span>
           </p>
         </div>
         <div className="g-card p-4">
           <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">Units on hand</p>
-          <p className="text-2xl font-semibold mt-1 tabular-nums">
+          <p className="text-xl sm:text-2xl font-semibold mt-1 tabular-nums">
             {formatNumber(totalBalance)}
           </p>
         </div>
