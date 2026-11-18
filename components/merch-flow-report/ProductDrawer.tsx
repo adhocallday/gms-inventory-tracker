@@ -61,7 +61,7 @@ export function ProductDrawer({
       className="fixed inset-0 z-50 flex items-end justify-center sm:items-stretch sm:justify-end"
       role="dialog"
       aria-modal="true"
-      aria-label={product.name}
+      aria-label={product.displayName ?? product.name}
     >
       <button
         aria-label="Close"
@@ -77,19 +77,19 @@ export function ProductDrawer({
           className="sticky top-0 flex items-center justify-between gap-3 border-b bg-white px-5 py-3"
           style={{ borderColor: gms.border }}
         >
-          <span
-            className="text-[10px] font-bold uppercase tracking-[0.18em]"
-            style={{ color: gms.red }}
-          >
-            {rank && total ? `Rank ${rank} of ${total}` : 'Product'}
+          <span className="tnum text-[13px] font-semibold" style={{ color: gms.slate }}>
+            {rank && total ? `Rank ${rank} of ${total} by units` : 'Product'}
           </span>
           <button
             onClick={onClose}
-            className="rounded px-2 py-1 text-[18px] leading-none"
+            autoFocus
+            className="-mr-2 flex h-10 w-10 items-center justify-center rounded-app transition-colors hover:bg-app"
             style={{ color: gms.slate }}
             aria-label="Close"
           >
-            ×
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+              <path d="m4 4 8 8M12 4l-8 8" />
+            </svg>
           </button>
         </div>
 
@@ -106,39 +106,36 @@ export function ProductDrawer({
                 className="max-h-full max-w-full object-contain"
               />
             ) : (
-              <span
-                className="text-[11px] uppercase tracking-[0.16em]"
-                style={{ color: gms.mist }}
-              >
+              <span className="text-[13px]" style={{ color: gms.slate }}>
                 No image supplied
               </span>
             )}
           </div>
 
-          <h2 className="mt-4 text-[17px] font-bold uppercase leading-tight">
-            {product.name}
+          <h2 className="mt-4 text-[18px] font-bold leading-tight text-ink [text-wrap:balance]">
+            {product.displayName ?? product.name}
           </h2>
-          <p className="tnum mt-1 text-[12px]" style={{ color: gms.slate }}>
-            {product.sku}
+          <p className="mt-1 text-[13px]" style={{ color: gms.slate }}>
+            {product.displayName && product.displayName !== product.name && (
+              <span className="block uppercase">{product.name}</span>
+            )}
+            <span className="tnum">{product.sku}</span>
           </p>
 
           <dl className="mt-5 grid grid-cols-2 gap-3">
             {stats.map((s) => (
               <div key={s.label} className="rounded p-3" style={{ background: gms.surface }}>
-                <dd className="tnum text-[18px] font-bold">{s.value}</dd>
-                <dt
-                  className="mt-1 text-[9px] font-semibold uppercase tracking-[0.14em]"
-                  style={{ color: gms.slate }}
-                >
+                <dt className="text-[12px] font-medium" style={{ color: gms.slate }}>
                   {s.label}
                 </dt>
+                <dd className="tnum mt-1 text-[20px] font-bold leading-tight text-ink">{s.value}</dd>
               </div>
             ))}
           </dl>
 
           {(product.supplier || product.unitCost) && (
             <div
-              className="mt-4 border-t pt-4 text-[12px]"
+              className="mt-4 border-t pt-4 text-[13px]"
               style={{ borderColor: gms.border, color: gms.slate }}
             >
               {product.supplier && (

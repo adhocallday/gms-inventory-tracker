@@ -27,7 +27,7 @@ export function CategoryMix({
 
   return (
     <div>
-      <p className="mb-4 text-[12px]" style={{ color: gms.slate }}>
+      <p className="mb-4 max-w-[75ch] text-[13px] leading-relaxed" style={{ color: gms.slate }}>
         Share of units by category, then the share of the audience that bought each
         of the ten best-selling products.
       </p>
@@ -36,7 +36,7 @@ export function CategoryMix({
         {totals.map((total) => (
           <div
             key={total.category}
-            className="flex items-center overflow-hidden whitespace-nowrap px-2 text-[11.5px] font-bold text-white"
+            className="flex items-center overflow-hidden whitespace-nowrap px-2 text-[12px] font-bold text-white"
             style={{ width: `${total.share * 100}%`, background: total.color }}
             title={`${total.category}: ${percent(total.share, 1)}`}
           >
@@ -45,7 +45,7 @@ export function CategoryMix({
         ))}
       </div>
 
-      <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-[11px]">
+      <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-[12px]">
         {totals.map((total) => (
           <li key={total.category} className="flex items-center gap-1.5">
             <span
@@ -63,7 +63,7 @@ export function CategoryMix({
       {attendance > 0 && (
         <div className="mt-7" data-tour="mf-ratios">
           <h3
-            className="border-b pb-1.5 text-[10px] font-bold uppercase tracking-[0.16em]"
+            className="border-b pb-1.5 text-[11px] font-bold uppercase tracking-[0.12em]"
             style={{ color: gms.red, borderColor: gms.border }}
           >
             Reach · share of audience
@@ -78,7 +78,7 @@ export function CategoryMix({
                   className="flex items-center gap-2 border-b py-1.5 sm:gap-3"
                   style={{ borderColor: '#F0F0F0' }}
                 >
-                  <span className="min-w-0 flex-1 truncate text-[12px]">
+                  <span className="min-w-0 flex-1 truncate text-[13px] text-ink">
                     {product.displayName ?? product.name}
                   </span>
                   <span className="relative hidden h-2.5 w-28 shrink-0 sm:block lg:w-40">
@@ -94,7 +94,7 @@ export function CategoryMix({
                       }}
                     />
                   </span>
-                  <span className="tnum w-20 shrink-0 text-right text-[11px]" style={{ color: gms.slate }}>
+                  <span className="tnum w-20 shrink-0 text-right text-[12px]" style={{ color: gms.slate }}>
                     1 in {Math.round(1 / share).toLocaleString('en-US')}
                   </span>
                 </li>

@@ -36,7 +36,7 @@ export function Scorecard({
 
   return (
     <div>
-      <p className="mb-4 text-[12px]" style={{ color: gms.slate }}>
+      <p className="mb-4 max-w-[75ch] text-[13px] leading-relaxed" style={{ color: gms.slate }}>
         Ranked by units sold. The red bar is units, the grey bar is share of tour
         gross. ▲ and ▼ show how far the product ranks higher or lower by share of
         gross than by units. Products under {percent(tailThreshold, 0)} of gross are
@@ -50,9 +50,9 @@ export function Scorecard({
             <li key={row.sku} style={{ borderColor: '#F0F0F0' }}>
               <button
                 onClick={() => onSelect(row)}
-                className="flex w-full items-center gap-2.5 py-2 text-left sm:gap-4"
+                className="-mx-2 flex w-[calc(100%+1rem)] items-center gap-2.5 rounded px-2 py-2 text-left transition-colors hover:bg-app sm:gap-4"
               >
-                <span className="tnum w-5 shrink-0 text-[11px]" style={{ color: gms.mist }}>
+                <span className="tnum w-5 shrink-0 text-[12px]" style={{ color: gms.slate }}>
                   {row.rankByUnits}
                 </span>
 
@@ -68,21 +68,22 @@ export function Scorecard({
                       className="max-h-full max-w-full object-contain"
                     />
                   ) : (
-                    <span className="text-[7px] uppercase" style={{ color: gms.mist }}>
-                      No image
+                    <span className="text-[12px]" style={{ color: gms.slate }}>
+                      <span aria-hidden="true">—</span>
+                      <span className="sr-only">No image</span>
                     </span>
                   )}
                 </span>
 
                 <span className="min-w-0 flex-1">
                   <span className="flex items-baseline gap-2">
-                    <span className="truncate text-[12.5px] font-semibold">
+                    <span className="truncate text-[13px] font-semibold text-ink">
                       {row.displayName ?? row.name}
                     </span>
                     {row.rankShift !== 0 && (
                       <span
-                        className="tnum shrink-0 text-[10px] font-bold"
-                        style={{ color: row.rankShift > 0 ? gms.red : gms.mist }}
+                        className="tnum shrink-0 text-[11px] font-bold"
+                        style={{ color: row.rankShift > 0 ? gms.red : gms.slate }}
                         title={`#${row.rankByUnits} by units, #${row.rankByGross} by share of gross`}
                       >
                         {row.rankShift > 0 ? '▲' : '▼'}
@@ -91,7 +92,7 @@ export function Scorecard({
                     )}
                   </span>
 
-                  <span className="mt-0.5 flex items-center gap-1.5 text-[10px]" style={{ color: gms.mist }}>
+                  <span className="mt-0.5 flex items-center gap-1.5 text-[12px]" style={{ color: gms.slate }}>
                     <span
                       className="inline-block h-2 w-2 rounded-[2px]"
                       style={{ background: CATEGORY_COLORS[category] }}
@@ -119,14 +120,14 @@ export function Scorecard({
                 </span>
 
                 <span className="shrink-0 text-right">
-                  <span className="tnum block text-[12.5px] font-bold">
+                  <span className="tnum block text-[13px] font-bold text-ink">
                     {units(row.unitsSold)}
                   </span>
-                  <span className="tnum block text-[10.5px]" style={{ color: gms.slate }}>
+                  <span className="tnum block text-[12px]" style={{ color: gms.slate }}>
                     {percent(row.shareOfGross)}
                   </span>
                   {attendance > 0 && (
-                    <span className="tnum block text-[10px]" style={{ color: gms.mist }}>
+                    <span className="tnum block text-[12px]" style={{ color: gms.slate }}>
                       Ratio 1 in {Math.round(attendance / row.unitsSold).toLocaleString('en-US')}
                     </span>
                   )}
@@ -143,14 +144,14 @@ export function Scorecard({
           >
             <span className="w-5 shrink-0" />
             <span className="hidden h-10 w-10 shrink-0 sm:block" />
-            <span className="min-w-0 flex-1 text-[12px]" style={{ color: gms.slate }}>
+            <span className="min-w-0 flex-1 text-[13px]" style={{ color: gms.slate }}>
               {tail.length} more products, each under {percent(tailThreshold, 0)} of gross
             </span>
             <span className="shrink-0 text-right">
-              <span className="tnum block text-[12.5px] font-bold" style={{ color: gms.slate }}>
+              <span className="tnum block text-[13px] font-bold" style={{ color: gms.slate }}>
                 {units(tailUnits)}
               </span>
-              <span className="tnum block text-[10.5px]" style={{ color: gms.mist }}>
+              <span className="tnum block text-[12px]" style={{ color: gms.slate }}>
                 {percent(tailShare)}
               </span>
             </span>

@@ -36,8 +36,8 @@ function Panel({
   children: ReactNode;
 }) {
   return (
-    <section id={id} data-tour={TOUR_ANCHORS[id]} className="mt-5 scroll-mt-16 rounded bg-white p-4 sm:p-7">
-      <h2 className="text-[15px] font-bold uppercase tracking-tight sm:text-[17px]">
+    <section id={id} data-tour={TOUR_ANCHORS[id]} className="mt-5 scroll-mt-32 rounded bg-white p-4 sm:p-7">
+      <h2 className="text-[16px] font-bold uppercase tracking-tight text-ink sm:text-[18px]">
         {title}
       </h2>
       <div className="mt-4">{children}</div>
@@ -71,7 +71,7 @@ export function ReportDashboard({
   const ranked = [...report.products].sort((a, b) => b.unitsSold - a.unitsSold);
 
   return (
-    <div className="min-h-full" style={{ background: '#F7F7F8' }}>
+    <div className="min-h-full bg-app">
       <ReportHeader artist={report.artist} tourName={report.tourName} pdfHref={pdfHref} pdfLabel={pdfLabel} />
 
       <header style={{ background: gms.black }}>
@@ -95,24 +95,21 @@ export function ReportDashboard({
             )}
           </div>
 
-          <p
-            className="mt-6 text-[10px] font-bold uppercase tracking-[0.28em]"
-            style={{ color: gms.red }}
-          >
-            Tour Sales Chart
-          </p>
           <h1
-            className="mt-2 text-[26px] font-extrabold uppercase leading-[1.02] tracking-tight text-white sm:text-[42px]"
+            className="mt-7 text-[28px] font-extrabold uppercase leading-[1.02] tracking-tight text-white [text-wrap:balance] sm:text-[44px]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             {report.artist}
           </h1>
           <p
-            className="mt-2 text-[12px] uppercase tracking-[0.1em] sm:text-[15px]"
+            className="mt-3 text-[13px] uppercase tracking-[0.08em] sm:text-[15px]"
             style={{ color: gms.mist }}
           >
             {report.tourName}
             {report.dateRange ? ` · ${report.dateRange}` : ''}
+            <span className="mt-1 block normal-case tracking-normal text-white/70">
+              Tour sales chart
+            </span>
           </p>
 
           <LinkButton
@@ -150,13 +147,17 @@ export function ReportDashboard({
 
         <Panel id="all-products" title="All Products">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[520px] border-collapse">
+            <table className="w-full min-w-[560px] border-collapse">
+              <caption className="sr-only">All products, ranked by units sold</caption>
               <thead>
                 <tr style={{ background: gms.black }}>
-                  {['Product', 'Tracker name', 'SKU', 'Units', 'Stock'].map((h) => (
+                  {['Product', 'Tracker name', 'SKU', 'Units', 'Stock'].map((h, i) => (
                     <th
                       key={h}
-                      className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-[0.1em] text-white"
+                      scope="col"
+                      className={`px-3 py-2.5 text-[11px] font-bold uppercase tracking-[0.1em] text-white ${
+                        i >= 3 ? 'text-right' : 'text-left'
+                      }`}
                     >
                       {h}
                     </th>
@@ -169,17 +170,19 @@ export function ReportDashboard({
                     key={product.sku}
                     style={{ background: i % 2 ? gms.surface : '#fff' }}
                   >
-                    <td className="px-3 py-1.5 text-[12px] font-medium">
+                    <td className="px-3 py-2 text-[13px] font-medium text-ink">
                       {product.displayName ?? product.name}
                     </td>
-                    <td className="px-3 py-1.5 text-[11px]" style={{ color: gms.slate }}>
+                    <td className="px-3 py-2 text-[12px]" style={{ color: gms.slate }}>
                       {product.name}
                     </td>
-                    <td className="tnum px-3 py-1.5 text-[11px]" style={{ color: gms.mist }}>
+                    <td className="tnum px-3 py-2 text-[12px]" style={{ color: gms.slate }}>
                       {product.sku}
                     </td>
-                    <td className="tnum px-3 py-1.5 text-[12px]">{units(product.unitsSold)}</td>
-                    <td className="tnum px-3 py-1.5 text-[11px]" style={{ color: gms.slate }}>
+                    <td className="tnum px-3 py-2 text-right text-[13px] font-semibold text-ink">
+                      {units(product.unitsSold)}
+                    </td>
+                    <td className="tnum px-3 py-2 text-right text-[12px]" style={{ color: gms.slate }}>
                       {product.closingStock !== undefined ? units(product.closingStock) : '—'}
                     </td>
                   </tr>
@@ -190,8 +193,8 @@ export function ReportDashboard({
         </Panel>
 
         <footer
-          className="mt-6 flex flex-wrap items-center justify-between gap-3 px-1 text-[10px] uppercase tracking-[0.16em]"
-          style={{ color: gms.mist }}
+          className="mt-6 flex flex-wrap items-center justify-between gap-3 px-1 pb-2 text-[12px]"
+          style={{ color: gms.slate }}
         >
           <span>
             {report.shows.length} shows · {report.products.length} products

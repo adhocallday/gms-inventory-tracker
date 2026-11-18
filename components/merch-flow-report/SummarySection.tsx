@@ -80,19 +80,19 @@ export function SummarySection({
         {kpis.map((kpi) => (
           <div
             key={kpi.label}
-            className="rounded p-3"
-            style={{ background: gms.surface, borderLeft: `3px solid ${gms.red}` }}
+            className="rounded px-3 pb-3 pt-2.5"
+            style={{ background: gms.surface, borderTop: `2px solid ${gms.red}` }}
           >
             <dt
-              className="text-[9px] font-bold uppercase tracking-[0.14em]"
+              className="text-[11px] font-bold uppercase tracking-[0.1em]"
               style={{ color: gms.slate }}
             >
               {kpi.label}
             </dt>
-            <dd className="tnum mt-1.5 text-[20px] font-extrabold leading-none sm:text-[24px]">
+            <dd className="tnum mt-2 text-[22px] font-extrabold leading-none text-ink sm:text-[26px]">
               {kpi.value}
             </dd>
-            <dd className="mt-1.5 text-[10px]" style={{ color: gms.mist }}>
+            <dd className="mt-2 text-[12px]" style={{ color: gms.slate }}>
               {kpi.note}
             </dd>
           </div>
@@ -103,7 +103,7 @@ export function SummarySection({
         {figures.length > 0 && (
           <section data-tour="mf-figures">
             <h3
-              className="border-b pb-1.5 text-[10px] font-bold uppercase tracking-[0.16em]"
+              className="border-b pb-1.5 text-[11px] font-bold uppercase tracking-[0.12em]"
               style={{ color: gms.red, borderColor: gms.border }}
             >
               Key figures
@@ -121,7 +121,7 @@ export function SummarySection({
                   >
                     {figure.stat}
                   </span>
-                  <span className="text-[12px] leading-snug">{figure.text}</span>
+                  <span className="text-[13px] leading-snug text-ink">{figure.text}</span>
                 </li>
               ))}
             </ul>
@@ -130,7 +130,7 @@ export function SummarySection({
 
         <section>
           <h3
-            className="border-b pb-1.5 text-[10px] font-bold uppercase tracking-[0.16em]"
+            className="border-b pb-1.5 text-[11px] font-bold uppercase tracking-[0.12em]"
             style={{ color: gms.red, borderColor: gms.border }}
           >
             Top five products · units
@@ -140,7 +140,7 @@ export function SummarySection({
               <li key={product.sku} style={{ borderColor: '#F0F0F0' }} className="border-b">
                 <button
                   onClick={() => onSelect(product)}
-                  className="flex w-full items-center gap-2.5 py-2 text-left"
+                  className="-mx-1.5 flex w-[calc(100%+0.75rem)] items-center gap-2.5 rounded px-1.5 py-2 text-left transition-colors hover:bg-app"
                 >
                   <span
                     className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded border bg-white"
@@ -154,22 +154,23 @@ export function SummarySection({
                         className="max-h-full max-w-full object-contain"
                       />
                     ) : (
-                      <span className="text-[6px] uppercase" style={{ color: gms.mist }}>
-                        No image
+                      <span className="text-[12px]" style={{ color: gms.slate }}>
+                        <span aria-hidden="true">—</span>
+                        <span className="sr-only">No image</span>
                       </span>
                     )}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[12px] font-semibold">
+                    <span className="block truncate text-[13px] font-semibold text-ink">
                       {product.displayName ?? product.name}
                     </span>
-                    <span className="block text-[10px]" style={{ color: gms.mist }}>
+                    <span className="block text-[12px]" style={{ color: gms.slate }}>
                       {percent(product.shareOfGross, 1)} of gross
                       {report.attendance > 0 &&
                         ` · Ratio 1 in ${Math.round(report.attendance / product.unitsSold)}`}
                     </span>
                   </span>
-                  <span className="tnum shrink-0 text-[12.5px] font-bold">
+                  <span className="tnum shrink-0 text-[13px] font-bold text-ink">
                     {units(product.unitsSold)}
                   </span>
                 </button>
@@ -185,7 +186,7 @@ export function SummarySection({
           ].map((block) => (
             <div key={block.title} className="mb-5">
               <h3
-                className="border-b pb-1.5 text-[10px] font-bold uppercase tracking-[0.16em]"
+                className="border-b pb-1.5 text-[11px] font-bold uppercase tracking-[0.12em]"
                 style={{ color: gms.red, borderColor: gms.border }}
               >
                 {block.title}
@@ -197,7 +198,7 @@ export function SummarySection({
                     className="flex items-center gap-2 border-b py-1.5"
                     style={{ borderColor: '#F0F0F0' }}
                   >
-                    <span className="min-w-0 flex-1 truncate text-[12px] font-medium">
+                    <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-ink">
                       {titleCase(show.city)}
                     </span>
                     <span className="relative hidden h-2.5 w-20 shrink-0 sm:block">
@@ -213,7 +214,7 @@ export function SummarySection({
                         }}
                       />
                     </span>
-                    <span className="tnum w-14 shrink-0 text-right text-[11.5px] font-semibold">
+                    <span className="tnum w-14 shrink-0 text-right text-[12px] font-semibold text-ink">
                       {compactUsd(show.grossUsd)}
                     </span>
                   </li>
@@ -222,7 +223,7 @@ export function SummarySection({
             </div>
           ))}
           {excluded > 0 && (
-            <p className="text-[10px]" style={{ color: gms.mist }}>
+            <p className="text-[12px]" style={{ color: gms.slate }}>
               Excludes {excluded} pre-tour one-off{excluded === 1 ? '' : 's'}.
             </p>
           )}

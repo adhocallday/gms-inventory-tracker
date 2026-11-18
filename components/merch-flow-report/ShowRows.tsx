@@ -30,7 +30,7 @@ export function ShowRows({ shows }: { shows: Show[] }) {
 
   return (
     <div>
-      <p className="mb-4 text-[12px]" style={{ color: gms.slate }}>
+      <p className="mb-4 max-w-[75ch] text-[13px] leading-relaxed" style={{ color: gms.slate }}>
         All {shows.length} shows in date order. The bar is gross; the right column is
         spend per head. Red is above the tour average, grey is below, and the dashed
         line marks the average.
@@ -42,10 +42,10 @@ export function ShowRows({ shows }: { shows: Show[] }) {
             className="flex items-baseline justify-between border-b pb-1.5"
             style={{ borderColor: gms.black }}
           >
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.14em]">
+            <h3 className="text-[12px] font-bold uppercase tracking-[0.12em] text-ink">
               {month.label}
             </h3>
-            <span className="tnum text-[11px]" style={{ color: gms.slate }}>
+            <span className="tnum text-[12px]" style={{ color: gms.slate }}>
               {month.shows.length} shows · {compactUsd(month.gross)}
             </span>
           </div>
@@ -61,17 +61,18 @@ export function ShowRows({ shows }: { shows: Show[] }) {
                   style={{ borderColor: '#F0F0F0' }}
                 >
                   <span
-                    className="tnum w-12 shrink-0 text-[10px] sm:w-14 sm:text-[11px]"
-                    style={{ color: gms.mist }}
+                    className="tnum w-12 shrink-0 text-[12px] sm:w-14"
+                    style={{ color: gms.slate }}
                   >
                     {shortDate(show.date)}
                   </span>
 
-                  <span className="w-24 shrink-0 truncate text-[11px] font-medium sm:w-36 sm:text-[12px]">
+                  <span className="w-24 shrink-0 truncate text-[12px] font-medium text-ink sm:w-36 sm:text-[13px]">
                     {show.cityDisplay ?? show.city}
                     {show.flag && (
                       <span className="ml-1" style={{ color: gms.red }} title="Flagged">
-                        ◆
+                        <span aria-hidden="true">◆</span>
+                        <span className="sr-only">(flagged)</span>
                       </span>
                     )}
                   </span>
@@ -91,7 +92,7 @@ export function ShowRows({ shows }: { shows: Show[] }) {
                     />
                   </span>
 
-                  <span className="tnum w-16 shrink-0 text-right text-[11px] font-semibold sm:w-20 sm:text-[12px]">
+                  <span className="tnum w-16 shrink-0 text-right text-[12px] font-semibold text-ink sm:w-20 sm:text-[13px]">
                     {compactUsd(show.grossUsd)}
                   </span>
 
@@ -106,7 +107,7 @@ export function ShowRows({ shows }: { shows: Show[] }) {
                   </span>
 
                   <span
-                    className="tnum w-14 shrink-0 text-right text-[11px] sm:w-16"
+                    className="tnum w-14 shrink-0 text-right text-[12px] sm:w-16"
                     style={{ color: gms.slate }}
                   >
                     {perHead ? usd(perHead, 2) : '—'}
@@ -119,7 +120,7 @@ export function ShowRows({ shows }: { shows: Show[] }) {
       ))}
 
       <ul
-        className="flex flex-wrap gap-x-5 gap-y-2 pt-1 text-[10px]"
+        className="flex flex-wrap gap-x-5 gap-y-2 pt-1 text-[12px]"
         style={{ color: gms.slate }}
       >
         {[
