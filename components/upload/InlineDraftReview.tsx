@@ -83,14 +83,14 @@ export function InlineDraftReview({
 
   if (postSuccess) {
     return (
-      <div className="bg-gradient-to-br from-emerald-50/80 to-white border-2 border-emerald-200 rounded-2xl p-6 space-y-4">
+      <div className="bg-gradient-to-br from-success-bg to-white border-2 border-success-border rounded-2xl p-6 space-y-4">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
-            <Check className="w-5 h-5 text-emerald-600" />
+            <Check className="w-5 h-5 text-success" />
           </div>
           <div>
-            <h3 className="font-semibold text-emerald-800">Document Posted Successfully</h3>
-            <p className="text-sm text-emerald-600">
+            <h3 className="font-semibold text-success">Document Posted Successfully</h3>
+            <p className="text-sm text-success">
               The data has been added to the database.
             </p>
           </div>
@@ -113,26 +113,26 @@ export function InlineDraftReview({
       <div className="p-4 border-b border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${hasErrors ? 'bg-red-100' : 'bg-emerald-100'}`}>
+            <div className={`p-2 rounded-lg ${hasErrors ? 'bg-danger-bg' : 'bg-success-bg'}`}>
               {hasErrors ? (
-                <AlertTriangle className="w-4 h-4 text-red-600" />
+                <AlertTriangle className="w-4 h-4 text-danger" />
               ) : (
-                <Check className="w-4 h-4 text-emerald-600" />
+                <Check className="w-4 h-4 text-success" />
               )}
             </div>
             <div>
               <h3 className="font-semibold text-[var(--color-text-primary)]">
-                {docType === 'sales-report' && 'Sales Report'}
-                {docType === 'po' && 'Purchase Order'}
-                {docType === 'packing-list' && 'Packing List'}
-                {docType === 'settlement' && 'Settlement Report'}
+                {docType === 'sales-report' && 'Sales report'}
+                {docType === 'po' && 'Purchase order'}
+                {docType === 'packing-list' && 'Packing list'}
+                {docType === 'settlement' && 'Settlement'}
               </h3>
-              <p className="text-xs text-[var(--color-text-muted)]">
-                Review and post to database
+              <p className="text-xs text-[var(--color-text-secondary)]">
+                Check the fields, then post
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-[var(--color-bg-border)] rounded-lg transition">
+          <button type="button" onClick={onClose} aria-label="Close draft" className="p-2 hover:bg-[var(--color-bg-border)] rounded-lg transition">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -142,13 +142,13 @@ export function InlineDraftReview({
       {(hasErrors || hasWarnings) && (
         <div className="p-4 space-y-2 border-b border-[var(--color-bg-border)]">
           {validation.missing_fields.map((field) => (
-            <div key={field} className="flex items-center gap-2 text-sm text-red-600">
+            <div key={field} className="flex items-center gap-2 text-sm text-danger">
               <X className="w-3 h-3" />
               <span>Missing: {field.replace('_', ' ')}</span>
             </div>
           ))}
           {validation.warnings.map((warning, i) => (
-            <div key={i} className="flex items-start gap-2 text-sm text-amber-600">
+            <div key={i} className="flex items-start gap-2 text-sm text-warn">
               <AlertTriangle className="w-3 h-3 mt-0.5 flex-shrink-0" />
               <span>{warning}</span>
             </div>
@@ -158,10 +158,10 @@ export function InlineDraftReview({
 
       {/* Matching Info */}
       {matching.length > 0 && (
-        <div className="p-4 bg-blue-50/50 border-b border-[var(--color-bg-border)]">
-          <p className="text-xs text-blue-700 font-medium mb-1">Auto-matched:</p>
+        <div className="p-4 bg-info-bg border-b border-[var(--color-bg-border)]">
+          <p className="text-xs text-info font-medium mb-1">Auto-matched:</p>
           {matching.map((m, i) => (
-            <p key={i} className="text-xs text-blue-600">{m}</p>
+            <p key={i} className="text-xs text-info">{m}</p>
           ))}
         </div>
       )}
@@ -172,8 +172,9 @@ export function InlineDraftReview({
         {(docType === 'sales-report' || docType === 'settlement') && (
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-[var(--color-text-muted)] block mb-1">Date</label>
+              <label htmlFor="draft-date" className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">Date</label>
               <input
+                id="draft-date"
                 type="date"
                 value={editedData?.show_date || ''}
                 onChange={(e) => setEditedData({ ...editedData, show_date: e.target.value })}
@@ -181,8 +182,9 @@ export function InlineDraftReview({
               />
             </div>
             <div>
-              <label className="text-xs text-[var(--color-text-muted)] block mb-1">Venue</label>
+              <label htmlFor="draft-venue" className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">Venue</label>
               <input
+                id="draft-venue"
                 type="text"
                 value={editedData?.venue_name || ''}
                 onChange={(e) => setEditedData({ ...editedData, venue_name: e.target.value })}
@@ -196,8 +198,9 @@ export function InlineDraftReview({
         {docType === 'sales-report' && (
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="text-xs text-[var(--color-text-muted)] block mb-1">Attendance</label>
+              <label htmlFor="draft-attendance" className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">Attendance</label>
               <input
+                id="draft-attendance"
                 type="number"
                 value={editedData?.attendance || ''}
                 onChange={(e) => setEditedData({ ...editedData, attendance: Number(e.target.value) })}
@@ -205,13 +208,13 @@ export function InlineDraftReview({
               />
             </div>
             <div>
-              <label className="text-xs text-[var(--color-text-muted)] block mb-1">Total Gross</label>
+              <label className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">Total gross</label>
               <div className="text-lg font-semibold text-[var(--color-text-primary)]">
                 {formatCurrency(editedData?.total_gross || 0)}
               </div>
             </div>
             <div>
-              <label className="text-xs text-[var(--color-text-muted)] block mb-1">Line Items</label>
+              <label className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">Line items</label>
               <div className="text-lg font-semibold text-[var(--color-text-primary)]">
                 {lineItems.length}
               </div>
@@ -223,8 +226,9 @@ export function InlineDraftReview({
         {docType === 'po' && (
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-[var(--color-text-muted)] block mb-1">PO Number</label>
+              <label htmlFor="draft-po-number" className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">PO number</label>
               <input
+                id="draft-po-number"
                 type="text"
                 value={editedData?.po_number || ''}
                 onChange={(e) => setEditedData({ ...editedData, po_number: e.target.value })}
@@ -232,8 +236,9 @@ export function InlineDraftReview({
               />
             </div>
             <div>
-              <label className="text-xs text-[var(--color-text-muted)] block mb-1">Vendor</label>
+              <label htmlFor="draft-vendor" className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">Vendor</label>
               <input
+                id="draft-vendor"
                 type="text"
                 value={editedData?.vendor || ''}
                 onChange={(e) => setEditedData({ ...editedData, vendor: e.target.value })}
@@ -294,7 +299,7 @@ export function InlineDraftReview({
       {/* Error Message */}
       {postError && (
         <div className="px-4 pb-4">
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          <div className="p-3 bg-danger-bg border border-danger-border rounded-lg text-sm text-danger">
             {postError}
           </div>
         </div>

@@ -60,6 +60,7 @@
   --color-bg-surface: var(--mf-card);
   --color-bg-elevated: var(--mf-surface2);
   --color-bg-border: var(--mf-border);
+  --color-bg-border-strong: var(--mf-border-strong);
   --color-red-muted: var(--mf-danger-bg);
   --color-text-primary: var(--mf-text);
   --color-text-secondary: var(--mf-text2);
@@ -104,6 +105,7 @@
   --color-bg-surface: var(--mf-ink);
   --color-bg-elevated: #1A1B1E;
   --color-bg-border: #2A2B2F;
+  --color-bg-border-strong: #3F3F46;
   --color-red-muted: #3D0012;
   --color-text-primary: #FFFFFF;
   --color-text-secondary: #A0A0A0;

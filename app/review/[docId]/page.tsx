@@ -13,8 +13,9 @@ export default async function ReviewDocumentPage({
     .maybeSingle();
 
   if (!doc) {
-    redirect('/');
+    redirect('/dashboard/parsed-documents');
   }
 
-  redirect(`/upload?docId=${doc.id}`);
+  // The review form lives on the document's own page.
+  redirect(`/dashboard/parsed-documents/${doc.id}`);
 }

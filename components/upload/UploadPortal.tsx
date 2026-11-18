@@ -7,36 +7,33 @@ import { InlineDraftReview } from '@/components/upload/InlineDraftReview';
 import { useShows } from '@/hooks/useShows';
 import { useTours } from '@/hooks/useTours';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { Button } from '@/components/ui/Button';
 import { ArrowRight, Check } from 'lucide-react';
+import { formatDate } from '@/lib/format';
+import { cn } from '@/lib/utils';
 
 type DocType = 'po' | 'packing-list' | 'sales-report' | 'settlement';
 
 const DOC_TYPES: { id: DocType; label: string; description: string }[] = [
   {
     id: 'po',
-    label: 'Purchase Order',
-    description:
-      'Capture order details, vendor, and line items ready for posting to purchase_orders.'
+    label: 'Purchase order',
+    description: 'Vendor, order date and line items. Posting creates the purchase order.'
   },
   {
     id: 'packing-list',
-    label: 'Packing List',
-    description:
-      'Match receipts to existing POs and verify quantities received at the warehouse.'
+    label: 'Packing list',
+    description: 'Quantities received at the warehouse, matched to an existing purchase order.'
   },
   {
     id: 'sales-report',
-    label: 'Sales Report',
-    description:
-      'Ingest AtVenu show reports (quantities, pricing, comps) for review before posting.'
+    label: 'Sales report',
+    description: 'An AtVenu show report: units, prices and comps for one show.'
   },
   {
     id: 'settlement',
     label: 'Settlement',
-    description:
-      'Review settlement data (gross, fees, comps) before it lands in the show ledger.'
+    description: 'The venue settlement for one show: gross, tax, fees and net.'
   }
 ];
 
@@ -116,93 +113,103 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
     setDetectedClassification(null);
   };
 
-  const breadcrumbs = generateBreadcrumbs([
-    { label: 'Upload Document' },
-  ]);
-
   return (
-    <div className="g-container py-6 md:py-12 space-y-6 md:space-y-10">
+    <div className="g-container py-6 space-y-6">
       <PageHeader
-        title="Upload Document"
-        subtitle="Drop a single PDF and the AI parser will identify if it is a Purchase Order, Packing List, Sales Report, or Settlement. You can edit the prefills, validate the content, and approve to post into the database without ever storing the PDF."
-        kicker="Document Center"
-        breadcrumbs={breadcrumbs}
+        title="Upload a document"
+        subtitle="One PDF at a time: a purchase order, packing list, sales report or settlement. Claude reads it into a draft, and nothing is posted until you review and approve the draft."
       />
 
-      {/* Auto-Detect Toggle */}
-      <div data-tour="upload-detect" className="p-4 border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-surface)]">
-        <div className="flex items-center justify-between">
+      {/* Document type: detected by Claude, or chosen by hand */}
+      <div data-tour="upload-detect" className="rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] p-4 space-y-3">
+        <div className="flex items-center justify-between gap-4">
           <div>
-            <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
-              AI Auto-Detect
-            </h3>
-            <p className="text-xs text-[var(--color-text-muted)] mt-1">
-              Automatically detect document type from PDF content
+            <h2 id="detect-label" className="text-sm font-semibold text-[var(--color-text-primary)]">
+              Detect the document type
+            </h2>
+            <p className="text-sm text-[var(--color-text-secondary)] mt-0.5">
+              {autoDetectEnabled
+                ? 'Claude reads the PDF and picks the type. Turn off to choose it yourself.'
+                : 'Choose the type below.'}
             </p>
           </div>
-          <Button
+          <button
+            type="button"
+            role="switch"
+            aria-checked={autoDetectEnabled}
+            aria-labelledby="detect-label"
             onClick={() => {
               setAutoDetectEnabled(!autoDetectEnabled);
               setDetectedType(null);
               setDetectedClassification(null);
             }}
-            variant={autoDetectEnabled ? 'primary' : 'outline'}
+            className={cn(
+              'relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full border transition-colors',
+              autoDetectEnabled
+                ? 'border-[var(--color-red-primary)] bg-[var(--color-red-primary)]'
+                : 'border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)]'
+            )}
           >
-            {autoDetectEnabled ? 'Enabled' : 'Disabled'}
-          </Button>
+            <span
+              aria-hidden="true"
+              className={cn(
+                'inline-block h-4 w-4 rounded-full bg-white shadow transition-transform',
+                autoDetectEnabled ? 'translate-x-6' : 'translate-x-1'
+              )}
+            />
+          </button>
         </div>
-      </div>
 
-      {/* Manual Type Selection (only when auto-detect is off) */}
-      {!autoDetectEnabled && (
-        <div>
-          <h3 className="text-xs uppercase tracking-[0.3em] text-[var(--color-text-muted)] mb-3">
-            Select Document Type
-          </h3>
-          <div className="flex flex-wrap gap-3">
-            {DOC_TYPES.map((entry) => (
-              <Button
-                key={entry.id}
-                onClick={() => {
-                  setDocType(entry.id);
-                  if (!requiresShow[entry.id]) {
-                    setShowId('');
-                  }
-                }}
-                variant={docType === entry.id ? 'primary' : 'outline'}
-              >
-                {entry.label}
-              </Button>
-            ))}
+        {!autoDetectEnabled && (
+          <div>
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Document type">
+              {DOC_TYPES.map((entry) => (
+                <Button
+                  key={entry.id}
+                  size="sm"
+                  aria-pressed={docType === entry.id}
+                  onClick={() => {
+                    setDocType(entry.id);
+                    if (!requiresShow[entry.id]) {
+                      setShowId('');
+                    }
+                  }}
+                  variant={docType === entry.id ? 'primary' : 'secondary'}
+                >
+                  {entry.label}
+                </Button>
+              ))}
+            </div>
+            {docInfo && (
+              <p className="text-sm text-[var(--color-text-secondary)] mt-2">{docInfo.description}</p>
+            )}
           </div>
-          {docInfo && (
-            <p className="text-xs text-[var(--color-text-muted)] mt-2">{docInfo.description}</p>
-          )}
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Detected Type Badge (when auto-detect is on and type is detected) */}
       {autoDetectEnabled && detectedType && detectedClassification && (
-        <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 shrink-0 text-green-400" aria-hidden="true" />
+        <div className="p-3 bg-success-bg border border-success-border rounded-lg" role="status">
+          <div className="flex items-start gap-2">
+            <Check className="h-4 w-4 mt-0.5 shrink-0 text-success" aria-hidden="true" />
             <div className="flex-1">
-              <p className="text-sm text-green-400 font-semibold">
+              <p className="text-sm text-success font-semibold">
                 Detected: {detectedClassification.typeName}
               </p>
-              <p className="text-xs text-green-400/80 mt-0.5">
-                Confidence: {detectedClassification.confidence} · {detectedClassification.reasoning}
+              <p className="text-sm text-[var(--color-text-secondary)] mt-0.5">
+                Confidence {detectedClassification.confidence}. {detectedClassification.reasoning}
               </p>
             </div>
           </div>
         </div>
       )}
 
-      <div className="g-card p-4 md:p-6 space-y-6">
+      <div className="g-card p-4 md:p-5 space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <div>
-            <label className="text-xs text-[var(--color-text-muted)] block mb-2">Tour</label>
+            <label htmlFor="upload-tour" className="text-sm font-medium text-[var(--color-text-primary)] block mb-1.5">Tour</label>
             <select
+              id="upload-tour"
               className="g-input w-full"
               value={tourId}
               onChange={(event) => {
@@ -220,8 +227,9 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
           </div>
           {requiresShow[docType] && (
             <div>
-              <label className="text-xs text-[var(--color-text-muted)] block mb-2">Show</label>
+              <label htmlFor="upload-show" className="text-sm font-medium text-[var(--color-text-primary)] block mb-1.5">Show</label>
               <select
+                id="upload-show"
                 className="g-input w-full"
                 value={showId}
                 onChange={(event) => setShowId(event.target.value)}
@@ -229,7 +237,7 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
                 <option value="">Choose a show</option>
                 {filteredShowOptions.map((show) => (
                   <option key={show.id} value={show.id}>
-                    {new Date(show.show_date).toLocaleDateString('en-US')} · {show.venue_name}
+                    {formatDate(show.show_date)} · {show.venue_name}
                   </option>
                 ))}
               </select>
@@ -252,15 +260,10 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
               // Auto-select tour and show if matched
               if (tourShowMatch?.tourId) {
                 setTourId(tourShowMatch.tourId);
-                console.log('Auto-selected tour:', tourShowMatch.tourName);
               }
               if (tourShowMatch?.showId) {
                 setShowId(tourShowMatch.showId);
-                console.log('Auto-selected show:', tourShowMatch.venueName, 'on', tourShowMatch.showDate);
               }
-
-              console.log('Detected document type:', classification);
-              console.log('Tour/Show match:', tourShowMatch);
             }}
             onParseComplete={handleParseComplete}
             autoRedirect={false}
@@ -282,15 +285,13 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
         )}
 
         <div className="space-y-3" data-tour="upload-status">
-          <div className="text-xs uppercase tracking-[0.3em] text-[var(--color-text-muted)]">
-            Draft status
-          </div>
+          <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Draft</h2>
           {parsedId ? (
             <div className="border border-[var(--color-bg-border)] rounded-md p-4 bg-[var(--color-bg-elevated)] space-y-2">
               <p className="text-sm text-[var(--color-text-primary)] font-semibold">
-                Draft created · ID {parsedId}
+                Draft created
               </p>
-              <div className="text-xs text-[var(--color-text-muted)] space-y-1">
+              <div className="text-sm text-[var(--color-text-secondary)] space-y-1">
                 {validation?.missing_fields?.length ? (
                   <p>Missing fields: {validation.missing_fields.join(', ')}</p>
                 ) : (
@@ -303,8 +304,8 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
                 )}
                 {matchingSteps.length > 0 && (
                   <div>
-                    <p className="text-[var(--color-text-muted)]">Inference:</p>
-                    <ul className="list-disc list-inside text-[var(--color-text-muted)]">
+                    <p>How the tour and show were matched:</p>
+                    <ul className="list-disc list-inside">
                       {matchingSteps.map((entry, index) => (
                         <li key={index}>{entry}</li>
                       ))}
@@ -314,29 +315,27 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
               </div>
               <Link
                 href={`/dashboard/parsed-documents/${parsedId}`}
-                className="inline-flex items-center gap-2 text-xs font-semibold text-[var(--color-red-primary)]"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--color-red-text)] hover:underline"
               >
                 Review draft <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
               </Link>
             </div>
           ) : (
-            <p className="text-sm text-[var(--color-text-muted)]">
-              No document parsed yet. Upload a PDF to start a new draft.
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              No PDF parsed in this session yet. The draft appears here after upload.
             </p>
           )}
           {docId && (
-            <p className="text-xs text-[var(--color-text-muted)]">
-              Resuming draft{' '}
-              <Link href={`/dashboard/parsed-documents/${docId}`} className="text-[var(--color-red-primary)]">
-                #{docId}
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              <Link href={`/dashboard/parsed-documents/${docId}`} className="font-semibold text-[var(--color-red-text)] hover:underline">
+                Continue reviewing the draft you opened
               </Link>
-              .
             </p>
           )}
-          <p className="text-xs text-[var(--color-text-muted)]">
-            Need to continue reviewing other drafts?{' '}
-            <Link href="/dashboard/parsed-documents" className="text-[var(--color-red-primary)]">
-              See the list
+          <p className="text-sm text-[var(--color-text-secondary)]">
+            Earlier drafts are in{' '}
+            <Link href="/dashboard/parsed-documents" className="font-medium text-[var(--color-red-text)] hover:underline">
+              Documents
             </Link>
             .
           </p>

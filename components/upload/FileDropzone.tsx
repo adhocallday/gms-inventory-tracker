@@ -4,7 +4,7 @@ import { useCallback, useState, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useRouter } from 'next/navigation';
 import { buildUploadBody, readJsonResponse, stageLargeUpload } from '@/lib/upload/upload-client';
-import { Check, Lightbulb, Upload } from 'lucide-react';
+import { Check, Upload } from 'lucide-react';
 
 type DocType = 'po' | 'packing-list' | 'sales-report' | 'settlement';
 
@@ -196,11 +196,11 @@ export function FileDropzone({
 
   const getFileTypeLabel = () => {
     switch (fileType) {
-      case 'po': return 'Purchase Order';
-      case 'packing-list': return 'Packing List';
-      case 'sales-report': return 'Sales Report';
-      case 'settlement': return 'Settlement Report';
-      default: return 'Document';
+      case 'po': return 'purchase order';
+      case 'packing-list': return 'packing list';
+      case 'sales-report': return 'sales report';
+      case 'settlement': return 'settlement';
+      default: return 'document';
     }
   };
   
@@ -209,38 +209,35 @@ export function FileDropzone({
       <div
         {...getRootProps()}
         className={`
-          border-2 border-dashed rounded-lg p-4 md:p-8 lg:p-12 text-center cursor-pointer
-          transition-colors duration-200
-          ${isDragActive ? 'border-[var(--color-red-primary)] bg-[rgba(225,6,20,0.08)]' : 'border-[var(--color-bg-border)] hover:border-[var(--color-text-muted)]'}
+          border-2 border-dashed rounded-lg p-6 md:p-10 text-center cursor-pointer
+          transition-colors duration-150
+          focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus-ring)]
+          ${isDragActive ? 'border-[var(--color-red-primary)] bg-[var(--color-red-muted)]' : 'border-[var(--color-bg-border-strong)] hover:border-[var(--color-text-muted)] hover:bg-[var(--color-bg-elevated)]'}
           ${uploading || parsing ? 'pointer-events-none opacity-50' : ''}
         `}
       >
         <input {...getInputProps()} />
         
         {detecting && (
-          <div className="space-y-2">
+          <div className="space-y-2" role="status">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-red-primary)] mx-auto"></div>
-            <p className="text-sm text-[var(--color-text-secondary)]">Detecting document type...</p>
-            <p className="text-xs text-[var(--color-text-muted)] mt-1">Analyzing PDF with AI...</p>
+            <p className="text-sm font-medium text-[var(--color-text-primary)]">Detecting the document type…</p>
+            <p className="text-sm text-[var(--color-text-secondary)] mt-1">Claude is reading the first pages.</p>
           </div>
         )}
 
         {uploading && (
-          <div className="space-y-2">
+          <div className="space-y-2" role="status">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-red-primary)] mx-auto"></div>
-            <p className="text-sm text-[var(--color-text-secondary)]">Uploading file...</p>
+            <p className="text-sm font-medium text-[var(--color-text-primary)]">Uploading the PDF…</p>
           </div>
         )}
 
         {parsing && (
-          <div className="space-y-2">
-            <div className="animate-pulse">
-              <div className="h-12 w-12 mx-auto mb-2">
-                <Lightbulb className="h-12 w-12 text-[var(--color-red-primary)]" aria-hidden="true" />
-              </div>
-              <p className="text-sm text-[var(--color-text-secondary)]">AI is parsing your document...</p>
-              <p className="text-xs text-[var(--color-text-muted)] mt-1">This may take 10-30 seconds</p>
-            </div>
+          <div className="space-y-2" role="status">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-red-primary)] mx-auto"></div>
+            <p className="text-sm font-medium text-[var(--color-text-primary)]">Claude is reading the document…</p>
+            <p className="text-sm text-[var(--color-text-secondary)] mt-1">Usually 10 to 30 seconds.</p>
           </div>
         )}
 
@@ -251,10 +248,10 @@ export function FileDropzone({
               <p className="text-sm text-[var(--color-text-secondary)]">Drop the PDF here</p>
             ) : (
               <>
-                <p className="text-sm text-[var(--color-text-secondary)]">
-                  Drag & drop {getFileTypeLabel()} PDF here, or click to select
+                <p className="text-sm font-medium text-[var(--color-text-primary)]">
+                  Drop a {getFileTypeLabel()} PDF here, or click to choose a file
                 </p>
-                <p className="text-xs text-[var(--color-text-muted)]">PDF files only</p>
+                <p className="text-sm text-[var(--color-text-secondary)]">PDF only, one file at a time</p>
               </>
             )}
           </div>
@@ -282,25 +279,22 @@ export function FileDropzone({
                 <p className="text-sm font-semibold text-[var(--color-text-primary)]">
                   Detected: {classification.typeName}
                 </p>
-                <p className="text-xs text-[var(--color-text-muted)]">
-                  Confidence: {classification.confidence}
-                </p>
               </div>
-              <span className={`px-2 py-1 rounded text-xs font-medium ${
-                classification.confidence === 'high' ? 'bg-green-500/20 text-green-400' :
-                classification.confidence === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                'bg-red-500/20 text-red-400'
+              <span className={`px-2 py-0.5 rounded-md border text-xs font-medium ${
+                classification.confidence === 'high' ? 'bg-success-bg text-success border-success-border' :
+                classification.confidence === 'medium' ? 'bg-warn-bg text-warn border-warn-border' :
+                'bg-danger-bg text-danger border-danger-border'
               }`}>
-                {classification.confidence.toUpperCase()}
+                {classification.confidence} confidence
               </span>
             </div>
 
-            <p className="text-xs text-[var(--color-text-secondary)] mb-2">
+            <p className="text-sm text-[var(--color-text-secondary)] mb-2">
               {classification.reasoning}
             </p>
 
-            <div className="text-xs text-[var(--color-text-muted)] mb-4">
-              <strong>Indicators found:</strong>
+            <div className="text-sm text-[var(--color-text-secondary)] mb-4">
+              <strong className="font-medium text-[var(--color-text-primary)]">What it found:</strong>
               <ul className="list-disc list-inside mt-1">
                 {classification.indicators.map((indicator, i) => (
                   <li key={i}>{indicator}</li>
@@ -310,22 +304,22 @@ export function FileDropzone({
 
             {/* Tour/Show Match Information */}
             {tourShowMatch && (tourShowMatch.tourId || tourShowMatch.showId) && (
-              <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                <p className="text-xs font-semibold text-blue-400 mb-2">Auto-detected:</p>
+              <div className="mb-4 p-3 bg-info-bg border border-info-border rounded-lg text-sm">
+                <p className="font-semibold text-info mb-1">Matched to</p>
                 {tourShowMatch.tourName && (
-                  <p className="text-xs text-blue-300">
+                  <p className="text-[var(--color-text-primary)]">
                     <strong>Tour:</strong> {tourShowMatch.tourName}
                   </p>
                 )}
                 {tourShowMatch.showDate && tourShowMatch.venueName && (
-                  <p className="text-xs text-blue-300">
+                  <p className="text-[var(--color-text-primary)]">
                     <strong>Show:</strong> {tourShowMatch.showDate} at {tourShowMatch.venueName}
                   </p>
                 )}
                 {tourShowMatch.matchReasoning.length > 0 && (
                   <details className="mt-2">
-                    <summary className="text-xs text-blue-400 cursor-pointer">Match reasoning</summary>
-                    <ul className="list-disc list-inside mt-1 text-xs text-blue-300/80">
+                    <summary className="text-info cursor-pointer">Why this match</summary>
+                    <ul className="list-disc list-inside mt-1 text-[var(--color-text-secondary)]">
                       {tourShowMatch.matchReasoning.map((reason, i) => (
                         <li key={i}>{reason}</li>
                       ))}
@@ -346,9 +340,10 @@ export function FileDropzone({
                     parseDocument(currentFile, detectedType);
                   }
                 }}
-                className="flex-1 px-3 py-2.5 md:px-4 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold text-sm md:text-base"
+                type="button"
+                className="flex-1 px-4 py-2.5 bg-[var(--color-red-primary)] text-white rounded-md hover:bg-[var(--color-red-hover)] active:bg-[var(--color-red-active)] transition-colors font-semibold text-sm"
               >
-                Confirm & Parse
+                Read this document
               </button>
               <button
                 onClick={() => {
@@ -362,7 +357,8 @@ export function FileDropzone({
                   setDetectedType(null);
                   setCurrentFile(null);
                 }}
-                className="px-3 py-2.5 md:px-4 border border-[var(--color-bg-border)] rounded-lg hover:bg-[var(--color-bg-surface)]/5 transition text-[var(--color-text-primary)] text-sm md:text-base"
+                type="button"
+                className="px-4 py-2.5 border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] rounded-md hover:bg-[var(--color-bg-elevated)] transition-colors text-[var(--color-text-primary)] text-sm font-medium"
               >
                 Cancel
               </button>
@@ -372,9 +368,9 @@ export function FileDropzone({
       )}
 
       {error && (
-        <div className="mt-4 p-4 border border-[rgba(225,6,20,0.35)] rounded-lg bg-[rgba(225,6,20,0.08)]">
-          <p className="text-sm text-[var(--color-red-primary)]">
-            <strong>Error:</strong> {error}
+        <div className="mt-4 p-4 border border-danger-border rounded-lg bg-danger-bg" role="alert">
+          <p className="text-sm text-danger">
+            <strong>Could not read this PDF.</strong> {error}
           </p>
         </div>
       )}
@@ -382,7 +378,7 @@ export function FileDropzone({
       {parsedData && (
         <div className="mt-4 p-3 md:p-4 border border-[var(--color-bg-border)] rounded-lg bg-[var(--color-bg-surface)]">
           <p className="text-sm text-[var(--color-text-primary)] font-semibold mb-2">
-            <Check className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Document parsed successfully!
+            <Check className="inline-block h-4 w-4 align-[-0.125em] mr-1 text-success" aria-hidden="true" /> Document read
           </p>
           <pre className="text-xs bg-[var(--color-bg-elevated)] p-2 md:p-3 rounded border border-[var(--color-bg-border)] overflow-auto max-h-48 md:max-h-64 lg:max-h-96 text-[var(--color-text-secondary)]">
             {JSON.stringify(parsedData, null, 2)}
