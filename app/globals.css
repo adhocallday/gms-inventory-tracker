@@ -612,6 +612,8 @@ option {
   outline-offset: 2px;
 }
 dialog.mf-tour-menu::backdrop { background: var(--color-scrim); }
+/* Phone menu (MobileNav): a bottom sheet. */
+dialog.mf-sheet::backdrop { background: var(--color-scrim); }
 .driver-popover.mf-tour .driver-popover-arrow-side-left { border-left-color: var(--color-bg-surface); }
 .driver-popover.mf-tour .driver-popover-arrow-side-right { border-right-color: var(--color-bg-surface); }
 .driver-popover.mf-tour .driver-popover-arrow-side-top { border-top-color: var(--color-bg-surface); }

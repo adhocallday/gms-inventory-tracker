@@ -3,27 +3,19 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  LineChart,
-  FileText,
-  Settings,
-  ChevronLeft,
-  ChevronRight,
-  Upload,
-  LayoutGrid,
-  BarChart3,
-  Tablet,
-  Workflow,
-  HelpCircle,
-  BookOpen,
-  type LucideIcon,
-} from 'lucide-react';
+import { PanelLeftClose, PanelLeftOpen, Upload, HelpCircle, BookOpen } from 'lucide-react';
 import { MerchFlowMark, MerchFlowWordmark } from '@/components/brand/MerchFlowLogo';
-import { MERCHFLOW_APPS, type AppId } from '@/lib/apps';
+import { MERCHFLOW_APPS } from '@/lib/apps';
 import { openTourMenu } from '@/components/onboarding/tour-control';
 import { cn } from '@/lib/utils';
 import { useSidebar } from './SidebarContext';
+import { APP_ICONS, NAV_ITEMS, appTourAnchor, isNavActive } from './nav-items';
 
+/**
+ * The desktop and tablet sidebar (768px and up): wordmark and labels, or the
+ * mark and an icon rail when collapsed. The choice persists in
+ * `sidebar-collapsed` (SidebarContext). Phones get MobileNav instead.
+ */
 export function NavBar() {
   const pathname = usePathname();
   const { isCollapsed, toggleSidebar } = useSidebar();
@@ -36,39 +28,28 @@ export function NavBar() {
   // Render consistent placeholder during SSR to avoid hydration mismatch
   const collapsed = mounted ? isCollapsed : false;
 
-  const navItems = [
-    { href: '/', label: 'Tours', icon: LineChart, section: 'Tours', tour: 'nav-tours' },
-    { href: '/dashboard/parsed-documents', label: 'Documents', icon: FileText, section: 'Documents', tour: 'documents' },
-    { href: '/admin', label: 'Admin', icon: Settings, section: 'Admin', tour: undefined },
-  ];
-
-  const appIcons: Record<AppId, LucideIcon> = {
-    tracker: LayoutGrid,
-    charts: BarChart3,
-    pos: Tablet,
-    flow: Workflow,
-  };
-
-  // Tour pages (/tours/...) belong under Tours; the review page under Documents.
-  const isActive = (href: string) =>
-    href === '/'
-      ? pathname === '/' || pathname.startsWith('/tours') || pathname.startsWith('/products')
-      : pathname.startsWith(href) || (href === '/dashboard/parsed-documents' && pathname.startsWith('/review'));
+  const navItems = NAV_ITEMS;
+  const appIcons = APP_ICONS;
+  const isActive = (href: string) => isNavActive(pathname, href);
+  const toggleLabel = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
 
   return (
     <nav
+      id="mf-sidebar"
       aria-label="Main"
       className={cn(
+        // Phones use the bottom bar (MobileNav) instead.
+        'hidden md:flex',
         // Sticky to the viewport, scrolling on its own when taller than it,
         // so the Upload button stays reachable on long pages.
-        'sticky top-0 h-screen overflow-y-auto bg-[var(--color-bg-surface)] border-r border-[var(--color-bg-border)] flex flex-col transition-[width] duration-200 flex-shrink-0',
+        'sticky top-0 h-screen overflow-y-auto bg-[var(--color-bg-surface)] border-r border-[var(--color-bg-border)] flex-col transition-[width] duration-200 flex-shrink-0',
         collapsed ? 'w-16' : 'w-56'
       )}
     >
       <div className="flex flex-col justify-between flex-1">
         <div className={cn('py-5 space-y-6', collapsed ? 'px-2' : 'px-4')}>
           {/* Logo and collapse toggle */}
-          <div className="flex items-center justify-between gap-2">
+          <div className={cn('flex items-center gap-2', collapsed ? 'flex-col' : 'justify-between')}>
             {!collapsed && (
               <Link
                 href="/"
@@ -81,7 +62,7 @@ export function NavBar() {
 
             {/* Collapsed logo: the MerchFlow mark */}
             {collapsed && (
-              <Link href="/" aria-label="MerchFlow Tracker home" className="block mx-auto text-[var(--color-text-primary)]">
+              <Link href="/" aria-label="MerchFlow Tracker home" className="block text-[var(--color-text-primary)]">
                 <MerchFlowMark className="w-10 h-10" />
               </Link>
             )}
@@ -90,19 +71,17 @@ export function NavBar() {
             <button
               type="button"
               onClick={toggleSidebar}
-              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-label={toggleLabel}
               aria-expanded={!collapsed}
-              className={cn(
-                'p-1.5 rounded-md hover:bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition flex-shrink-0',
-                collapsed && 'mx-auto mt-2'
-              )}
-              title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-controls="mf-sidebar-links"
+              title={toggleLabel}
+              className="h-9 w-9 inline-flex items-center justify-center rounded-md border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red-primary)] transition flex-shrink-0"
             >
-              {collapsed ? <ChevronRight className="w-4 h-4" aria-hidden="true" /> : <ChevronLeft className="w-4 h-4" aria-hidden="true" />}
+              {collapsed ? <PanelLeftOpen className="w-4 h-4" aria-hidden="true" /> : <PanelLeftClose className="w-4 h-4" aria-hidden="true" />}
             </button>
           </div>
 
-          <div className="space-y-6">
+          <div id="mf-sidebar-links" className="space-y-6">
             {/* Each former section (Tours, Documents, Admin) held one item whose
                 label repeated the heading, so they form one unlabelled group. */}
             <div className="space-y-1">
@@ -116,6 +95,7 @@ export function NavBar() {
                     href={item.href}
                     data-tour={item.tour}
                     title={collapsed ? item.label : undefined}
+                    aria-label={collapsed ? item.label : undefined}
                     aria-current={active ? 'page' : undefined}
                     className={cn(
                       'flex items-center gap-3 rounded-md text-sm font-medium transition-colors',
@@ -147,7 +127,8 @@ export function NavBar() {
                     <a
                       key={app.id}
                       href={current ? '/' : app.href}
-                      data-tour={app.id === 'pos' ? 'pos-link' : app.id === 'charts' ? 'charts-app' : undefined}
+                      data-tour={appTourAnchor(app.id)}
+                      aria-label={collapsed ? app.label : undefined}
                       aria-current={current ? 'page' : undefined}
                       title={collapsed ? `${app.label}: ${app.note}` : app.note}
                       className={cn(
@@ -186,6 +167,7 @@ export function NavBar() {
                 <Link
                   href="/welcome"
                   title={collapsed ? 'How MerchFlow works' : undefined}
+                  aria-label={collapsed ? 'How MerchFlow works' : undefined}
                   className={cn(
                     'flex items-center gap-3 rounded-md text-sm font-medium transition text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)]',
                     collapsed ? 'px-3 py-2 justify-center' : 'px-3 py-2'
@@ -199,6 +181,7 @@ export function NavBar() {
                   onClick={openTourMenu}
                   aria-haspopup="dialog"
                   title={collapsed ? 'Replay tour' : undefined}
+                  aria-label={collapsed ? 'Replay tour' : undefined}
                   className={cn(
                     'w-full flex items-center gap-3 rounded-md text-sm font-medium transition text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)]',
                     collapsed ? 'px-3 py-2 justify-center' : 'px-3 py-2'

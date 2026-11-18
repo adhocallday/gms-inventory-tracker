@@ -303,12 +303,12 @@ lib/ai/
 ### MerchFlow links and onboarding
 - App URLs live in `lib/apps.ts` (`NEXT_PUBLIC_TRACKER_URL`, `NEXT_PUBLIC_CHARTS_URL`, `NEXT_PUBLIC_FLOW_URL`, `NEXT_PUBLIC_POS_URL`).
 - `GET /api/tours/[id]/merch-flow-data` serves TrackerData to MerchFlow Charts; it requires header `x-merchflow-link: $MERCHFLOW_LINK_SECRET` (same value set in both apps).
-- First visit: `/` redirects to `/welcome` once (localStorage `mf.onboarding.v2`). The guided tour (driver.js) is `components/onboarding/GuidedTour.tsx`; its chapters and steps are in `components/onboarding/tour-chapters.ts`. Steps anchor on `data-tour="…"` attributes across most pages (NavBar, /welcome, tours, shows, upload, documents and review, inventory, COGS, projections, reports, admin, /pos), so keep those when editing. The tour's position is in sessionStorage (`mf.tour.state`); a missing anchor shows the step's `gap` text or is skipped.
+- First visit: `/` redirects to `/welcome` once (localStorage `mf.onboarding.v2`). The guided tour (driver.js) is `components/onboarding/GuidedTour.tsx`; its two tours (`overview` for leadership and finance, the default, and `full`, the walkthrough for operations staff) are in `components/onboarding/tour-chapters.ts`. Overview steps can show live figures from `/api/tours/[id]/overview-facts` via `{tokens}` (`tour-facts.ts`). `tour-chapters.test.ts` checks every step's page and anchor exist. Steps anchor on `data-tour="…"` attributes across most pages (NavBar, /welcome, tours, shows, upload, documents and review, inventory, COGS, projections, reports, admin, /pos), so keep those when editing. The tour's position is in sessionStorage (`mf.tour.state`); a missing anchor shows the step's `gap` text or is skipped.
 
-### Collapsible Sidebar
-- State managed via `SidebarContext`
-- Collapsed state persisted in localStorage
-- Key: `sidebar-collapsed`
+### Navigation
+- 768px and up: the sidebar (`components/layout/NavBar.tsx`), collapsible to an icon rail. State in `SidebarContext`, persisted in localStorage key `sidebar-collapsed`.
+- Under 768px: no sidebar. `components/layout/MobileNav.tsx` is a fixed bottom bar (Tours, Documents, Upload, POS, Menu); Menu opens every destination in a bottom-sheet `<dialog>`. `<main>` is padded so the bar never covers content.
+- Nav items are shared in `components/layout/nav-items.ts`. Some data-tour anchors (`upload`, `nav-tours`, `documents`, `pos-link`) exist in both; the tour highlights the visible one.
 
 ### Hydration-Safe Components
 ```tsx

@@ -1,5 +1,6 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { NavBar } from '@/components/layout/NavBar';
+import { MobileNav } from '@/components/layout/MobileNav';
 import { SidebarProvider } from '@/components/layout/SidebarContext';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
@@ -14,6 +15,9 @@ export const metadata: Metadata = {
   applicationName: 'MerchFlow Tracker',
   appleWebApp: { title: 'Tracker' },
 };
+
+// viewport-fit=cover so env(safe-area-inset-bottom) is set for the phone bottom bar.
+export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover' };
 
 // Light is the default. Dark is opt-in through the toggle, stored as
 // localStorage mf.theme=dark (a new key, so a 'dark' saved by the old dark-first
@@ -42,7 +46,8 @@ export default function RootLayout({
           <SidebarProvider>
             <div className="min-h-screen flex bg-[var(--color-bg-base)]">
               <NavBar />
-              <main className="flex-1 flex flex-col min-w-0">
+              {/* Under 768px the bottom bar (MobileNav) replaces the sidebar; pad so it never covers content. */}
+              <main className="flex-1 flex flex-col min-w-0 pb-[calc(60px+env(safe-area-inset-bottom))] md:pb-0">
                 {/* Top Bar with Theme Toggle */}
                 <div className="flex justify-end items-center px-4 md:px-6 lg:px-8 py-2 border-b border-[var(--color-bg-border)]">
                   <ThemeToggle />
@@ -58,6 +63,7 @@ export default function RootLayout({
                 </div>
               </main>
             </div>
+            <MobileNav />
             <GuidedTour />
           </SidebarProvider>
         </ThemeProvider>
