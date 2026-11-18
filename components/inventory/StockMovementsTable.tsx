@@ -54,11 +54,12 @@ export function StockMovementsTable({ data, loading }: StockMovementsTableProps)
       },
       {
         accessorKey: 'quantity_received',
-        header: 'Qty Received',
+        header: 'Qty received',
+        meta: { align: 'right' },
         cell: ({ row }) => {
           const qty = row.getValue('quantity_received') as number;
           return (
-            <div className="text-right text-green-300 font-medium">
+            <div className="text-right font-medium tabular-nums">
               +{new Intl.NumberFormat('en-US').format(qty)}
             </div>
           );

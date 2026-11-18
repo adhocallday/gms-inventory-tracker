@@ -159,9 +159,9 @@ export default function InventoryTrackerPage() {
 
   if (loading) {
     return (
-      <div className="g-container py-12">
+      <div className="g-container py-12" role="status">
         <div className="text-center text-[var(--color-text-secondary)]">
-          Loading inventory data...
+          Loading inventory…
         </div>
       </div>
     );
@@ -170,142 +170,137 @@ export default function InventoryTrackerPage() {
   if (!tour || !data) {
     return (
       <div className="g-container py-12">
-        <div className="text-center text-[var(--color-text-muted)]">
-          No data available
+        <div className="text-center text-[var(--color-text-secondary)]">
+          Inventory for this tour could not be loaded. Reload the page, or go back to the tour.
         </div>
       </div>
     );
   }
+
+  // Sizes with sales but no receipts recorded have a negative balance. They
+  // are counted in the totals as computed; the alert below names them.
+  const noReceiptLines = data.inventory.filter((i) => i.balance < 0 && !i.total_received).length;
 
   const productTypes = Array.from(
     new Set(data.inventory.map((i) => i.product_type))
   );
 
   return (
-    <div className="g-container py-12">
-      {/* Header */}
+    <div className="g-container py-6">
       <Link href={`/tours/${tourId}`} className="text-sm font-medium g-link">
-        <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to tour
+        <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />
+        {tour.name}
       </Link>
 
-      <div className="flex flex-col gap-4 mt-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="flex flex-col gap-4 mt-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="g-kicker">Inventory Tracker</p>
-          <h1 className="text-3xl font-semibold g-title mt-2">{tour.name}</h1>
-          <p className="text-sm text-[var(--color-text-secondary)]">{tour.artist}</p>
+          <h1 className="text-2xl font-semibold tracking-tight lg:text-[28px] lg:leading-9">Inventory</h1>
+          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+            {tour.artist}. Balance = received − sold − comps, refreshed after each posted document.
+          </p>
         </div>
-        <Button variant="outline" onClick={exportCsv}>
+        <Button variant="secondary" onClick={exportCsv}>
           Export CSV
         </Button>
       </div>
 
-      {/* Summary Cards */}
-      <div data-tour="inv-summary" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-8">
-        <div className="g-card p-4">
-          <p className="text-xs text-[var(--color-text-muted)] mb-1">Products</p>
-          <p className="text-2xl font-semibold">{data.summary.total_products}</p>
-        </div>
-
-        <div className="g-card p-4">
-          <p className="text-xs text-[var(--color-text-muted)] mb-1">On Hand</p>
-          <p className="text-2xl font-semibold text-green-300">
-            {formatNumber(data.summary.total_on_hand)}
-          </p>
-        </div>
-
-        <div className="g-card p-4">
-          <p className="text-xs text-[var(--color-text-muted)] mb-1">On Order</p>
-          <p className="text-2xl font-semibold text-blue-300">
-            {formatNumber(data.summary.total_on_order)}
-          </p>
-        </div>
-
-        <div className="g-card p-4">
-          <p className="text-xs text-[var(--color-text-muted)] mb-1">Total Sold</p>
-          <p className="text-2xl font-semibold">{formatNumber(data.summary.total_sold)}</p>
-        </div>
-
-        <div className="g-card p-4">
-          <p className="text-xs text-[var(--color-text-muted)] mb-1">Inventory Value</p>
-          <p className="text-2xl font-semibold">
-            {formatCurrency(data.summary.total_value)}
-          </p>
-        </div>
+      {/* Summary */}
+      <div data-tour="inv-summary" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mt-6">
+        {[
+          { label: 'Product lines', value: formatNumber(data.summary.total_products) },
+          { label: 'On hand', value: formatNumber(data.summary.total_on_hand) },
+          { label: 'On order', value: formatNumber(data.summary.total_on_order) },
+          { label: 'Sold', value: formatNumber(data.summary.total_sold) },
+          { label: 'Inventory value', value: formatCurrency(data.summary.total_value) },
+        ].map((card) => (
+          <div key={card.label} className="g-card p-4">
+            <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">{card.label}</p>
+            <p className="mt-1 text-2xl font-semibold tabular-nums">{card.value}</p>
+          </div>
+        ))}
       </div>
 
       {/* Alerts */}
-      {(data.summary.low_stock_items > 0 || data.summary.out_of_stock_items > 0) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-          {data.summary.low_stock_items > 0 && (
-            <div className="g-card p-4 border-yellow-500/30">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 shrink-0 text-yellow-400" aria-hidden="true" />
-                <div>
-                  <p className="text-sm font-semibold text-yellow-300">
-                    {data.summary.low_stock_items} Low Stock Items
-                  </p>
-                  <p className="text-xs text-[var(--color-text-muted)]">
-                    Less than 10 units remaining
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
+      {(data.summary.low_stock_items > 0 || data.summary.out_of_stock_items > 0 || noReceiptLines > 0) && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
           {data.summary.out_of_stock_items > 0 && (
-            <div className="g-card p-4 border-red-500/30">
-              <div className="flex items-center gap-2">
-                <Ban className="h-5 w-5 shrink-0 text-red-400" aria-hidden="true" />
-                <div>
-                  <p className="text-sm font-semibold text-red-300">
-                    {data.summary.out_of_stock_items} Out of Stock
-                  </p>
-                  <p className="text-xs text-[var(--color-text-muted)]">
-                    No units available
-                  </p>
-                </div>
-              </div>
+            <button
+              type="button"
+              onClick={() => setStockFilter('out')}
+              className="text-left rounded-lg border p-4 bg-danger-bg border-danger-border hover:border-danger"
+            >
+              <p className="flex items-center gap-2 text-sm font-semibold text-danger">
+                <Ban className="h-4 w-4 shrink-0" aria-hidden="true" />
+                {data.summary.out_of_stock_items} out of stock
+              </p>
+              <p className="mt-0.5 text-sm text-[var(--color-text-secondary)]">Balance is zero. Show only these.</p>
+            </button>
+          )}
+          {data.summary.low_stock_items > 0 && (
+            <button
+              type="button"
+              onClick={() => setStockFilter('low')}
+              className="text-left rounded-lg border p-4 bg-warn-bg border-warn-border hover:border-warn"
+            >
+              <p className="flex items-center gap-2 text-sm font-semibold text-warn">
+                <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
+                {data.summary.low_stock_items} low stock
+              </p>
+              <p className="mt-0.5 text-sm text-[var(--color-text-secondary)]">Fewer than 10 left. Show only these.</p>
+            </button>
+          )}
+          {noReceiptLines > 0 && (
+            <div className="rounded-lg border p-4 bg-[var(--color-bg-surface)] border-[var(--color-bg-border)]">
+              <p className="text-sm font-semibold text-[var(--color-text-primary)]">
+                {noReceiptLines} sizes with no received stock recorded
+              </p>
+              <p className="mt-0.5 text-sm text-[var(--color-text-secondary)]">
+                Sold but never received on a posted packing list, so their balance is negative.
+              </p>
             </div>
           )}
         </div>
       )}
 
       {/* Filters */}
-      <div data-tour="inv-controls" className="g-card p-4 mt-6">
+      <div data-tour="inv-controls" className="g-card p-4 mt-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label className="g-label block mb-1">Search SKU</label>
+            <label htmlFor="inv-search" className="g-label block mb-1">SKU</label>
             <input
-              type="text"
-              className="g-input"
-              placeholder="Search by SKU..."
+              id="inv-search"
+              type="search"
+              className="g-input w-full"
+              placeholder="Search by SKU"
               value={searchSku}
               onChange={(e) => setSearchSku(e.target.value)}
             />
           </div>
 
           <div>
-            <label className="g-label block mb-1">Stock Level</label>
+            <label htmlFor="inv-stock" className="g-label block mb-1">Stock level</label>
             <select
-              className="g-input"
+              id="inv-stock"
+              className="g-input w-full"
               value={stockFilter}
               onChange={(e) => setStockFilter(e.target.value as any)}
             >
-              <option value="all">All Items</option>
-              <option value="in-stock">In Stock</option>
-              <option value="low">Low Stock (&lt; 10)</option>
-              <option value="out">Out of Stock</option>
+              <option value="all">All</option>
+              <option value="in-stock">In stock</option>
+              <option value="low">Low stock (under 10)</option>
+              <option value="out">Out of stock</option>
             </select>
           </div>
 
           <div>
-            <label className="g-label block mb-1">Product Type</label>
+            <label htmlFor="inv-type" className="g-label block mb-1">Product type</label>
             <select
-              className="g-input"
+              id="inv-type"
+              className="g-input w-full"
               value={productTypeFilter}
               onChange={(e) => setProductTypeFilter(e.target.value)}
             >
-              <option value="all">All Types</option>
+              <option value="all">All types</option>
               {productTypes.map((type) => (
                 <option key={type} value={type}>
                   {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -315,24 +310,23 @@ export default function InventoryTrackerPage() {
           </div>
 
           <div>
-            <label className="g-label block mb-1">View</label>
-            <div className="flex gap-2">
-              <button
-                className={`g-button ${
-                  view === 'balance' ? '' : 'g-button-outline'
-                } text-sm flex-1`}
-                onClick={() => setView('balance')}
-              >
-                Balance
-              </button>
-              <button
-                className={`g-button ${
-                  view === 'movements' ? '' : 'g-button-outline'
-                } text-sm flex-1`}
-                onClick={() => setView('movements')}
-              >
-                Movements
-              </button>
+            <p className="g-label block mb-1" id="inv-view">View</p>
+            <div className="flex rounded-md border border-[var(--color-bg-border)] p-0.5 bg-[var(--color-bg-elevated)]" role="group" aria-labelledby="inv-view">
+              {(['balance', 'movements'] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  aria-pressed={view === v}
+                  onClick={() => setView(v)}
+                  className={`flex-1 rounded px-3 py-1.5 text-sm font-medium transition-colors ${
+                    view === v
+                      ? 'bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] shadow-sm'
+                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+                  }`}
+                >
+                  {v === 'balance' ? 'Balance' : 'Received stock'}
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -340,20 +334,20 @@ export default function InventoryTrackerPage() {
 
       {/* Inventory Balance Table */}
       {view === 'balance' && (
-        <div data-tour="inv-balance" className="g-card p-6 mt-6">
-          <h3 className="text-lg font-semibold g-title mb-4">
-            Inventory Balance ({filteredInventory.length} items)
-          </h3>
+        <div data-tour="inv-balance" className="mt-6">
+          <h2 className="text-lg font-semibold mb-3">
+            Balance <span className="font-normal text-[var(--color-text-secondary)] tabular-nums">· {filteredInventory.length} lines</span>
+          </h2>
           <InventoryBalanceTable data={filteredInventory} />
         </div>
       )}
 
       {/* Stock Movements Table */}
       {view === 'movements' && (
-        <div className="g-card p-6 mt-6">
-          <h3 className="text-lg font-semibold g-title mb-4">
-            Stock Movements ({filteredMovements.length} records)
-          </h3>
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold mb-3">
+            Received stock <span className="font-normal text-[var(--color-text-secondary)] tabular-nums">· {filteredMovements.length} receipts</span>
+          </h2>
           <StockMovementsTable data={filteredMovements} />
         </div>
       )}

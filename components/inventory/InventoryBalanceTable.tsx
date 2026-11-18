@@ -36,16 +36,20 @@ export function InventoryBalanceTable({ data, loading, showTotals = true }: Inve
           const balance = row.original.balance;
           const isLowStock = balance > 0 && balance < 10;
           const isOutOfStock = balance === 0;
+          const noReceipts = balance < 0 && !row.original.total_received;
 
           return (
             <div>
               <div className="font-semibold text-[var(--color-text-primary)]">{row.getValue('sku')}</div>
-              <div className="text-xs text-[var(--color-text-muted)]">{row.original.description}</div>
+              <div className="text-xs text-[var(--color-text-secondary)]">{row.original.description}</div>
+              {noReceipts && (
+                <Badge variant="default" size="sm" className="mt-1">No received stock recorded</Badge>
+              )}
               {isOutOfStock && (
-                <Badge variant="out-of-stock" className="mt-1 text-xs">Out of stock</Badge>
+                <Badge variant="out-of-stock" size="sm" className="mt-1">Out of stock</Badge>
               )}
               {isLowStock && (
-                <Badge variant="low-stock" className="mt-1 text-xs">Low stock</Badge>
+                <Badge variant="low-stock" size="sm" className="mt-1">Low stock</Badge>
               )}
             </div>
           );
@@ -74,36 +78,44 @@ export function InventoryBalanceTable({ data, loading, showTotals = true }: Inve
       {
         accessorKey: 'total_received',
         header: 'Received',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('total_received')} format="number" />,
         enableSorting: true,
       },
       {
         accessorKey: 'total_sold',
         header: 'Sold',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('total_sold')} format="number" />,
         enableSorting: true,
       },
       {
         accessorKey: 'total_comps',
         header: 'Comps',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('total_comps')} format="number" />,
         enableSorting: true,
       },
       {
         accessorKey: 'balance',
         header: 'Balance',
+        meta: { align: 'right' },
         cell: ({ row }) => {
           const balance = row.getValue('balance') as number;
           const isLowStock = balance > 0 && balance < 10;
           const isOutOfStock = balance === 0;
 
+          // Negative balances come from sales with no receipts recorded: show
+          // the figure, but not as a stock-out or as healthy stock.
           return (
-            <div className={`text-right font-semibold ${
-              isOutOfStock
-                ? 'text-red-300'
+            <div className={`text-right font-semibold tabular-nums ${
+              balance < 0
+                ? 'text-[var(--color-text-secondary)]'
+                : isOutOfStock
+                ? 'text-danger'
                 : isLowStock
-                ? 'text-yellow-300'
-                : 'text-green-300'
+                ? 'text-warn'
+                : 'text-[var(--color-text-primary)]'
             }`}>
               {new Intl.NumberFormat('en-US').format(balance)}
             </div>
@@ -113,13 +125,15 @@ export function InventoryBalanceTable({ data, loading, showTotals = true }: Inve
       },
       {
         accessorKey: 'full_package_cost',
-        header: 'Unit Cost',
+        header: 'Unit cost',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('full_package_cost')} format="currency" />,
         enableSorting: true,
       },
       {
         id: 'value',
         header: 'Value',
+        meta: { align: 'right' },
         accessorFn: (row) => row.balance * row.full_package_cost,
         cell: ({ row }) => {
           const value = row.original.balance * row.original.full_package_cost;
