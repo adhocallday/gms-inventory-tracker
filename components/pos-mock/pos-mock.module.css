@@ -1,0 +1,122 @@
+/* POS mock: the app inside the iPad always uses the light iOS palette. */
+.app {
+  --ink: #111214;
+  --text: #1d1c1d;
+  --text2: #4b5563;
+  --muted: #6b7280;
+  --red: #e8003d;
+  --red-hover: #c70034;
+  --red-active: #a8002c;
+  --bg: #f5f5f6;
+  --card: #ffffff;
+  --surface: #f7f7f8;
+  --surface2: #f1f2f4;
+  --border: #e5e7eb;
+  --success: #05603a;
+  --success-bg: #e7f6ee;
+  --warn: #8a4b00;
+  --warn-bg: #fff4e0;
+  --danger: #b00020;
+  --info: #4f46e5;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  color-scheme: light;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app :focus-visible {
+  outline: 3px solid var(--info);
+  outline-offset: 2px;
+}
+
+/* Screen titles take focus on navigation so Tab continues from there; no ring needed. */
+.app [data-screen-title]:focus-visible {
+  outline: none;
+}
+
+.app button:disabled {
+  cursor: not-allowed;
+}
+
+/* Card reader: pulsing rings, as PulsingRing in CardReaderView.swift */
+.ring {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 9999px;
+  border: 2px solid var(--info);
+  animation: pulse 1.4s ease-out infinite;
+}
+
+@keyframes pulse {
+  from {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* A card moving onto the reader */
+.tapCard {
+  animation: tap 1.6s ease-in-out infinite;
+}
+
+@keyframes tap {
+  0%,
+  100% {
+    transform: translate(46px, -34px) rotate(-12deg);
+  }
+  45%,
+  60% {
+    transform: translate(0, 0) rotate(-4deg);
+  }
+}
+
+.approved {
+  animation: pop 0.35s ease-out;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.screenIn {
+  animation: screenIn 0.18s ease-out;
+}
+
+@keyframes screenIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring,
+  .tapCard,
+  .approved,
+  .screenIn {
+    animation: none;
+  }
+  .ring {
+    opacity: 0.35;
+  }
+  .tapCard {
+    transform: translate(0, 0) rotate(-4deg);
+  }
+}
