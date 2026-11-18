@@ -1,10 +1,11 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { createServiceClient } from '@/lib/supabase/client';
 import { ReportBuilder } from '@/components/reports/ReportBuilder';
 import { ReportList } from '@/components/reports/ReportList';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
-import { Lightbulb } from 'lucide-react';
+import { BarChart3, Lightbulb } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,6 +66,15 @@ export default async function TourReportsPage({ params }: TourReportsPageProps) 
         subtitle={`${tour.name} • ${showCount || 0} shows • ${productCount || 0} products`}
         kicker="Reporting"
         breadcrumbs={breadcrumbs}
+        actions={
+          <Link
+            href={`/tours/${tourId}/reports/merch-flow`}
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-md text-sm font-semibold bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] transition-all"
+          >
+            <BarChart3 className="h-4 w-4" aria-hidden="true" />
+            Merch flow report
+          </Link>
+        }
       />
 
       {/* Info Box */}
