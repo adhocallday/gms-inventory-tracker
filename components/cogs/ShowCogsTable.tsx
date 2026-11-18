@@ -54,20 +54,23 @@ export function ShowCogsTable({ data, loading }: ShowCogsTableProps) {
       {
         accessorKey: 'attendance',
         header: 'Attendance',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('attendance') || 0} format="number" />,
         enableSorting: true,
       },
       {
         accessorKey: 'total_gross',
         header: 'Revenue',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('total_gross') || 0} format="currency" />,
         enableSorting: true,
       },
       {
         accessorKey: 'cogs',
         header: 'COGS',
+        meta: { align: 'right' },
         cell: ({ row }) => (
-          <div className="text-right text-red-300">
+          <div className="text-right tabular-nums">
             {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(row.getValue('cogs') || 0)}
           </div>
         ),
@@ -75,9 +78,10 @@ export function ShowCogsTable({ data, loading }: ShowCogsTableProps) {
       },
       {
         accessorKey: 'margin',
-        header: 'Margin',
+        header: 'Gross margin',
+        meta: { align: 'right' },
         cell: ({ row }) => (
-          <div className="text-right text-green-300">
+          <div className="text-right tabular-nums">
             {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(row.getValue('margin') || 0)}
           </div>
         ),
@@ -86,15 +90,16 @@ export function ShowCogsTable({ data, loading }: ShowCogsTableProps) {
       {
         accessorKey: 'margin_percentage',
         header: 'Margin %',
+        meta: { align: 'right' },
         cell: ({ row }) => {
           const marginPct = row.getValue('margin_percentage') as number;
           return (
-            <div className={`text-right font-semibold ${
+            <div className={`text-right font-semibold tabular-nums ${
               marginPct >= 50
-                ? 'text-green-300'
+                ? 'text-[var(--color-text-primary)]'
                 : marginPct >= 30
-                ? 'text-yellow-300'
-                : 'text-red-300'
+                ? 'text-warn'
+                : 'text-danger'
             }`}>
               {marginPct.toFixed(1)}%
             </div>
@@ -104,7 +109,8 @@ export function ShowCogsTable({ data, loading }: ShowCogsTableProps) {
       },
       {
         accessorKey: 'per_head',
-        header: 'Per Head',
+        header: 'Per head',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('per_head') || 0} format="currency" />,
         enableSorting: true,
       },

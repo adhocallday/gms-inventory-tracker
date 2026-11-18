@@ -105,10 +105,11 @@ export default function ProductGrid({ tourId, products }: ProductGridProps) {
 /**
  * gross_margin from product_summary_view is a dollar amount
  * (gross - units sold x full package cost), not a percentage. Margin % is
- * that over gross, and only meaningful when a unit cost is recorded.
+ * that over gross, and only meaningful when a unit cost (above zero) is recorded.
  */
 function marginPercent(product: ProductCardData): number | null {
-  if (product.full_package_cost === null || product.gross_margin === null) return null;
+  // A cost of 0 means no cost was entered, not a free product.
+  if (!product.full_package_cost || product.full_package_cost <= 0 || product.gross_margin === null) return null;
   if (!product.total_gross) return null;
   return (Number(product.gross_margin) / Number(product.total_gross)) * 100;
 }

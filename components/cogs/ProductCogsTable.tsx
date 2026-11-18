@@ -28,6 +28,19 @@ interface ProductCogsTableProps {
   };
 }
 
+/** A unit cost of 0 or null means none was entered; margins are then unknown. */
+export function hasCost(row: Pick<ProductCogsRow, 'full_package_cost'>): boolean {
+  return Number(row.full_package_cost) > 0;
+}
+
+export function marginPercent(row: ProductCogsRow): number | null {
+  if (!hasCost(row) || !(row.total_gross > 0)) return null;
+  return (row.gross_margin / row.total_gross) * 100;
+}
+
+const formatWhole = (value: number) =>
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+
 export function ProductCogsTable({ data, loading, totals }: ProductCogsTableProps) {
   const columns: ColumnDef<ProductCogsRow>[] = useMemo(
     () => [
@@ -37,7 +50,7 @@ export function ProductCogsTable({ data, loading, totals }: ProductCogsTableProp
         cell: ({ row }) => (
           <div>
             <div className="font-semibold text-[var(--color-text-primary)]">{row.getValue('sku')}</div>
-            <div className="text-xs text-[var(--color-text-muted)]">{row.original.description}</div>
+            <div className="text-xs text-[var(--color-text-secondary)]">{row.original.description}</div>
           </div>
         ),
         enableSorting: true,
@@ -52,62 +65,73 @@ export function ProductCogsTable({ data, loading, totals }: ProductCogsTableProp
       },
       {
         accessorKey: 'total_sold',
-        header: 'Units Sold',
+        header: 'Units sold',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('total_sold') || 0} format="number" />,
         enableSorting: true,
       },
       {
         accessorKey: 'total_gross',
         header: 'Revenue',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('total_gross') || 0} format="currency" />,
         enableSorting: true,
       },
       {
         accessorKey: 'full_package_cost',
-        header: 'Unit Cost',
-        cell: ({ row }) => <NumericCell value={row.getValue('full_package_cost') || 0} format="currency" />,
+        header: 'Unit cost',
+        meta: { align: 'right' },
+        cell: ({ row }) =>
+          hasCost(row.original) ? (
+            <NumericCell value={row.original.full_package_cost} format="currency" />
+          ) : (
+            <span className="text-[var(--color-text-secondary)]">Not set</span>
+          ),
         enableSorting: true,
       },
       {
         accessorKey: 'total_cogs',
-        header: 'Total COGS',
-        cell: ({ row }) => (
-          <div className="text-right text-red-300">
-            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(row.getValue('total_cogs') || 0)}
-          </div>
-        ),
+        header: 'COGS',
+        meta: { align: 'right' },
+        cell: ({ row }) =>
+          hasCost(row.original) ? (
+            <span className="tabular-nums">{formatWhole(row.original.total_cogs || 0)}</span>
+          ) : (
+            <span className="text-[var(--color-text-secondary)]">—</span>
+          ),
         enableSorting: true,
       },
       {
         accessorKey: 'gross_margin',
-        header: 'Margin',
-        cell: ({ row }) => (
-          <div className="text-right text-green-300">
-            {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(row.getValue('gross_margin') || 0)}
-          </div>
-        ),
+        header: 'Gross margin',
+        meta: { align: 'right' },
+        cell: ({ row }) =>
+          hasCost(row.original) ? (
+            <span className="tabular-nums">{formatWhole(row.original.gross_margin || 0)}</span>
+          ) : (
+            <span className="text-[var(--color-text-secondary)]">—</span>
+          ),
         enableSorting: true,
       },
       {
         id: 'margin_pct',
         header: 'Margin %',
-        accessorFn: (row) => {
-          return row.total_gross > 0 ? (row.gross_margin / row.total_gross) * 100 : 0;
-        },
+        meta: { align: 'right' },
+        accessorFn: (row) => marginPercent(row) ?? -Infinity,
         cell: ({ row }) => {
-          const marginPct = row.original.total_gross > 0
-            ? (row.original.gross_margin / row.original.total_gross) * 100
-            : 0;
+          const marginPct = marginPercent(row.original);
+          if (marginPct === null) {
+            return <span className="text-[var(--color-text-secondary)]">No unit cost</span>;
+          }
+          // Below 30% is flagged; healthy margins stay in plain text.
           return (
-            <div className={`text-right font-semibold ${
-              marginPct >= 50
-                ? 'text-green-300'
-                : marginPct >= 30
-                ? 'text-yellow-300'
-                : 'text-red-300'
-            }`}>
+            <span
+              className={`font-semibold tabular-nums ${
+                marginPct < 30 ? 'text-danger' : marginPct < 50 ? 'text-warn' : 'text-[var(--color-text-primary)]'
+              }`}
+            >
               {marginPct.toFixed(1)}%
-            </div>
+            </span>
           );
         },
         enableSorting: true,
@@ -129,36 +153,26 @@ export function ProductCogsTable({ data, loading, totals }: ProductCogsTableProp
         striped
         emptyState={{
           icon: <DollarSign className="w-12 h-12 text-[var(--color-text-muted)]" />,
-          title: 'No COGS data',
-          description: 'Upload sales reports to see cost of goods sold analysis',
+          title: 'No sales posted yet',
+          description: 'COGS appears once a sales report is posted and products have unit costs.',
         }}
       />
 
       {totals && data.length > 0 && (
-        <div className="mt-4 p-4 bg-[var(--color-bg-surface)]/5 rounded-lg border border-[var(--color-bg-border)]">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-            <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Units</p>
-              <p className="font-semibold">{totals.total_units_sold.toLocaleString()}</p>
+        <dl className="mt-4 grid grid-cols-2 md:grid-cols-5 gap-4 rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] p-4 text-sm">
+          {[
+            ['Units sold', totals.total_units_sold.toLocaleString()],
+            ['Revenue', formatCurrency(totals.total_revenue)],
+            ['COGS', formatCurrency(totals.total_cogs)],
+            ['Gross margin', formatCurrency(totals.total_margin)],
+            ['Margin %', `${totals.margin_percentage.toFixed(1)}%`],
+          ].map(([label, value]) => (
+            <div key={label}>
+              <dt className="text-xs text-[var(--color-text-secondary)] mb-1">{label}</dt>
+              <dd className="font-semibold tabular-nums">{value}</dd>
             </div>
-            <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Revenue</p>
-              <p className="font-semibold">{formatCurrency(totals.total_revenue)}</p>
-            </div>
-            <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total COGS</p>
-              <p className="font-semibold text-red-300">{formatCurrency(totals.total_cogs)}</p>
-            </div>
-            <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Margin</p>
-              <p className="font-semibold text-green-300">{formatCurrency(totals.total_margin)}</p>
-            </div>
-            <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Margin %</p>
-              <p className="font-semibold text-green-300">{totals.margin_percentage.toFixed(1)}%</p>
-            </div>
-          </div>
-        </div>
+          ))}
+        </dl>
       )}
     </div>
   );

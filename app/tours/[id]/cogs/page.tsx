@@ -3,9 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ProductCogsTable, type ProductCogsRow } from '@/components/cogs/ProductCogsTable';
+import { ProductCogsTable, hasCost, marginPercent, type ProductCogsRow } from '@/components/cogs/ProductCogsTable';
 import { ShowCogsTable, type ShowCogsRow } from '@/components/cogs/ShowCogsTable';
-import { Button } from '@/components/ui/Button';
 import { ArrowLeft } from 'lucide-react';
 
 interface Tour {
@@ -76,9 +75,9 @@ export default function CogsReportPage() {
 
   if (loading) {
     return (
-      <div className="g-container py-12">
+      <div className="g-container py-12" role="status">
         <div className="text-center text-[var(--color-text-secondary)]">
-          Loading COGS data...
+          Loading COGS…
         </div>
       </div>
     );
@@ -87,188 +86,115 @@ export default function CogsReportPage() {
   if (!tour || !cogsData) {
     return (
       <div className="g-container py-12">
-        <div className="text-center text-[var(--color-text-muted)]">
-          No data available
+        <div className="text-center text-[var(--color-text-secondary)]">
+          COGS for this tour could not be loaded. Reload the page, or go back to the tour.
         </div>
       </div>
     );
   }
 
-  const topPerformers = [...cogsData.products]
+  // Rank only products with a unit cost: with no cost entered, margin reads
+  // 100% and would crowd the top five.
+  const ranked = cogsData.products
     .filter((p) => p.total_sold > 0)
-    .sort((a, b) => {
-      const marginA = a.total_gross > 0 ? (a.gross_margin / a.total_gross) * 100 : 0;
-      const marginB = b.total_gross > 0 ? (b.gross_margin / b.total_gross) * 100 : 0;
-      return marginB - marginA;
-    })
-    .slice(0, 5);
+    .map((p) => ({ product: p, pct: marginPercent(p) }))
+    .filter((r): r is { product: (typeof cogsData.products)[number]; pct: number } => r.pct !== null);
+  const topPerformers = [...ranked].sort((a, b) => b.pct - a.pct).slice(0, 5);
+  const bottomPerformers = [...ranked].sort((a, b) => a.pct - b.pct).slice(0, 5);
+  const noCostCount = cogsData.products.filter((p) => p.total_sold > 0 && !hasCost(p)).length;
 
-  const bottomPerformers = [...cogsData.products]
-    .filter((p) => p.total_sold > 0)
-    .sort((a, b) => {
-      const marginA = a.total_gross > 0 ? (a.gross_margin / a.total_gross) * 100 : 0;
-      const marginB = b.total_gross > 0 ? (b.gross_margin / b.total_gross) * 100 : 0;
-      return marginA - marginB;
-    })
-    .slice(0, 5);
+  const rankList = (title: string, rows: typeof topPerformers) => (
+    <div className="g-card p-5">
+      <h2 className="text-base font-semibold mb-3">{title}</h2>
+      <ol className="space-y-3">
+        {rows.map(({ product, pct }, index) => (
+          <li key={`${product.sku}-${product.size}-${index}`} className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-sm font-semibold">
+                {product.sku} · {product.size}
+              </p>
+              <p className="text-xs text-[var(--color-text-secondary)] truncate">{product.description}</p>
+            </div>
+            <div className="text-right">
+              <p className={`text-sm font-semibold tabular-nums ${pct < 30 ? 'text-danger' : pct < 50 ? 'text-warn' : ''}`}>
+                {formatPercent(pct)}
+              </p>
+              <p className="text-xs text-[var(--color-text-secondary)] tabular-nums">{formatCurrency(product.gross_margin)}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
 
   return (
-    <div className="g-container py-12">
-      {/* Header */}
+    <div className="g-container py-6">
       <Link href={`/tours/${tourId}`} className="text-sm font-medium g-link">
-        <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to tour
+        <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />
+        {tour.name}
       </Link>
+      <h1 className="mt-3 text-2xl font-semibold tracking-tight lg:text-[28px] lg:leading-9">Cost of goods sold</h1>
+      <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+        {tour.artist}. COGS = units sold × full package cost; margin = revenue − COGS.
+      </p>
 
-      <div className="flex flex-col gap-4 mt-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <p className="g-kicker">COGS Report</p>
-          <h1 className="text-3xl font-semibold g-title mt-2">{tour.name}</h1>
-          <p className="text-sm text-[var(--color-text-secondary)]">{tour.artist}</p>
-        </div>
-      </div>
-
-      {/* Summary Cards */}
-      <div data-tour="cogs-summary" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-        <div className="g-card p-4">
-          <p className="text-xs text-[var(--color-text-muted)] mb-1">Total Revenue</p>
-          <p className="text-2xl font-semibold text-[var(--color-text-primary)]">
-            {formatCurrency(cogsData.totals.total_revenue)}
-          </p>
-        </div>
-
-        <div className="g-card p-4">
-          <p className="text-xs text-[var(--color-text-muted)] mb-1">Total COGS</p>
-          <p className="text-2xl font-semibold text-red-300">
-            {formatCurrency(cogsData.totals.total_cogs)}
-          </p>
-        </div>
-
-        <div className="g-card p-4">
-          <p className="text-xs text-[var(--color-text-muted)] mb-1">Gross Margin</p>
-          <p className="text-2xl font-semibold text-green-300">
-            {formatCurrency(cogsData.totals.total_margin)}
-          </p>
-        </div>
-
-        <div className="g-card p-4">
-          <p className="text-xs text-[var(--color-text-muted)] mb-1">Margin %</p>
-          <p className="text-2xl font-semibold text-green-300">
-            {formatPercent(cogsData.totals.margin_percentage)}
-          </p>
-        </div>
-      </div>
-
-      {/* Top/Bottom Performers */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-        {/* Top Performers */}
-        <div className="g-card p-6">
-          <h3 className="text-lg font-semibold g-title mb-4">
-            Top 5 Products by Margin %
-          </h3>
-          <div className="space-y-3">
-            {topPerformers.map((product, index) => {
-              const marginPct =
-                product.total_gross > 0
-                  ? (product.gross_margin / product.total_gross) * 100
-                  : 0;
-              return (
-                <div
-                  key={`${product.sku}-${product.size}-${index}`}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold">
-                      {product.sku} - {product.size}
-                    </p>
-                    <p className="text-xs text-[var(--color-text-muted)]">
-                      {product.description}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-green-300">
-                      {formatPercent(marginPct)}
-                    </p>
-                    <p className="text-xs text-[var(--color-text-muted)]">
-                      {formatCurrency(product.gross_margin)}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+      <div data-tour="cogs-summary" className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
+        {[
+          ['Revenue', formatCurrency(cogsData.totals.total_revenue)],
+          ['COGS', formatCurrency(cogsData.totals.total_cogs)],
+          ['Gross margin', formatCurrency(cogsData.totals.total_margin)],
+          ['Margin %', formatPercent(cogsData.totals.margin_percentage)],
+        ].map(([label, value]) => (
+          <div key={label} className="g-card p-4">
+            <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">{label}</p>
+            <p className="mt-1 text-2xl font-semibold tabular-nums">{value}</p>
           </div>
-        </div>
+        ))}
+      </div>
+      {noCostCount > 0 && (
+        <p className="mt-3 text-sm text-warn">
+          {noCostCount} product sizes with sales have no unit cost, so their COGS counts as $0 and the totals
+          overstate margin. Set costs under Product costs.
+        </p>
+      )}
 
-        {/* Bottom Performers */}
-        <div className="g-card p-6">
-          <h3 className="text-lg font-semibold g-title mb-4">
-            Bottom 5 Products by Margin %
-          </h3>
-          <div className="space-y-3">
-            {bottomPerformers.map((product, index) => {
-              const marginPct =
-                product.total_gross > 0
-                  ? (product.gross_margin / product.total_gross) * 100
-                  : 0;
-              return (
-                <div
-                  key={`${product.sku}-${product.size}-${index}`}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold">
-                      {product.sku} - {product.size}
-                    </p>
-                    <p className="text-xs text-[var(--color-text-muted)]">
-                      {product.description}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-yellow-300">
-                      {formatPercent(marginPct)}
-                    </p>
-                    <p className="text-xs text-[var(--color-text-muted)]">
-                      {formatCurrency(product.gross_margin)}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+        {rankList('Highest margin %, top 5', topPerformers)}
+        {rankList('Lowest margin %, bottom 5', bottomPerformers)}
       </div>
 
       {/* View Toggle */}
-      <div data-tour="cogs-table" className="flex items-center gap-3 mt-8 mb-6">
-        <Button
-          variant={view === 'products' ? 'primary' : 'outline'}
-          onClick={() => setView('products')}
-        >
-          By Product
-        </Button>
-        <Button
-          variant={view === 'shows' ? 'primary' : 'outline'}
-          onClick={() => setView('shows')}
-        >
-          By Show
-        </Button>
+      <div data-tour="cogs-table" className="mt-8 mb-3 flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold">{view === 'products' ? 'By product' : 'By show'}</h2>
+        <div className="flex rounded-md border border-[var(--color-bg-border)] p-0.5 bg-[var(--color-bg-elevated)]" role="group" aria-label="Group COGS by">
+          {(['products', 'shows'] as const).map((v) => (
+            <button
+              key={v}
+              type="button"
+              aria-pressed={view === v}
+              onClick={() => setView(v)}
+              className={`rounded px-3 py-1.5 text-sm font-medium transition-colors ${
+                view === v
+                  ? 'bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] shadow-sm'
+                  : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+              }`}
+            >
+              {v === 'products' ? 'By product' : 'By show'}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Product COGS Table */}
       {view === 'products' && (
-        <div className="g-card p-6">
-          <h3 className="text-lg font-semibold g-title mb-4">
-            Product COGS Breakdown
-          </h3>
+        <div>
           <ProductCogsTable data={cogsData.products} totals={cogsData.totals} />
         </div>
       )}
 
       {/* Show COGS Table */}
       {view === 'shows' && (
-        <div className="g-card p-6">
-          <h3 className="text-lg font-semibold g-title mb-4">
-            Show COGS Breakdown
-          </h3>
+        <div>
           <ShowCogsTable data={cogsData.shows} />
         </div>
       )}
