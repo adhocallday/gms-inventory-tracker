@@ -4,19 +4,19 @@ import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/60 disabled:pointer-events-none disabled:opacity-60',
+  'inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus-ring)] disabled:pointer-events-none disabled:opacity-60',
   {
     variants: {
       variant: {
         primary:
-          'bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] active:scale-95',
+          'bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] active:bg-[var(--color-red-active)]',
         secondary:
-          'border border-[var(--color-bg-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-primary)] hover:text-[var(--color-text-primary)]',
+          'border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)]',
         outline:
           'border border-[var(--color-bg-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-text-primary)] hover:text-[var(--color-text-primary)]',
-        ghost: 'bg-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]',
+        ghost: 'bg-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)]',
         destructive:
-          'bg-[var(--color-red-muted)] text-[var(--color-red-primary)] hover:bg-[var(--color-red-primary)] hover:text-white active:scale-95',
+          'border border-danger-border bg-danger-bg text-danger hover:bg-danger hover:text-white',
       },
       size: {
         sm: 'h-8 px-3 text-xs',

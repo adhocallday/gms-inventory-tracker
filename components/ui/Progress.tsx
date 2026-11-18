@@ -9,10 +9,10 @@ const progressVariants = cva('h-2 w-full overflow-hidden rounded-full bg-[var(--
   variants: {
     variant: {
       default: '[&>div]:bg-[var(--color-red-primary)]',
-      success: '[&>div]:bg-green-600',
-      warning: '[&>div]:bg-yellow-600',
-      danger: '[&>div]:bg-red-600',
-      info: '[&>div]:bg-blue-600',
+      success: '[&>div]:bg-success',
+      warning: '[&>div]:bg-warn',
+      danger: '[&>div]:bg-danger',
+      info: '[&>div]:bg-info',
     },
     size: {
       sm: 'h-1',

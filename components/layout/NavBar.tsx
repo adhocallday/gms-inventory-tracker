@@ -55,7 +55,9 @@ export function NavBar() {
   return (
     <nav
       className={cn(
-        'min-h-screen bg-[var(--color-bg-surface)] border-r border-[var(--color-bg-border)] flex flex-col transition-all duration-300 flex-shrink-0',
+        // Sticky to the viewport, scrolling on its own when taller than it,
+        // so the Upload button stays reachable on long pages.
+        'sticky top-0 h-screen overflow-y-auto bg-[var(--color-bg-surface)] border-r border-[var(--color-bg-border)] flex flex-col transition-[width] duration-200 flex-shrink-0',
         collapsed ? 'w-16' : 'w-56'
       )}
     >

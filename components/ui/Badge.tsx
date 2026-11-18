@@ -2,39 +2,39 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const badgeVariants = cva(
-  'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors border',
+  'inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium border whitespace-nowrap',
   {
     variants: {
       variant: {
         // Tour statuses
-        active: 'bg-green-500/10 text-green-600 border-green-500/20',
-        completed: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-        upcoming: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
-        cancelled: 'bg-[var(--color-bg-border)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)]',
+        active: 'bg-success-bg text-success border-success-border',
+        completed: 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)]',
+        upcoming: 'bg-info-bg text-info border-info-border',
+        cancelled: 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)]',
 
         // Document statuses
-        draft: 'bg-[var(--color-bg-border)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)]',
-        approved: 'bg-green-500/10 text-green-600 border-green-500/20',
-        posted: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-        rejected: 'bg-red-500/10 text-red-600 border-red-500/20',
-        error: 'bg-red-500/10 text-red-600 border-red-500/20',
+        draft: 'bg-warn-bg text-warn border-warn-border',
+        approved: 'bg-info-bg text-info border-info-border',
+        posted: 'bg-success-bg text-success border-success-border',
+        rejected: 'bg-danger-bg text-danger border-danger-border',
+        error: 'bg-danger-bg text-danger border-danger-border',
 
         // PO statuses
-        open: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20',
-        received: 'bg-green-500/10 text-green-600 border-green-500/20',
-        closed: 'bg-[var(--color-bg-border)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)]',
+        open: 'bg-warn-bg text-warn border-warn-border',
+        received: 'bg-success-bg text-success border-success-border',
+        closed: 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)]',
 
         // Inventory statuses
-        'in-stock': 'bg-green-500/10 text-green-600 border-green-500/20',
-        'low-stock': 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20',
-        'out-of-stock': 'bg-red-500/10 text-red-600 border-red-500/20',
+        'in-stock': 'bg-success-bg text-success border-success-border',
+        'low-stock': 'bg-warn-bg text-warn border-warn-border',
+        'out-of-stock': 'bg-danger-bg text-danger border-danger-border',
 
         // Generic statuses
-        success: 'bg-green-500/10 text-green-600 border-green-500/20',
-        warning: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20',
-        danger: 'bg-red-500/10 text-red-600 border-red-500/20',
-        info: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-        default: 'bg-[var(--color-bg-border)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)]',
+        success: 'bg-success-bg text-success border-success-border',
+        warning: 'bg-warn-bg text-warn border-warn-border',
+        danger: 'bg-danger-bg text-danger border-danger-border',
+        info: 'bg-info-bg text-info border-info-border',
+        default: 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] border-[var(--color-bg-border)]',
       },
       size: {
         sm: 'text-xs px-2 py-0.5',

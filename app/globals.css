@@ -44,12 +44,13 @@
   /* Hover and active go darker, so white text keeps its contrast. */
   --color-red-hover: var(--mf-red-hover);
   --color-red-active: var(--mf-red-active);
-  --color-status-active: #22C55E;
-  --color-status-warning: #F59E0B;
-  --color-status-error: var(--mf-red);
-  --color-status-complete: #6366F1;
-  --color-data-positive: #22C55E;
-  --color-data-negative: var(--mf-red);
+  /* Status and data colours follow the semantic tokens below, per theme. */
+  --color-status-active: var(--color-success);
+  --color-status-warning: var(--color-warn);
+  --color-status-error: var(--color-danger);
+  --color-status-complete: var(--color-info);
+  --color-data-positive: var(--color-success);
+  --color-data-negative: var(--color-danger);
 }
 
 /* Light theme (default): no data-theme attribute, or data-theme="light". */
@@ -67,6 +68,33 @@
   --color-data-neutral: var(--mf-text2);
   --color-card-shadow: rgba(17, 18, 20, 0.06);
   --color-card-shadow-hover: rgba(17, 18, 20, 0.1);
+  /* Red text on the page background: #E8003D is 4.36:1 on #F7F7F8, so
+     text links use the hover red (AA on every light surface). */
+  --color-red-text: var(--mf-red-hover);
+  --color-focus-ring: var(--mf-red);
+
+  /*
+   * Semantic colours. Text (fg) passes AA on its own bg, on white and on the
+   * page background; white text on the fg colour also passes. Red stays the
+   * brand accent; danger is a separate, darker red that means a problem.
+   */
+  --color-danger: var(--mf-danger);
+  --color-danger-bg: var(--mf-danger-bg);
+  --color-danger-border: #F5C2C9;
+  --color-success: var(--mf-success);
+  --color-success-bg: var(--mf-success-bg);
+  --color-success-border: #B4DFC7;
+  --color-warn: var(--mf-warn);
+  --color-warn-bg: var(--mf-warn-bg);
+  --color-warn-border: #F2D3A0;
+  --color-info: #0B5CAD;
+  --color-info-bg: #E8F1FB;
+  --color-info-border: #BCD4EE;
+  /* AI-generated content (projections, agent output). */
+  --color-ai: #6B3FA0;
+  --color-ai-bg: #F3EDF9;
+  --color-ai-border: #D9C9EC;
+  --color-scrim: rgba(17, 18, 20, 0.45);
   color-scheme: light;
 }
 
@@ -84,6 +112,24 @@
   --color-data-neutral: #A0A0A0;
   --color-card-shadow: rgba(0, 0, 0, 0.55);
   --color-card-shadow-hover: rgba(0, 0, 0, 0.75);
+  --color-red-text: #FF4D79;
+  --color-focus-ring: #FF4D79;
+  --color-danger: #FF6B81;
+  --color-danger-bg: #3D0A14;
+  --color-danger-border: #6B1626;
+  --color-success: #4ADE80;
+  --color-success-bg: #0B2A1A;
+  --color-success-border: #14532D;
+  --color-warn: #FBBF24;
+  --color-warn-bg: #2E1F05;
+  --color-warn-border: #5C3D0A;
+  --color-info: #60A5FA;
+  --color-info-bg: #0C1E36;
+  --color-info-border: #1E3A5F;
+  --color-ai: #C4A3F0;
+  --color-ai-bg: #24173A;
+  --color-ai-border: #44306A;
+  --color-scrim: rgba(0, 0, 0, 0.6);
   color-scheme: dark;
 }
 
@@ -98,7 +144,25 @@ body {
 
 main {
   padding: var(--g-padding-y) var(--g-padding-x);
-  animation: fadeIn 0.25s var(--g-ease);
+}
+
+/* Numbers line up in columns everywhere, not only in .font-mono. */
+td, th, .tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* One focus ring for every control that does not draw its own. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Headings wrap evenly; body copy avoids one-word last lines. */
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+
+@media (prefers-reduced-motion: reduce) {
+  .g-card, .g-card:hover { transition: none; transform: none; }
 }
 
 html,
@@ -126,15 +190,15 @@ a {
 }
 
 .g-card:hover {
-  transform: translateY(-2px);
   box-shadow: 0 20px 40px var(--color-card-shadow-hover);
 }
 
 .g-kicker {
   text-transform: uppercase;
-  letter-spacing: 0.4em;
-  font-size: 11px;
-  color: var(--color-text-muted);
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
 }
 
 .g-title {
@@ -172,21 +236,19 @@ a {
   min-height: 160px;
 }
 
-.kpi-card.kpi-primary {
-  border-top: 3px solid var(--color-red-primary);
-}
-
 .kpi-label {
-  font-size: 11px;
-  letter-spacing: 0.3em;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
 }
 
 .kpi-value {
-  font-size: 36px;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.15;
   margin-top: 0.4rem;
   color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .kpi-trend {
@@ -198,36 +260,40 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.1rem 0.55rem;
+  padding: 0.1rem 0.5rem;
   border-radius: 6px;
-  font-size: 11px;
+  border: 1px solid transparent;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
 }
 
 .badge-draft {
-  background: rgba(245, 158, 11, 0.15);
-  color: var(--color-status-warning);
+  background: var(--color-warn-bg);
+  border-color: var(--color-warn-border);
+  color: var(--color-warn);
 }
 
 .badge-approved {
-  background: rgba(34, 197, 94, 0.15);
-  color: var(--color-status-active);
+  background: var(--color-success-bg);
+  border-color: var(--color-success-border);
+  color: var(--color-success);
 }
 
 .badge-rejected {
-  background: rgba(232, 0, 61, 0.15);
-  color: var(--color-status-error);
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+  color: var(--color-danger);
 }
 
 .badge-complete {
-  background: rgba(99, 102, 241, 0.15);
-  color: var(--color-status-complete);
+  background: var(--color-info-bg);
+  border-color: var(--color-info-border);
+  color: var(--color-info);
 }
 
 .insight-alert {
-  border-left: 3px solid var(--color-status-error);
+  border-color: var(--color-danger-border);
+  background: var(--color-danger-bg);
 }
 
 ::selection {
@@ -260,7 +326,7 @@ a {
 .g-input:focus {
   outline: none;
   border-color: var(--color-red-primary);
-  box-shadow: 0 0 0 2px rgba(232, 0, 61, 0.15);
+  box-shadow: 0 0 0 2px var(--color-red-muted);
 }
 
 .g-input::placeholder {
@@ -275,7 +341,7 @@ a {
 /* Select dropdowns */
 select.g-input {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23A0A0A0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   padding-right: 2.5rem;
@@ -394,7 +460,7 @@ option {
 }
 
 .spreadsheet tbody tr:hover {
-  background: rgba(232, 0, 61, 0.05);
+  background: var(--color-bg-elevated);
 }
 
 /* Compact spreadsheet inputs */
@@ -427,7 +493,7 @@ option {
 
 /* Warning row highlight */
 .spreadsheet tr.warning-row {
-  background: rgba(232, 0, 61, 0.08) !important;
+  background: var(--color-warn-bg) !important;
 }
 
 /* Totals row */
@@ -563,7 +629,7 @@ option {
   outline: 2px solid var(--color-red-primary);
   outline-offset: 2px;
 }
-dialog.mf-tour-menu::backdrop { background: rgba(17, 18, 20, 0.45); }
+dialog.mf-tour-menu::backdrop { background: var(--color-scrim); }
 .driver-popover.mf-tour .driver-popover-arrow-side-left { border-left-color: var(--color-bg-surface); }
 .driver-popover.mf-tour .driver-popover-arrow-side-right { border-right-color: var(--color-bg-surface); }
 .driver-popover.mf-tour .driver-popover-arrow-side-top { border-top-color: var(--color-bg-surface); }

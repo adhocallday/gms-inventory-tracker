@@ -59,7 +59,7 @@ export function DataTable<TData, TValue>({
   // Loading state
   if (loading) {
     return (
-      <div className="g-card overflow-hidden">
+      <div className="g-card overflow-clip" aria-busy="true">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-[var(--color-bg-elevated)] border-b border-[var(--color-bg-border)]">
@@ -102,13 +102,16 @@ export function DataTable<TData, TValue>({
   }
 
   return (
-    <div className="g-card overflow-hidden">
-      <div className="overflow-x-auto">
+    // overflow-clip (not hidden) and no horizontal scroller from lg up: a
+    // scroll container would capture the sticky header, so it would never
+    // stick to the window. Below lg the table scrolls sideways instead.
+    <div className="g-card overflow-clip">
+      <div className="overflow-x-auto lg:overflow-x-visible">
         <table className="w-full">
           <thead
             className={cn(
               'bg-[var(--color-bg-elevated)] border-b border-[var(--color-bg-border)]',
-              stickyHeader && 'sticky top-0 z-10 shadow-sm'
+              stickyHeader && 'lg:sticky lg:top-0 z-10'
             )}
           >
             {table.getHeaderGroups().map((headerGroup) => (
@@ -121,11 +124,23 @@ export function DataTable<TData, TValue>({
                     <th
                       key={header.id}
                       className={cn(
-                        'px-4 text-left text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]',
+                        'px-4 text-left text-xs font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-elevated)] shadow-[inset_0_-1px_0_var(--color-bg-border)]',
                         compact ? 'py-2' : 'py-3',
                         canSort && 'cursor-pointer select-none hover:text-[var(--color-text-primary)]'
                       )}
                       onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
+                      onKeyDown={
+                        canSort
+                          ? (e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                header.column.toggleSorting();
+                              }
+                            }
+                          : undefined
+                      }
+                      tabIndex={canSort ? 0 : undefined}
+                      aria-sort={sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : canSort ? 'none' : undefined}
                     >
                       {header.isPlaceholder ? null : (
                         <div className="flex items-center gap-2">
@@ -140,7 +155,7 @@ export function DataTable<TData, TValue>({
                               ) : sorted === 'desc' ? (
                                 <ArrowDown className="w-3 h-3" />
                               ) : (
-                                <ArrowUpDown className="w-3 h-3 opacity-40" />
+                                <ArrowUpDown className="w-3 h-3 opacity-50" aria-hidden="true" />
                               )}
                             </span>
                           )}
@@ -213,11 +228,15 @@ export function DateCell({ value }: { value: string | Date | null | undefined })
     return <span className="text-[var(--color-text-muted)]">—</span>;
   }
 
+  // A date-only string ("2025-07-09") parses as UTC midnight, so format it
+  // in UTC or it shows the previous day west of Greenwich.
+  const dateOnly = typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value);
   const date = typeof value === 'string' ? new Date(value) : value;
   const formatted = date.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
+    ...(dateOnly ? { timeZone: 'UTC' } : {}),
   });
 
   return <span>{formatted}</span>;

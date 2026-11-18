@@ -4,7 +4,8 @@ import type { Breadcrumb as BreadcrumbType } from '@/lib/breadcrumbs';
 
 interface PageHeaderProps {
   title: string;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
+  /** @deprecated Not rendered: the heading carries the page name on its own. */
   kicker?: string;
   actions?: React.ReactNode;
   breadcrumbs?: BreadcrumbType[];
@@ -14,7 +15,6 @@ interface PageHeaderProps {
 export function PageHeader({
   title,
   subtitle,
-  kicker,
   actions,
   breadcrumbs,
   className,
@@ -25,25 +25,21 @@ export function PageHeader({
         <Breadcrumb items={breadcrumbs} />
       )}
 
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div className="space-y-2">
-          {kicker && (
-            <p className="g-kicker text-[var(--color-text-muted)]">{kicker}</p>
-          )}
-
-          <h1 className="text-3xl font-bold g-title text-[var(--color-text-primary)] lg:text-4xl">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="space-y-1.5 min-w-0">
+          <h1 className="text-2xl font-semibold tracking-tight text-[var(--color-text-primary)] lg:text-[28px] lg:leading-9">
             {title}
           </h1>
 
           {subtitle && (
-            <p className="text-sm text-[var(--color-text-secondary)] lg:text-base">
+            <p className="max-w-[70ch] text-sm text-[var(--color-text-secondary)]">
               {subtitle}
             </p>
           )}
         </div>
 
         {actions && (
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             {actions}
           </div>
         )}

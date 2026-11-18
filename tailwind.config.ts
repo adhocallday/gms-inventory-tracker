@@ -15,6 +15,14 @@ const config: Config = {
         mono: ['var(--font-mono)'],
       },
       colors: {
+        // Semantic colours (app/globals.css), theme-aware:
+        // text-danger, bg-danger-bg, border-danger-border, and so on.
+        danger: { DEFAULT: 'var(--color-danger)', bg: 'var(--color-danger-bg)', border: 'var(--color-danger-border)' },
+        success: { DEFAULT: 'var(--color-success)', bg: 'var(--color-success-bg)', border: 'var(--color-success-border)' },
+        warn: { DEFAULT: 'var(--color-warn)', bg: 'var(--color-warn-bg)', border: 'var(--color-warn-border)' },
+        info: { DEFAULT: 'var(--color-info)', bg: 'var(--color-info-bg)', border: 'var(--color-info-border)' },
+        ai: { DEFAULT: 'var(--color-ai)', bg: 'var(--color-ai-bg)', border: 'var(--color-ai-border)' },
+        scrim: 'var(--color-scrim)',
         'mf-red': 'var(--mf-red)',
         'mf-ink': 'var(--mf-ink)',
         // MerchFlow Charts' Tailwind 4 theme tokens (merch-flow-charts
