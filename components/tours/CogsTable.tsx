@@ -32,7 +32,7 @@ export function CogsTable({ data, loading }: CogsTableProps) {
             <div className="font-semibold text-[var(--color-text-primary)]">
               {row.original.sku || 'SKU'}
             </div>
-            <div className="text-xs text-[var(--color-text-muted)] mt-0.5">
+            <div className="text-xs text-[var(--color-text-secondary)] mt-0.5">
               {row.original.description || 'Description pending'}
             </div>
           </div>
@@ -47,12 +47,13 @@ export function CogsTable({ data, loading }: CogsTableProps) {
       {
         accessorKey: 'size',
         header: 'Size',
-        cell: ({ row }) => row.getValue('size') || <span className="text-[var(--color-text-muted)]">—</span>,
+        cell: ({ row }) => row.getValue('size') || <span className="text-[var(--color-text-secondary)]">—</span>,
         enableSorting: true,
       },
       {
         accessorKey: 'total_sold',
-        header: 'Units Sold',
+        header: 'Units sold',
+        meta: { align: 'right' },
         cell: ({ row }) => (
           <div className="text-right">
             <NumericCell value={row.getValue('total_sold')} format="number" />
@@ -63,6 +64,7 @@ export function CogsTable({ data, loading }: CogsTableProps) {
       {
         accessorKey: 'total_gross',
         header: 'Gross',
+        meta: { align: 'right' },
         cell: ({ row }) => (
           <div className="text-right">
             <NumericCell value={row.getValue('total_gross')} format="currency" />
@@ -73,6 +75,7 @@ export function CogsTable({ data, loading }: CogsTableProps) {
       {
         accessorKey: 'total_cogs',
         header: 'COGS',
+        meta: { align: 'right' },
         cell: ({ row }) => (
           <div className="text-right">
             <NumericCell value={row.getValue('total_cogs')} format="currency" />
@@ -82,7 +85,8 @@ export function CogsTable({ data, loading }: CogsTableProps) {
       },
       {
         accessorKey: 'gross_margin',
-        header: 'Margin',
+        header: 'Gross margin',
+        meta: { align: 'right' },
         cell: ({ row }) => {
           const margin = row.getValue('gross_margin') as number | null;
           return (
@@ -105,7 +109,7 @@ export function CogsTable({ data, loading }: CogsTableProps) {
       stickyHeader
       striped
       emptyState={{
-        icon: <DollarSign className="w-12 h-12 text-[var(--color-text-muted)]" />,
+        icon: <DollarSign className="w-12 h-12 text-[var(--color-text-secondary)]" />,
         title: 'No COGS data yet',
         description: 'Upload sales and cost data to see cost of goods sold',
       }}

@@ -1,5 +1,6 @@
 'use client';
 
+import { formatDate as formatDay } from '@/lib/format';
 import { useMemo, useState } from 'react';
 
 type StockMovementRow = {
@@ -11,15 +12,9 @@ type StockMovementRow = {
   vendor: string | null;
 };
 
-const dateFormatter = new Intl.DateTimeFormat('en-US', {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric'
-});
-
 function formatDate(value?: string | null) {
-  if (!value) return 'TBD';
-  return dateFormatter.format(new Date(value));
+  // Date-only values format in UTC so they do not shift a day early.
+  return formatDay(value, undefined, 'not set');
 }
 
 const INITIAL_COUNT = 10;
@@ -52,11 +47,11 @@ export function StockMovementPanel({ rows }: { rows: StockMovementRow[] }) {
   };
 
   return (
-    <section className="g-card p-6">
+    <section className="g-card p-5">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h2 className="text-lg font-semibold g-title">Stock Movement</h2>
-          <p className="text-sm text-[var(--color-text-muted)]">
+          <h2 className="text-base font-semibold">Stock received</h2>
+          <p className="text-sm text-[var(--color-text-secondary)]">
             Chronological receipts by delivery.
           </p>
         </div>

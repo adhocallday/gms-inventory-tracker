@@ -119,6 +119,10 @@ export function DataTable<TData, TValue>({
                 {headerGroup.headers.map((header) => {
                   const canSort = header.column.getCanSort();
                   const sorted = header.column.getIsSorted();
+                  // Numeric columns set meta: { align: 'right' } so the header
+                  // lines up with right-aligned figures.
+                  const alignRight =
+                    (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right';
 
                   return (
                     <th
@@ -126,6 +130,7 @@ export function DataTable<TData, TValue>({
                       className={cn(
                         'px-4 text-left text-xs font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-elevated)] shadow-[inset_0_-1px_0_var(--color-bg-border)]',
                         compact ? 'py-2' : 'py-3',
+                        alignRight && 'text-right',
                         canSort && 'cursor-pointer select-none hover:text-[var(--color-text-primary)]'
                       )}
                       onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
@@ -143,7 +148,7 @@ export function DataTable<TData, TValue>({
                       aria-sort={sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : canSort ? 'none' : undefined}
                     >
                       {header.isPlaceholder ? null : (
-                        <div className="flex items-center gap-2">
+                        <div className={cn('flex items-center gap-2', alignRight && 'justify-end')}>
                           {flexRender(
                             header.column.columnDef.header,
                             header.getContext()
@@ -210,7 +215,7 @@ export function NumericCell({ value, format = 'number' }: { value: number | null
     formatted = new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-      minimumFractionDigits: 0,
+      minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(value);
   } else if (format === 'percentage') {
@@ -219,7 +224,7 @@ export function NumericCell({ value, format = 'number' }: { value: number | null
     formatted = value.toLocaleString();
   }
 
-  return <span className="font-mono">{formatted}</span>;
+  return <span className="tabular-nums">{formatted}</span>;
 }
 
 // Helper for date columns

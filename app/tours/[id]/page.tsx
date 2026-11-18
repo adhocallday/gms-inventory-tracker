@@ -9,7 +9,8 @@ import ShowsTable, { ShowSummaryRow } from '@/components/tours/ShowsTable';
 import TopSellersPanel from '@/components/tours/TopSellersPanel';
 import { CogsTable, type CogsRow } from '@/components/tours/CogsTable';
 import { InventoryTable } from '@/components/tours/InventoryTable';
-import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { formatDate as formatDay } from '@/lib/format';
 import { ArrowLeft, ArrowRight, BarChart3, DollarSign, Package, SettingsIcon, Tag, TrendingUp } from 'lucide-react';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
@@ -19,17 +20,15 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
 });
 
 function formatDate(value?: string | null) {
-  if (!value) return 'TBD';
-  return new Date(value).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
+  return formatDay(value, undefined, 'not set');
 }
 
 function formatNumber(value: number) {
   return new Intl.NumberFormat('en-US').format(value);
 }
+
+const tabClass =
+  'inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-bg-elevated)] hover:text-[var(--color-text-primary)]';
 
 type TourDetailParams = {
   params: { id: string };
@@ -324,94 +323,85 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
     .slice(0, 3);
 
   return (
-    <div className="g-container py-12">
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <Link
-            href="/"
-            className="text-sm font-medium g-link"
-          >
-            <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to dashboard
-          </Link>
-          <h1 className="text-3xl font-semibold g-title mt-3">
-            {tour.name}
-          </h1>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-            {tour.artist}
-          </p>
-          <p className="text-sm text-[var(--color-text-muted)] mt-2">
-            {formatDate(tour.start_date)} — {formatDate(tour.end_date)}
-          </p>
+    <div className="g-container py-6">
+      <div>
+        <Link href="/" className="text-sm font-medium g-link">
+          <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />
+          Tours
+        </Link>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight lg:text-[28px] lg:leading-9">{tour.name}</h1>
+          <Badge variant={tour.status as never}>{tour.status}</Badge>
         </div>
-        <div className="g-kicker">
-          {tour.status}
-        </div>
+        <p className="mt-1 text-sm text-[var(--color-text-secondary)] tabular-nums">
+          {tour.artist} · {formatDate(tour.start_date)} – {formatDate(tour.end_date)}
+        </p>
       </div>
 
       {/* Navigation Tabs */}
-      <nav data-tour="tour-tabs" className="flex gap-2 mt-8 border-b border-[var(--color-bg-border)] pb-0 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+      <nav data-tour="tour-tabs" aria-label="Tour pages" className="flex gap-1 mt-6 border-b border-[var(--color-bg-border)] pb-2 overflow-x-auto">
         <Link
           href={`/tours/${tour.id}/projections`}
-          className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
+          className={tabClass}
         >
           <BarChart3 className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Projections
         </Link>
         <Link
           href={`/tours/${tour.id}/reports`}
-          className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
+          className={tabClass}
         >
           <TrendingUp className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Reports
         </Link>
         <Link
           href={`/tours/${tour.id}/inventory`}
           data-tour="inventory"
-          className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
+          className={tabClass}
         >
           <Package className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Inventory
         </Link>
         <Link
           href={`/tours/${tour.id}/cogs`}
-          className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
+          className={tabClass}
         >
           <DollarSign className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> COGS
         </Link>
         <Link
           href={`/admin/tours/${tour.id}/products`}
-          className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
+          className={tabClass}
         >
-          <Tag className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Product Costs
+          <Tag className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Product costs
         </Link>
         <Link
           href={`/tours/${tour.id}/settings/warehouses`}
-          className="px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-b-2 hover:border-[var(--color-red-primary)] transition"
+          className={tabClass}
         >
-          <SettingsIcon className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Warehouse Settings
+          <SettingsIcon className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Warehouses
         </Link>
       </nav>
 
-      <div data-tour="tour-kpis" className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+      <div data-tour="tour-kpis" className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--color-text-muted)]">Total gross</p>
-          <p className="text-2xl font-semibold mt-2">
+          <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">Gross sales</p>
+          <p className="text-2xl font-semibold mt-1 tabular-nums">
             {currencyFormatter.format(totalGross)}
           </p>
         </div>
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--color-text-muted)]">Per-head</p>
-          <p className="text-2xl font-semibold mt-2">
+          <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">Per head</p>
+          <p className="text-2xl font-semibold mt-1 tabular-nums">
             {currencyFormatter.format(perHead)}
           </p>
         </div>
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--color-text-muted)]">Shows logged</p>
-          <p className="text-2xl font-semibold mt-2">
+          <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">Shows with sales</p>
+          <p className="text-2xl font-semibold mt-1 tabular-nums">
             {showSummary?.length ?? 0}
           </p>
         </div>
         <div className="g-card p-4">
-          <p className="text-xs text-[var(--color-text-muted)]">Inventory balance</p>
-          <p className="text-2xl font-semibold mt-2">
-            {formatNumber(totalBalance)} units
+          <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">Units on hand</p>
+          <p className="text-2xl font-semibold mt-1 tabular-nums">
+            {formatNumber(totalBalance)}
           </p>
         </div>
       </div>
@@ -425,14 +415,14 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       </div>
 
       {/* Business Insights Section */}
-      <section className="mt-12">
-        <h2 className="text-xl font-semibold g-title mb-6">Business Insights</h2>
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <section className="mt-10">
+        <h2 className="text-lg font-semibold mb-4">Sales and planning</h2>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
           <TopSellersPanel tourId={tour.id} topSellers={cogsSorted} productMap={productMap} />
 
-        <section className="g-card p-6">
+        <section className="g-card p-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold g-title">Projections</h2>
+            <h2 className="text-base font-semibold">Projections</h2>
             <Link
               href={`/tours/${tour.id}/projections`}
               className="text-sm font-medium g-link"
@@ -442,28 +432,34 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
           </div>
           {baselineScenario ? (
             <div className="mt-4 space-y-3 text-sm">
-              <p className="text-[var(--color-text-muted)]">
+              <p className="text-[var(--color-text-secondary)]">
                 Baseline scenario: <span className="text-[var(--color-text-primary)]">{baselineScenario.name}</span>
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="border border-[var(--color-bg-border)] rounded-md p-3">
-                  <p className="text-xs text-[var(--color-text-muted)]">Forecast units</p>
-                  <p className="text-lg font-semibold mt-1">{formatNumber(forecastUnits)}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">Forecast units</p>
+                  <p className="text-lg font-semibold mt-1 tabular-nums">{formatNumber(forecastUnits)}</p>
                 </div>
                 <div className="border border-[var(--color-bg-border)] rounded-md p-3">
-                  <p className="text-xs text-[var(--color-text-muted)]">Forecast gross</p>
-                  <p className="text-lg font-semibold mt-1">
-                    {currencyFormatter.format(forecastGross)}
-                  </p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">Forecast gross</p>
+                  {forecastGross === 0 && forecastUnits > 0 ? (
+                    <p className="text-sm font-medium mt-1 text-[var(--color-text-secondary)]">
+                      No retail prices set
+                    </p>
+                  ) : (
+                    <p className="text-lg font-semibold mt-1 tabular-nums">
+                      {currencyFormatter.format(forecastGross)}
+                    </p>
+                  )}
                 </div>
               </div>
               {topForecasted.length === 0 ? (
-                <p className="text-xs text-[var(--color-text-muted)]">
+                <p className="text-xs text-[var(--color-text-secondary)]">
                   No overrides saved yet. Open the sheet to plan units.
                 </p>
               ) : (
                 <div className="space-y-2">
-                  <p className="text-xs text-[var(--color-text-muted)]">Top forecasted SKUs</p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">Top forecasted SKUs</p>
                   {topForecasted.map(([sku, units]) => (
                     <div key={sku} className="flex items-center justify-between">
                       <span className="text-sm">{sku}</span>
@@ -476,21 +472,21 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
               )}
             </div>
           ) : (
-            <div className="mt-4 p-4 border border-dashed border-[var(--color-bg-border)] rounded-md text-sm text-[var(--color-text-muted)]">
-              No projection scenarios yet. Add a scenario to compare forecasted units and revenue.
+            <div className="mt-4 p-4 border border-dashed border-[var(--color-bg-border)] rounded-md text-sm text-[var(--color-text-secondary)]">
+              No projection scenario yet. Open the sheet to create one.
             </div>
           )}
         </section>
 
-        <section className="g-card p-6">
-          <h2 className="text-lg font-semibold g-title">Grab sheet</h2>
-          <p className="text-sm text-[var(--color-text-muted)] mt-2">
-            Add design assets to quickly preview merch layouts for this tour.
+        <section className="g-card p-5">
+          <h2 className="text-base font-semibold">Grab sheet</h2>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-2">
+            Design images for this tour&apos;s products.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
             {designAssets.length === 0 ? (
-              <div className="sm:col-span-2 text-sm text-[var(--color-text-muted)] border border-dashed border-[var(--color-bg-border)] rounded-md p-4">
-                No design assets uploaded yet.
+              <div className="sm:col-span-2 text-sm text-[var(--color-text-secondary)] border border-dashed border-[var(--color-bg-border)] rounded-md p-4">
+                No design images uploaded for this tour.
               </div>
             ) : (
               designAssets.slice(0, 4).map((asset) => {
@@ -500,14 +496,14 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
                     key={asset.id}
                     className="border border-[var(--color-bg-border)] rounded-md overflow-hidden"
                   >
-                    <div className="h-28 bg-[var(--color-bg-elevated)] flex items-center justify-center text-xs text-[var(--color-text-muted)]">
+                    <div className="h-28 bg-[var(--color-bg-elevated)] flex items-center justify-center text-xs text-[var(--color-text-secondary)]">
                       {asset.storage_path}
                     </div>
                     <div className="p-2">
                       <p className="text-xs font-semibold">
                         {product?.sku ?? asset.sku ?? 'SKU'}
                       </p>
-                      <p className="text-[11px] text-[var(--color-text-muted)]">
+                      <p className="text-[11px] text-[var(--color-text-secondary)]">
                         {asset.asset_type ?? 'asset'}
                       </p>
                     </div>
@@ -521,24 +517,24 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       </section>
 
       {/* Detailed Data Section */}
-      <section className="mt-12">
-        <h2 className="text-xl font-semibold g-title mb-6">Detailed Data</h2>
+      <section className="mt-10">
+        <h2 className="text-lg font-semibold mb-4">Top 10 by gross and by stock</h2>
 
-        <div className="g-card p-6 mb-6">
+        <div className="g-card p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold g-title">COGS Report</h3>
+            <h3 className="text-base font-semibold">COGS, top 10 by gross</h3>
             <Link href={`/tours/${tour.id}/cogs`} className="text-sm font-medium g-link">
-              View full report <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
+              All products <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
             </Link>
           </div>
           <CogsTable data={cogsSorted.slice(0, 10) as CogsRow[]} />
         </div>
 
-        <div className="g-card p-6">
+        <div className="g-card p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold g-title">Inventory Balances</h3>
+            <h3 className="text-base font-semibold">Inventory, top 10 by units on hand</h3>
             <Link href={`/tours/${tour.id}/inventory`} className="text-sm font-medium g-link">
-              View full report <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
+              All products <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
             </Link>
           </div>
           <InventoryTable
@@ -550,7 +546,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
               return {
                 ...row,
                 sku: product?.sku ?? 'SKU',
-                description: product?.description ?? 'Description pending',
+                description: product?.description ?? 'No description',
                 unit_cost: unitCost,
                 inventory_value: inventoryValue,
               };
@@ -560,9 +556,9 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       </section>
 
       {/* Operations Section */}
-      <section className="mt-12">
-        <h2 className="text-xl font-semibold g-title mb-6">Operations</h2>
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <section className="mt-10">
+        <h2 className="text-lg font-semibold mb-4">Purchasing and receiving</h2>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
           <PurchaseOrdersPanel
             purchaseOrders={(purchaseOrders ?? []) as PurchaseOrderRow[]}
             openQuantities={(openQuantities ?? []) as OpenQtyRow[]}

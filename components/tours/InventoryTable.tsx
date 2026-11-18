@@ -37,7 +37,7 @@ export function InventoryTable({ data, loading }: InventoryTableProps) {
             <div className="font-semibold text-[var(--color-text-primary)]">
               {row.original.sku || 'SKU'}
             </div>
-            <div className="text-xs text-[var(--color-text-muted)] mt-0.5">
+            <div className="text-xs text-[var(--color-text-secondary)] mt-0.5">
               {row.original.description || 'Description pending'}
             </div>
           </div>
@@ -52,12 +52,13 @@ export function InventoryTable({ data, loading }: InventoryTableProps) {
       {
         accessorKey: 'size',
         header: 'Size',
-        cell: ({ row }) => row.getValue('size') || <span className="text-[var(--color-text-muted)]">—</span>,
+        cell: ({ row }) => row.getValue('size') || <span className="text-[var(--color-text-secondary)]">—</span>,
         enableSorting: true,
       },
       {
         accessorKey: 'total_received',
         header: 'Received',
+        meta: { align: 'right' },
         cell: ({ row }) => (
           <div className="text-right">
             <NumericCell value={row.getValue('total_received')} format="number" />
@@ -68,6 +69,7 @@ export function InventoryTable({ data, loading }: InventoryTableProps) {
       {
         accessorKey: 'total_sold',
         header: 'Sold',
+        meta: { align: 'right' },
         cell: ({ row }) => (
           <div className="text-right">
             <NumericCell value={row.getValue('total_sold')} format="number" />
@@ -78,6 +80,7 @@ export function InventoryTable({ data, loading }: InventoryTableProps) {
       {
         accessorKey: 'total_comps',
         header: 'Comps',
+        meta: { align: 'right' },
         cell: ({ row }) => (
           <div className="text-right">
             <NumericCell value={row.getValue('total_comps')} format="number" />
@@ -88,6 +91,7 @@ export function InventoryTable({ data, loading }: InventoryTableProps) {
       {
         accessorKey: 'balance',
         header: 'Balance',
+        meta: { align: 'right' },
         cell: ({ row }) => (
           <div className="text-right font-semibold">
             <NumericCell value={row.getValue('balance')} format="number" />
@@ -97,12 +101,13 @@ export function InventoryTable({ data, loading }: InventoryTableProps) {
       },
       {
         accessorKey: 'unit_cost',
-        header: 'Unit Cost',
+        header: 'Unit cost',
+        meta: { align: 'right' },
         cell: ({ row }) => {
           const cost = row.getValue('unit_cost') as number;
           return (
             <div className="text-right">
-              {cost ? <NumericCell value={cost} format="currency" /> : <span className="text-[var(--color-text-muted)]">—</span>}
+              {cost ? <NumericCell value={cost} format="currency" /> : <span className="text-[var(--color-text-secondary)]">—</span>}
             </div>
           );
         },
@@ -110,12 +115,13 @@ export function InventoryTable({ data, loading }: InventoryTableProps) {
       },
       {
         accessorKey: 'inventory_value',
-        header: 'Inventory Value',
+        header: 'Value',
+        meta: { align: 'right' },
         cell: ({ row }) => {
           const value = row.getValue('inventory_value') as number;
           return (
             <div className="text-right">
-              {value ? <NumericCell value={value} format="currency" /> : <span className="text-[var(--color-text-muted)]">—</span>}
+              {value ? <NumericCell value={value} format="currency" /> : <span className="text-[var(--color-text-secondary)]">—</span>}
             </div>
           );
         },
@@ -133,7 +139,7 @@ export function InventoryTable({ data, loading }: InventoryTableProps) {
       stickyHeader
       striped
       emptyState={{
-        icon: <Package className="w-12 h-12 text-[var(--color-text-muted)]" />,
+        icon: <Package className="w-12 h-12 text-[var(--color-text-secondary)]" />,
         title: 'No inventory data yet',
         description: 'Upload packing lists and sales reports to track inventory',
       }}

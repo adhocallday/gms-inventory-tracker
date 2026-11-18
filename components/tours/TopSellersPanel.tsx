@@ -40,9 +40,9 @@ export default function TopSellersPanel({ tourId, topSellers, productMap }: TopS
   };
 
   return (
-    <section className="g-card p-6">
+    <section className="g-card p-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold g-title">Top sellers</h2>
+        <h2 className="text-base font-semibold">Top sellers</h2>
         <Link
           href={`/upload?docType=sales-report&tourId=${tourId}`}
           className="text-sm font-medium g-link"
@@ -52,8 +52,8 @@ export default function TopSellersPanel({ tourId, topSellers, productMap }: TopS
       </div>
       <div className="mt-4 space-y-4">
         {visibleSellers.length === 0 ? (
-          <p className="text-sm text-[var(--color-text-muted)]">
-            No sales data yet. Upload a sales report to populate insights.
+          <p className="text-sm text-[var(--color-text-secondary)]">
+            No sales posted yet. Upload a sales report to see top sellers.
           </p>
         ) : (
           <>
@@ -63,15 +63,15 @@ export default function TopSellersPanel({ tourId, topSellers, productMap }: TopS
                 <Link
                   key={`${row.product_id}-${row.size}`}
                   href={`/products/${row.product_id}`}
-                  className="block border border-[var(--color-bg-border)] rounded-md p-3 hover:border-[var(--color-red-primary)] transition"
+                  className="block border border-[var(--color-bg-border)] rounded-md p-3 transition-colors hover:bg-[var(--color-bg-elevated)]"
                 >
                   <p className="text-sm font-semibold">
                     {product?.sku ?? 'SKU'} · {row.size}
                   </p>
-                  <p className="text-xs text-[var(--color-text-muted)]">
-                    {product?.description ?? 'Description pending'}
+                  <p className="text-xs text-[var(--color-text-secondary)]">
+                    {product?.description ?? 'No description'}
                   </p>
-                  <div className="flex items-center justify-between text-sm text-[var(--color-text-secondary)] mt-2">
+                  <div className="flex items-center justify-between text-sm text-[var(--color-text-secondary)] mt-2 tabular-nums">
                     <span>{formatNumber(Number(row.total_sold ?? 0))} sold</span>
                     <span className="font-medium text-[var(--color-text-primary)]">
                       {currencyFormatter.format(Number(row.total_gross ?? 0))}
@@ -84,7 +84,7 @@ export default function TopSellersPanel({ tourId, topSellers, productMap }: TopS
             {canLoadMore && (
               <button
                 onClick={handleLoadMore}
-                className="w-full py-2 rounded-lg border border-[var(--color-bg-border)] hover:border-[var(--color-red-primary)] text-sm transition"
+                className="w-full py-2 rounded-md border border-[var(--color-bg-border)] text-sm font-medium transition-colors hover:bg-[var(--color-bg-elevated)]"
               >
                 Load more ({topSellers.length - visibleCount} remaining)
               </button>

@@ -33,65 +33,82 @@ export default function ProductGrid({ tourId, products }: ProductGridProps) {
   };
 
   return (
-    <section className="space-y-4">
+    <section className="mt-10 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold g-title">Products</h2>
-        <div className="flex gap-3 text-xs uppercase tracking-[0.3em] text-[var(--color-text-muted)]">
-          <Link
-            href={`/tours/${tourId}/inventory`}
-            className="g-link px-3 py-1 border border-[var(--color-bg-border)] rounded-full hover:border-[var(--color-text-muted)]"
-          >
+        <h2 className="text-lg font-semibold">Products</h2>
+        <div className="flex gap-2 text-sm">
+          <Link href={`/tours/${tourId}/inventory`} className="g-link rounded-md px-2 py-1 hover:bg-[var(--color-bg-elevated)]">
             Inventory
           </Link>
-          <Link
-            href={`/tours/${tourId}/cogs`}
-            className="g-link px-3 py-1 border border-[var(--color-bg-border)] rounded-full hover:border-[var(--color-text-muted)]"
-          >
+          <Link href={`/tours/${tourId}/cogs`} className="g-link rounded-md px-2 py-1 hover:bg-[var(--color-bg-elevated)]">
             COGS
           </Link>
         </div>
       </div>
 
-      <div className="g-card">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {visibleProducts.map((product) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {visibleProducts.map((product) => {
+          const margin = marginPercent(product);
+          const noStock = product.balance !== null && product.balance < 0;
+          return (
             <Link
               key={`${product.product_id}:${product.size ?? 'os'}`}
               href={`/products/${product.product_id}`}
-              className="block space-y-2 bg-[var(--color-bg-elevated)] p-4 rounded-lg border border-[var(--color-bg-border)] hover:border-[var(--color-red-hover)] transition"
+              className="block rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] p-4 transition-colors hover:border-[var(--color-text-muted)]"
             >
-              <div className="text-xs text-[var(--color-text-muted)]">{product.size ?? 'One-Size'}</div>
-              <div className="font-mono text-sm text-[var(--color-red-primary)]">{product.sku}</div>
-              <p className="text-sm text-[var(--color-text-primary)]">{product.description}</p>
-              <div className="flex justify-between text-xs text-[var(--color-text-muted)]">
-                <span>Sold: {product.total_sold?.toLocaleString()}</span>
-                <span>
-                  Value: {product.unit_value ? `$${product.unit_value.toFixed(2)}` : '--'}
-                </span>
+              <div className="flex items-baseline justify-between gap-3">
+                <span className="font-mono text-sm text-[var(--color-text-primary)]">{product.sku}</span>
+                <span className="text-xs font-medium text-[var(--color-text-secondary)]">{product.size ?? 'One size'}</span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-[var(--color-text-primary)]">
-                  Margin: {product.gross_margin ? `${product.gross_margin.toFixed(0)}%` : '--'}
-                </span>
-                <span className="text-xs text-[var(--color-text-muted)]">
-                  Balance: {product.balance?.toLocaleString() ?? '0'}
-                </span>
-              </div>
+              <p className="mt-1 text-sm text-[var(--color-text-primary)] line-clamp-2">{product.description}</p>
+              <dl className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                <div>
+                  <dt className="text-[var(--color-text-secondary)]">Sold</dt>
+                  <dd className="mt-0.5 text-sm font-medium tabular-nums">{product.total_sold.toLocaleString()}</dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--color-text-secondary)]">Margin</dt>
+                  <dd className="mt-0.5 text-sm font-medium tabular-nums" title={margin === null ? 'No unit cost recorded' : undefined}>
+                    {margin === null ? '—' : `${margin.toFixed(0)}%`}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-[var(--color-text-secondary)]">On hand</dt>
+                  <dd className="mt-0.5 text-sm font-medium tabular-nums">
+                    {product.balance === null ? '—' : product.balance.toLocaleString()}
+                  </dd>
+                </div>
+              </dl>
+              {noStock && (
+                <p className="mt-2 text-xs text-[var(--color-text-secondary)]">No received stock recorded for this size</p>
+              )}
             </Link>
-          ))}
-        </div>
-
-        {canLoadMore && (
-          <div className="flex justify-center mt-6">
-            <button
-              className="px-4 py-2 rounded-full border border-[var(--color-bg-border)] text-sm hover:border-[var(--color-text-muted)] hover:bg-[var(--color-bg-elevated)] transition"
-              onClick={handleLoadMore}
-            >
-              Load more products
-            </button>
-          </div>
-        )}
+          );
+        })}
       </div>
+
+      {canLoadMore && (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            className="rounded-md border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] px-4 py-2 text-sm font-medium hover:bg-[var(--color-bg-elevated)]"
+            onClick={handleLoadMore}
+          >
+            Show more products ({products.length - visibleCount} more)
+          </button>
+        </div>
+      )}
     </section>
   );
+}
+
+/**
+ * gross_margin from product_summary_view is a dollar amount
+ * (gross - units sold x full package cost), not a percentage. Margin % is
+ * that over gross, and only meaningful when a unit cost is recorded.
+ */
+function marginPercent(product: ProductCardData): number | null {
+  if (product.full_package_cost === null || product.gross_margin === null) return null;
+  if (!product.total_gross) return null;
+  return (Number(product.gross_margin) / Number(product.total_gross)) * 100;
 }

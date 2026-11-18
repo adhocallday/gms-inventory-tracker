@@ -1,6 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+import { Badge } from '@/components/ui/Badge';
+import { buttonVariants } from '@/components/ui/Button';
+
+const DOC_LABELS: Record<string, string> = {
+  po: 'Purchase order',
+  'packing-list': 'Packing list',
+  packing_list: 'Packing list',
+  'sales-report': 'Sales report',
+  sales_report: 'Sales report',
+  settlement: 'Settlement',
+};
 import { useMemo, useState } from 'react';
 
 type ParsedDocumentRow = {
@@ -68,11 +79,11 @@ export function NeedsReviewPanel({ documents }: { documents: ParsedDocumentRow[]
   }
 
   return (
-    <section className="g-card p-6">
+    <section className="g-card p-5">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold g-title">Needs Review</h2>
-          <p className="text-sm text-[var(--color-text-muted)]">
+          <h2 className="text-base font-semibold">Needs review</h2>
+          <p className="text-sm text-[var(--color-text-secondary)]">
             Drafts and documents with parsing errors.
           </p>
         </div>
@@ -83,7 +94,7 @@ export function NeedsReviewPanel({ documents }: { documents: ParsedDocumentRow[]
 
       <div className="mt-4 space-y-3">
         {visibleDocs.length === 0 ? (
-          <div className="text-sm text-[var(--color-text-muted)]">
+          <div className="text-sm text-[var(--color-text-secondary)]">
             No documents waiting for review.
           </div>
         ) : (
@@ -94,28 +105,28 @@ export function NeedsReviewPanel({ documents }: { documents: ParsedDocumentRow[]
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold">{doc.doc_type}</p>
-                  <p className="text-xs text-[var(--color-text-muted)]">
+                  <p className="text-sm font-semibold">{DOC_LABELS[doc.doc_type] ?? doc.doc_type}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)] break-all">
                     {doc.source_filename ?? 'Unnamed file'} · {formatDate(doc.updated_at)}
                   </p>
                 </div>
-                <span className="g-kicker text-[10px]">{doc.status}</span>
+                <Badge variant={(doc.status as never) ?? 'default'} size="sm">{doc.status}</Badge>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Link href={`/review/${doc.id}`} className="g-button g-button-outline text-xs">
+                <Link href={`/dashboard/parsed-documents/${doc.id}`} className={buttonVariants({ variant: 'secondary', size: 'sm' })}>
                   Review
                 </Link>
                 <button
                   type="button"
-                  className="g-button text-xs"
+                  className={buttonVariants({ size: 'sm' })}
                   onClick={() => handlePost(doc.id)}
                   disabled={busyId === doc.id}
                 >
-                  Approve &amp; Post
+                  Approve and post
                 </button>
                 <button
                   type="button"
-                  className="g-button g-button-outline text-xs"
+                  className={buttonVariants({ variant: 'ghost', size: 'sm' })}
                   onClick={() => handleReject(doc.id)}
                   disabled={busyId === doc.id}
                 >

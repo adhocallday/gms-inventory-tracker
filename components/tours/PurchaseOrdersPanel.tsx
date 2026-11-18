@@ -1,5 +1,7 @@
 'use client';
 
+import { formatDate as formatDay } from '@/lib/format';
+import { Badge } from '@/components/ui/Badge';
 import { useMemo, useState } from 'react';
 
 interface PurchaseOrderRow {
@@ -23,12 +25,6 @@ interface OpenQtyRow {
   open_quantity: number;
 }
 
-const dateFormatter = new Intl.DateTimeFormat('en-US', {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric'
-});
-
 const moneyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
@@ -36,8 +32,8 @@ const moneyFormatter = new Intl.NumberFormat('en-US', {
 });
 
 function formatDate(value?: string | null) {
-  if (!value) return 'TBD';
-  return dateFormatter.format(new Date(value));
+  // Date-only values format in UTC so they do not shift a day early.
+  return formatDay(value, undefined, 'not set');
 }
 
 const INITIAL_COUNT = 5;
@@ -93,11 +89,11 @@ export function PurchaseOrdersPanel({
   };
 
   return (
-    <section className="g-card p-6">
+    <section className="g-card p-5">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h2 className="text-lg font-semibold g-title">Purchase Orders</h2>
-          <p className="text-sm text-[var(--color-text-muted)]">
+          <h2 className="text-base font-semibold">Purchase orders</h2>
+          <p className="text-sm text-[var(--color-text-secondary)]">
             Track ordered vs received inventory by SKU.
           </p>
         </div>
@@ -135,7 +131,7 @@ export function PurchaseOrdersPanel({
 
       <div className="mt-4 space-y-3">
         {filteredOrders.length === 0 ? (
-          <div className="text-sm text-[var(--color-text-muted)]">
+          <div className="text-sm text-[var(--color-text-secondary)]">
             No purchase orders match the current filters.
           </div>
         ) : (
@@ -149,7 +145,8 @@ export function PurchaseOrdersPanel({
               >
                 <button
                   type="button"
-                  className="w-full text-left p-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
+                  className="w-full text-left p-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between hover:bg-[var(--color-bg-elevated)]"
+                  aria-expanded={!!isOpen}
                   onClick={() =>
                     setExpanded((prev) => ({
                       ...prev,
@@ -159,17 +156,17 @@ export function PurchaseOrdersPanel({
                 >
                   <div>
                     <p className="text-sm font-semibold">{po.po_number}</p>
-                    <p className="text-xs text-[var(--color-text-muted)]">
+                    <p className="text-xs text-[var(--color-text-secondary)]">
                       {po.vendor} · Ordered {formatDate(po.order_date)} · ETA{' '}
                       {formatDate(po.expected_delivery)}
                     </p>
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-[var(--color-text-muted)]">
-                    <span className="uppercase tracking-wide">{po.status}</span>
+                  <div className="flex items-center gap-4 text-xs text-[var(--color-text-secondary)] tabular-nums">
+                    <Badge variant={(po.status as never) ?? 'default'} size="sm">{po.status}</Badge>
                     <span>
                       {po.total_amount
                         ? moneyFormatter.format(po.total_amount)
-                        : 'Total TBD'}
+                        : 'No total'}
                     </span>
                     <span>{rows.length} SKUs</span>
                   </div>
@@ -179,11 +176,11 @@ export function PurchaseOrdersPanel({
                     <table className="min-w-full text-sm g-table mt-3">
                       <thead>
                         <tr>
-                          <th className="text-left py-2">SKU</th>
-                          <th className="text-left py-2">Size</th>
-                          <th className="text-right py-2">Ordered</th>
-                          <th className="text-right py-2">Received</th>
-                          <th className="text-right py-2">Open</th>
+                          <th className="text-left py-2 text-xs font-semibold text-[var(--color-text-secondary)]">SKU</th>
+                          <th className="text-left py-2 text-xs font-semibold text-[var(--color-text-secondary)]">Size</th>
+                          <th className="text-right py-2 text-xs font-semibold text-[var(--color-text-secondary)]">Ordered</th>
+                          <th className="text-right py-2 text-xs font-semibold text-[var(--color-text-secondary)]">Received</th>
+                          <th className="text-right py-2 text-xs font-semibold text-[var(--color-text-secondary)]">Open</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -191,7 +188,7 @@ export function PurchaseOrdersPanel({
                           <tr key={row.po_line_item_id} className="border-t border-[var(--color-bg-border)]">
                             <td className="py-2">
                               <div className="font-semibold">{row.sku}</div>
-                              <div className="text-xs text-[var(--color-text-muted)]">
+                              <div className="text-xs text-[var(--color-text-secondary)]">
                                 {row.description}
                               </div>
                             </td>
@@ -215,7 +212,7 @@ export function PurchaseOrdersPanel({
             <button
               type="button"
               onClick={handleLoadMore}
-              className="px-4 py-2 rounded-full border border-[var(--color-bg-border)] text-sm hover:bg-[var(--color-bg-elevated)] transition"
+              className="px-4 py-2 rounded-md border border-[var(--color-bg-border)] text-sm font-medium hover:bg-[var(--color-bg-elevated)]"
             >
               Load more ({filteredOrders.length - visibleCount} remaining)
             </button>
