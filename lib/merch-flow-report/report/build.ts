@@ -1,25 +1,19 @@
-import { defaultAccent } from './palette';
+import type { TrackerData } from '../parse/tracker';
+import type { PopItem } from '../parse/pop';
+import { gms } from '../brand/tokens';
 import {
   FULL_SECTIONS,
   DEFAULT_OPTIONS,
   type Product,
   type TourReport,
-  type TrackerData,
   type SectionId,
   type ReportOptions,
   type Category,
 } from './types';
 
-/** A product photo source: a POP file in the Charts app, a product image here. */
-export type PhotoSource = {
-  sku: string;
-  itemName: string;
-  imageKey?: string;
-};
-
 export type MatchRow = {
   sku: string;
-  /** Canonical name, from the tracker / database. Absent for a photo with no sales row. */
+  /** Canonical name, from the tracker. Absent for a POP with no tracker row. */
   trackerName?: string;
   popName?: string;
   unitsSold?: number;
@@ -35,35 +29,35 @@ export type MatchRow = {
  * Builds the review table the operator confirms before anything is rendered.
  *
  * Two failure modes are real and both are surfaced rather than swallowed: a
- * product with no photo, and a photo for an item that never made this tour's
- * inventory.
+ * tracker product with no photo, and a POP file for an item that never made
+ * this tour's inventory.
  */
-export function buildMatchRows(products: Product[], photos: PhotoSource[]): MatchRow[] {
-  const photoBySku = new Map(photos.map((p) => [p.sku, p]));
-  const productSkus = new Set(products.map((p) => p.sku));
+export function buildMatchRows(
+  products: Product[],
+  pops: (PopItem & { imageKey?: string })[],
+): MatchRow[] {
+  const popBySku = new Map(pops.map((p) => [p.sku, p]));
   const rows: MatchRow[] = [];
 
   for (const product of products) {
-    const photo = photoBySku.get(product.sku);
+    const pop = popBySku.get(product.sku);
     rows.push({
       sku: product.sku,
       trackerName: product.name,
-      popName: photo?.itemName,
+      popName: pop?.itemName,
       unitsSold: product.unitsSold,
       shareOfGross: product.shareOfGross,
-      imageKey: photo?.imageKey,
-      displayName: product.displayName,
-      category: product.category,
-      status: photo?.imageKey ? 'matched' : 'noImage',
+      imageKey: pop?.imageKey,
+      status: pop?.imageKey ? 'matched' : 'noImage',
     });
   }
 
-  for (const photo of photos) {
-    if (productSkus.has(photo.sku)) continue;
+  for (const pop of pops) {
+    if (products.some((p) => p.sku === pop.sku)) continue;
     rows.push({
-      sku: photo.sku,
-      popName: photo.itemName,
-      imageKey: photo.imageKey,
+      sku: pop.sku,
+      popName: pop.itemName,
+      imageKey: pop.imageKey,
       status: 'noSalesData',
     });
   }
@@ -87,7 +81,7 @@ export function buildReport(input: {
   artistAccent?: string;
   artistLogoKey?: string;
   sections?: SectionId[];
-  /** Applied city spellings, keyed on the stored value. */
+  /** Applied city spellings, keyed on the tracker value. */
   cityOverrides?: Record<string, string>;
   options?: ReportOptions;
 }): TourReport {
@@ -106,8 +100,8 @@ export function buildReport(input: {
       ...p,
       imageKey: imageBySku.get(p.sku),
       popName: popNameBySku.get(p.sku),
-      displayName: editsBySku.get(p.sku)?.displayName ?? p.displayName,
-      category: editsBySku.get(p.sku)?.category ?? p.category,
+      displayName: editsBySku.get(p.sku)?.displayName,
+      category: editsBySku.get(p.sku)?.category,
     }))
     .sort((a, b) => b.unitsSold - a.unitsSold);
 
@@ -123,7 +117,7 @@ export function buildReport(input: {
     }),
     branding: {
       artistLogoKey: input.artistLogoKey,
-      artistAccent: input.artistAccent || defaultAccent,
+      artistAccent: input.artistAccent || gms.red,
     },
     sections: input.sections ?? DEFAULT_SECTIONS,
     options: input.options ?? DEFAULT_OPTIONS,

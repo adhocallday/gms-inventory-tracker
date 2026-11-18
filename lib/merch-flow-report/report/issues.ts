@@ -1,23 +1,18 @@
 import type { Show } from './types';
 import type { MatchRow } from './build';
 import { titleCase, cleanName } from './derive';
-import { shortDate } from './format';
-import { PER_HEAD_SUSPECT_BELOW, TOP_N, resolveConfig, type MerchFlowOptions } from './config';
+import { shortDate } from '../format';
 
 /**
  * Things worth a human look before publishing.
  *
  * Every issue is a suggestion with an explicit action — nothing is corrected
  * on the operator's behalf. A tour that genuinely started early is not an
- * error, and a product spelled oddly may be spelled that way on purpose.
+ * error, and a product the tracker spells oddly may be spelled that way on
+ * purpose.
  */
 
-export type IssueKind =
-  | 'missingPhoto'
-  | 'outsideRange'
-  | 'perHeadSuspect'
-  | 'missingAttendance'
-  | 'spelling';
+export type IssueKind = 'missingPhoto' | 'outsideRange' | 'perHeadSuspect' | 'spelling';
 
 export type Issue = {
   kind: IssueKind;
@@ -27,48 +22,52 @@ export type Issue = {
   action?: string;
 };
 
-export function citySuggestions(
-  shows: Show[],
-  options?: MerchFlowOptions,
-): { from: string; to: string }[] {
-  const { cityTypos } = resolveConfig(options);
+const PER_HEAD_SUSPECT_BELOW = 5;
+const TOP_N = 10;
+
+export const CITY_TYPOS: Record<string, string> = {
+  HUNTSVILE: 'Huntsville',
+  'VIRGINA BEACH': 'Virginia Beach',
+};
+
+/** Product-name typos worth offering, keyed on the tracker's own spelling. */
+export const NAME_TYPOS: Record<string, string> = {
+  CAPTIANS: 'Captains',
+};
+
+export function citySuggestions(shows: Show[]): { from: string; to: string }[] {
   const seen = new Map<string, string>();
   for (const show of shows) {
-    const fix = cityTypos[show.city.trim().toUpperCase()];
+    const key = show.city.trim().toUpperCase();
+    const fix = CITY_TYPOS[key];
     if (fix && !seen.has(show.city)) seen.set(show.city, fix);
   }
-  return Array.from(seen, ([from, to]) => ({ from, to }));
+  return [...seen].map(([from, to]) => ({ from, to }));
 }
 
-export function nameSuggestions(
-  rows: MatchRow[],
-  options?: MerchFlowOptions,
-): { from: string; to: string }[] {
-  const { nameTypos } = resolveConfig(options);
+export function nameSuggestions(rows: MatchRow[]): { from: string; to: string }[] {
   const out: { from: string; to: string }[] = [];
   for (const row of rows) {
     const name = row.trackerName;
     if (!name) continue;
-    for (const [wrong, right] of Object.entries(nameTypos)) {
+    for (const [wrong, right] of Object.entries(NAME_TYPOS)) {
       if (new RegExp(`\\b${wrong}\\b`, 'i').test(name)) {
         out.push({ from: wrong, to: right });
       }
     }
   }
   // One entry per distinct correction.
-  return Array.from(new Map(out.map((o) => [o.from, o])).values());
+  return [...new Map(out.map((o) => [o.from, o])).values()];
 }
 
 export function findIssues({
   rows,
   shows,
   tourStart,
-  options,
 }: {
   rows: MatchRow[];
   shows: Show[];
   tourStart?: string;
-  options?: MerchFlowOptions;
 }): Issue[] {
   const issues: Issue[] = [];
 
@@ -88,7 +87,7 @@ export function findIssues({
       detail: topWithoutPhoto
         .map(
           ({ row, rank }) =>
-            `${row.displayName ?? cleanName(row.trackerName ?? row.sku, options).display} (#${rank})`,
+            `${row.displayName ?? cleanName(row.trackerName ?? row.sku).display} (#${rank})`,
         )
         .join(', '),
       action: 'Add photos',
@@ -100,7 +99,7 @@ export function findIssues({
     issues.push({
       kind: 'outsideRange',
       title: `${outside.length} show${outside.length === 1 ? ' is' : 's are'} outside the main tour leg`,
-      detail: outside.map((s) => `${titleCase(s.city, options)} (${shortDate(s.date)})`).join(', '),
+      detail: outside.map((s) => `${titleCase(s.city)} (${shortDate(s.date)})`).join(', '),
     });
   }
 
@@ -110,24 +109,12 @@ export function findIssues({
   for (const show of suspect) {
     issues.push({
       kind: 'perHeadSuspect',
-      title: `${titleCase(show.city, options)} spend per head is $${(show.perHeadUsd ?? 0).toFixed(2)}`,
-      detail: `Implies a crowd of ${Math.round(show.grossUsd / (show.perHeadUsd || 1)).toLocaleString('en-US')}, which looks like an attendance entry error.`,
+      title: `${titleCase(show.city)} spend per head is $${(show.perHeadUsd ?? 0).toFixed(2)}`,
+      detail: `Implies a crowd of ${Math.round(show.grossUsd / (show.perHeadUsd || 1)).toLocaleString('en-US')}, which looks like an attendance entry error in the tracker.`,
     });
   }
 
-  const noHeads = shows.filter((s) => typeof s.perHeadUsd !== 'number');
-  if (noHeads.length) {
-    issues.push({
-      kind: 'missingAttendance',
-      title: `${noHeads.length} of ${shows.length} show${shows.length === 1 ? '' : 's'} ${noHeads.length === 1 ? 'has' : 'have'} no attendance`,
-      detail: `Per head and 1-in-N figures leave these out: ${noHeads
-        .map((s) => `${titleCase(s.city, options)} (${shortDate(s.date)})`)
-        .join(', ')}.`,
-      action: 'Enter attendance',
-    });
-  }
-
-  const spelling = [...citySuggestions(shows, options), ...nameSuggestions(rows, options)];
+  const spelling = [...citySuggestions(shows), ...nameSuggestions(rows)];
   if (spelling.length) {
     issues.push({
       kind: 'spelling',

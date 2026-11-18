@@ -630,3 +630,21 @@ dialog.mf-tour-menu::backdrop { background: rgba(17, 18, 20, 0.45); }
 .mf-flow svg .flow.thin { stroke-width: 1.6; }
 .mf-flow svg .lane { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; fill: var(--muted); }
 .mf-flow svg .tag { font-size: 10.5px; fill: var(--auto); font-weight: 600; }
+
+/*
+ * MerchFlow Charts' report dashboard (components/merch-flow-report, vendored).
+ * It is light-only, as in Charts, so its text colour and scheme are pinned
+ * here rather than following the tracker theme.
+ */
+.mf-report {
+  --font-display: "MADE TOMMY", var(--font-sans);
+  color: #1d1c1d;
+  color-scheme: light;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tabular figures where numbers are compared down a column (Charts' .tnum). */
+.tnum {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}

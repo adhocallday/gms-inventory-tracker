@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/client';
-import { loadTourReport } from '@/lib/reporting/merch-flow/from-db';
+import { loadTourData } from '@/lib/reporting/merch-flow/from-db';
 import { LINK_SECRET_HEADER, isValidLinkSecret } from '@/lib/http/link-secret';
 
 export const runtime = 'nodejs';
@@ -11,8 +11,9 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /**
  * GET /api/tours/[id]/merch-flow-data
  *
- * The tour's TrackerData (the shape MerchFlow Charts' wizard takes), built from
- * the database by lib/reporting/merch-flow/from-db.ts. Server-to-server only:
+ * The tour's TrackerData (the shape MerchFlow Charts' wizard takes, read by
+ * Charts' lib/report/from-tracker-link.ts), built from the database by
+ * lib/reporting/merch-flow/from-db.ts. Server-to-server only:
  * requires the `x-merchflow-link` header to equal MERCHFLOW_LINK_SECRET.
  */
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 
   try {
-    const data = await loadTourReport(createServiceClient(), tourId);
+    const data = await loadTourData(createServiceClient(), tourId);
     if (!data) return NextResponse.json({ error: 'Tour not found' }, { status: 404 });
 
     return NextResponse.json(

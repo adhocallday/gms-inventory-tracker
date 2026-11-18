@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mapTourData, categoryFromDb, type RawTourData } from './from-db';
+import { mapTourData, assembleReport, type RawTourData } from './from-db';
 
 const tp = (
   id: string,
@@ -71,7 +71,7 @@ describe('mapTourData', () => {
   const result = mapTourData(raw);
   const { tracker } = result;
 
-  it('rolls sizes up to one product per SKU with units, gross and share', () => {
+  it('rolls sizes up to one product per SKU with units and share of gross', () => {
     expect(tracker.products.map((p) => p.sku)).toEqual([
       'MOCKRX203225BK',
       'MOCKRX303217BK',
@@ -80,9 +80,18 @@ describe('mapTourData', () => {
     const tee = tracker.products[0];
     expect(tee.name).toBe('BLACK MOCK ITIN TEE');
     expect(tee.unitsSold).toBe(85);
-    expect(tee.grossUsd).toBe(3200);
     expect(tee.shareOfGross).toBeCloseTo(3200 / 4500, 10);
     expect(tracker.products.reduce((s, p) => s + p.shareOfGross, 0)).toBeCloseTo(1, 10);
+  });
+
+  it("emits only the fields Charts' TrackerData declares", () => {
+    expect(Object.keys(tracker).sort()).toEqual(['artist', 'attendance', 'products', 'shows', 'tourDates']);
+    for (const p of tracker.products) {
+      expect(Object.keys(p).sort()).toEqual(['name', 'shareOfGross', 'sku', 'unitCost', 'unitsSold']);
+    }
+    for (const s of tracker.shows) {
+      expect(Object.keys(s).sort()).toEqual(['city', 'date', 'grossUsd', 'perHeadUsd']);
+    }
   });
 
   it('weights unit cost by units sold across sizes', () => {
@@ -92,36 +101,14 @@ describe('mapTourData', () => {
     expect(tracker.products[2].unitCost).toBe(2);
   });
 
-  it('uses the DB category when it maps, else infers from the name', () => {
-    expect(tracker.products[0].category).toBe('Tees');
-    expect(tracker.products[1].category).toBe('Headwear');
-    // "Apparel" is too generic; "MOCK POSTER" falls back to the SKU class (1xx) -> Accessories.
-    expect(tracker.products[2].category).toBe('Accessories');
-  });
-
-  it('sums comps per product and for the tour', () => {
-    expect(tracker.products[0].compUnits).toBe(5);
-    expect(tracker.products[1].compUnits).toBeUndefined();
-    expect(result.totalComps).toBe(5);
-  });
-
   it('maps shows in date order and drops shows with no sales', () => {
     expect(tracker.shows).toEqual([
-      { date: '2026-07-01', city: 'Arena A', grossUsd: 1500, attendance: undefined, perHeadUsd: undefined },
-      { date: '2026-07-03', city: 'DENVER', grossUsd: 3000, attendance: 100, perHeadUsd: 30 },
+      { date: '2026-07-01', city: 'Arena A', grossUsd: 1500, perHeadUsd: undefined },
+      { date: '2026-07-03', city: 'DENVER', grossUsd: 3000, perHeadUsd: 30 },
     ]);
     expect(tracker.attendance).toBe(100);
     expect(tracker.artist).toBe('Mock Artist');
     expect(tracker.tourDates).toBe('Jul 1, 2026 – Jul 31, 2026');
-  });
-
-  it('counts units only at shows with attendance for ratios', () => {
-    // s3 has attendance but no sales; s2 is the only counted show with sales.
-    expect(result.unitsAtCountedShows).toEqual({
-      MOCKRX203225BK: 55,
-      MOCKRX303217BK: 20,
-      MOCKRX103218BK: 20,
-    });
   });
 
   it('keeps one photo per SKU', () => {
@@ -131,12 +118,12 @@ describe('mapTourData', () => {
   });
 
   it('reports the data gaps', () => {
-    expect(result.gaps.map((g) => g.field)).toEqual(['sales', 'gross', 'attendance', 'category', 'cost']);
+    expect(result.gaps.map((g) => g.field)).toEqual(['sales', 'gross', 'attendance', 'cost', 'comps']);
     expect(result.gaps[0].message).toContain('1 show has no sales posted');
     expect(result.gaps[1].message).toContain('1 of 7 sales lines with units have no gross_sales');
     expect(result.gaps[2].message).toContain('1 of 2 reported shows');
-    expect(result.gaps[3].message).toContain('2 products have');
-    expect(result.gaps[4].message).toContain('1 selling product has');
+    expect(result.gaps[3].message).toContain('1 selling product has');
+    expect(result.gaps[4].message).toContain('5 comped units are not in units sold');
   });
 
   it('accepts embeds typed as arrays', () => {
@@ -144,12 +131,7 @@ describe('mapTourData', () => {
       ...raw,
       tourProducts: raw.tourProducts.map((row) => {
         const product = Array.isArray(row.product) ? row.product[0] : row.product;
-        return {
-          ...row,
-          product: product
-            ? [{ ...product, category: Array.isArray(product.category) || !product.category ? product.category : [product.category] }]
-            : null,
-        };
+        return { ...row, product: product ? [product] : null };
       }),
     });
     expect(arrayShaped.tracker).toEqual(tracker);
@@ -164,12 +146,24 @@ describe('mapTourData', () => {
   });
 });
 
-describe('categoryFromDb', () => {
-  it('maps recognisable names and leaves generic ones alone', () => {
-    expect(categoryFromDb('Hoodies')).toBe('Hoodies & jerseys');
-    expect(categoryFromDb('Event Tees')).toBe('Tees');
-    expect(categoryFromDb('Accessories')).toBe('Accessories');
-    expect(categoryFromDb('Apparel')).toBeUndefined();
-    expect(categoryFromDb(null)).toBeUndefined();
+describe('assembleReport', () => {
+  const { tracker, photos } = mapTourData(raw);
+  const { report, imageUrls } = assembleReport('Mock Tour', tracker, photos);
+
+  it('moves photos out of the report into imageUrls keyed by SKU, as Charts publishes', () => {
+    expect(imageUrls).toEqual({ MOCKRX303217BK: 'https://img/cap.png' });
+    expect(report.products.every((p) => p.imageKey === undefined)).toBe(true);
+  });
+
+  it("uses the Charts wizard's defaults", () => {
+    expect(report.tourName).toBe('Mock Tour');
+    expect(report.artist).toBe('Mock Artist');
+    expect(report.branding.artistAccent).toBe('#E8003D');
+    expect(report.options.perHead).toBe('meanOfShows');
+    expect(report.sections).toContain('dataCheck');
+  });
+
+  it('falls back to the artist for an unnamed tour, as tracker-link.ts does', () => {
+    expect(assembleReport('', tracker).report.tourName).toBe('Mock Artist');
   });
 });
