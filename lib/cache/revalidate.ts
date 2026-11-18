@@ -4,5 +4,7 @@ import { revalidatePath } from 'next/cache';
 export function revalidateDashboards(tourId?: string | null) {
   revalidatePath('/');
   revalidatePath('/admin');
-  if (tourId) revalidatePath(`/tours/${tourId}`);
+  // 'layout' also refreshes every page under the tour: shows, inventory, reports.
+  if (tourId) revalidatePath(`/tours/${tourId}`, 'layout');
+  revalidatePath('/products/[id]', 'page');
 }

@@ -4,7 +4,8 @@ import { createServiceClient } from '@/lib/supabase/client';
 import { ProductSalesTable } from '@/components/products/ProductSalesTable';
 import { ArrowLeft } from 'lucide-react';
 
-export const revalidate = 0;
+// Cached for 30s; posting a document refreshes it immediately (lib/cache/revalidate.ts)
+export const revalidate = 30;
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',

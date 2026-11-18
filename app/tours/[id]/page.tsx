@@ -98,8 +98,8 @@ type ForecastOverrideRow = {
   override_units: number | null;
 };
 
-// Force dynamic rendering to always fetch fresh data
-export const revalidate = 0;
+// Cached for 30s; posting a document refreshes it immediately (lib/cache/revalidate.ts)
+export const revalidate = 30;
 
 export default async function TourDetailPage({ params }: TourDetailParams) {
   const supabase = createServiceClient();

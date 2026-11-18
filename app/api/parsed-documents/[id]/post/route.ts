@@ -10,6 +10,7 @@ export async function POST(
   try {
     const supabase = createServiceClient();
     const { updated, receipt } = await postParsedDocument(supabase, params.id);
+    revalidateDashboards(updated?.tour_id);
 
     return NextResponse.json({ data: updated, receipt });
   } catch (error: any) {

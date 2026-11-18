@@ -14,75 +14,97 @@ function guessProductType(size?: string) {
   return 'other';
 }
 
-async function getOrCreateProduct(
-  supabase: ReturnType<typeof createServiceClient>,
-  sku: string,
-  description?: string,
-  size?: string
-) {
-  const { data: existing } = await supabase
-    .from('products')
-    .select('id, description')
-    .eq('sku', sku)
-    .maybeSingle();
+type Supabase = ReturnType<typeof createServiceClient>;
 
-  if (existing?.id) {
-    return existing.id;
-  }
+type LineRef = { sku?: string; description?: string; size?: string; unit_cost?: number };
 
-  const productId = crypto.randomUUID();
-  await supabase
-    .from('products')
-    .insert({
-      id: productId,
-      sku,
-      description: description || sku,
-      product_type: guessProductType(size)
-    });
-
-  return productId;
+function lineKey(sku: string, size?: string) {
+  return `${sku}|${normalizeSize(size)}`;
 }
 
-async function getOrCreateTourProduct(
-  supabase: ReturnType<typeof createServiceClient>,
-  tourId: string,
-  productId: string,
-  size?: string,
-  unitCost?: number
-) {
-  const normalizedSize = normalizeSize(size);
-  const { data: existing } = await supabase
-    .from('tour_products')
-    .select('id')
-    .eq('tour_id', tourId)
-    .eq('product_id', productId)
-    .eq('size', normalizedSize)
-    .maybeSingle();
+function check<T>(result: { data: T; error: { message: string } | null }, what: string): T {
+  if (result.error) {
+    throw new Error(`${what}: ${result.error.message}`);
+  }
+  return result.data;
+}
 
-  if (existing?.id) {
-    return existing.id;
+/**
+ * Resolves every line's SKU and size to a tour_product id in a fixed number of
+ * queries, creating missing products and tour_products in bulk.
+ */
+async function resolveTourProducts(supabase: Supabase, tourId: string, lines: LineRef[]) {
+  const withSku = lines.filter((line): line is LineRef & { sku: string } => Boolean(line.sku));
+  const skus = Array.from(new Set(withSku.map((line) => line.sku)));
+  const byKey = new Map<string, string>();
+  if (skus.length === 0) return byKey;
+
+  const productIdBySku = new Map<string, string>();
+  const existingProducts = check(
+    await supabase.from('products').select('id, sku').in('sku', skus),
+    'Loading products'
+  );
+  for (const product of existingProducts ?? []) productIdBySku.set(product.sku, product.id);
+
+  const missingProducts = skus
+    .filter((sku) => !productIdBySku.has(sku))
+    .map((sku) => {
+      const line = withSku.find((candidate) => candidate.sku === sku)!;
+      return {
+        id: crypto.randomUUID(),
+        sku,
+        description: line.description || sku,
+        product_type: guessProductType(line.size)
+      };
+    });
+  if (missingProducts.length > 0) {
+    check(await supabase.from('products').insert(missingProducts), 'Creating products');
+    for (const product of missingProducts) productIdBySku.set(product.sku, product.id);
   }
 
-  const { data: inserted } = await supabase
-    .from('tour_products')
-    .insert({
+  const productIds = Array.from(new Set(productIdBySku.values()));
+  const existingTourProducts = check(
+    await supabase
+      .from('tour_products')
+      .select('id, product_id, size')
+      .eq('tour_id', tourId)
+      .in('product_id', productIds),
+    'Loading tour products'
+  );
+  const skuByProductId = new Map(Array.from(productIdBySku, ([sku, id]) => [id, sku]));
+  for (const tp of existingTourProducts ?? []) {
+    byKey.set(lineKey(skuByProductId.get(tp.product_id)!, tp.size), tp.id);
+  }
+
+  const missingTourProducts = new Map<string, Record<string, unknown>>();
+  for (const line of withSku) {
+    const key = lineKey(line.sku, line.size);
+    if (byKey.has(key) || missingTourProducts.has(key)) continue;
+    missingTourProducts.set(key, {
+      id: crypto.randomUUID(),
       tour_id: tourId,
-      product_id: productId,
-      size: normalizedSize,
-      full_package_cost: unitCost ?? 0,
+      product_id: productIdBySku.get(line.sku),
+      size: normalizeSize(line.size),
+      full_package_cost: line.unit_cost ?? 0,
       blank_unit_cost: 0,
       print_unit_cost: 0,
       suggested_retail: null,
       is_active: true
-    })
-    .select('id')
-    .single();
+    });
+  }
+  if (missingTourProducts.size > 0) {
+    check(
+      await supabase.from('tour_products').insert(Array.from(missingTourProducts.values())),
+      'Creating tour products'
+    );
+    missingTourProducts.forEach((row, key) => byKey.set(key, row.id as string));
+  }
 
-  return inserted?.id as string;
+  return byKey;
 }
 
 async function upsertPurchaseOrder(
-  supabase: ReturnType<typeof createServiceClient>,
+  supabase: Supabase,
   payload: any,
   sourceDocId: string
 ) {
@@ -126,49 +148,30 @@ async function upsertPurchaseOrder(
 }
 
 async function postPurchaseOrder(
-  supabase: ReturnType<typeof createServiceClient>,
+  supabase: Supabase,
   payload: any,
   sourceDocId: string
 ) {
   const poId = await upsertPurchaseOrder(supabase, payload, sourceDocId);
-  const lineItemIds: string[] = [];
+  const lines = (payload.line_items || []).filter((item: any) => item.sku);
+  const tourProducts = await resolveTourProducts(supabase, payload.tour_id, lines);
 
-  for (const item of payload.line_items || []) {
-    if (!item.sku) continue;
-    const productId = await getOrCreateProduct(
-      supabase,
-      item.sku,
-      item.description,
-      item.size
-    );
-    const tourProductId = await getOrCreateTourProduct(
-      supabase,
-      payload.tour_id,
-      productId,
-      item.size,
-      item.unit_cost
-    );
+  const rows = lines.map((item: any) => ({
+    po_id: poId,
+    tour_product_id: tourProducts.get(lineKey(item.sku, item.size)),
+    quantity_ordered: item.quantity_ordered ?? 0,
+    unit_cost: item.unit_cost ?? 0,
+    line_total: item.line_total ?? 0
+  }));
+  const inserted = rows.length
+    ? check(await supabase.from('po_line_items').insert(rows).select('id'), 'Saving PO lines')
+    : [];
 
-    const { data: inserted } = await supabase
-      .from('po_line_items')
-      .insert({
-        po_id: poId,
-        tour_product_id: tourProductId,
-        quantity_ordered: item.quantity_ordered ?? 0,
-        unit_cost: item.unit_cost ?? 0,
-        line_total: item.line_total ?? 0
-      })
-      .select('id')
-      .single();
-
-    if (inserted?.id) lineItemIds.push(inserted.id);
-  }
-
-  return { poId, lineItemIds };
+  return { poId, lineItemIds: (inserted ?? []).map((row: { id: string }) => row.id) };
 }
 
 async function postPackingList(
-  supabase: ReturnType<typeof createServiceClient>,
+  supabase: Supabase,
   payload: any,
   sourceDocId: string
 ) {
@@ -183,7 +186,7 @@ async function postPackingList(
   }
 
   const packingListId = crypto.randomUUID();
-  await supabase.from('packing_lists').insert({
+  const packingListInsert = await supabase.from('packing_lists').insert({
     id: packingListId,
     delivery_number: payload.delivery_number,
     po_id: po.id,
@@ -192,65 +195,66 @@ async function postPackingList(
     received_by: payload.received_by,
     source_doc_id: sourceDocId
   });
+  check(packingListInsert, 'Saving packing list');
 
-  const itemIds: string[] = [];
+  const lines = (payload.line_items || []).filter((item: any) => item.sku);
+  const tourProducts = await resolveTourProducts(supabase, po.tour_id, lines);
 
-  for (const item of payload.line_items || []) {
-    if (!item.sku) continue;
-    const productId = await getOrCreateProduct(
-      supabase,
-      item.sku,
-      item.description,
-      item.size
-    );
-    const tourProductId = await getOrCreateTourProduct(
-      supabase,
-      po.tour_id,
-      productId,
-      item.size
-    );
+  const poLineByTourProduct = new Map<string, string>();
+  const existingPoLines = check(
+    await supabase.from('po_line_items').select('id, tour_product_id').eq('po_id', po.id),
+    'Loading PO lines'
+  );
+  for (const line of existingPoLines ?? []) poLineByTourProduct.set(line.tour_product_id, line.id);
 
-    let { data: poLine } = await supabase
-      .from('po_line_items')
-      .select('id')
-      .eq('po_id', po.id)
-      .eq('tour_product_id', tourProductId)
-      .maybeSingle();
-
-    if (!poLine?.id) {
-      const { data: insertedPoLine } = await supabase
+  // Items received that were never on the PO still get a PO line, at zero ordered.
+  const unorderedIds = Array.from(new Set(
+    lines
+      .map((item: any) => tourProducts.get(lineKey(item.sku, item.size))!)
+      .filter((id: string) => !poLineByTourProduct.has(id))
+  )) as string[];
+  if (unorderedIds.length > 0) {
+    const created = check(
+      await supabase
         .from('po_line_items')
-        .insert({
+        .insert(unorderedIds.map((id) => ({
           po_id: po.id,
-          tour_product_id: tourProductId,
+          tour_product_id: id,
           quantity_ordered: 0,
           unit_cost: 0,
           line_total: 0
-        })
-        .select('id')
-        .single();
-
-      poLine = insertedPoLine ?? null;
-    }
-
-    const { data: insertedItem } = await supabase
-      .from('packing_list_items')
-      .insert({
-        packing_list_id: packingListId,
-        po_line_item_id: poLine?.id,
-        quantity_received: item.quantity_received ?? 0
-      })
-      .select('id')
-      .single();
-
-    if (insertedItem?.id) itemIds.push(insertedItem.id);
+        })))
+        .select('id, tour_product_id'),
+      'Adding unordered PO lines'
+    );
+    for (const line of created ?? []) poLineByTourProduct.set(line.tour_product_id, line.id);
   }
 
-  return { packingListId, itemIds };
+  // One row per PO line: the same SKU and size listed twice on a packing list is summed.
+  const received = new Map<string, number>();
+  for (const item of lines) {
+    const poLineId = poLineByTourProduct.get(tourProducts.get(lineKey(item.sku, item.size))!)!;
+    received.set(poLineId, (received.get(poLineId) ?? 0) + (item.quantity_received ?? 0));
+  }
+  const inserted = received.size
+    ? check(
+        await supabase
+          .from('packing_list_items')
+          .insert(Array.from(received, ([poLineId, quantity]) => ({
+            packing_list_id: packingListId,
+            po_line_item_id: poLineId,
+            quantity_received: quantity
+          })))
+          .select('id'),
+        'Saving packing list lines'
+      )
+    : [];
+
+  return { packingListId, itemIds: (inserted ?? []).map((row: { id: string }) => row.id) };
 }
 
 async function getOrCreateShow(
-  supabase: ReturnType<typeof createServiceClient>,
+  supabase: Supabase,
   payload: any
 ) {
   if (payload.show_id) return payload.show_id;
@@ -282,86 +286,65 @@ async function getOrCreateShow(
 }
 
 async function postSalesReport(
-  supabase: ReturnType<typeof createServiceClient>,
+  supabase: Supabase,
   payload: any,
   sourceDocId: string
 ) {
   const showId = await getOrCreateShow(supabase, payload);
-  const saleIds: string[] = [];
+  const lines = (payload.line_items || []).filter((item: any) => item.sku);
+  const tourProducts = await resolveTourProducts(supabase, payload.tour_id, lines);
 
-  for (const item of payload.line_items || []) {
-    if (!item.sku) continue;
-    const productId = await getOrCreateProduct(
-      supabase,
-      item.sku,
-      item.description,
-      item.size
-    );
-    const tourProductId = await getOrCreateTourProduct(
-      supabase,
-      payload.tour_id,
-      productId,
-      item.size
-    );
-
-    const { data: inserted } = await supabase
-      .from('sales')
-      .insert({
-        show_id: showId,
-        tour_product_id: tourProductId,
-        qty_sold: item.qty_sold ?? 0,
-        unit_price: item.unit_price ?? 0,
-        gross_sales: item.gross_sales ?? 0,
-        source_doc_id: sourceDocId
-      })
-      .select('id')
-      .single();
-
-    if (inserted?.id) saleIds.push(inserted.id);
+  // One row per show and tour product; a repeated SKU and size is summed so the
+  // upsert never touches the same row twice. Re-posting a show replaces its sales.
+  const rows = new Map<string, Record<string, any>>();
+  for (const item of lines) {
+    const tourProductId = tourProducts.get(lineKey(item.sku, item.size))!;
+    const row = rows.get(tourProductId) ?? {
+      show_id: showId,
+      tour_product_id: tourProductId,
+      qty_sold: 0,
+      unit_price: item.unit_price ?? 0,
+      gross_sales: 0,
+      source_doc_id: sourceDocId
+    };
+    row.qty_sold += item.qty_sold ?? 0;
+    row.gross_sales += item.gross_sales ?? 0;
+    rows.set(tourProductId, row);
   }
+  const saved = rows.size
+    ? check(
+        await supabase
+          .from('sales')
+          .upsert(Array.from(rows.values()), { onConflict: 'show_id,tour_product_id' })
+          .select('id'),
+        'Saving sales'
+      )
+    : [];
 
-  return { showId, saleIds };
+  return { showId, saleIds: (saved ?? []).map((row: { id: string }) => row.id) };
 }
 
 async function postSettlement(
-  supabase: ReturnType<typeof createServiceClient>,
+  supabase: Supabase,
   payload: any,
   sourceDocId: string
 ) {
   const showId = await getOrCreateShow(supabase, payload);
-  const compIds: string[] = [];
+  const comps = (payload.comps || []).filter((comp: any) => comp.sku);
+  const tourProducts = await resolveTourProducts(supabase, payload.tour_id, comps);
 
-  for (const comp of payload.comps || []) {
-    if (!comp.sku) continue;
-    const productId = await getOrCreateProduct(
-      supabase,
-      comp.sku,
-      comp.description,
-      comp.size
-    );
-    const tourProductId = await getOrCreateTourProduct(
-      supabase,
-      payload.tour_id,
-      productId,
-      comp.size
-    );
+  const rows = comps.map((comp: any) => ({
+    show_id: showId,
+    tour_product_id: tourProducts.get(lineKey(comp.sku, comp.size)),
+    comp_type: comp.comp_type || 'other',
+    quantity: comp.quantity ?? 0,
+    source_doc_id: sourceDocId
+  }));
+  const inserted = rows.length
+    ? check(await supabase.from('comps').insert(rows).select('id'), 'Saving comps')
+    : [];
 
-    const { data: inserted } = await supabase
-      .from('comps')
-      .insert({
-        show_id: showId,
-        tour_product_id: tourProductId,
-        comp_type: comp.comp_type || 'other',
-        quantity: comp.quantity ?? 0,
-        source_doc_id: sourceDocId
-      })
-      .select('id')
-      .single();
-
-    if (inserted?.id) compIds.push(inserted.id);
-  }
-
-  return { showId, compIds };
+  return { showId, compIds: (inserted ?? []).map((row: { id: string }) => row.id) };
 }
 
 function buildPayload(doc: any) {
@@ -394,7 +377,7 @@ function validatePayload(docType: string, payload: any) {
 }
 
 export async function postParsedDocument(
-  supabase: ReturnType<typeof createServiceClient>,
+  supabase: Supabase,
   docId: string
 ) {
   const { data: doc, error } = await supabase
@@ -432,6 +415,9 @@ export async function postParsedDocument(
     default:
       throw new Error(`Unsupported doc_type: ${doc.doc_type}`);
   }
+
+  // inventory_balances is a materialized view: bring it current after every post.
+  check(await supabase.rpc('refresh_inventory_balances'), 'Refreshing inventory balances');
 
   const { data: updated } = await supabase
     .from('parsed_documents')

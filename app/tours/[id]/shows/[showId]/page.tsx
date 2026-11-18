@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createServiceClient } from '@/lib/supabase/client';
+import { fetchAll } from '@/lib/supabase/fetch-all';
 import { SalesLinesTable } from '@/components/shows/SalesLinesTable';
 import { CompsTable } from '@/components/shows/CompsTable';
 import { InventoryImpactTable } from '@/components/shows/InventoryImpactTable';
@@ -63,8 +64,8 @@ type ReceiptRow = {
   vendor: string | null;
 };
 
-// Force dynamic rendering to always fetch fresh data
-export const revalidate = 0;
+// Cached for 30s; posting a document refreshes it immediately (lib/cache/revalidate.ts)
+export const revalidate = 30;
 
 export default async function ShowDetailPage({ params }: ShowDetailParams) {
   const supabase = createServiceClient();
@@ -129,15 +130,24 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
 
   // Tour-wide sales and comps (for before/after balances) depend on the show list
   const tourShowIds = (tourShows ?? []).map((row) => row.id);
-  const [{ data: allSalesData }, { data: allCompsData }] = await Promise.all([
-    supabase
-      .from('sales')
-      .select('show_id, qty_sold, tour_product_id')
-      .in('show_id', tourShowIds),
-    supabase
-      .from('comps')
-      .select('show_id, quantity, tour_product_id')
-      .in('show_id', tourShowIds),
+  // A tour easily has more than 1000 sales rows, so page through them.
+  const [allSalesData, allCompsData] = await Promise.all([
+    fetchAll<{ show_id: string; qty_sold: number | null; tour_product_id: string }>((from, to) =>
+      supabase
+        .from('sales')
+        .select('show_id, qty_sold, tour_product_id')
+        .in('show_id', tourShowIds)
+        .order('id')
+        .range(from, to)
+    ),
+    fetchAll<{ show_id: string; quantity: number | null; tour_product_id: string }>((from, to) =>
+      supabase
+        .from('comps')
+        .select('show_id, quantity, tour_product_id')
+        .in('show_id', tourShowIds)
+        .order('id')
+        .range(from, to)
+    ),
   ]);
 
   const settlementDoc = settlementDocs?.[0];
