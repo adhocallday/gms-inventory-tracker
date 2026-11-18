@@ -88,7 +88,7 @@ export default async function MerchFlowReportPage({ params }: MerchFlowPageProps
       </section>
 
       {/* Charts' dashboard is light-only; pin its text colour so dark mode does not leak in. */}
-      <div className="mf-report overflow-hidden rounded-lg">
+      <div className="mf-report overflow-clip rounded-lg">
         <ReportDashboard
           report={report}
           imageUrls={imageUrls}
