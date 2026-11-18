@@ -6,18 +6,9 @@ interface ProductPercentageSectionProps {
   products: any[];
 }
 
-const COLORS = [
-  '#3B82F6', // Blue
-  '#8B5CF6', // Purple
-  '#10B981', // Green
-  '#F59E0B', // Orange
-  '#EF4444', // Red
-  '#6B7280', // Gray
-  '#EC4899', // Pink
-  '#14B8A6', // Teal
-  '#F97316', // Orange-red
-  '#8B5CF6'  // Violet
-];
+// MerchFlow chart palette (tailwind chart-1..5, shared with MerchFlow
+// Charts), then neutrals for the long tail.
+const COLORS = ['#E8003D', '#0082F3', '#C77400', '#00A36F', '#9B5FC0', '#4B5563', '#9CA3AF', '#D1D5DB'];
 
 export function ProductPercentageSection({ products }: ProductPercentageSectionProps) {
   // Calculate total gross
@@ -79,7 +70,7 @@ export function ProductPercentageSection({ products }: ProductPercentageSectionP
       <div className="mb-6">
         <h2 className="text-3xl font-bold g-title mb-2">Product % Breakdown</h2>
         <div className="text-sm text-[var(--color-text-muted)]">
-          <span className="font-semibold">Total Gross: </span>
+          <span className="font-semibold">Total gross: </span>
           ${totalGross.toLocaleString()}
         </div>
       </div>
@@ -97,7 +88,7 @@ export function ProductPercentageSection({ products }: ProductPercentageSectionP
                   labelLine={false}
                   label={(entry) => `${entry.percent.toFixed(1)}%`}
                   outerRadius={120}
-                  fill="#8884d8"
+                  fill="#0082F3"
                   dataKey="value"
                 >
                   {chartData.map((entry, index) => (

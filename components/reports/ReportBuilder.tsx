@@ -21,42 +21,42 @@ const DEFAULT_SECTIONS: ReportSection[] = [
   {
     id: 'cover',
     type: 'cover',
-    title: 'Cover Page',
+    title: 'Cover page',
     enabled: true,
     config: { includeTourArt: true }
   },
   {
     id: 'product-breakdown',
     type: 'product_breakdown',
-    title: 'Product Breakdown',
+    title: 'Product breakdown',
     enabled: true,
     config: { groupByCategory: true, showImages: true }
   },
   {
     id: 'event-tees',
     type: 'product_breakdown',
-    title: 'Event Tees',
+    title: 'Event tees',
     enabled: true,
     config: { category: 'event-tees', showImages: true }
   },
   {
     id: 'gross-sales',
     type: 'sales_chart',
-    title: 'Gross Sales Report',
+    title: 'Gross sales report',
     enabled: true,
     config: { chartType: 'bar', groupBy: 'city' }
   },
   {
     id: 'per-heads',
     type: 'sales_chart',
-    title: 'Per Heads Report',
+    title: 'Per heads report',
     enabled: true,
     config: { chartType: 'bar', metric: 'per_head' }
   },
   {
     id: 'product-ratios',
     type: 'analytics',
-    title: 'Product Ratios',
+    title: 'Product ratios',
     enabled: true,
     config: { showTable: true }
   },
@@ -128,46 +128,46 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
   return (
     <div className="g-card p-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold g-title mb-2">Generate New Report</h2>
-        <p className="text-sm text-[var(--color-text-muted)]">
-          Create a professional PDF report with sales data, charts, and product images
+        <h2 className="text-2xl font-bold mb-2">Generate new report</h2>
+        <p className="text-sm text-[var(--color-text-secondary)]">
+          Builds a report from this tour's posted sales: charts and product tables, saved so you can print it later.
         </p>
       </div>
 
       {/* Report Type */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-          Report Type
+          Report type
         </label>
         <select
           value={reportType}
           onChange={(e) => setReportType(e.target.value)}
           className="w-full g-input"
         >
-          <option value="post_tour_breakdown">Post-Tour Breakdown (Full Report)</option>
-          <option value="sales_analysis">Sales Analysis Only</option>
-          <option value="inventory_summary">Inventory Summary</option>
+          <option value="post_tour_breakdown">Post-tour breakdown (full report)</option>
+          <option value="sales_analysis">Sales analysis only</option>
+          <option value="inventory_summary">Inventory summary</option>
         </select>
       </div>
 
       {/* Report Title */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-2">
-          Report Title
+          Report title
         </label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="w-full g-input"
-          placeholder="e.g., Ghost Skeletour 2025 - Post-Tour Sales Report"
+          placeholder="e.g. SKELETOUR 2025 post-tour sales"
         />
       </div>
 
       {/* Sections */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-3">
-          Report Sections
+          Report sections
         </label>
         <div className="space-y-2">
           {sections.map((section) => (
@@ -185,7 +185,7 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
                 <div className="text-sm font-medium text-[var(--color-text-primary)]">
                   {section.title}
                 </div>
-                <div className="text-xs text-[var(--color-text-muted)]">
+                <div className="text-xs text-[var(--color-text-secondary)]">
                   {section.type.replace('_', ' ')}
                 </div>
               </div>
@@ -205,15 +205,15 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
 
       {/* Loading Progress */}
       {loading && (
-        <div className="mt-4 p-5 bg-gradient-to-br from-blue-50/80 to-white border-2 border-blue-200 rounded-2xl shadow-sm">
+        <div className="mt-4 p-5 bg-gradient-to-br from-info-bg to-white border-2 border-info-border rounded-2xl shadow-sm">
           <div className="flex items-center gap-3 mb-3">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-            <span className="text-sm font-semibold text-blue-800">Generating your report...</span>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-info-border"></div>
+            <span className="text-sm font-semibold text-info">Generating your report...</span>
           </div>
-          <div className="w-full bg-blue-100 rounded-full h-2 overflow-hidden">
-            <div className="h-full bg-blue-500 rounded-full animate-pulse" style={{ width: '70%' }}></div>
+          <div className="w-full bg-info-bg rounded-full h-2 overflow-hidden">
+            <div className="h-full bg-info rounded-full animate-pulse" style={{ width: '70%' }}></div>
           </div>
-          <p className="text-xs text-blue-600 mt-2">
+          <p className="text-xs text-info mt-2">
             This may take a few moments while we compile all your sales data, product images, and charts.
           </p>
         </div>
@@ -221,37 +221,37 @@ export function ReportBuilder({ tourId, tour }: ReportBuilderProps) {
 
       {/* Status Messages */}
       {success && (
-        <div className="mt-4 p-5 bg-gradient-to-br from-emerald-50/80 to-white border-2 border-emerald-200 rounded-2xl shadow-sm">
+        <div className="mt-4 p-5 bg-gradient-to-br from-success-bg to-white border-2 border-success-border rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
-              <Check className="h-5 w-5 shrink-0 text-emerald-600" aria-hidden="true" />
+            <div className="p-2 rounded-lg bg-[var(--color-bg-surface)] shadow-inner">
+              <Check className="h-5 w-5 shrink-0 text-success" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-emerald-800">Report Generated</p>
-              <p className="text-xs text-emerald-600">Refreshing page to show new report...</p>
+              <p className="text-sm font-semibold text-success">Report generated</p>
+              <p className="text-xs text-success">Refreshing page to show new report...</p>
             </div>
           </div>
         </div>
       )}
 
       {error && (
-        <div className="mt-4 p-5 bg-gradient-to-br from-red-50/80 to-white border-2 border-red-200 rounded-2xl shadow-sm">
+        <div className="mt-4 p-5 bg-gradient-to-br from-danger-bg to-white border-2 border-danger-border rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-[var(--color-bg-surface)] shadow-inner">
-              <X className="h-5 w-5 shrink-0 text-red-600" aria-hidden="true" />
+            <div className="p-2 rounded-lg bg-[var(--color-bg-surface)] shadow-inner">
+              <X className="h-5 w-5 shrink-0 text-danger" aria-hidden="true" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-red-800">Error</p>
-              <p className="text-xs text-red-600">{error}</p>
+              <p className="text-sm font-semibold text-danger">Error</p>
+              <p className="text-xs text-danger">{error}</p>
             </div>
           </div>
         </div>
       )}
 
       {/* Info Box */}
-      <div className="mt-6 p-5 bg-gradient-to-br from-blue-50/80 to-white border-2 border-blue-200 rounded-2xl shadow-sm">
-        <p className="font-semibold text-blue-800 mb-2"><BarChart3 className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />What's Included:</p>
-        <ul className="list-disc list-inside space-y-1 text-xs text-blue-700">
+      <div className="mt-6 p-5 bg-gradient-to-br from-info-bg to-white border-2 border-info-border rounded-2xl shadow-sm">
+        <p className="font-semibold text-info mb-2"><BarChart3 className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />What's Included:</p>
+        <ul className="list-disc list-inside space-y-1 text-xs text-info">
           <li>Product images (grab sheets) with sales data</li>
           <li>Sales charts by city and venue</li>
           <li>Per-head revenue analysis</li>

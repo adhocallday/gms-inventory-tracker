@@ -5,8 +5,7 @@ import { ReportBuilder } from '@/components/reports/ReportBuilder';
 import { ReportList } from '@/components/reports/ReportList';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { MakeSalesChartButton } from '@/components/reports/MakeSalesChartButton';
-import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
-import { BarChart3, Lightbulb } from 'lucide-react';
+import { ArrowLeft, BarChart3, Info } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,7 +28,7 @@ export default async function TourReportsPage({ params }: TourReportsPageProps) 
     return (
       <div className="g-container py-8">
         <div className="g-card p-8 text-center">
-          <p className="text-[var(--color-text-muted)]">Tour not found</p>
+          <p className="text-[var(--color-text-secondary)]">This tour does not exist or was deleted.</p>
         </div>
       </div>
     );
@@ -48,25 +47,24 @@ export default async function TourReportsPage({ params }: TourReportsPageProps) 
     .select('*', { count: 'exact', head: true })
     .eq('tour_id', tourId);
 
-  // Fetch product count
-  const { count: productCount } = await supabase
-    .from('products')
-    .select('*', { count: 'exact', head: true })
+  // Products belong to a tour through tour_products (one row per size);
+  // products itself has no tour_id, so counting it by tour always gave 0.
+  const { data: tourProductRows } = await supabase
+    .from('tour_products')
+    .select('product_id')
     .eq('tour_id', tourId);
-
-  const breadcrumbs = generateBreadcrumbs([
-    { label: 'Tours', href: '/' },
-    { label: tour.name, href: `/tours/${tourId}` },
-    { label: 'Reports' },
-  ]);
+  const productCount = new Set((tourProductRows ?? []).map((row) => row.product_id)).size;
 
   return (
-    <div className="g-container py-12">
+    <div className="g-container py-6">
+      <Link href={`/tours/${tourId}`} className="text-sm font-medium g-link">
+        <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />
+        {tour.name}
+      </Link>
       <PageHeader
-        title="Tour Reports"
-        subtitle={`${tour.name} • ${showCount || 0} shows • ${productCount || 0} products`}
-        kicker="Reporting"
-        breadcrumbs={breadcrumbs}
+        className="mt-3"
+        title="Reports"
+        subtitle={`${showCount || 0} shows · ${productCount} products. The merch flow report is live; reports built below are saved snapshots.`}
         actions={
           <>
             <MakeSalesChartButton tourId={tourId} />
@@ -82,34 +80,28 @@ export default async function TourReportsPage({ params }: TourReportsPageProps) 
         }
       />
 
-      {/* Info Box */}
-      <div className="mb-8 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-        <h3 className="text-sm font-semibold text-blue-400 mb-2"><Lightbulb className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />About Product Images</h3>
-        <p className="text-xs text-blue-400/80 mb-2">
-          Product images (grab sheets) will automatically appear in reports once uploaded. To add images:
+      <div className="mt-6 mb-6 rounded-lg border border-info-border bg-info-bg p-4 text-sm">
+        <p className="flex items-center gap-1.5 font-semibold text-info">
+          <Info className="h-4 w-4 shrink-0" aria-hidden="true" />
+          Product images
         </p>
-        <ol className="text-xs text-blue-400/80 space-y-1 list-decimal list-inside">
-          <li>Images can be uploaded through the product management interface (coming soon)</li>
-          <li>Supported formats: PNG, JPG, GIF, WebP (max 10MB)</li>
-          <li>Set one image as "primary" to display in reports</li>
-          <li>Images are stored securely in Supabase Storage and delivered via CDN</li>
-        </ol>
-        <p className="text-xs text-blue-400/80 mt-3">
-          <strong>Note:</strong> Reports currently display product data without images. Upload grab sheets to see them in the Product Breakdown section.
+        <p className="mt-1 text-[var(--color-text-secondary)]">
+          Reports built here show product data without images: the tracker has no image upload screen yet.
+          When images are added (PNG, JPG, GIF or WebP, up to 10 MB), the one marked primary appears in the product breakdown.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Report Builder */}
         <div className="lg:col-span-2">
-          <Suspense fallback={<div className="g-card p-8">Loading...</div>}>
+          <Suspense fallback={<div className="g-card p-8 text-sm text-[var(--color-text-secondary)]" role="status">Loading…</div>}>
             <ReportBuilder tourId={tourId} tour={tour} />
           </Suspense>
         </div>
 
         {/* Existing Reports List */}
         <div className="lg:col-span-1">
-          <Suspense fallback={<div className="g-card p-8">Loading...</div>}>
+          <Suspense fallback={<div className="g-card p-8 text-sm text-[var(--color-text-secondary)]" role="status">Loading…</div>}>
             <ReportList tourId={tourId} reports={reports || []} />
           </Suspense>
         </div>

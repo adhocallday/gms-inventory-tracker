@@ -63,11 +63,11 @@ export function ProductBreakdownSection({
         <h2 className="text-3xl font-bold g-title mb-2">{title}</h2>
         <div className="flex gap-6 text-sm text-[var(--color-text-muted)]">
           <div>
-            <span className="font-semibold">Total Units: </span>
+            <span className="font-semibold">Total units: </span>
             {totalUnits.toLocaleString()}
           </div>
           <div>
-            <span className="font-semibold">Total Gross: </span>
+            <span className="font-semibold">Total gross: </span>
             ${totalGross.toLocaleString()}
           </div>
           <div>

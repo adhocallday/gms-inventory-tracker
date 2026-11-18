@@ -30,7 +30,7 @@ export default async function MerchFlowReportPage({ params }: MerchFlowPageProps
     return (
       <div className="g-container py-8">
         <div className="g-card p-8 text-center">
-          <p className="text-[var(--color-text-muted)]">The merch flow report could not be loaded. Try again shortly.</p>
+          <p className="text-[var(--color-text-secondary)]">The merch flow report could not be loaded. Reload the page in a minute; if it keeps failing, the tour&apos;s sales data may be incomplete.</p>
         </div>
       </div>
     );
@@ -55,32 +55,32 @@ export default async function MerchFlowReportPage({ params }: MerchFlowPageProps
           <AlertTriangle className="inline-block h-4 w-4 align-[-0.15em] mr-1.5 text-[var(--color-text-secondary)]" aria-hidden="true" />
           Data quality
         </h2>
-        <p className="text-xs text-[var(--color-text-muted)] mt-1">
+        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
           Suggestions only. Nothing here changes the stored data or the report below.
         </p>
         {issues.length === 0 && gaps.length === 0 ? (
           <p className="mt-3 text-sm text-[var(--color-text-secondary)]">
-            <CheckCircle className="inline-block h-4 w-4 align-[-0.125em] mr-1 text-green-600" aria-hidden="true" />
+            <CheckCircle className="inline-block h-4 w-4 align-[-0.125em] mr-1 text-success" aria-hidden="true" />
             No issues found.
           </p>
         ) : (
           <ul className="mt-3 grid gap-2 md:grid-cols-2">
             {gaps.map((gap) => (
-              <li key={`gap-${gap.field}`} className="rounded-lg border border-blue-500/25 bg-blue-500/10 p-3">
+              <li key={`gap-${gap.field}`} className="rounded-lg border border-info-border bg-info-bg p-3">
                 <p className="text-sm font-semibold text-[var(--color-text-primary)]">
-                  <Info className="inline-block h-4 w-4 align-[-0.125em] mr-1 text-blue-500" aria-hidden="true" />
+                  <Info className="inline-block h-4 w-4 align-[-0.125em] mr-1 text-info" aria-hidden="true" />
                   Missing data: {gap.field}
                 </p>
-                <p className="text-xs text-[var(--color-text-secondary)] mt-1">{gap.message}</p>
+                <p className="text-sm text-[var(--color-text-secondary)] mt-1">{gap.message}</p>
               </li>
             ))}
             {issues.map((issue) => (
-              <li key={`${issue.kind}-${issue.title}`} className="rounded-lg border border-orange-500/25 bg-orange-500/10 p-3">
+              <li key={`${issue.kind}-${issue.title}`} className="rounded-lg border border-warn-border bg-warn-bg p-3">
                 <p className="text-sm font-semibold text-[var(--color-text-primary)]">
-                  <AlertTriangle className="inline-block h-4 w-4 align-[-0.125em] mr-1 text-orange-500" aria-hidden="true" />
+                  <AlertTriangle className="inline-block h-4 w-4 align-[-0.125em] mr-1 text-warn" aria-hidden="true" />
                   {issue.title}
                 </p>
-                <p className="text-xs text-[var(--color-text-secondary)] mt-1">{issue.detail}</p>
+                <p className="text-sm text-[var(--color-text-secondary)] mt-1">{issue.detail}</p>
               </li>
             ))}
           </ul>

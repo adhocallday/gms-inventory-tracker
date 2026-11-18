@@ -30,12 +30,12 @@ export function ProductRatiosSection({ products, showSummary }: ProductRatiosSec
   return (
     <section className="print:page-break-inside-avoid">
       <div className="mb-6">
-        <h2 className="text-3xl font-bold g-title mb-2">Product Ratios</h2>
+        <h2 className="text-3xl font-bold g-title mb-2">Product ratios</h2>
         <p className="text-sm text-[var(--color-text-muted)]">
           Shows how many attendees purchased each product (e.g., "1 in 8" means 1 out of every 8 attendees bought this item)
         </p>
         <div className="mt-2 text-sm text-[var(--color-text-muted)]">
-          <span className="font-semibold">Total Attendance: </span>
+          <span className="font-semibold">Total attendance: </span>
           {totalAttendance.toLocaleString()}
         </div>
       </div>
@@ -47,7 +47,7 @@ export function ProductRatiosSection({ products, showSummary }: ProductRatiosSec
               <tr className="border-b border-[var(--color-bg-border)]">
                 <th className="text-left py-3 px-4 text-sm font-semibold g-title">Product</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold g-title">SKU</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold g-title">Units Sold</th>
+                <th className="text-right py-3 px-4 text-sm font-semibold g-title">Units sold</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold g-title">Ratio</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold g-title">Penetration %</th>
               </tr>

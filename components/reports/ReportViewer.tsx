@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic';
 import { ProductRatiosSection } from './sections/ProductRatiosSection';
 
 // recharts is the largest client chunk; load chart sections only when a report renders them
-const chartFallback = () => <div className="h-80 animate-pulse rounded-xl bg-[var(--color-bg-elevated)]" />;
+const chartFallback = () => <div className="h-80 animate-pulse rounded-lg bg-[var(--color-bg-elevated)]" />;
 const SalesChartSection = dynamic(
   () => import('./sections/SalesChartSection').then((m) => m.SalesChartSection),
   { loading: chartFallback }
@@ -66,11 +66,11 @@ export function ReportViewer({
               <div className="flex items-center gap-4">
                 <Link
                   href={`/tours/${tour.id}/reports`}
-                  className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
+                  className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
                 >
                   <ArrowLeft className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" />Back to Reports
                 </Link>
-                <h1 className="text-xl font-semibold g-title">{report.title}</h1>
+                <h1 className="text-xl font-semibold">{report.title}</h1>
               </div>
 
               <div className="flex items-center gap-2">
@@ -78,7 +78,7 @@ export function ReportViewer({
                   onClick={handlePrint}
                   className="px-4 py-2 border border-[var(--color-bg-border)] rounded hover:bg-[var(--color-bg-elevated)] transition text-sm"
                 >
-                  Print Report
+                  Print report
                 </button>
               </div>
             </div>
@@ -101,7 +101,7 @@ export function ReportViewer({
           {/* Product Breakdown - Regular Products */}
           {isSectionEnabled('product-breakdown') && (
             <ProductBreakdownSection
-              title="Product Breakdown"
+              title="Product breakdown"
               products={productSummary.filter(p => !p.sku?.includes('EVENT'))}
               productImages={productImages}
               categories={categories}
@@ -111,7 +111,7 @@ export function ReportViewer({
           {/* Product Breakdown - Event Tees */}
           {isSectionEnabled('event-tees') && (
             <ProductBreakdownSection
-              title="Event Tees"
+              title="Event tees"
               products={productSummary.filter(p => p.sku?.includes('EVENT'))}
               productImages={productImages}
               categories={categories.filter(c => c.slug === 'event-tees')}
@@ -121,7 +121,7 @@ export function ReportViewer({
           {/* Gross Sales Chart */}
           {isSectionEnabled('gross-sales') && (
             <SalesChartSection
-              title="Gross Sales Report"
+              title="Gross sales report"
               showSummary={showSummary}
             />
           )}
@@ -129,7 +129,7 @@ export function ReportViewer({
           {/* Per Heads Chart */}
           {isSectionEnabled('per-heads') && (
             <PerHeadsChartSection
-              title="Per Heads Report"
+              title="Per heads report"
               showSummary={showSummary}
             />
           )}

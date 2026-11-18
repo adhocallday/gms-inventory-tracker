@@ -32,10 +32,10 @@ export function ReportList({ tourId, reports }: ReportListProps) {
 
   const getStatusBadge = (status: Report['status']) => {
     const badges = {
-      pending: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-      generating: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-      completed: 'bg-green-500/10 text-green-500 border-green-500/20',
-      failed: 'bg-red-500/10 text-red-500 border-red-500/20'
+      pending: 'bg-warn-bg text-warn border-warn-border',
+      generating: 'bg-info-bg text-info border-info-border',
+      completed: 'bg-success-bg text-success border-success-border',
+      failed: 'bg-danger-bg text-danger border-danger-border'
     };
 
     const labels = {
@@ -62,7 +62,7 @@ export function ReportList({ tourId, reports }: ReportListProps) {
   };
 
   const handleDelete = async (reportId: string) => {
-    if (!confirm('Are you sure you want to delete this report?')) {
+    if (!confirm('Delete this saved report? This cannot be undone.')) {
       return;
     }
 
@@ -97,67 +97,67 @@ export function ReportList({ tourId, reports }: ReportListProps) {
     return (
       <div className="g-card p-8 text-center">
         <BarChart3 className="block mx-auto h-10 w-10 mb-4 text-[var(--color-text-secondary)]" aria-hidden="true" />
-        <h3 className="text-lg font-semibold g-title mb-2">No Reports Yet</h3>
-        <p className="text-sm text-[var(--color-text-muted)]">
-          Create your first report to get started
+        <h3 className="text-lg font-semibold mb-2">No reports yet</h3>
+        <p className="text-sm text-[var(--color-text-secondary)]">
+          Reports you generate on the left are listed here.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="g-card p-6">
-      <h2 className="text-xl font-semibold g-title mb-4">Generated Reports</h2>
+    <div className="g-card p-5">
+      <h2 className="text-lg font-semibold mb-4">Saved reports</h2>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {reports.map((report) => (
             <div
               key={report.id}
-              className="border border-[var(--color-bg-border)] rounded-lg p-4 hover:border-[var(--color-red-primary)] transition"
+              className="border border-[var(--color-bg-border)] rounded-lg p-4"
             >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold g-title">{report.title}</h3>
-                    {getStatusBadge(report.status)}
-                  </div>
-                  <p className="text-sm text-[var(--color-text-muted)]">
-                    {getReportTypeLabel(report.report_type)}
-                  </p>
+              <div className="mb-2">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <h3 className="font-semibold">{report.title}</h3>
+                  {getStatusBadge(report.status)}
                 </div>
+                <p className="text-sm text-[var(--color-text-secondary)]">
+                  {getReportTypeLabel(report.report_type)}
+                </p>
+              </div>
 
-                <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                   <Link
                     href={`/tours/${tourId}/reports/${report.id}`}
-                    className="px-3 py-1.5 text-sm bg-[var(--color-red-primary)] text-white rounded hover:bg-[var(--color-red-hover)] transition"
+                    className="px-3 py-1.5 text-sm font-medium border border-[var(--color-bg-border)] rounded-md bg-[var(--color-bg-surface)] hover:bg-[var(--color-bg-elevated)] transition-colors"
                   >
-                    View Report
+                    View report
                   </Link>
                   {report.status === 'completed' && report.pdf_url && (
                     <button
                       onClick={() => handleDownload(report)}
-                      className="px-3 py-1.5 text-sm border border-[var(--color-bg-border)] rounded hover:bg-[var(--color-bg-elevated)] transition"
+                      type="button"
+                      className="px-3 py-1.5 text-sm font-medium border border-[var(--color-bg-border)] rounded-md hover:bg-[var(--color-bg-elevated)] transition-colors"
                     >
                       Download PDF
                     </button>
                   )}
                   <button
+                    type="button"
                     onClick={() => handleDelete(report.id)}
                     disabled={deletingId === report.id}
-                    className="px-3 py-1.5 text-sm border border-[var(--color-bg-border)] rounded hover:bg-[var(--color-bg-elevated)] transition disabled:opacity-50"
+                    className="px-3 py-1.5 text-sm font-medium text-danger rounded-md hover:bg-danger-bg transition-colors disabled:opacity-50"
                   >
-                    {deletingId === report.id ? 'Deleting...' : 'Delete'}
+                    {deletingId === report.id ? 'Deleting…' : 'Delete'}
                   </button>
-                </div>
               </div>
 
               {report.description && (
-                <p className="text-sm text-[var(--color-text-muted)] mb-2">
+                <p className="text-sm text-[var(--color-text-secondary)] mb-2">
                   {report.description}
                 </p>
               )}
 
-              <div className="flex items-center gap-4 text-xs text-[var(--color-text-muted)] mt-3 pt-3 border-t border-[var(--color-bg-border)]">
+              <div className="flex items-center gap-4 text-xs text-[var(--color-text-secondary)] mt-3 pt-3 border-t border-[var(--color-bg-border)]">
                 <span>
                   {report.section_count || 0} {report.section_count === 1 ? 'section' : 'sections'}
                 </span>
@@ -176,7 +176,7 @@ export function ReportList({ tourId, reports }: ReportListProps) {
               </div>
 
               {report.status === 'failed' && (
-                <div className="mt-3 p-2 bg-red-500/10 border border-red-500/20 rounded text-sm text-red-500">
+                <div className="mt-3 p-2 bg-danger-bg border border-danger-border rounded text-sm text-danger">
                   Report generation failed. Please try creating a new report.
                 </div>
               )}

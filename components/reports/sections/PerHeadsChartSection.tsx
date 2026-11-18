@@ -35,7 +35,7 @@ export function PerHeadsChartSection({ title, showSummary }: PerHeadsChartSectio
         <h2 className="text-3xl font-bold g-title mb-2">{title}</h2>
         <div className="flex gap-6 text-sm text-[var(--color-text-muted)]">
           <div>
-            <span className="font-semibold">Average Per Head: </span>
+            <span className="font-semibold">Average per head: </span>
             ${avgPerHead.toFixed(2)}
           </div>
           <div>
@@ -73,7 +73,7 @@ export function PerHeadsChartSection({ title, showSummary }: PerHeadsChartSectio
                 borderRadius: '8px'
               }}
             />
-            <Bar dataKey="perHead" fill="#8B5CF6" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="perHead" fill="#0082F3" radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
