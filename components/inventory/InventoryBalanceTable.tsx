@@ -5,6 +5,7 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { Package } from 'lucide-react';
 import { DataTable, NumericCell } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/Badge';
+import { StatCard, STAT_GRID } from '@/components/dashboard/StatCard';
 
 export interface InventoryBalanceRow {
   product_id: string;
@@ -176,29 +177,12 @@ export function InventoryBalanceTable({ data, loading, showTotals = true }: Inve
       />
 
       {showTotals && data.length > 0 && (
-        <div className="mt-4 p-4 bg-[var(--color-bg-surface)]/5 rounded-lg border border-[var(--color-bg-border)]">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-            <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Received</p>
-              <p className="font-semibold">{formatNumber(totals.received)}</p>
-            </div>
-            <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Sold</p>
-              <p className="font-semibold">{formatNumber(totals.sold)}</p>
-            </div>
-            <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Comps</p>
-              <p className="font-semibold">{formatNumber(totals.comps)}</p>
-            </div>
-            <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Balance</p>
-              <p className="font-semibold tabular-nums">{formatNumber(totals.balance)}</p>
-            </div>
-            <div>
-              <p className="text-[var(--color-text-muted)] text-xs mb-1">Total Value</p>
-              <p className="font-semibold">{formatCurrency(totals.value)}</p>
-            </div>
-          </div>
+        <div className={`${STAT_GRID} mt-3`}>
+          <StatCard label="Total received" value={formatNumber(totals.received)} />
+          <StatCard label="Total sold" value={formatNumber(totals.sold)} />
+          <StatCard label="Total comps" value={formatNumber(totals.comps)} />
+          <StatCard label="Total balance" value={formatNumber(totals.balance)} />
+          <StatCard label="Total value" value={formatCurrency(totals.value)} />
         </div>
       )}
     </div>

@@ -4,6 +4,7 @@ import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { BarChart3 } from 'lucide-react';
 import { formatDate } from '@/lib/format';
 import { loadAnalytics } from '@/lib/analytics';
+import { StatCard, STAT_GRID } from '@/components/dashboard/StatCard';
 
 // Read live on every request (the Supabase client is no-store), never prerendered at build.
 export const dynamic = 'force-dynamic';
@@ -55,7 +56,7 @@ export default async function AnalyticsPage() {
       />
 
       {/* Summary Stats */}
-      <div data-tour="admin-analytics" className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mt-6 mb-8">
+      <div data-tour="admin-analytics" className={`${STAT_GRID} 2xl:grid-cols-7 mt-5 mb-5`}>
         {[
           ['Gross sales', formatCurrency(summary.totalGross)],
           ['Per head', formatCurrency(summary.avgPerHead)],
@@ -65,15 +66,12 @@ export default async function AnalyticsPage() {
           ['Units sold', formatNumber(summary.totalUnits)],
           ['Attendance', formatNumber(summary.totalAttendance)],
         ].map(([label, value]) => (
-          <div key={label} className="g-card p-4">
-            <div className="text-[13px] font-medium text-[var(--color-text-secondary)] mb-1">{label}</div>
-            <div className="text-xl font-semibold tabular-nums text-[var(--color-text-primary)]">{value}</div>
-          </div>
+          <StatCard key={label} label={label} value={value} />
         ))}
       </div>
 
       {/* Tour Rankings */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
         {/* Top by Gross */}
         <div className="g-card overflow-hidden">
           <div className="p-4 border-b border-[var(--color-bg-border)]">

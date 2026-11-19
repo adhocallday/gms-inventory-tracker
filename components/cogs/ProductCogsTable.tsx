@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { type ColumnDef } from '@tanstack/react-table';
 import { DollarSign } from 'lucide-react';
 import { DataTable, NumericCell } from '@/components/ui/DataTable';
+import { StatCard, STAT_GRID } from '@/components/dashboard/StatCard';
 
 export interface ProductCogsRow {
   sku: string;
@@ -159,7 +160,7 @@ export function ProductCogsTable({ data, loading, totals }: ProductCogsTableProp
       />
 
       {totals && data.length > 0 && (
-        <dl className="mt-4 grid grid-cols-2 md:grid-cols-5 gap-4 rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] p-4 text-sm">
+        <div className={`${STAT_GRID} mt-3`}>
           {[
             ['Units sold', totals.total_units_sold.toLocaleString()],
             ['Revenue', formatCurrency(totals.total_revenue)],
@@ -167,12 +168,9 @@ export function ProductCogsTable({ data, loading, totals }: ProductCogsTableProp
             ['Gross margin', formatCurrency(totals.total_margin)],
             ['Margin %', `${totals.margin_percentage.toFixed(1)}%`],
           ].map(([label, value]) => (
-            <div key={label}>
-              <dt className="text-xs text-[var(--color-text-secondary)] mb-1">{label}</dt>
-              <dd className="font-semibold tabular-nums">{value}</dd>
-            </div>
+            <StatCard key={label} label={label} value={value} />
           ))}
-        </dl>
+        </div>
       )}
     </div>
   );

@@ -59,7 +59,7 @@ const STATUS = [
 
 export default function WelcomePage() {
   return (
-    <div className="py-8 space-y-12 max-w-6xl">
+    <div className="py-6 space-y-10 max-w-7xl">
       <header className="space-y-4">
         <MerchFlowWordmark className="h-14 w-auto text-[var(--color-text-primary)]" />
         <h1 className="text-2xl font-semibold tracking-tight lg:text-[28px] lg:leading-9">How MerchFlow works</h1>

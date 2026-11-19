@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/Badge';
 import { buttonVariants } from '@/components/ui/Button';
 import { formatDate } from '@/lib/format';
-import { StatCard } from '@/components/dashboard/StatCard';
+import { StatCard, STAT_GRID } from '@/components/dashboard/StatCard';
 import { ArrowRight, BarChart3, Calendar, ClipboardList, FileText, Folder, Music, Package, Plus, Tag } from 'lucide-react';
 
 // Stats can be up to 30s stale; mutation routes call revalidateDashboards()
@@ -120,7 +120,7 @@ export default async function AdminDashboard() {
       />
 
       {/* Stats Grid */}
-      <div data-tour="admin-stats" className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6 mb-10">
+      <div data-tour="admin-stats" className={`${STAT_GRID} mt-5 mb-6`}>
         {stats.map((stat, index) => (
           <StatCard
             key={index}
@@ -215,7 +215,7 @@ export default async function AdminDashboard() {
       </section>
 
       {/* Admin Tools */}
-      <section className="mt-10">
+      <section className="mt-8">
         <h2 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">Across all tours</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Link

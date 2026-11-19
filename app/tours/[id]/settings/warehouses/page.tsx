@@ -35,7 +35,7 @@ export default async function WarehouseSettingsPage({ params }: PageProps) {
 
   return (
     <div className="g-container py-8">
-      <header className="mb-8">
+      <header className="mb-5">
         <div className="flex items-center gap-3 mb-3">
           <a
             href={`/tours/${tourId}`}

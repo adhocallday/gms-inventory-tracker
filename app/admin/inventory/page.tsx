@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Package, AlertTriangle, TrendingDown, Filter } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
-import { StatCard } from '@/components/dashboard/StatCard';
+import { StatCard, STAT_GRID } from '@/components/dashboard/StatCard';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { Badge } from '@/components/ui/Badge';
 import { DataTable, NumericCell } from '@/components/ui/DataTable';
@@ -249,7 +249,7 @@ export default function AdminInventoryPage() {
       />
 
       {/* Stats Grid */}
-      <div data-tour="admin-inventory" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mt-6 mb-6">
+      <div data-tour="admin-inventory" className={`${STAT_GRID} mt-5 mb-5`}>
         <StatCard label="Product lines" value={stats.totalItems.toLocaleString()} iconName="package" />
         <StatCard label="Units on hand" value={stats.totalBalance.toLocaleString()} iconName="layers" />
         <StatCard label="Low stock" value={stats.lowStockItems} iconName="alert-triangle" />

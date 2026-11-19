@@ -57,12 +57,14 @@ export function ProductSalesTable({ data, loading }: ProductSalesTableProps) {
       {
         accessorKey: 'qty_sold',
         header: 'Qty sold',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('qty_sold')} format="number" />,
         enableSorting: true,
       },
       {
         accessorKey: 'gross_sales',
         header: 'Gross sales',
+        meta: { align: 'right' },
         cell: ({ row }) => <NumericCell value={row.getValue('gross_sales')} format="currency" />,
         enableSorting: true,
       },

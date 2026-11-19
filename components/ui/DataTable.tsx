@@ -65,7 +65,7 @@ export function DataTable<TData, TValue>({
             <thead className="bg-[var(--color-bg-elevated)] border-b border-[var(--color-bg-border)]">
               <tr>
                 {columns.map((_, index) => (
-                  <th key={index} className="px-4 py-3 text-left">
+                  <th key={index} className="px-3 py-2 text-left">
                     <Skeleton className="h-4 w-24" />
                   </th>
                 ))}
@@ -75,7 +75,7 @@ export function DataTable<TData, TValue>({
               {[...Array(5)].map((_, rowIndex) => (
                 <tr key={rowIndex} className="border-b border-[var(--color-bg-border)]">
                   {columns.map((_, colIndex) => (
-                    <td key={colIndex} className="px-4 py-4">
+                    <td key={colIndex} className="px-3 py-2.5">
                       <Skeleton className="h-4 w-full" />
                     </td>
                   ))}
@@ -128,8 +128,8 @@ export function DataTable<TData, TValue>({
                     <th
                       key={header.id}
                       className={cn(
-                        'px-4 text-left text-xs font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-elevated)] shadow-[inset_0_-1px_0_var(--color-bg-border)]',
-                        compact ? 'py-2' : 'py-3',
+                        'px-3 text-left text-xs font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-elevated)] shadow-[inset_0_-1px_0_var(--color-bg-border)]',
+                        compact ? 'py-1.5' : 'py-2',
                         alignRight && 'text-right',
                         canSort && 'cursor-pointer select-none hover:text-[var(--color-text-primary)]'
                       )}
@@ -187,10 +187,12 @@ export function DataTable<TData, TValue>({
                   <td
                     key={cell.id}
                     className={cn(
-                      'px-4 text-[var(--color-text-secondary)]',
-                      compact ? 'py-3' : 'py-4',
+                      // 13.5px body text, py-2 rows; on phones a 44px row
+                      // height keeps every row an easy touch target.
+                      'px-3 text-[13.5px] leading-5 text-[var(--color-text-secondary)] h-11 md:h-auto',
+                      compact ? 'py-1.5' : 'py-2',
                       (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' &&
-                        'text-right'
+                        'text-right tabular-nums'
                     )}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

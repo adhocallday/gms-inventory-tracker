@@ -8,6 +8,7 @@ import { InventoryImpactTable } from '@/components/shows/InventoryImpactTable';
 import { ReceivingContextTable } from '@/components/shows/ReceivingContextTable';
 import { ArrowLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
+import { StatCard, STAT_GRID } from '@/components/dashboard/StatCard';
 import { formatDate as formatDay } from '@/lib/format';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
@@ -380,18 +381,21 @@ export default async function ShowDetailPage({ params }: ShowDetailParams) {
                   : 'This settlement has not been posted yet. Figures are from the parsed draft.'}
               </p>
             )}
-            <dl className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-4 text-sm">
+            <div className={`${STAT_GRID} mt-3`}>
               {settlementFigures.map((figure) => (
-                <div key={figure.label} className="rounded-md border border-[var(--color-bg-border)] p-3">
-                  <dt className="text-xs font-medium text-[var(--color-text-secondary)]">{figure.label}</dt>
-                  {figure.value === null ? (
-                    <dd className="mt-1 text-sm text-[var(--color-text-secondary)]">Not in settlement</dd>
-                  ) : (
-                    <dd className="mt-1 text-lg font-semibold tabular-nums">{currencyFormatter.format(figure.value)}</dd>
-                  )}
-                </div>
+                <StatCard
+                  key={figure.label}
+                  label={figure.label}
+                  value={
+                    figure.value === null ? (
+                      <span className="text-sm font-normal text-[var(--color-text-secondary)]">Not in settlement</span>
+                    ) : (
+                      currencyFormatter.format(figure.value)
+                    )
+                  }
+                />
               ))}
-            </dl>
+            </div>
           </>
         ) : (
           <p className="text-sm text-[var(--color-text-secondary)] mt-2">

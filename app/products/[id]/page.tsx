@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { createServiceClient } from '@/lib/supabase/client';
 import { ProductSalesTable } from '@/components/products/ProductSalesTable';
 import { ArrowLeft } from 'lucide-react';
+import { StatCard, STAT_GRID } from '@/components/dashboard/StatCard';
 
 // Cached for 30s; posting a document refreshes it immediately (lib/cache/revalidate.ts)
 export const revalidate = 30;
@@ -87,7 +88,7 @@ export default async function ProductDetailPage({ params }: ProductDetailParams)
         </Link>
       </div>
 
-      <div className="g-card p-6 mb-8">
+      <div className="g-card p-5 mb-5">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-2">{product.sku}</h1>
@@ -96,23 +97,14 @@ export default async function ProductDetailPage({ params }: ProductDetailParams)
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-6 mt-8">
-          <div>
-            <p className="text-sm text-[var(--color-text-secondary)] mb-1">Total sold</p>
-            <p className="text-2xl font-semibold">{formatNumber(totalSold)}</p>
-          </div>
-          <div>
-            <p className="text-sm text-[var(--color-text-secondary)] mb-1">Total revenue</p>
-            <p className="text-2xl font-semibold">{currencyFormatter.format(totalGross)}</p>
-          </div>
-          <div>
-            <p className="text-sm text-[var(--color-text-secondary)] mb-1">Current inventory</p>
-            <p className="text-2xl font-semibold">{formatNumber(totalInventory)}</p>
-          </div>
+        <div className={`${STAT_GRID} mt-5`}>
+          <StatCard label="Total sold" value={formatNumber(totalSold)} />
+          <StatCard label="Total revenue" value={currencyFormatter.format(totalGross)} />
+          <StatCard label="Current inventory" value={formatNumber(totalInventory)} />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <section className="g-card p-6">
           <h2 className="text-lg font-semibold mb-4">Sales by size</h2>
           <div className="space-y-3">

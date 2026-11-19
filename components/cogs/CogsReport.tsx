@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ProductCogsTable, hasCost, marginPercent, type ProductCogsRow } from '@/components/cogs/ProductCogsTable';
 import { ShowCogsTable, type ShowCogsRow } from '@/components/cogs/ShowCogsTable';
 import { ArrowLeft } from 'lucide-react';
+import { StatCard, STAT_GRID } from '@/components/dashboard/StatCard';
 
 export interface Tour {
   id: string;
@@ -51,7 +52,7 @@ export function CogsReport({ tour, cogsData }: { tour: Tour; cogsData: CogsData 
   const noCostCount = cogsData.products.filter((p) => p.total_sold > 0 && !hasCost(p)).length;
 
   const rankList = (title: string, rows: typeof topPerformers) => (
-    <div className="g-card p-5">
+    <div className="g-card g-panel">
       <h2 className="text-base font-semibold mb-3">{title}</h2>
       <ol className="space-y-3">
         {rows.map(({ product, pct }, index) => (
@@ -85,17 +86,14 @@ export function CogsReport({ tour, cogsData }: { tour: Tour; cogsData: CogsData 
         {tour.artist}. COGS = units sold × full package cost; margin = revenue − COGS.
       </p>
 
-      <div data-tour="cogs-summary" className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
+      <div data-tour="cogs-summary" className={`${STAT_GRID} mt-5`}>
         {[
           ['Revenue', formatCurrency(cogsData.totals.total_revenue)],
           ['COGS', formatCurrency(cogsData.totals.total_cogs)],
           ['Gross margin', formatCurrency(cogsData.totals.total_margin)],
           ['Margin %', formatPercent(cogsData.totals.margin_percentage)],
         ].map(([label, value]) => (
-          <div key={label} className="g-card p-4">
-            <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">{label}</p>
-            <p className="mt-1 text-2xl font-semibold tabular-nums">{value}</p>
-          </div>
+          <StatCard key={label} label={label} value={value} />
         ))}
       </div>
       {noCostCount > 0 && (
@@ -105,13 +103,13 @@ export function CogsReport({ tour, cogsData }: { tour: Tour; cogsData: CogsData 
         </p>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-5">
         {rankList('Highest margin %, top 5', topPerformers)}
         {rankList('Lowest margin %, bottom 5', bottomPerformers)}
       </div>
 
       {/* View Toggle */}
-      <div data-tour="cogs-table" className="mt-8 mb-3 flex items-center justify-between gap-3">
+      <div data-tour="cogs-table" className="mt-6 mb-3 flex items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">{view === 'products' ? 'By product' : 'By show'}</h2>
         <div className="flex rounded-md border border-[var(--color-bg-border)] p-0.5 bg-[var(--color-bg-elevated)]" role="group" aria-label="Group COGS by">
           {(['products', 'shows'] as const).map((v) => (

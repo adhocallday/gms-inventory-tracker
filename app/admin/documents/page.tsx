@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { formatDate } from '@/lib/format';
 import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { Badge } from '@/components/ui/Badge';
+import { StatCard, STAT_GRID } from '@/components/dashboard/StatCard';
 import { Button, buttonVariants } from '@/components/ui/Button';
 import { ChevronDown, ChevronRight, ClipboardList, DollarSign, FileText, Package, Receipt } from 'lucide-react';
 
@@ -134,21 +135,18 @@ export default function DocumentsPage() {
       />
 
       {/* Stats */}
-      <div data-tour="admin-documents" className="grid grid-cols-3 md:grid-cols-6 gap-3 mt-6 mb-6">
+      <div data-tour="admin-documents" className={`${STAT_GRID} mt-5 mb-5`}>
         {(
           [
-            ['Total', stats.total, ''],
-            ['Draft', stats.draft, stats.draft > 0 ? 'text-warn' : ''],
-            ['Approved', stats.approved, ''],
-            ['Posted', stats.posted, ''],
-            ['Rejected', stats.rejected, ''],
-            ['Errors', stats.error, stats.error > 0 ? 'text-danger' : ''],
+            ['Total', stats.total, 'default'],
+            ['Draft', stats.draft, stats.draft > 0 ? 'warn' : 'default'],
+            ['Approved', stats.approved, 'default'],
+            ['Posted', stats.posted, 'default'],
+            ['Rejected', stats.rejected, 'default'],
+            ['Errors', stats.error, stats.error > 0 ? 'danger' : 'default'],
           ] as const
         ).map(([label, value, tone]) => (
-          <div key={label} className="g-card p-4">
-            <div className="text-[13px] font-medium text-[var(--color-text-secondary)]">{label}</div>
-            <div className={`mt-1 text-2xl font-semibold tabular-nums ${tone || 'text-[var(--color-text-primary)]'}`}>{value}</div>
-          </div>
+          <StatCard key={label} label={label} value={value} valueTone={tone} />
         ))}
       </div>
 

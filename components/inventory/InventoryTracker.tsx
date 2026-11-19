@@ -6,6 +6,7 @@ import { InventoryBalanceTable, type InventoryBalanceRow } from '@/components/in
 import { StockMovementsTable, type StockMovementRow } from '@/components/inventory/StockMovementsTable';
 import { Button } from '@/components/ui/Button';
 import { AlertTriangle, ArrowLeft, Ban } from 'lucide-react';
+import { StatCard, STAT_GRID } from '@/components/dashboard/StatCard';
 
 export interface Tour {
   id: string;
@@ -146,7 +147,7 @@ export function InventoryTracker({ tour, data }: { tour: Tour; data: InventoryDa
       </div>
 
       {/* Summary */}
-      <div data-tour="inv-summary" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mt-6">
+      <div data-tour="inv-summary" className={`${STAT_GRID} mt-5`}>
         {[
           { label: 'Product lines', value: formatNumber(data.summary.total_products) },
           { label: 'On hand', value: formatNumber(data.summary.total_on_hand) },
@@ -154,21 +155,18 @@ export function InventoryTracker({ tour, data }: { tour: Tour; data: InventoryDa
           { label: 'Sold', value: formatNumber(data.summary.total_sold) },
           { label: 'Inventory value', value: formatCurrency(data.summary.total_value) },
         ].map((card) => (
-          <div key={card.label} className="g-card p-4">
-            <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">{card.label}</p>
-            <p className="mt-1 text-2xl font-semibold tabular-nums">{card.value}</p>
-          </div>
+          <StatCard key={card.label} label={card.label} value={card.value} />
         ))}
       </div>
 
       {/* Alerts */}
       {(data.summary.low_stock_items > 0 || data.summary.out_of_stock_items > 0 || noReceiptLines > 0) && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 mt-2.5">
           {data.summary.out_of_stock_items > 0 && (
             <button
               type="button"
               onClick={() => setStockFilter('out')}
-              className="text-left rounded-lg border p-4 bg-danger-bg border-danger-border hover:border-danger"
+              className="text-left rounded-lg border px-3 py-2.5 bg-danger-bg border-danger-border hover:border-danger"
             >
               <p className="flex items-center gap-2 text-sm font-semibold text-danger">
                 <Ban className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -181,7 +179,7 @@ export function InventoryTracker({ tour, data }: { tour: Tour; data: InventoryDa
             <button
               type="button"
               onClick={() => setStockFilter('low')}
-              className="text-left rounded-lg border p-4 bg-warn-bg border-warn-border hover:border-warn"
+              className="text-left rounded-lg border px-3 py-2.5 bg-warn-bg border-warn-border hover:border-warn"
             >
               <p className="flex items-center gap-2 text-sm font-semibold text-warn">
                 <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -191,7 +189,7 @@ export function InventoryTracker({ tour, data }: { tour: Tour; data: InventoryDa
             </button>
           )}
           {noReceiptLines > 0 && (
-            <div className="rounded-lg border p-4 bg-[var(--color-bg-surface)] border-[var(--color-bg-border)]">
+            <div className="rounded-lg border px-3 py-2.5 bg-[var(--color-bg-surface)] border-[var(--color-bg-border)]">
               <p className="text-sm font-semibold text-[var(--color-text-primary)]">
                 {noReceiptLines} sizes with no received stock recorded
               </p>
@@ -204,7 +202,7 @@ export function InventoryTracker({ tour, data }: { tour: Tour; data: InventoryDa
       )}
 
       {/* Filters */}
-      <div data-tour="inv-controls" className="g-card p-4 mt-4">
+      <div data-tour="inv-controls" className="g-card g-panel mt-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label htmlFor="inv-search" className="g-label block mb-1">SKU</label>
@@ -275,7 +273,7 @@ export function InventoryTracker({ tour, data }: { tour: Tour; data: InventoryDa
 
       {/* Inventory Balance Table */}
       {view === 'balance' && (
-        <div data-tour="inv-balance" className="mt-6">
+        <div data-tour="inv-balance" className="mt-5">
           <h2 className="text-lg font-semibold mb-3">
             Balance <span className="font-normal text-[var(--color-text-secondary)] tabular-nums">· {filteredInventory.length} lines</span>
           </h2>
@@ -285,7 +283,7 @@ export function InventoryTracker({ tour, data }: { tour: Tour; data: InventoryDa
 
       {/* Stock Movements Table */}
       {view === 'movements' && (
-        <div className="mt-6">
+        <div className="mt-5">
           <h2 className="text-lg font-semibold mb-3">
             Received stock <span className="font-normal text-[var(--color-text-secondary)] tabular-nums">· {filteredMovements.length} receipts</span>
           </h2>

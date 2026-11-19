@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { formatNumber } from '@/lib/format';
 import { RecentActivityPanel, type RecentDocument } from '@/components/dashboard/RecentActivityPanel';
 import { UpcomingShowsPanel, type UpcomingShow } from '@/components/dashboard/UpcomingShowsPanel';
-import { cn } from '@/lib/utils';
+import { StatCard, STAT_GRID } from '@/components/dashboard/StatCard';
 import { fetchAll } from '@/lib/supabase/fetch-all';
 
 type TourRow = {
@@ -180,7 +180,7 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-8 py-6">
+    <div className="space-y-5 py-6">
       <PageHeader
         title="Tours"
         subtitle="Every tour with its posted sales, and the documents waiting for review."
@@ -192,46 +192,24 @@ export default async function DashboardPage() {
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4" data-tour="home-kpis">
-        {kpiCards.map((card) => {
-          const body = (
-            <>
-              <div className="text-[13px] font-medium text-[var(--color-text-secondary)]">{card.label}</div>
-              <div className="mt-1 text-2xl font-semibold tabular-nums text-[var(--color-text-primary)]">
-                {card.value}
-              </div>
-              <div
-                className={cn(
-                  'mt-1 text-xs',
-                  card.attention ? 'font-medium text-warn' : 'text-[var(--color-text-secondary)]'
-                )}
-              >
-                {card.note}
-              </div>
-            </>
-          );
-          const base = 'rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] p-4';
-          return card.href ? (
-            <Link
-              key={card.label}
-              href={card.href}
-              className={cn(base, 'transition-colors hover:border-[var(--color-text-muted)]')}
-            >
-              {body}
-            </Link>
-          ) : (
-            <article key={card.label} className={base}>
-              {body}
-            </article>
-          );
-        })}
+      <div className={STAT_GRID} data-tour="home-kpis">
+        {kpiCards.map((card) => (
+          <StatCard
+            key={card.label}
+            label={card.label}
+            value={card.value}
+            sub={card.note}
+            subTone={card.attention ? 'warn' : 'default'}
+            href={card.href}
+          />
+        ))}
       </div>
 
       <div data-tour="tours-dashboard">
         <ToursGrid tours={toursWithStats} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" data-tour="home-activity">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" data-tour="home-activity">
         <RecentActivityPanel documents={(recentDocs ?? []) as RecentDocument[]} />
         <UpcomingShowsPanel shows={upcomingShows} />
       </div>

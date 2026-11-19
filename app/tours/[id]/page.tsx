@@ -10,6 +10,7 @@ import TopSellersPanel from '@/components/tours/TopSellersPanel';
 import { CogsTable, type CogsRow } from '@/components/tours/CogsTable';
 import { InventoryTable } from '@/components/tours/InventoryTable';
 import { Badge } from '@/components/ui/Badge';
+import { StatCard, STAT_GRID } from '@/components/dashboard/StatCard';
 import { formatDate as formatDay } from '@/lib/format';
 import { ArrowLeft, ArrowRight, BarChart3, DollarSign, Package, SettingsIcon, Tag, TrendingUp } from 'lucide-react';
 
@@ -340,7 +341,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       </div>
 
       {/* Navigation Tabs */}
-      <nav data-tour="tour-tabs" aria-label="Tour pages" className="flex gap-1 mt-6 border-b border-[var(--color-bg-border)] pb-2 overflow-x-auto">
+      <nav data-tour="tour-tabs" aria-label="Tour pages" className="flex gap-1 mt-5 border-b border-[var(--color-bg-border)] pb-2 overflow-x-auto">
         <Link
           href={`/tours/${tour.id}/projections`}
           className={tabClass}
@@ -380,32 +381,19 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         </Link>
       </nav>
 
-      <div data-tour="tour-kpis" className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6">
-        <div className="g-card p-4">
-          <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">Gross sales</p>
-          <p className="text-xl sm:text-2xl font-semibold mt-1 tabular-nums">
-            {currencyFormatter.format(totalGross)}
-          </p>
-        </div>
-        <div className="g-card p-4">
-          <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">Per head</p>
-          <p className="text-xl sm:text-2xl font-semibold mt-1 tabular-nums">
-            {currencyFormatter.format(perHead)}
-          </p>
-        </div>
-        <div className="g-card p-4">
-          <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">Shows with sales</p>
-          <p className="text-xl sm:text-2xl font-semibold mt-1 tabular-nums">
-            {showsWithSales}
-            <span className="ml-1 text-sm font-normal text-[var(--color-text-secondary)]">of {showSummary?.length ?? 0}</span>
-          </p>
-        </div>
-        <div className="g-card p-4">
-          <p className="text-[13px] font-medium text-[var(--color-text-secondary)]">Units on hand</p>
-          <p className="text-xl sm:text-2xl font-semibold mt-1 tabular-nums">
-            {formatNumber(totalBalance)}
-          </p>
-        </div>
+      <div data-tour="tour-kpis" className={`${STAT_GRID} mt-5`}>
+        <StatCard label="Gross sales" value={currencyFormatter.format(totalGross)} />
+        <StatCard label="Per head" value={currencyFormatter.format(perHead)} />
+        <StatCard
+          label="Shows with sales"
+          value={
+            <>
+              {showsWithSales}
+              <span className="ml-1 text-sm font-normal text-[var(--color-text-secondary)]">of {showSummary?.length ?? 0}</span>
+            </>
+          }
+        />
+        <StatCard label="Units on hand" value={formatNumber(totalBalance)} />
       </div>
 
       <div data-tour="tour-shows">
@@ -417,8 +405,8 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       </div>
 
       {/* Business Insights Section */}
-      <section className="mt-10">
-        <h2 className="text-lg font-semibold mb-4">Sales and planning</h2>
+      <section className="mt-8">
+        <h2 className="text-lg font-semibold mb-3">Sales and planning</h2>
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
           <TopSellersPanel tourId={tour.id} topSellers={cogsSorted} productMap={productMap} />
 
@@ -519,8 +507,8 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       </section>
 
       {/* Detailed Data Section */}
-      <section className="mt-10">
-        <h2 className="text-lg font-semibold mb-4">Top 10 by gross and by stock</h2>
+      <section className="mt-8">
+        <h2 className="text-lg font-semibold mb-3">Top 10 by gross and by stock</h2>
 
         <div className="g-card p-5 mb-4">
           <div className="flex items-center justify-between mb-4">
@@ -558,8 +546,8 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       </section>
 
       {/* Operations Section */}
-      <section className="mt-10">
-        <h2 className="text-lg font-semibold mb-4">Purchasing and receiving</h2>
+      <section className="mt-8">
+        <h2 className="text-lg font-semibold mb-3">Purchasing and receiving</h2>
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
           <PurchaseOrdersPanel
             purchaseOrders={(purchaseOrders ?? []) as PurchaseOrderRow[]}
