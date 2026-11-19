@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseText, AIParseError, type JsonSchema } from '@/lib/ai/claude-client';
 
 export const runtime = 'nodejs';
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 const SHOWS_SCHEMA: JsonSchema = {
   type: 'object',

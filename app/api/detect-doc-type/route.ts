@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { parseDocument, AIParseError, type JsonSchema } from '@/lib/ai/claude-client';
 import { readUploadedFile, UploadError } from '@/lib/ai/read-upload';
+import { firstPdfPages } from '@/lib/ai/pdf-pages';
 import { createServiceClient } from '@/lib/supabase/client';
 
 export const runtime = 'nodejs';
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 const NULLABLE_STRING = { type: ['string', 'null'] };
 
@@ -186,12 +187,14 @@ export async function POST(request: NextRequest) {
       }
       throw e;
     }
-    const base64Pdf = upload.buffer.toString('base64');
+    // Classification only needs the first pages.
+    const trimmed = await firstPdfPages(upload.buffer.toString('base64'), 2);
+    const base64Pdf = trimmed.data;
 
     console.log(`[Detect Doc Type] Analyzing ${upload.fileName} (${(upload.buffer.length / 1024).toFixed(1)} KB) with Claude`);
 
     // Use the same parseDocument function that all other parsers use
-    const instructions = `You are analyzing a PDF document to determine its type and extract key information.
+    const instructions = `You are analyzing the first pages of a PDF document to determine its type and extract key information.
 
 Possible document types:
 1. Purchase Order (PO) - Contains vendor information, order details, SKUs, quantities, pricing
@@ -199,7 +202,7 @@ Possible document types:
 3. Sales Report - Contains sales data, quantities sold, revenue by product
 4. Settlement - Contains financial settlement information, fees, net amounts
 
-Analyze this PDF and return ONLY a JSON object (no markdown formatting) with:
+Analyze these pages and return:
 {
   "detectedType": "po" | "packing-list" | "sales-report" | "settlement",
   "confidence": "high" | "medium" | "low",
@@ -222,7 +225,6 @@ Important: Extract artistOrTourName, showDate, and venueName even if confidence 
 
     const parsedResponse = await parseDocument(base64Pdf, 'application/pdf', instructions, CLASSIFICATION_SCHEMA, {
       task: 'document-classification',
-      maxTokens: 2048,
     });
 
     const classification: ClassificationResult = {

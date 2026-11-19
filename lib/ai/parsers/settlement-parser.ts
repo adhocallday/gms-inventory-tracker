@@ -1,4 +1,4 @@
-import { parseDocument, type JsonSchema } from '../claude-client';
+import { parseDocument, type JsonSchema, type ParseOptions } from '../claude-client';
 
 export interface SettlementComp {
   sku: string;
@@ -43,7 +43,8 @@ const SETTLEMENT_SCHEMA: JsonSchema = {
 };
 
 export async function parseSettlementReport(
-  pdfBase64: string
+  pdfBase64: string,
+  options: ParseOptions = {}
 ): Promise<SettlementReportData> {
   const instructions = `
 You are parsing an AtVenu settlement report PDF. The structure is consistent:
@@ -75,5 +76,5 @@ Rules:
 - Return ONLY the JSON, no explanation or markdown
 `;
 
-  return parseDocument(pdfBase64, 'application/pdf', instructions, SETTLEMENT_SCHEMA) as Promise<SettlementReportData>;
+  return parseDocument(pdfBase64, 'application/pdf', instructions, SETTLEMENT_SCHEMA, options) as Promise<SettlementReportData>;
 }

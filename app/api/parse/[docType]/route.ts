@@ -5,7 +5,7 @@ import { parsePurchaseOrder } from '@/lib/ai/parsers/po-parser';
 import { parsePackingList } from '@/lib/ai/parsers/packing-list-parser';
 import { parseSalesReport } from '@/lib/ai/parsers/sales-report-parser';
 import { parseSettlementReport } from '@/lib/ai/parsers/settlement-parser';
-import { AIParseError } from '@/lib/ai/claude-client';
+import { AIParseError, type ParseOptions } from '@/lib/ai/claude-client';
 import { readUploadedFile, UploadError } from '@/lib/ai/read-upload';
 
 export const runtime = 'nodejs';
@@ -322,16 +322,16 @@ async function buildValidation(
   return { missing_fields, warnings };
 }
 
-async function parseByType(docType: DocType, base64: string) {
+async function parseByType(docType: DocType, base64: string, options: ParseOptions = {}) {
   switch (docType) {
     case 'po':
-      return parsePurchaseOrder(base64);
+      return parsePurchaseOrder(base64, options);
     case 'packing-list':
-      return parsePackingList(base64);
+      return parsePackingList(base64, options);
     case 'sales-report':
-      return parseSalesReport(base64);
+      return parseSalesReport(base64, options);
     case 'settlement':
-      return parseSettlementReport(base64);
+      return parseSettlementReport(base64, options);
     default:
       throw new Error(`Unsupported docType ${docType}`);
   }
@@ -402,7 +402,7 @@ export async function POST(
   let parsed: any;
   try {
     const parseStart = Date.now();
-    parsed = await parseByType(docType, base64);
+    parsed = await parseByType(docType, base64, { tourId, docId: sourceHash });
     console.log(`[Parse/${docType}] AI parsing: ${Date.now() - parseStart}ms`);
   } catch (error: any) {
     console.error(`[Parse Error] Doc type: ${docType}, File: ${fileName}`);

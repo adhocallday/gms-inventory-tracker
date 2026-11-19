@@ -1,5 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { parseDocument } from '@/lib/ai/claude-client';
+import { parseDocument, type JsonSchema } from '@/lib/ai/claude-client';
+
+const INVENTORY_SCHEMA: JsonSchema = {
+  type: 'object',
+  properties: {
+    inventory: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          sku: { type: 'string' },
+          size: { type: 'string' },
+          location: { type: 'string', enum: ['Warehouse', 'Webstore', 'Road', 'Retail'] },
+          quantity: { type: 'integer' },
+        },
+        required: ['sku', 'size', 'location', 'quantity'],
+      },
+    },
+  },
+  required: ['inventory'],
+};
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -64,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     const instructions = `You are analyzing an inventory spreadsheet containing starting stock levels.
 
-Extract all inventory line items from this document and return them as a structured JSON array.
+Extract all inventory line items from this document and return them as a list.
 
 For each inventory line item, extract:
 - sku: Product SKU (must match one of the valid SKUs below)
@@ -93,27 +113,9 @@ IMPORTANT GUIDELINES:
 - If a row has subtotals or summary data, skip it
 - Only include line items with actual inventory quantities
 
-Return ONLY a valid JSON object (no markdown formatting):
-{
-  "inventory": [
-    {
-      "sku": "GHOSRX203729BK",
-      "size": "M",
-      "location": "Warehouse",
-      "quantity": 150
-    },
-    {
-      "sku": "GHOSRX203729BK",
-      "size": "L",
-      "location": "Road",
-      "quantity": 200
-    }
-  ]
-}
+If no inventory is found, return an empty inventory array.`;
 
-If no inventory is found, return: {"inventory": []}`;
-
-    const parsedResponse = await parseDocument(base64Data, mediaType, instructions);
+    const parsedResponse = await parseDocument(base64Data, mediaType, instructions, INVENTORY_SCHEMA, { task: 'admin-parsing' });
 
     console.log(`[Parse Inventory] Successfully extracted ${parsedResponse.inventory?.length || 0} inventory items`);
 

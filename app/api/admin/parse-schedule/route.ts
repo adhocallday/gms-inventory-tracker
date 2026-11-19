@@ -1,5 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { parseDocument } from '@/lib/ai/claude-client';
+import { parseDocument, type JsonSchema } from '@/lib/ai/claude-client';
+
+const SHOWS_SCHEMA: JsonSchema = {
+  type: 'object',
+  properties: {
+    shows: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          showDate: { type: 'string', description: 'YYYY-MM-DD' },
+          venueName: { type: 'string' },
+          city: { type: 'string' },
+          state: { type: 'string' },
+          country: { type: 'string' },
+          capacity: { type: ['number', 'null'] },
+        },
+        required: ['showDate', 'venueName', 'city', 'state', 'country', 'capacity'],
+      },
+    },
+  },
+  required: ['shows'],
+};
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -49,7 +71,7 @@ export async function POST(request: NextRequest) {
     // Create instructions for Claude
     const instructions = `You are analyzing a document containing tour schedule information for "${tourName}" by ${artist}.
 
-Extract all show/concert dates from this document and return them as a structured JSON array.
+Extract all show/concert dates from this document and list them.
 
 For each show, extract:
 - showDate: Date in YYYY-MM-DD format
@@ -65,23 +87,9 @@ IMPORTANT FORMATTING:
 - State should be 2-letter abbreviation (FL, not Florida)
 - Country should be 2-letter code (US, not United States)
 
-Return ONLY a valid JSON object (no markdown formatting):
-{
-  "shows": [
-    {
-      "showDate": "2025-01-15",
-      "venueName": "Amalie Arena",
-      "city": "Tampa",
-      "state": "FL",
-      "country": "US",
-      "capacity": 19092
-    }
-  ]
-}
+If no shows are found, return an empty shows array.`;
 
-If no shows are found, return: {"shows": []}`;
-
-    const parsedResponse = await parseDocument(base64Data, mediaType, instructions);
+    const parsedResponse = await parseDocument(base64Data, mediaType, instructions, SHOWS_SCHEMA, { task: 'admin-parsing' });
 
     console.log(`[Parse Schedule] Successfully extracted ${parsedResponse.shows?.length || 0} shows`);
 

@@ -1,122 +1,62 @@
 /**
- * Benchmark script for testing document agent caching effectiveness.
+ * Sales report parse benchmark: latency, tokens, cache reads and cost per call,
+ * read from the API's `usage` (not inferred from timing).
  *
- * Run with: npx tsx scripts/benchmark-agents.ts
+ * Paid API calls. Dry run by default; pass --run to call the API.
+ *   npx tsx scripts/benchmark-agents.ts [--run] [--iterations 3]
  *
- * Expected results with Haiku:
- * - Parse time: ~3-8s per document
- * - Much faster than Sonnet (~50s)
+ * The parser sends no cache_control, so cache_read is expected to be 0; the
+ * numbers show what each parse actually costs.
  */
-
-// Load environment variables
 import * as dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env.local', quiet: true });
+process.env.AI_USAGE_LOG ??= 'off'; // benchmark runs don't write usage rows
 
 import * as fs from 'fs';
 import * as path from 'path';
 import { parseSalesReport } from '../lib/ai/parsers/sales-report-parser';
+import { calculateCostUsd } from '../lib/ai/usage';
+import { getModelProfile } from '../lib/ai/models';
+import type { CallResult } from '../lib/ai/claude-client';
 
-interface BenchmarkResult {
-  iteration: number;
-  file: string;
-  totalMs: number;
-  cacheStatus: string;
-  lineItems: number;
+const args = process.argv.slice(2);
+const run = args.includes('--run');
+const iterations = Number(args[args.indexOf('--iterations') + 1]) || 3;
+
+async function main() {
+  const pdfDir = path.join(process.cwd(), 'ghosttrackers');
+  const file = fs
+    .readdirSync(pdfDir)
+    .find(f => f.toLowerCase().includes('salesreport') && f.endsWith('.pdf'));
+  if (!file) throw new Error('No sales report PDF found in ghosttrackers/');
+  const base64 = fs.readFileSync(path.join(pdfDir, file)).toString('base64');
+  const profile = getModelProfile('document-parsing');
+
+  console.log(`File: ${file}`);
+  console.log(`Profile: ${profile.model} effort=${profile.effort} max_tokens=${profile.maxTokens}`);
+  if (!run) {
+    console.log(`Dry run: would parse it ${iterations} times. Pass --run to call the API.`);
+    return;
+  }
+
+  let total = 0;
+  for (let i = 1; i <= iterations; i++) {
+    let meta: CallResult | undefined;
+    const result = await parseSalesReport(base64, { onResult: r => (meta = r) });
+    if (!meta) continue;
+    const cost = calculateCostUsd(meta.model, meta.usage);
+    total += cost;
+    const u = meta.usage;
+    console.log(
+      `#${i} ${meta.latencyMs}ms model=${meta.model} in=${u.input_tokens} out=${u.output_tokens} ` +
+        `cache_write=${u.cache_creation_input_tokens ?? 0} cache_read=${u.cache_read_input_tokens ?? 0} ` +
+        `cost=$${cost.toFixed(4)} items=${result.lineItems?.length ?? 0}`
+    );
+  }
+  console.log(`Total: $${total.toFixed(4)}`);
 }
 
-async function runBenchmark() {
-  const pdfDir = path.join(__dirname, '..', 'ghosttrackers');
-
-  // Find sales report PDFs
-  const files = fs.readdirSync(pdfDir)
-    .filter(f => f.toLowerCase().includes('salesreport') && f.endsWith('.pdf'));
-
-  if (files.length === 0) {
-    console.error('No sales report PDFs found in ghosttrackers/');
-    process.exit(1);
-  }
-
-  console.log('='.repeat(70));
-  console.log('DOCUMENT AGENT BENCHMARK - Prompt Caching Test');
-  console.log('='.repeat(70));
-  console.log('');
-  console.log(`Found ${files.length} sales report(s)`);
-  console.log('Testing cache effectiveness by parsing multiple times...');
-  console.log('');
-
-  const results: BenchmarkResult[] = [];
-
-  // Parse the same document 3 times to test caching
-  const testFile = files[0];
-  const pdfPath = path.join(pdfDir, testFile);
-  const buffer = fs.readFileSync(pdfPath);
-  const base64 = buffer.toString('base64');
-
-  console.log(`Using: ${testFile}`);
-  console.log(`Size: ${(buffer.length / 1024).toFixed(1)} KB`);
-  console.log('');
-  console.log('-'.repeat(70));
-
-  for (let i = 1; i <= 3; i++) {
-    console.log(`\n[Iteration ${i}] Starting parse...`);
-
-    const start = Date.now();
-    try {
-      const result = await parseSalesReport(base64);
-      const totalMs = Date.now() - start;
-
-      results.push({
-        iteration: i,
-        file: testFile,
-        totalMs,
-        cacheStatus: i === 1 ? 'MISS (expected)' : 'HIT (expected)',
-        lineItems: result.lineItems?.length ?? 0
-      });
-
-      console.log(`[Iteration ${i}] Complete: ${totalMs}ms, ${result.lineItems?.length ?? 0} items`);
-    } catch (error) {
-      console.error(`[Iteration ${i}] Error:`, error);
-    }
-
-    // Small delay between requests
-    if (i < 3) {
-      console.log('Waiting 2s before next iteration...');
-      await new Promise(r => setTimeout(r, 2000));
-    }
-  }
-
-  // Summary
-  console.log('\n' + '='.repeat(70));
-  console.log('RESULTS SUMMARY');
-  console.log('='.repeat(70));
-  console.log('');
-
-  console.log('| Iteration | Time (ms) | Cache | Items |');
-  console.log('|-----------|-----------|-------|-------|');
-  for (const r of results) {
-    console.log(`| ${r.iteration}         | ${r.totalMs.toString().padStart(9)} | ${r.cacheStatus.padEnd(5)} | ${r.lineItems.toString().padStart(5)} |`);
-  }
-
-  console.log('');
-
-  if (results.length >= 2) {
-    const first = results[0].totalMs;
-    const second = results[1].totalMs;
-    const improvement = ((first - second) / first * 100).toFixed(1);
-
-    console.log(`First parse:  ${first}ms`);
-    console.log(`Second parse: ${second}ms`);
-    console.log(`Improvement:  ${improvement}% faster`);
-
-    if (second < first * 0.7) {
-      console.log('\n✓ Caching is working! Subsequent parses are significantly faster.');
-    } else {
-      console.log('\n⚠ Cache may not be effective - times are similar.');
-      console.log('  This could mean:');
-      console.log('  - Cache TTL expired (5 min)');
-      console.log('  - API doesn\'t support caching for this request');
-    }
-  }
-}
-
-runBenchmark().catch(console.error);
+main().catch(e => {
+  console.error(e);
+  process.exit(1);
+});

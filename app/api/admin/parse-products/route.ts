@@ -20,7 +20,7 @@ interface ProductWithImage extends Product {
   imageDataUrl?: string;
 }
 
-// JSON Schema for product extraction (enables fast Haiku parsing)
+// JSON Schema for product extraction (structured outputs)
 const PRODUCTS_SCHEMA = {
   type: 'object',
   properties: {
@@ -137,7 +137,6 @@ For each product, extract:
 
 ${existingProducts.length > 0 ? `\nEXISTING PRODUCTS (avoid duplicates):\n${existingProducts.map(p => `- ${p.sku}`).join('\n')}` : ''}`;
 
-    // Use Haiku with schema for fast, reliable parsing
     const parsedResponse = await parseText(spreadsheetText, instructions, PRODUCTS_SCHEMA);
 
     console.log(`[Parse Products] Spreadsheet parsing: ${Date.now() - startTime}ms`);
@@ -237,7 +236,6 @@ For each product, extract:
 - category: Product category (e.g., "T-Shirt", "Hoodie", "Poster", "Vinyl", "Accessory")
 - basePrice: Base retail price as a number (e.g., 30.00, not "$30")
 - sizes: Array of available sizes (e.g., ["S", "M", "L", "XL", "2XL", "3XL"] or ["One-Size"])
-- imageUrl: If this is an image of a product, return null (images will be handled separately)
 
 IMPORTANT GUIDELINES:
 - SKU should be uppercase and preserve any special characters
@@ -248,23 +246,10 @@ IMPORTANT GUIDELINES:
 
 ${existingProducts.length > 0 ? `\nEXISTING PRODUCTS (avoid duplicates):\n${existingProducts.map(p => `- ${p.sku}: ${p.name}`).join('\n')}` : ''}
 
-Return ONLY a valid JSON object (no markdown formatting):
-{
-  "products": [
-    {
-      "sku": "GHOSRX203729BK",
-      "name": "Black T-Shirt Skeleton Tour",
-      "category": "T-Shirt",
-      "basePrice": 30.00,
-      "sizes": ["S", "M", "L", "XL", "2XL", "3XL"]
-    }
-  ]
-}
-
-If no products are found, return: {"products": []}`;
+If no products are found, return an empty products array.`;
 
     // Parse document with Claude
-    const parsedResponse = await parseDocument(base64Data, mediaType, instructions);
+    const parsedResponse = await parseDocument(base64Data, mediaType, instructions, PRODUCTS_SCHEMA, { task: 'admin-parsing' });
 
     console.log(`[Parse Products] Successfully extracted ${parsedResponse.products?.length || 0} products`);
 

@@ -1,4 +1,4 @@
-import { parseDocument, type JsonSchema } from '../claude-client';
+import { parseDocument, type JsonSchema, type ParseOptions } from '../claude-client';
 
 export interface POLineItem {
   sku: string;
@@ -47,7 +47,8 @@ const PO_SCHEMA: JsonSchema = {
 };
 
 export async function parsePurchaseOrder(
-  pdfBase64: string
+  pdfBase64: string,
+  options: ParseOptions = {}
 ): Promise<PurchaseOrderData> {
   const instructions = `
 You are parsing a purchase order PDF. Extract the following and return ONLY valid JSON:
@@ -77,5 +78,5 @@ Rules:
 - Return ONLY the JSON, no explanation or markdown
 `;
 
-  return parseDocument(pdfBase64, 'application/pdf', instructions, PO_SCHEMA) as Promise<PurchaseOrderData>;
+  return parseDocument(pdfBase64, 'application/pdf', instructions, PO_SCHEMA, options) as Promise<PurchaseOrderData>;
 }

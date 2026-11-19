@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { getModelForTask, MODELS, type TaskType } from './models';
+import { fallbackParams, getModelProfile, type Effort, type TaskType } from './models';
+import { logUsage, type UsageRecord } from './usage';
 
 export interface ParsedDocument {
   [key: string]: any;
@@ -7,14 +8,34 @@ export interface ParsedDocument {
 
 export type JsonSchema = Record<string, unknown>;
 
-type MediaType = 'application/pdf' | 'image/jpeg' | 'image/png';
+export type MediaType = 'application/pdf' | 'image/jpeg' | 'image/png';
 
-interface ParseOptions {
-  /** Routes to a model via MODEL_ROUTING (default: 'document-parsing') */
+export interface CallResult {
+  model: string;
+  usage: UsageRecord['usage'];
+  latencyMs: number;
+  stopReason: string | null;
+}
+
+export interface ParseOptions {
+  /** Picks the model profile in lib/ai/models.ts (default: 'document-parsing') */
   task?: TaskType;
-  /** Reasoning effort for Sonnet/Opus (ignored for Haiku) */
-  effort?: 'low' | 'medium' | 'high';
+  /** Overrides the profile's effort */
+  effort?: Effort;
+  /** Overrides the profile's max_tokens */
   maxTokens?: number;
+  /** Overrides the profile's model (eval only; production code uses profiles) */
+  model?: string;
+  /** Attached to the usage log row */
+  tourId?: string | null;
+  docId?: string | null;
+  /** Called after each API response with its usage (eval, tests) */
+  onResult?: (result: CallResult) => void;
+  /**
+   * Overrides the media type the caller passes, so a PDF-only parser can be
+   * fed a page photo (extraction eval). The scanner path replaces this.
+   */
+  mediaType?: MediaType;
 }
 
 /**
@@ -41,13 +62,32 @@ export function getAnthropicClient(): Anthropic {
   return client;
 }
 
+/** Replace the shared client (eval dry runs and tests). */
+export function __setAnthropicClient(c: Anthropic | null) {
+  client = c;
+}
+
+/** Map SDK errors to AIParseError with a user-facing message. */
+export function toAIParseError(error: unknown): unknown {
+  if (error instanceof Anthropic.AuthenticationError) {
+    return new AIParseError('AI parsing is not configured', 'Invalid ANTHROPIC_API_KEY');
+  }
+  if (error instanceof Anthropic.RateLimitError) {
+    return new AIParseError('AI service is busy, please retry in a minute', error.message);
+  }
+  if (error instanceof Anthropic.APIError) {
+    return new AIParseError('AI service error', `${error.status ?? ''} ${error.message}`.trim());
+  }
+  return error;
+}
+
 /**
  * Structured outputs require every object to declare additionalProperties: false.
  * Applied recursively so parser schemas can stay readable.
  */
-function strictSchema(schema: JsonSchema): JsonSchema {
+export function strictSchema(schema: JsonSchema): JsonSchema {
   const out: JsonSchema = { ...schema };
-  if (out.type === 'object') {
+  if (out.type === 'object' || (Array.isArray(out.type) && out.type.includes('object'))) {
     out.additionalProperties = false;
     if (out.properties) {
       out.properties = Object.fromEntries(
@@ -55,77 +95,33 @@ function strictSchema(schema: JsonSchema): JsonSchema {
       );
     }
   }
-  if (out.type === 'array' && out.items) {
+  if (out.items) {
     out.items = strictSchema(out.items as JsonSchema);
+  }
+  if (Array.isArray(out.anyOf)) {
+    out.anyOf = (out.anyOf as JsonSchema[]).map(strictSchema);
   }
   return out;
 }
 
-/** Fallback for callers that don't pass a schema: pull the JSON object out of free text. */
-function extractJSON(text: string): ParsedDocument {
-  const codeBlock = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-  const body = codeBlock ? codeBlock[1] : text;
-  const jsonMatch = body.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
-    throw new AIParseError('Could not read the AI response', 'No JSON found in response: ' + text.substring(0, 300));
-  }
-  try {
-    return JSON.parse(jsonMatch[0]);
-  } catch (e) {
-    throw new AIParseError('Could not read the AI response', 'Invalid JSON: ' + (e as Error).message);
-  }
-}
-
-async function runStructured(
-  content: Anthropic.Beta.BetaContentBlockParam[],
-  schema: JsonSchema | undefined,
-  { task = 'document-parsing', effort = 'medium', maxTokens = 32000 }: ParseOptions
-): Promise<ParsedDocument> {
-  const anthropic = getAnthropicClient();
-  const model = getModelForTask(task);
-  const isHaiku = model === MODELS.HAIKU;
-
-  const outputConfig: Anthropic.Beta.BetaOutputConfig = {};
-  if (schema) outputConfig.format = { type: 'json_schema', schema: strictSchema(schema) };
-  // Haiku 4.5 does not accept the effort parameter
-  if (!isHaiku) outputConfig.effort = effort;
-
-  let message: Anthropic.Beta.BetaMessage;
-  try {
-    message = await anthropic.beta.messages
-      .stream({
-        model,
-        max_tokens: maxTokens,
-        messages: [{ role: 'user', content }],
-        ...(Object.keys(outputConfig).length ? { output_config: outputConfig } : {}),
-        // Server-side refusal fallback: if a safety classifier declines, the API
-        // re-runs the request on a fallback model within the same call.
-        ...(isHaiku ? {} : { betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' as const }),
-      })
-      .finalMessage();
-  } catch (error) {
-    if (error instanceof Anthropic.AuthenticationError) {
-      throw new AIParseError('AI parsing is not configured', 'Invalid ANTHROPIC_API_KEY');
-    }
-    if (error instanceof Anthropic.RateLimitError) {
-      throw new AIParseError('AI service is busy, please retry in a minute', error.message);
-    }
-    if (error instanceof Anthropic.APIError) {
-      throw new AIParseError('AI service error', `${error.status ?? ''} ${error.message}`.trim());
-    }
-    throw error;
-  }
-
+/** Throw on refusal or truncation; return the joined text blocks (thinking blocks skipped). */
+export function readTextOrThrow(
+  message: Pick<Anthropic.Beta.BetaMessage, 'stop_reason' | 'stop_details' | 'content'>,
+  maxTokens: number,
+  what = 'document'
+): string {
   if (message.stop_reason === 'refusal') {
-    throw new AIParseError('The AI declined to process this document', message.stop_details?.explanation ?? undefined);
+    throw new AIParseError(
+      `The AI declined to process this ${what}`,
+      message.stop_details?.explanation ?? message.stop_details?.category ?? undefined
+    );
   }
   if (message.stop_reason === 'max_tokens') {
     throw new AIParseError(
-      'Document is too large to parse in one pass',
+      what === 'document' ? 'Document is too large to parse in one pass' : `The AI response for this ${what} was cut off`,
       `Output hit the ${maxTokens} token limit`
     );
   }
-
   const text = message.content
     .filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === 'text')
     .map(b => b.text)
@@ -133,8 +129,57 @@ async function runStructured(
   if (!text) {
     throw new AIParseError('No response from AI', `stop_reason: ${message.stop_reason}`);
   }
+  return text;
+}
 
-  if (!schema) return extractJSON(text);
+async function runStructured(
+  content: Anthropic.Beta.BetaContentBlockParam[],
+  schema: JsonSchema,
+  options: ParseOptions
+): Promise<ParsedDocument> {
+  const task = options.task ?? 'document-parsing';
+  const profile = getModelProfile(task);
+  const model = options.model ?? profile.model;
+  const effort = options.effort ?? profile.effort;
+  const maxTokens = options.maxTokens ?? profile.maxTokens;
+  const anthropic = getAnthropicClient();
+
+  const started = Date.now();
+  let message: Anthropic.Beta.BetaMessage;
+  try {
+    message = await anthropic.beta.messages
+      .stream({
+        model,
+        max_tokens: maxTokens,
+        messages: [{ role: 'user', content }],
+        output_config: { effort, format: { type: 'json_schema', schema: strictSchema(schema) } },
+        // Server-side refusal fallback on Opus/Sonnet (Haiku has none; refusals handled below).
+        ...fallbackParams(model),
+      })
+      .finalMessage();
+  } catch (error) {
+    throw toAIParseError(error);
+  }
+
+  const result: CallResult = {
+    model: message.model,
+    usage: message.usage,
+    latencyMs: Date.now() - started,
+    stopReason: message.stop_reason,
+  };
+  options.onResult?.(result);
+  await logUsage({
+    task,
+    model: message.model,
+    effort,
+    usage: message.usage,
+    latencyMs: result.latencyMs,
+    stopReason: message.stop_reason,
+    tourId: options.tourId,
+    docId: options.docId,
+  });
+
+  const text = readTextOrThrow(message, maxTokens);
   try {
     return JSON.parse(text);
   } catch (e) {
@@ -143,19 +188,20 @@ async function runStructured(
 }
 
 /**
- * Parse a PDF or image with Claude. Pass a JSON schema to get schema-valid output.
+ * Parse a PDF or image with Claude into schema-valid JSON (structured outputs).
  */
 export async function parseDocument(
   base64Data: string,
   mediaType: MediaType,
   instructions: string,
-  schema?: JsonSchema,
+  schema: JsonSchema,
   options: ParseOptions = {}
 ): Promise<ParsedDocument> {
+  const type = options.mediaType ?? mediaType;
   const fileBlock: Anthropic.Beta.BetaContentBlockParam =
-    mediaType === 'application/pdf'
-      ? { type: 'document', source: { type: 'base64', media_type: mediaType, data: base64Data } }
-      : { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64Data } };
+    type === 'application/pdf'
+      ? { type: 'document', source: { type: 'base64', media_type: type, data: base64Data } }
+      : { type: 'image', source: { type: 'base64', media_type: type, data: base64Data } };
 
   return runStructured([fileBlock, { type: 'text', text: instructions }], schema, options);
 }
@@ -166,12 +212,12 @@ export async function parseDocument(
 export async function parseText(
   text: string,
   instructions: string,
-  schema?: JsonSchema,
+  schema: JsonSchema,
   options: ParseOptions = {}
 ): Promise<ParsedDocument> {
   return runStructured(
     [{ type: 'text', text: `${instructions}\n\nData to parse:\n${text}` }],
     schema,
-    options
+    { task: 'admin-parsing', ...options }
   );
 }

@@ -249,22 +249,28 @@ scripts/             # Utility scripts
 The AI-powered document parsing is the core feature of this application. Key details:
 
 ### Models Used
-Model IDs live only in `lib/ai/models.ts` (`getModelForTask()`); never hardcode them elsewhere.
-- **Haiku 4.5** (`claude-haiku-4-5`): document type classification (~3s)
-- **Sonnet 5.5** (`claude-sonnet-5-5`): document parsing and chat
-- **Opus 5.5** (`claude-opus-5-5`): projections and recommendations
+Model IDs live only in `lib/ai/models.ts`; never hardcode them elsewhere. Each task has a profile
+(`getModelProfile(task)`: model, effort, max_tokens, thinking display):
+- **Haiku 5.5** (`claude-haiku-5-5`), effort low: document type classification (first 2 PDF pages only), grab-sheet crop verification
+- **Sonnet 5.5** (`claude-sonnet-5-5`), effort medium: document extraction (pending the extraction eval), admin parsers, projection chat
+- **Opus 5.5** (`claude-opus-5-5`): projections and recommendations (effort high), grab-sheet tile detection (medium)
+
+Every call logs tokens and cost (`lib/ai/usage.ts`) to `ai_processing_logs` (migration 009); `/admin/analytics` shows the month's AI usage.
 
 ### Architecture
 ```
 lib/ai/
   claude-client.ts      # Core API client
   pdf-utils.ts          # PDF text extraction (pdf-parse v2)
+  models.ts             # Model IDs, task profiles, pricing
+  usage.ts              # Token usage and cost logging
   parsers/              # Document-specific parsers
     sales-report-parser.ts
     po-parser.ts
     packing-list-parser.ts
     settlement-parser.ts
-  agents/               # Document agents with prompts
+  projection-agent.ts   # Projections (structured outputs, cached tour data) and chat
+  chat-tools.ts         # suggest_overrides tool, history validation
 ```
 
 ### Parsing Flow
@@ -278,6 +284,8 @@ lib/ai/
 ### API rules for current models
 - Do **not** use forced `tool_choice` (`tool`/`any`): it returns a 400 on Sonnet/Opus 5.5.
 - No `temperature`, `budget_tokens`, or assistant prefill. Use `output_config.effort`.
+- Opus/Sonnet calls send `fallbacks: "default"` (beta `server-side-fallback-2026-07-01`, via `fallbackParams()`); Haiku 5.5 has no fallback. Check `stop_reason` for `refusal` and `max_tokens` on every call.
+- Streamed calls that show progress use `thinking: {type: "adaptive", display: "summarized"}`; the default display is omitted (empty thinking text).
 - The first content block may be `thinking`: always find the `text` block, never `content[0]`.
 - AI routes need `export const maxDuration = 300`.
 

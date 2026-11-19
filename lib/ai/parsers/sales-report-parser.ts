@@ -1,4 +1,4 @@
-import { parseDocument, type JsonSchema } from '../claude-client';
+import { parseDocument, type JsonSchema, type ParseOptions } from '../claude-client';
 
 export interface SalesLineItem {
   sku: string;
@@ -49,7 +49,8 @@ const SALES_REPORT_SCHEMA: JsonSchema = {
 };
 
 export async function parseSalesReport(
-  pdfBase64: string
+  pdfBase64: string,
+  options: ParseOptions = {}
 ): Promise<SalesReportData> {
   const instructions = `
 You are parsing an AtVenu sales report PDF. Extract the following and return ONLY valid JSON:
@@ -83,5 +84,5 @@ Important:
 - Return ONLY the JSON object
 `;
 
-  return parseDocument(pdfBase64, 'application/pdf', instructions, SALES_REPORT_SCHEMA) as Promise<SalesReportData>;
+  return parseDocument(pdfBase64, 'application/pdf', instructions, SALES_REPORT_SCHEMA, options) as Promise<SalesReportData>;
 }
