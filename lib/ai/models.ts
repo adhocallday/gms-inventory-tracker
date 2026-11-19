@@ -61,7 +61,8 @@ const profile = (
  */
 export const MODEL_PROFILES: Record<TaskType, ModelProfile> = {
   'document-classification': profile(MODELS.HAIKU, 'low', 2048),
-  // Pending the §2 eval: Sonnet 5.5 medium vs Opus 5.5 low/medium per doc type.
+  // Chosen by the extraction eval (docs/ai-model-eval.md, 2026-11-19): Sonnet 5.5 at
+  // medium matched Opus 5.5 (low and medium) on every document at about half the cost.
   'document-parsing': profile(MODELS.SONNET, 'medium', 32000),
   'admin-parsing': profile(MODELS.SONNET, 'medium', 32000),
 

@@ -252,7 +252,7 @@ The AI-powered document parsing is the core feature of this application. Key det
 Model IDs live only in `lib/ai/models.ts`; never hardcode them elsewhere. Each task has a profile
 (`getModelProfile(task)`: model, effort, max_tokens, thinking display):
 - **Haiku 5.5** (`claude-haiku-5-5`), effort low: document type classification (first 2 PDF pages only), grab-sheet crop verification
-- **Sonnet 5.5** (`claude-sonnet-5-5`), effort medium: document extraction (pending the extraction eval), admin parsers, projection chat
+- **Sonnet 5.5** (`claude-sonnet-5-5`), effort medium: document extraction (chosen by the extraction eval, `docs/ai-model-eval.md`), admin parsers, projection chat
 - **Opus 5.5** (`claude-opus-5-5`): whole-tour projection analysis and comprehensive projections (effort medium; at high they ran 3-3.7 min, near the 300 s limit), recommendations and size distribution (effort high), grab-sheet tile detection (medium)
 
 Every call logs tokens and cost (`lib/ai/usage.ts`) to `ai_processing_logs` (migration 009); `/admin/analytics` shows the month's AI usage.
