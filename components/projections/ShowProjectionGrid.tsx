@@ -100,18 +100,17 @@ export function ShowProjectionGrid({
     async function loadData() {
       setIsLoading(true);
       try {
-        // Load shows with projections
-        const showsRes = await fetch(
-          `/api/tours/${tourId}/projections/shows?scenario_id=${scenarioId}`
-        );
+        // Shows with projections and the reorder thresholds are independent:
+        // fetch both at once.
+        const [showsRes, thresholdsRes] = await Promise.all([
+          fetch(`/api/tours/${tourId}/projections/shows?scenario_id=${scenarioId}`),
+          fetch(`/api/tours/${tourId}/reorder-thresholds`),
+        ]);
         if (showsRes.ok) {
           const data = await showsRes.json();
           setShows(data.shows || []);
           setInitialInventory(data.initialInventory || []);
         }
-
-        // Load thresholds
-        const thresholdsRes = await fetch(`/api/tours/${tourId}/reorder-thresholds`);
         if (thresholdsRes.ok) {
           const data = await thresholdsRes.json();
           setThresholds(data.thresholds || []);
@@ -303,8 +302,10 @@ export function ShowProjectionGrid({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-sm text-[var(--color-text-secondary)]">Loading show projections...</div>
+      <div className="space-y-px py-2" aria-busy="true" aria-label="Loading show projections">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="h-7 animate-pulse rounded bg-[var(--color-bg-elevated)]" />
+        ))}
       </div>
     );
   }

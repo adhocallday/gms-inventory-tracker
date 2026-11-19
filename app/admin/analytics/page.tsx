@@ -1,54 +1,12 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { BarChart3 } from 'lucide-react';
 import { formatDate } from '@/lib/format';
+import { loadAnalytics } from '@/lib/analytics';
 
-interface AnalyticsData {
-  summary: {
-    totalGross: number;
-    totalUnits: number;
-    totalShows: number;
-    totalTours: number;
-    activeTours: number;
-    totalAttendance: number;
-    avgPerHead: number;
-    showsWithoutSales?: number;
-  };
-  tourRankings: {
-    byGross: TourMetric[];
-    byPerHead: TourMetric[];
-  };
-  recentShows: RecentShow[];
-  tours: TourMetric[];
-}
-
-interface TourMetric {
-  id: string;
-  name: string;
-  artist: string;
-  status: string;
-  showCount: number;
-  totalGross: number;
-  totalUnits: number;
-  totalAttendance: number;
-  avgPerHead: number;
-}
-
-interface RecentShow {
-  id: string;
-  tourName: string;
-  venueName: string;
-  city: string;
-  state: string;
-  showDate: string;
-  attendance: number | null;
-  totalGross: number;
-  perHead: number | null;
-}
+// Read live on every request (the Supabase client is no-store), never prerendered at build.
+export const dynamic = 'force-dynamic';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('en-US', {
@@ -63,40 +21,17 @@ function formatNumber(value: number): string {
   return new Intl.NumberFormat('en-US').format(Math.round(value));
 }
 
-export default function AnalyticsPage() {
-  const [data, setData] = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
-
+export default async function AnalyticsPage() {
   const breadcrumbs = generateBreadcrumbs([
     { label: 'Admin', href: '/admin' },
     { label: 'Analytics' },
   ]);
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, []);
-
-  const fetchAnalytics = async () => {
-    try {
-      const res = await fetch('/api/admin/analytics');
-      const result = await res.json();
-      setData(result);
-    } catch (error) {
-      console.error('Failed to fetch analytics:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="g-container py-12">
-        <div className="g-card p-12 text-center">
-          <div className="animate-pulse text-[var(--color-text-secondary)]" role="status">Loading analytics…</div>
-        </div>
-      </div>
-    );
-  }
+  // Rendered on the server: the page arrives with its figures.
+  const data = await loadAnalytics().catch((error) => {
+    console.error('[Analytics page] Load failed:', error);
+    return null;
+  });
 
   if (!data) {
     return (

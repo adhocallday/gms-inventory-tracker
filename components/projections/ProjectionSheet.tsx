@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LayoutGrid, Calendar, Copy, Maximize2, Minimize2, X } from 'lucide-react';
+import { LayoutGrid, Calendar, Copy, Loader2, Maximize2, Minimize2, X } from 'lucide-react';
 import { EnhancedAIAgentPanel } from './AIAgentPanel';
 import { ProjectionVisualizations } from './ProjectionVisualizations';
 import { ShowProjectionGrid } from './ShowProjectionGrid';
@@ -902,10 +902,21 @@ export function ProjectionSheet({
           </div>
         </div>
 
-        <div className="spreadsheet-container mt-6">
-          {isLoadingOverrides ? (
-            <p className="text-sm text-[var(--color-text-secondary)] p-4">Loading overrides…</p>
-          ) : (
+        {/* The sheet renders at once; saved overrides fill in when they arrive. */}
+        <div className="relative mt-6">
+          {isLoadingOverrides && (
+            <div
+              role="status"
+              className="absolute right-2 top-2 z-30 inline-flex items-center gap-1.5 rounded-full border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] px-2.5 py-1 text-[12.5px] font-medium text-[var(--color-text-secondary)] shadow-sm"
+            >
+              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+              Syncing saved overrides
+            </div>
+          )}
+          <div
+            className={`spreadsheet-container transition-opacity ${isLoadingOverrides ? 'opacity-60' : ''}`}
+            aria-busy={isLoadingOverrides}
+          >
             <table className="spreadsheet">
               <thead>
                 <tr>
@@ -1068,7 +1079,7 @@ export function ProjectionSheet({
                 </tr>
               </tfoot>
             </table>
-          )}
+          </div>
         </div>
       </div>
       )}
