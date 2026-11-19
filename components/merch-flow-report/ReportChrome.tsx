@@ -43,7 +43,7 @@ export function ReportHeader({
           <div className="h-6 w-px shrink-0 bg-[#E5E7EB]" aria-hidden="true" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-[15px] font-bold text-ink">{artist}</p>
-            <p className="truncate text-[13px] text-[#6B7280]">{tourName}</p>
+            <p className="truncate text-[13px] text-[#374151]">{tourName}</p>
           </div>
 
           <div className="hidden shrink-0 items-center gap-2 sm:flex">
@@ -64,7 +64,7 @@ export function ReportHeader({
               <li key={section.id}>
                 <a
                   href={`#${section.id}`}
-                  className="inline-flex h-9 items-center whitespace-nowrap rounded-full px-3 text-[14px] font-semibold text-[#4B5563] transition-colors hover:bg-[#F1F2F4] hover:text-ink"
+                  className="inline-flex h-9 items-center whitespace-nowrap rounded-full px-3 text-[14px] font-semibold text-[#374151] transition-colors hover:bg-[#F1F2F4] hover:text-ink"
                 >
                   {section.label}
                 </a>

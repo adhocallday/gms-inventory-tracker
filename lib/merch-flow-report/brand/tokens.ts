@@ -20,6 +20,17 @@ export const gms = {
 } as const;
 
 /**
+ * Text on light backgrounds in the web dashboard (components/web). `gms.slate`
+ * (#5D6C7B, 5.4:1) read too faint at dashboard sizes, so secondary text and
+ * numbers use #374151 (10.3:1 on white). The A3 PDF keeps its own palette.
+ * `lib/brand/tokens.test.ts` checks every text colour in components/web.
+ */
+export const webText = {
+  primary: '#111214',
+  secondary: '#374151',
+} as const;
+
+/**
  * Categorical series palette, led by GMS red.
  *
  * The site's raw gold and spring green are far too light to carry marks on

@@ -1,8 +1,8 @@
 # Vendored from MerchFlow Charts
 
 - **Source:** `merch-flow-charts`, branch `feature/merchflow-brand`
-- **Commit:** `3e81c54aff203c58fdac5c1ce1950530333f245c`
-- **Copied:** 2026-11-18
+- **Commit:** `51c6323bddce033b06bf686c75613bcacda41fa2`
+- **Copied:** 2026-11-19
 - **Sync:** `node scripts/sync-merch-flow-report.mjs` (re-copy) or `--check` (fail if anything differs).
   `lib/merch-flow-report/sync.test.ts` runs the check whenever the sibling Charts repo is present.
 
