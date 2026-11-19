@@ -32,7 +32,7 @@ export function CogsTable({ data, loading }: CogsTableProps) {
             <div className="font-semibold text-[var(--color-text-primary)]">
               {row.original.sku || 'SKU'}
             </div>
-            <div className="text-xs text-[var(--color-text-secondary)] mt-0.5">
+            <div className="text-[12.5px] text-[var(--color-text-secondary)] mt-0.5">
               {row.original.description || 'Description pending'}
             </div>
           </div>

@@ -42,7 +42,7 @@ export function InventoryBalanceTable({ data, loading, showTotals = true }: Inve
           return (
             <div>
               <div className="font-semibold text-[var(--color-text-primary)]">{row.getValue('sku')}</div>
-              <div className="text-xs text-[var(--color-text-secondary)]">{row.original.description}</div>
+              <div className="text-[12.5px] text-[var(--color-text-secondary)]">{row.original.description}</div>
               {noReceipts && (
                 <Badge variant="default" size="sm" className="mt-1">No received stock recorded</Badge>
               )}

@@ -78,7 +78,7 @@ export default async function AnalyticsPage() {
             <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
               Tours by gross
             </h2>
-            <p className="text-xs text-[var(--color-text-secondary)]">
+            <p className="text-[12.5px] text-[var(--color-text-secondary)]">
               Posted sales, all time
             </p>
           </div>
@@ -102,7 +102,7 @@ export default async function AnalyticsPage() {
                       <div className="font-medium text-[var(--color-text-primary)]">
                         {tour.name}
                       </div>
-                      <div className="text-xs text-[var(--color-text-secondary)]">
+                      <div className="text-[12.5px] text-[var(--color-text-secondary)]">
                         {tour.artist} · {tour.showCount} shows
                       </div>
                     </div>
@@ -111,7 +111,7 @@ export default async function AnalyticsPage() {
                     <div className="font-semibold text-[var(--color-text-primary)]">
                       {formatCurrency(tour.totalGross)}
                     </div>
-                    <div className="text-xs text-[var(--color-text-secondary)]">
+                    <div className="text-[12.5px] text-[var(--color-text-secondary)]">
                       {formatCurrency(tour.avgPerHead)}/head
                     </div>
                   </div>
@@ -127,7 +127,7 @@ export default async function AnalyticsPage() {
             <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
               Tours by per head
             </h2>
-            <p className="text-xs text-[var(--color-text-secondary)]">
+            <p className="text-[12.5px] text-[var(--color-text-secondary)]">
               Gross over attendance
             </p>
           </div>
@@ -151,7 +151,7 @@ export default async function AnalyticsPage() {
                       <div className="font-medium text-[var(--color-text-primary)]">
                         {tour.name}
                       </div>
-                      <div className="text-xs text-[var(--color-text-secondary)]">
+                      <div className="text-[12.5px] text-[var(--color-text-secondary)]">
                         {tour.artist} · {formatNumber(tour.totalAttendance)} attendance
                       </div>
                     </div>
@@ -160,7 +160,7 @@ export default async function AnalyticsPage() {
                     <div className="font-semibold tabular-nums text-[var(--color-text-primary)]">
                       {formatCurrency(tour.avgPerHead)}
                     </div>
-                    <div className="text-xs text-[var(--color-text-secondary)]">
+                    <div className="text-[12.5px] text-[var(--color-text-secondary)]">
                       {formatCurrency(tour.totalGross)} total
                     </div>
                   </div>
@@ -177,7 +177,7 @@ export default async function AnalyticsPage() {
           <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
             Recent shows with sales
           </h2>
-          <p className="text-xs text-[var(--color-text-secondary)]">
+          <p className="text-[12.5px] text-[var(--color-text-secondary)]">
             The 10 latest shows with a posted sales report.
             {(summary.showsWithoutSales ?? 0) > 0 &&
               ` ${summary.showsWithoutSales} shows have no sales report posted yet and are not listed.`}
@@ -192,35 +192,35 @@ export default async function AnalyticsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[var(--color-bg-border)] text-left">
-                  <th className="px-4 py-3 text-xs font-medium text-[var(--color-text-secondary)]">Date</th>
-                  <th className="px-4 py-3 text-xs font-medium text-[var(--color-text-secondary)]">Tour</th>
-                  <th className="px-4 py-3 text-xs font-medium text-[var(--color-text-secondary)]">Venue</th>
-                  <th className="px-4 py-3 text-xs font-medium text-[var(--color-text-secondary)] text-right">Attendance</th>
-                  <th className="px-4 py-3 text-xs font-medium text-[var(--color-text-secondary)] text-right">Gross</th>
-                  <th className="px-4 py-3 text-xs font-medium text-[var(--color-text-secondary)] text-right">Per head</th>
+                <tr className="border-b border-[var(--color-bg-border)] bg-[var(--color-table-head)] text-left">
+                  <th className="px-3 py-2 text-[12.5px] font-semibold text-[var(--color-text-secondary)]">Date</th>
+                  <th className="px-3 py-2 text-[12.5px] font-semibold text-[var(--color-text-secondary)]">Tour</th>
+                  <th className="px-3 py-2 text-[12.5px] font-semibold text-[var(--color-text-secondary)]">Venue</th>
+                  <th className="px-3 py-2 text-[12.5px] font-semibold text-[var(--color-text-secondary)] text-right">Attendance</th>
+                  <th className="px-3 py-2 text-[12.5px] font-semibold text-[var(--color-text-secondary)] text-right">Gross</th>
+                  <th className="px-3 py-2 text-[12.5px] font-semibold text-[var(--color-text-secondary)] text-right">Per head</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--color-bg-border)]">
                 {recentShows.map(show => (
                   <tr key={show.id} className="tabular-nums">
-                    <td className="px-4 py-3 text-sm text-[var(--color-text-primary)]">
+                    <td className="px-3 py-2 text-[13.5px] text-[var(--color-text-primary)]">
                       {formatDate(show.showDate)}
                     </td>
-                    <td className="px-4 py-3 text-sm">
+                    <td className="px-3 py-2 text-[13.5px]">
                       <span className="font-medium text-[var(--color-text-primary)]">{show.tourName}</span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-[var(--color-text-secondary)]">
+                    <td className="px-3 py-2 text-[13.5px] text-[var(--color-text-primary)]">
                       {show.venueName}
                       {show.city && <span> · {[show.city, show.state].filter(Boolean).join(', ')}</span>}
                     </td>
-                    <td className="px-4 py-3 text-sm text-right text-[var(--color-text-primary)]">
+                    <td className="px-3 py-2 text-[13.5px] text-right text-[var(--color-text-primary)]">
                       {show.attendance === null ? <span className="text-[var(--color-text-secondary)]">Not recorded</span> : formatNumber(show.attendance)}
                     </td>
-                    <td className="px-4 py-3 text-sm text-right font-medium text-[var(--color-text-primary)]">
+                    <td className="px-3 py-2 text-[13.5px] text-right font-medium text-[var(--color-text-primary)]">
                       {formatCurrency(show.totalGross)}
                     </td>
-                    <td className="px-4 py-3 text-sm text-right">
+                    <td className="px-3 py-2 text-[13.5px] text-right">
                       {show.perHead === null ? (
                         <span className="text-[var(--color-text-secondary)]">—</span>
                       ) : (

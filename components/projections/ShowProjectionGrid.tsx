@@ -375,8 +375,8 @@ export function ShowProjectionGrid({
                     idx < visibleShows.length - 1 ? 'border-r border-[var(--color-bg-border)]' : ''
                   }`}
                 >
-                  <div className="text-xs font-semibold">{formatDate(show.show_date)}</div>
-                  <div className="text-[10px] text-[var(--color-text-secondary)] truncate max-w-[90px]">
+                  <div className="text-[13px] font-semibold">{formatDate(show.show_date)}</div>
+                  <div className="text-[11.5px] text-[var(--color-text-secondary)] truncate max-w-[90px]">
                     {show.city || show.venue_name || 'TBD'}
                   </div>
                 </th>
@@ -406,17 +406,17 @@ export function ShowProjectionGrid({
                   <td className="sticky left-0 z-10 bg-[var(--color-bg-surface)] py-2 px-3">
                     {isFirstOfSku ? (
                       <div>
-                        <div className="font-mono text-xs font-medium">{row.sku}</div>
-                        <div className="text-[10px] text-[var(--color-text-secondary)] truncate max-w-[110px]">
+                        <div className="font-mono text-[13px] font-medium">{row.sku}</div>
+                        <div className="text-[11.5px] text-[var(--color-text-secondary)] truncate max-w-[110px]">
                           {row.description}
                         </div>
                       </div>
                     ) : null}
                   </td>
-                  <td className="sticky left-[120px] z-10 bg-[var(--color-bg-surface)] py-2 px-3 text-xs">
+                  <td className="sticky left-[120px] z-10 bg-[var(--color-bg-surface)] py-2 px-3 text-[13px]">
                     {row.size || 'OS'}
                   </td>
-                  <td className="sticky left-[180px] z-10 bg-[var(--color-bg-surface)] py-2 px-3 text-right font-mono text-xs border-r border-[var(--color-bg-border)]">
+                  <td className="sticky left-[180px] z-10 bg-[var(--color-bg-surface)] py-2 px-3 text-right font-mono text-[13px] border-r border-[var(--color-bg-border)]">
                     {initialQty}
                   </td>
 
@@ -464,7 +464,7 @@ export function ShowProjectionGrid({
                                 onChange={(e) => setEditValue(e.target.value)}
                                 onBlur={handleCellBlur}
                                 onKeyDown={handleKeyDown}
-                                className="w-14 px-1 py-0.5 text-center text-xs border border-[var(--color-red-primary)] rounded focus:outline-none focus:ring-1 focus:ring-[var(--color-red-primary)]"
+                                className="w-14 px-1 py-0.5 text-center text-[13px] border border-[var(--color-red-primary)] rounded focus:outline-none focus:ring-1 focus:ring-[var(--color-red-primary)]"
                                 autoFocus
                               />
                             ) : (
@@ -472,7 +472,7 @@ export function ShowProjectionGrid({
                                 onClick={() =>
                                   handleCellClick(show.id, row.sku, row.size, projectedUnits)
                                 }
-                                className="w-14 px-1 py-0.5 text-center text-xs font-mono hover:bg-[var(--color-bg-border)] rounded cursor-text"
+                                className="w-14 px-1 py-0.5 text-center text-[13px] font-mono hover:bg-[var(--color-bg-border)] rounded cursor-text"
                                 disabled={isSaving}
                               >
                                 {projectedUnits || '-'}
@@ -484,7 +484,7 @@ export function ShowProjectionGrid({
                           {deliveryTotal !== 0 && (
                             <button
                               onClick={() => onDeliveryClick?.(show.id, row.sku, row.size)}
-                              className="flex items-center justify-center gap-0.5 text-[10px] text-success hover:bg-success-bg rounded px-1"
+                              className="flex items-center justify-center gap-0.5 text-[11.5px] text-success hover:bg-success-bg rounded px-1"
                             >
                               <Truck className="w-3 h-3" />
                               <span>{deliveryTotal > 0 ? '+' : ''}{deliveryTotal}</span>
@@ -495,7 +495,7 @@ export function ShowProjectionGrid({
                           {compTotal > 0 && (
                             <button
                               onClick={() => onCompClick?.(show.id, row.sku, row.size)}
-                              className="flex items-center justify-center gap-0.5 text-[10px] text-ai hover:bg-ai-bg rounded px-1"
+                              className="flex items-center justify-center gap-0.5 text-[11.5px] text-ai hover:bg-ai-bg rounded px-1"
                             >
                               <Gift className="w-3 h-3" />
                               <span>-{compTotal}</span>
@@ -504,7 +504,7 @@ export function ShowProjectionGrid({
 
                           {/* Running balance */}
                           <div
-                            className={`text-[10px] text-center font-medium ${
+                            className={`text-[11.5px] text-center font-medium ${
                               belowThreshold
                                 ? 'text-danger bg-danger-bg rounded'
                                 : balance < 0

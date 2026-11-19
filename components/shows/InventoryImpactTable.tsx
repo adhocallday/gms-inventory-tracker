@@ -32,7 +32,7 @@ export function InventoryImpactTable({ data, loading }: InventoryImpactTableProp
         cell: ({ row }) => (
           <div>
             <div className="font-semibold text-[var(--color-text-primary)]">{row.getValue('sku')}</div>
-            <div className="text-xs text-[var(--color-text-secondary)]">{row.original.description}</div>
+            <div className="text-[12.5px] text-[var(--color-text-secondary)]">{row.original.description}</div>
           </div>
         ),
         enableSorting: true,
@@ -94,7 +94,7 @@ export function InventoryImpactTable({ data, loading }: InventoryImpactTableProp
             return (
               <div className="text-right">
                 <div className="tabular-nums text-[var(--color-text-secondary)]">{value.toLocaleString()}</div>
-                <div className="text-xs text-[var(--color-text-secondary)]">No received stock recorded</div>
+                <div className="text-[12.5px] text-[var(--color-text-secondary)]">No received stock recorded</div>
               </div>
             );
           }
@@ -106,8 +106,8 @@ export function InventoryImpactTable({ data, loading }: InventoryImpactTableProp
               )}
             >
               {value.toLocaleString()}
-              {value <= 0 && <span className="block text-xs font-normal">Out of stock</span>}
-              {value > 0 && value < 10 && <span className="block text-xs font-normal">Low</span>}
+              {value <= 0 && <span className="block text-[12.5px] font-normal">Out of stock</span>}
+              {value > 0 && value < 10 && <span className="block text-[12.5px] font-normal">Low</span>}
             </div>
           );
         },

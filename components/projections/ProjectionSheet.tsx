@@ -824,7 +824,7 @@ export function ProjectionSheet({
 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap items-center gap-3">
-            <label className="text-xs text-[var(--color-text-secondary)]">Scenario</label>
+            <label className="text-[12.5px] font-medium text-[var(--color-text-secondary)]">Scenario</label>
             <select
               className="g-input"
               value={selectedScenarioId}
@@ -944,13 +944,13 @@ export function ProjectionSheet({
                   return (
                     <tr key={row.sku} className={warning ? 'warning-row' : ''}>
                       <td className="sticky-col sticky-col-1">
-                        <div className="font-semibold text-xs">{row.sku}</div>
+                        <div className="font-semibold text-[13px]">{row.sku}</div>
                         {warning && (
-                          <div className="text-[10px] text-[var(--color-red-primary)]">Low stock</div>
+                          <div className="text-[11.5px] text-[var(--color-red-primary)]">Low stock</div>
                         )}
                       </td>
                       <td className="sticky-col sticky-col-2">
-                        <div className="text-xs truncate max-w-[130px]" title={row.description}>
+                        <div className="text-[13px] truncate max-w-[130px]" title={row.description}>
                           {row.description}
                         </div>
                       </td>

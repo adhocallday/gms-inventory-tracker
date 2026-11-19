@@ -28,7 +28,7 @@ export function SalesLinesTable({ data, loading }: SalesLinesTableProps) {
         cell: ({ row }) => (
           <div>
             <div className="font-semibold text-[var(--color-text-primary)]">{row.getValue('sku')}</div>
-            <div className="text-xs text-[var(--color-text-secondary)]">{row.original.description}</div>
+            <div className="text-[12.5px] text-[var(--color-text-secondary)]">{row.original.description}</div>
           </div>
         ),
         enableSorting: true,

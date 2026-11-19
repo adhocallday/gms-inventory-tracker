@@ -61,13 +61,13 @@ export function CogsReport({ tour, cogsData }: { tour: Tour; cogsData: CogsData 
               <p className="text-sm font-semibold">
                 {product.sku} · {product.size}
               </p>
-              <p className="text-xs text-[var(--color-text-secondary)] truncate">{product.description}</p>
+              <p className="text-[12.5px] text-[var(--color-text-secondary)] truncate">{product.description}</p>
             </div>
             <div className="text-right">
               <p className={`text-sm font-semibold tabular-nums ${pct < 30 ? 'text-danger' : pct < 50 ? 'text-warn' : ''}`}>
                 {formatPercent(pct)}
               </p>
-              <p className="text-xs text-[var(--color-text-secondary)] tabular-nums">{formatCurrency(product.gross_margin)}</p>
+              <p className="text-[12.5px] text-[var(--color-text-secondary)] tabular-nums">{formatCurrency(product.gross_margin)}</p>
             </div>
           </li>
         ))}

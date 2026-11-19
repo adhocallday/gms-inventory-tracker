@@ -307,7 +307,7 @@ export function ParsedDocumentsList({
               >
                 {option.label}
                 {count !== undefined && option.value !== 'all' && docTypeFilter === 'all' && (
-                  <span className="ml-2 text-xs tabular-nums opacity-80">{count}</span>
+                  <span className="ml-2 text-[12.5px] tabular-nums opacity-80">{count}</span>
                 )}
               </button>
             );
@@ -365,7 +365,7 @@ export function ParsedDocumentsList({
             >
               {option.label}
               {count !== undefined && option.value !== 'all' && statusFilter === 'all' && (
-                <span className="ml-2 text-xs tabular-nums opacity-80">{count}</span>
+                <span className="ml-2 text-[12.5px] tabular-nums opacity-80">{count}</span>
               )}
             </button>
           );
@@ -447,7 +447,7 @@ export function ParsedDocumentsList({
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-medium text-[var(--color-text-secondary)]">
+                    <span className="text-[12.5px] font-medium text-[var(--color-text-secondary)]">
                       {DOC_TYPE_LABELS[doc.doc_type] || doc.doc_type}
                     </span>
                     <Badge variant={doc.status} size="sm">{doc.status}</Badge>
@@ -455,7 +455,7 @@ export function ParsedDocumentsList({
                   <p className="text-sm font-semibold text-[var(--color-text-primary)] mb-1 break-all">
                     {doc.source_filename || 'Untitled document'}
                   </p>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--color-text-secondary)]">
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-[12.5px] text-[var(--color-text-secondary)]">
                     {doc.tours && <span>Tour: {doc.tours.name}</span>}
                     {doc.shows && (
                       <span>
@@ -470,7 +470,7 @@ export function ParsedDocumentsList({
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="text-xs text-[var(--color-text-secondary)] tabular-nums">
+                  <div className="text-[12.5px] text-[var(--color-text-secondary)] tabular-nums">
                     {formatDate(doc.created_at)}
                   </div>
                   <span className={cn(buttonVariants({ variant: 'secondary', size: 'sm' }), 'group-hover:bg-[var(--color-bg-elevated)]')}>

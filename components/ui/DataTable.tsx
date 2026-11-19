@@ -110,7 +110,7 @@ export function DataTable<TData, TValue>({
         <table className="w-full">
           <thead
             className={cn(
-              'bg-[var(--color-bg-elevated)] border-b border-[var(--color-bg-border)]',
+              'bg-[var(--color-table-head)] border-b border-[var(--color-bg-border)]',
               stickyHeader && 'lg:sticky lg:top-0 z-10'
             )}
           >
@@ -128,7 +128,7 @@ export function DataTable<TData, TValue>({
                     <th
                       key={header.id}
                       className={cn(
-                        'px-3 text-left text-xs font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-elevated)] shadow-[inset_0_-1px_0_var(--color-bg-border)]',
+                        'px-3 text-left text-[12.5px] font-semibold text-[var(--color-text-secondary)] bg-[var(--color-table-head)] shadow-[inset_0_-1px_0_var(--color-bg-border)]',
                         compact ? 'py-1.5' : 'py-2',
                         alignRight && 'text-right',
                         canSort && 'cursor-pointer select-none hover:text-[var(--color-text-primary)]'
@@ -154,13 +154,13 @@ export function DataTable<TData, TValue>({
                             header.getContext()
                           )}
                           {canSort && (
-                            <span className="text-[var(--color-text-muted)]">
+                            <span className="text-[var(--color-text-secondary)]">
                               {sorted === 'asc' ? (
                                 <ArrowUp className="w-3 h-3" />
                               ) : sorted === 'desc' ? (
                                 <ArrowDown className="w-3 h-3" />
                               ) : (
-                                <ArrowUpDown className="w-3 h-3 opacity-50" aria-hidden="true" />
+                                <ArrowUpDown className="w-3 h-3 opacity-60" aria-hidden="true" />
                               )}
                             </span>
                           )}
@@ -189,7 +189,7 @@ export function DataTable<TData, TValue>({
                     className={cn(
                       // 13.5px body text, py-2 rows; on phones a 44px row
                       // height keeps every row an easy touch target.
-                      'px-3 text-[13.5px] leading-5 text-[var(--color-text-secondary)] h-11 md:h-auto',
+                      'px-3 text-[13.5px] leading-5 text-[var(--color-text-primary)] h-11 md:h-auto',
                       compact ? 'py-1.5' : 'py-2',
                       (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' &&
                         'text-right tabular-nums'
@@ -210,7 +210,7 @@ export function DataTable<TData, TValue>({
 // Helper component for numeric columns
 export function NumericCell({ value, format = 'number' }: { value: number | null | undefined; format?: 'number' | 'currency' | 'percentage' }) {
   if (value === null || value === undefined) {
-    return <span className="text-[var(--color-text-muted)]">—</span>;
+    return <span className="text-[var(--color-text-secondary)]">—</span>;
   }
 
   let formatted = value.toString();
@@ -234,7 +234,7 @@ export function NumericCell({ value, format = 'number' }: { value: number | null
 // Helper for date columns
 export function DateCell({ value }: { value: string | Date | null | undefined }) {
   if (!value) {
-    return <span className="text-[var(--color-text-muted)]">—</span>;
+    return <span className="text-[var(--color-text-secondary)]">—</span>;
   }
 
   // A date-only string ("2025-07-09") parses as UTC midnight, so format it
