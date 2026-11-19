@@ -13,7 +13,7 @@ import { APP_ICONS, NAV_ITEMS, isNavActive } from './nav-items';
 
 /**
  * Phone navigation (under 768px): a fixed bottom bar with Tours, Documents,
- * Upload, POS and Menu. Menu opens every destination in a bottom sheet (a
+ * Upload (the /scan camera scanner), POS and Menu. Menu opens every destination in a bottom sheet (a
  * modal <dialog>: focus stays inside, Escape and the backdrop close it) that
  * also closes on navigation. The desktop sidebar (NavBar) is hidden here.
  */
@@ -38,7 +38,15 @@ const BAR_ITEMS: BarItem[] = [
     tour: 'documents',
     active: (p) => isNavActive(p, '/dashboard/parsed-documents'),
   },
-  { href: '/upload', label: 'Upload', icon: Upload, tour: 'upload', active: (p) => p.startsWith('/upload') },
+  // On a phone, Upload opens the camera scanner; the PDF uploader stays in Menu.
+  // The guided tour still anchors on this item (data-tour="upload") and then opens /upload.
+  {
+    href: '/scan',
+    label: 'Upload',
+    icon: Upload,
+    tour: 'upload',
+    active: (p) => p.startsWith('/scan') || p.startsWith('/upload'),
+  },
   { href: '/pos', label: 'POS', icon: Tablet, tour: 'pos-link', active: (p) => p.startsWith('/pos') },
 ];
 
