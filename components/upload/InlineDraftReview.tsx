@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from '@/components/layout/NavigationProgress';
 import { Check, X, Edit2, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { StatCard } from '@/components/dashboard/StatCard';
 
 type DocType = 'po' | 'packing-list' | 'sales-report' | 'settlement';
 
@@ -38,6 +39,12 @@ export function InlineDraftReview({
 
   const hasErrors = validation.missing_fields.length > 0;
   const hasWarnings = validation.warnings.length > 0;
+
+  const quantityOf = (item: any) =>
+    item.qty_sold ?? item.quantity ?? item.quantity_ordered ?? item.quantity_received ?? 0;
+  const amountOf = (item: any) => item.gross_sales ?? item.line_total ?? null;
+  const showAmount = docType === 'sales-report' || docType === 'po';
+  const qtyLabel = docType === 'sales-report' ? 'Sold' : docType === 'packing-list' ? 'Received' : 'Qty';
 
   const lineItems = useMemo(() => {
     if (docType === 'settlement') {
@@ -170,7 +177,7 @@ export function InlineDraftReview({
       <div className="p-4 space-y-3">
         {/* Show-specific fields */}
         {(docType === 'sales-report' || docType === 'settlement') && (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label htmlFor="draft-date" className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">Date</label>
               <input
@@ -196,35 +203,83 @@ export function InlineDraftReview({
 
         {/* Sales report totals */}
         {docType === 'sales-report' && (
-          <div className="grid grid-cols-3 gap-3">
-            <div>
+          <div className="space-y-3">
+            <div className="sm:max-w-[50%]">
               <label htmlFor="draft-attendance" className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">Attendance</label>
               <input
                 id="draft-attendance"
                 type="number"
+                inputMode="numeric"
                 value={editedData?.attendance || ''}
                 onChange={(e) => setEditedData({ ...editedData, attendance: Number(e.target.value) })}
                 className="g-input w-full text-sm"
               />
             </div>
-            <div>
-              <label className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">Total gross</label>
-              <div className="text-lg font-semibold text-[var(--color-text-primary)]">
-                {formatCurrency(editedData?.total_gross || 0)}
+            <div className="grid grid-cols-2 gap-3">
+              <StatCard label="Total gross" value={formatCurrency(editedData?.total_gross || 0)} />
+              <StatCard label="Line items" value={lineItems.length} />
+            </div>
+          </div>
+        )}
+
+        {/* Settlement totals */}
+        {docType === 'settlement' && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <StatCard label="Gross sales" value={formatCurrency(editedData?.gross_sales_total || 0)} />
+            <StatCard label="Sales tax" value={formatCurrency(editedData?.sales_tax_total || 0)} />
+            <StatCard label="Card fees" value={formatCurrency(editedData?.credit_card_fees || 0)} />
+            <StatCard label="Comp lines" value={lineItems.length} />
+          </div>
+        )}
+
+        {/* Packing list fields */}
+        {docType === 'packing-list' && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label htmlFor="draft-pl-po" className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">PO number</label>
+                <input
+                  id="draft-pl-po"
+                  type="text"
+                  value={editedData?.po_number || ''}
+                  onChange={(e) => setEditedData({ ...editedData, po_number: e.target.value })}
+                  className="g-input w-full text-sm"
+                />
+              </div>
+              <div>
+                <label htmlFor="draft-pl-delivery" className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">Delivery number</label>
+                <input
+                  id="draft-pl-delivery"
+                  type="text"
+                  value={editedData?.delivery_number || ''}
+                  onChange={(e) => setEditedData({ ...editedData, delivery_number: e.target.value })}
+                  className="g-input w-full text-sm"
+                />
+              </div>
+              <div>
+                <label htmlFor="draft-pl-date" className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">Received</label>
+                <input
+                  id="draft-pl-date"
+                  type="date"
+                  value={editedData?.received_date || ''}
+                  onChange={(e) => setEditedData({ ...editedData, received_date: e.target.value })}
+                  className="g-input w-full text-sm"
+                />
               </div>
             </div>
-            <div>
-              <label className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">Line items</label>
-              <div className="text-lg font-semibold text-[var(--color-text-primary)]">
-                {lineItems.length}
-              </div>
+            <div className="grid grid-cols-2 gap-3">
+              <StatCard
+                label="Units received"
+                value={lineItems.reduce((sum: number, item: any) => sum + Number(quantityOf(item) || 0), 0)}
+              />
+              <StatCard label="Line items" value={lineItems.length} />
             </div>
           </div>
         )}
 
         {/* PO fields */}
         {docType === 'po' && (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label htmlFor="draft-po-number" className="text-xs font-medium text-[var(--color-text-secondary)] block mb-1">PO number</label>
               <input
@@ -250,6 +305,8 @@ export function InlineDraftReview({
 
         {/* Line Items Toggle */}
         <button
+          type="button"
+          aria-expanded={showLineItems}
           onClick={() => setShowLineItems(!showLineItems)}
           className="flex items-center justify-between w-full p-2 bg-[var(--color-bg-elevated)] rounded-lg hover:bg-[var(--color-bg-border)] transition"
         >
@@ -259,40 +316,59 @@ export function InlineDraftReview({
           {showLineItems ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </button>
 
-        {/* Line Items Table */}
+        {/* Line items: cards on phones, a table from md up */}
         {showLineItems && lineItems.length > 0 && (
-          <div className="max-h-48 overflow-y-auto border border-[var(--color-bg-border)] rounded-lg">
-            <table className="w-full text-xs">
-              <thead className="bg-[var(--color-bg-elevated)] sticky top-0">
-                <tr>
-                  <th className="text-left p-2 font-medium">SKU</th>
-                  <th className="text-left p-2 font-medium">Size</th>
-                  <th className="text-right p-2 font-medium">
-                    {docType === 'settlement' ? 'Qty' : 'Sold'}
-                  </th>
-                  {docType !== 'settlement' && (
-                    <th className="text-right p-2 font-medium">Gross</th>
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {lineItems.map((item: any, i: number) => (
-                  <tr key={i} className="border-t border-[var(--color-bg-border)]">
-                    <td className="p-2 font-mono">{item.sku}</td>
-                    <td className="p-2">{item.size || '-'}</td>
-                    <td className="p-2 text-right">
-                      {item.qty_sold ?? item.quantity ?? 0}
-                    </td>
-                    {docType !== 'settlement' && (
-                      <td className="p-2 text-right">
-                        {formatCurrency(item.gross_sales ?? item.line_total ?? 0)}
-                      </td>
+          <>
+            <ul className="md:hidden max-h-[60vh] overflow-y-auto space-y-2" aria-label={docType === 'settlement' ? 'Comps' : 'Line items'}>
+              {lineItems.map((item: any, i: number) => (
+                <li key={i} className="rounded-lg border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] px-3 py-2.5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-mono text-[13px] font-semibold text-[var(--color-text-primary)] break-all">{item.sku || '-'}</p>
+                      {item.description && (
+                        <p className="text-xs text-[var(--color-text-secondary)] truncate">{item.description}</p>
+                      )}
+                    </div>
+                    <span className="shrink-0 rounded bg-[var(--color-bg-elevated)] px-1.5 py-0.5 text-xs font-medium text-[var(--color-text-primary)]">
+                      {item.size || '-'}
+                    </span>
+                  </div>
+                  <div className="mt-1.5 flex items-center justify-between text-sm tabular-nums">
+                    <span className="text-[var(--color-text-secondary)]">
+                      {qtyLabel} <span className="font-semibold text-[var(--color-text-primary)]">{quantityOf(item)}</span>
+                    </span>
+                    {showAmount && amountOf(item) !== null && (
+                      <span className="font-semibold text-[var(--color-text-primary)]">{formatCurrency(amountOf(item))}</span>
                     )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="hidden md:block max-h-64 overflow-y-auto border border-[var(--color-bg-border)] rounded-lg">
+              <table className="w-full text-xs">
+                <thead className="bg-[var(--color-bg-elevated)] sticky top-0">
+                  <tr>
+                    <th className="text-left p-2 font-medium">SKU</th>
+                    <th className="text-left p-2 font-medium">Size</th>
+                    <th className="text-right p-2 font-medium">{qtyLabel}</th>
+                    {showAmount && <th className="text-right p-2 font-medium">{docType === 'po' ? 'Total' : 'Gross'}</th>}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {lineItems.map((item: any, i: number) => (
+                    <tr key={i} className="border-t border-[var(--color-bg-border)]">
+                      <td className="p-2 font-mono">{item.sku}</td>
+                      <td className="p-2">{item.size || '-'}</td>
+                      <td className="p-2 text-right tabular-nums">{quantityOf(item)}</td>
+                      {showAmount && (
+                        <td className="p-2 text-right tabular-nums">{formatCurrency(amountOf(item) ?? 0)}</td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 
