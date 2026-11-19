@@ -160,21 +160,25 @@ export function getModelName(modelId: string): string {
  *
  * Prices are USD per million tokens, for the per-call cost log.
  */
+/**
+ * Grab-sheet calls, derived from the task profiles and pricing above so model IDs
+ * and prices live in one place.
+ */
+function grabSheetProfile(task: 'grab-sheet-detect' | 'grab-sheet-verify') {
+  const { model, effort, maxTokens } = MODEL_PROFILES[task];
+  return {
+    model,
+    effort,
+    maxTokens,
+    // Server-side refusal fallback exists for Opus/Sonnet, not Haiku.
+    serverFallback: model !== MODELS.HAIKU,
+    price: MODEL_PRICING[model],
+  };
+}
+
 export const GRAB_SHEET_PROFILES = {
-  detect: {
-    model: MODELS.OPUS,
-    effort: 'medium',
-    maxTokens: 32000,
-    serverFallback: true,
-    price: { input: 4, output: 20, cacheRead: 0.2 },
-  },
-  verify: {
-    model: 'claude-haiku-5-5',
-    effort: 'low',
-    maxTokens: 2048,
-    serverFallback: false,
-    price: { input: 0.1, output: 0.5, cacheRead: 0.01 },
-  },
-} as const;
+  detect: grabSheetProfile('grab-sheet-detect'),
+  verify: grabSheetProfile('grab-sheet-verify'),
+};
 
 export type GrabSheetProfile = (typeof GRAB_SHEET_PROFILES)[keyof typeof GRAB_SHEET_PROFILES];
