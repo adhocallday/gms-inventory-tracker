@@ -7,7 +7,7 @@ import { NavigationProgress } from '@/components/layout/NavigationProgress';
 import { SidebarProvider } from '@/components/layout/SidebarContext';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { GuidedTour } from '@/components/onboarding/GuidedTour';
+import { GuidedTour } from '@/components/onboarding/GuidedTourLoader';
 import './globals.css';
 
 // Self-hosted by next/font (no render-blocking Google Fonts request, and a

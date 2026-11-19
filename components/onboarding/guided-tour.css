@@ -1,0 +1,40 @@
+/*
+ * Guided tour additions, loaded with the tour (GuidedTour.tsx). The base
+ * popover styling (.driver-popover.mf-tour) is in app/globals.css.
+ */
+
+/* "Loading Inventory…" while the tour opens the next page. */
+.driver-popover.mf-tour .mf-tour-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.driver-popover.mf-tour .mf-tour-spinner {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  border: 2px solid var(--color-bg-border);
+  border-top-color: var(--color-red-primary);
+  animation: mf-tour-spin 0.7s linear infinite;
+}
+
+.driver-popover.mf-tour.mf-tour-loading .driver-popover-next-btn {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+@keyframes mf-tour-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .driver-popover.mf-tour .mf-tour-spinner {
+    animation-duration: 2s;
+  }
+}

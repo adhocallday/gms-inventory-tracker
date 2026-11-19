@@ -166,6 +166,7 @@ export function NavBar() {
               <div className="space-y-1">
                 <Link
                   href="/welcome"
+                  data-tour="nav-welcome"
                   title={collapsed ? 'How MerchFlow works' : undefined}
                   aria-label={collapsed ? 'How MerchFlow works' : undefined}
                   className={cn(

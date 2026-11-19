@@ -4,7 +4,9 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   FULL_CHAPTERS,
+  NAV_ANCHORS,
   OVERVIEW_CHAPTERS,
+  TAB_ANCHORS,
   TOURS,
   chapterLabel,
   gapPath,
@@ -55,29 +57,81 @@ const PAGE_FILES: Record<TourPage, string> = {
 
 /** Every data-tour value written in app/ and components/ (literal, or built in a template). */
 function anchorsInRepo(): string {
-  return execFileSync('grep', ['-rhoE', '--include=*.tsx', 'data-tour[=:][^>]{0,200}|tour: .[a-z-]+.|TOUR_ANCHORS[^;]*', 'app', 'components'], {
+  return execFileSync('grep', ['-rhoE', '--include=*.tsx', '--include=nav-items.ts', 'data-tour[=:][^>]{0,200}|tour: .[a-z-]+.|TOUR_ANCHORS[^;]*', 'app', 'components'], {
     cwd: ROOT,
     encoding: 'utf8',
   });
 }
 
 describe('tours', () => {
-  it('has the overview (default, 10 chapters numbered from 1) and the full walkthrough (12, from 0)', () => {
-    expect(OVERVIEW_CHAPTERS).toHaveLength(10);
-    expect(FULL_CHAPTERS).toHaveLength(12);
+  it('has the overview (default, 8 chapters numbered from 1) and the full walkthrough (10, from 0)', () => {
+    expect(OVERVIEW_CHAPTERS).toHaveLength(8);
+    expect(FULL_CHAPTERS).toHaveLength(10);
     expect(TOURS.overview.firstNumber).toBe(1);
     expect(TOURS.full.firstNumber).toBe(0);
   });
 
-  it('keeps the overview to about 35 steps', () => {
-    const steps = allSteps('overview').length;
-    expect(steps).toBeGreaterThanOrEqual(30);
-    expect(steps).toBeLessThanOrEqual(42);
+  it('keeps the overview to about 30 steps and the full walkthrough to about 40', () => {
+    expect(allSteps('overview').length).toBeLessThanOrEqual(36);
+    expect(allSteps('full').length).toBeLessThanOrEqual(46);
   });
 
   it('labels chapters with the tour name', () => {
-    expect(chapterLabel('overview', 2)).toBe('Overview · 3 of 10 · AI reads, GMS rules decide');
-    expect(chapterLabel('full', 3)).toBe('Full walkthrough · 3 of 11 · A show');
+    expect(chapterLabel('overview', 2)).toBe('Overview · 3 of 8 · One database, one set of numbers');
+    expect(chapterLabel('full', 3)).toBe('Full walkthrough · 3 of 9 · A show');
+  });
+
+  it.each(TOUR_IDS)('%s: visits each page in one run of chapters, in navigation order', (tour) => {
+    // /welcome opens and closes each tour, so it is the one page allowed at both ends.
+    const chaptersByPage = new Map<TourPage, number[]>();
+    TOURS[tour].chapters.forEach((chapter, index) => {
+      for (const step of chapter.steps) {
+        const list = chaptersByPage.get(step.page) ?? [];
+        if (!list.includes(index)) list.push(index);
+        chaptersByPage.set(step.page, list);
+      }
+    });
+    for (const [page, chapters] of Array.from(chaptersByPage)) {
+      if (page === 'welcome') continue;
+      for (let i = 1; i < chapters.length; i++) {
+        expect(chapters[i] - chapters[i - 1], `${tour}: ${page} in chapters ${chapters.join(', ')}`).toBe(1);
+      }
+    }
+  });
+
+  it.each(TOUR_IDS)('%s: every chapter after the first opens with a "where to click" step', (tour) => {
+    TOURS[tour].chapters.slice(1).forEach((chapter) => {
+      const first = chapter.steps[0];
+      expect(first.via, `${chapter.id}: ${first.title}`).toBeDefined();
+      const allowed: readonly string[] = first.via === 'nav' ? NAV_ANCHORS : TAB_ANCHORS;
+      expect(allowed, `${chapter.id}: ${first.anchor}`).toContain(first.anchor);
+    });
+  });
+
+  it.each(TOUR_IDS)('%s: "where to click" steps use sidebar or tour-tab anchors', (tour) => {
+    for (const step of allSteps(tour)) {
+      if (step.via === 'nav') expect(NAV_ANCHORS as readonly string[]).toContain(step.anchor);
+      if (step.via === 'tab') {
+        expect(TAB_ANCHORS as readonly string[]).toContain(step.anchor);
+        expect(step.page, step.title).toBe('tour');
+      }
+    }
+  });
+
+  it('puts the tab anchors on the tour page and the nav anchors in the navigation', () => {
+    const tourPage = execFileSync('cat', [path.join(ROOT, PAGE_FILES.tour)], { encoding: 'utf8' });
+    for (const anchor of TAB_ANCHORS) expect(tourPage, anchor).toContain(`data-tour="${anchor}"`);
+    const nav = execFileSync(
+      'cat',
+      ['components/layout/NavBar.tsx', 'components/layout/MobileNav.tsx', 'components/layout/nav-items.ts'].map((f) =>
+        path.join(ROOT, f),
+      ),
+      { encoding: 'utf8' },
+    );
+    for (const anchor of NAV_ANCHORS) {
+      const found = nav.includes(`"${anchor}"`) || nav.includes(`'${anchor}'`);
+      expect(found, anchor).toBe(true);
+    }
   });
 
   it.each(TOUR_IDS)('%s: every step points at a page that exists', (tour) => {
@@ -93,7 +147,10 @@ describe('tours', () => {
     for (const step of allSteps(tour)) {
       for (const anchor of [step.anchor, step.fallbackAnchor]) {
         if (!anchor) continue;
-        const found = source.includes(`"${anchor}"`) || source.includes(`'${anchor}'`) || dynamic.some((re) => re.test(anchor));
+        const found =
+          source.includes(`"${anchor}"`) ||
+          source.includes(`'${anchor}'`) ||
+          dynamic.some((re) => re.test(anchor));
         expect(found, `${step.title}: data-tour="${anchor}"`).toBe(true);
       }
     }
