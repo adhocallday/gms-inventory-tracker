@@ -1,4 +1,5 @@
-import { parseDocument, type JsonSchema } from '../claude-client';
+import { parseDocumentInput, type JsonSchema } from '../claude-client';
+import { asDocumentInput, type DocumentInput } from '../document-input';
 
 export interface PackingListLineItem {
   sku: string;
@@ -39,7 +40,7 @@ const PACKING_LIST_SCHEMA: JsonSchema = {
 };
 
 export async function parsePackingList(
-  pdfBase64: string
+  input: DocumentInput | string
 ): Promise<PackingListData> {
   const instructions = `
 You are parsing a packing list/delivery receipt PDF. Vendor formats vary - be flexible.
@@ -71,5 +72,5 @@ Rules:
 - Return ONLY the JSON, no explanation or markdown
 `;
 
-  return parseDocument(pdfBase64, 'application/pdf', instructions, PACKING_LIST_SCHEMA) as Promise<PackingListData>;
+  return parseDocumentInput(asDocumentInput(input), instructions, PACKING_LIST_SCHEMA) as Promise<PackingListData>;
 }

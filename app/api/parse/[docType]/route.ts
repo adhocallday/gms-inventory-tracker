@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
 import { createServiceClient } from '@/lib/supabase/client';
 import { parsePurchaseOrder } from '@/lib/ai/parsers/po-parser';
 import { parsePackingList } from '@/lib/ai/parsers/packing-list-parser';
@@ -7,6 +6,7 @@ import { parseSalesReport } from '@/lib/ai/parsers/sales-report-parser';
 import { parseSettlementReport } from '@/lib/ai/parsers/settlement-parser';
 import { AIParseError } from '@/lib/ai/claude-client';
 import { readUploadedFile, UploadError } from '@/lib/ai/read-upload';
+import type { DocumentInput } from '@/lib/ai/document-input';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -322,16 +322,16 @@ async function buildValidation(
   return { missing_fields, warnings };
 }
 
-async function parseByType(docType: DocType, base64: string) {
+async function parseByType(docType: DocType, document: DocumentInput) {
   switch (docType) {
     case 'po':
-      return parsePurchaseOrder(base64);
+      return parsePurchaseOrder(document);
     case 'packing-list':
-      return parsePackingList(base64);
+      return parsePackingList(document);
     case 'sales-report':
-      return parseSalesReport(base64);
+      return parseSalesReport(document);
     case 'settlement':
-      return parseSettlementReport(base64);
+      return parseSettlementReport(document);
     default:
       throw new Error(`Unsupported docType ${docType}`);
   }
@@ -358,14 +358,11 @@ export async function POST(
       }
       throw e;
     }
-  const { buffer, fileName } = upload;
+  const { document, sourceHash, fileName } = upload;
   const tourId = upload.fields.tourId;
   const showId = upload.fields.showId;
-
-  const bufferStart = Date.now();
-  const sourceHash = crypto.createHash('sha256').update(buffer).digest('hex');
-  const base64 = buffer.toString('base64');
-  console.log(`[Parse/${docType}] Buffer/hash: ${Date.now() - bufferStart}ms`);
+  const pageNote = document.kind === 'images' ? `${document.pages.length} page image(s)` : 'PDF';
+  console.log(`[Parse/${docType}] ${pageNote}, ${(upload.byteLength / 1024).toFixed(0)} KB`);
 
   const supabase = createServiceClient();
 
@@ -402,7 +399,7 @@ export async function POST(
   let parsed: any;
   try {
     const parseStart = Date.now();
-    parsed = await parseByType(docType, base64);
+    parsed = await parseByType(docType, document);
     console.log(`[Parse/${docType}] AI parsing: ${Date.now() - parseStart}ms`);
   } catch (error: any) {
     console.error(`[Parse Error] Doc type: ${docType}, File: ${fileName}`);

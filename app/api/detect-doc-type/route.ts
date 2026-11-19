@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { parseDocument, AIParseError, type JsonSchema } from '@/lib/ai/claude-client';
+import { parseDocumentInput, AIParseError, type JsonSchema } from '@/lib/ai/claude-client';
+import { firstPages } from '@/lib/ai/document-input';
 import { readUploadedFile, UploadError } from '@/lib/ai/read-upload';
 import { createServiceClient } from '@/lib/supabase/client';
 
@@ -173,7 +174,7 @@ async function matchTourAndShow(extractedInfo: any): Promise<TourShowMatch> {
 
 /**
  * POST /api/detect-doc-type
- * Detect document type using Claude's PDF reading capability
+ * Detect document type from a PDF or page images
  */
 export async function POST(request: NextRequest) {
   try {
@@ -186,12 +187,13 @@ export async function POST(request: NextRequest) {
       }
       throw e;
     }
-    const base64Pdf = upload.buffer.toString('base64');
+    // The type and show are on the first pages; classify page images from those alone.
+    const document = firstPages(upload.document, 2);
 
-    console.log(`[Detect Doc Type] Analyzing ${upload.fileName} (${(upload.buffer.length / 1024).toFixed(1)} KB) with Claude`);
+    console.log(`[Detect Doc Type] Analyzing ${upload.fileName} (${(upload.byteLength / 1024).toFixed(1)} KB) with Claude`);
 
     // Use the same parseDocument function that all other parsers use
-    const instructions = `You are analyzing a PDF document to determine its type and extract key information.
+    const instructions = `You are analyzing a document (a PDF or photographed pages) to determine its type and extract key information.
 
 Possible document types:
 1. Purchase Order (PO) - Contains vendor information, order details, SKUs, quantities, pricing
@@ -199,7 +201,7 @@ Possible document types:
 3. Sales Report - Contains sales data, quantities sold, revenue by product
 4. Settlement - Contains financial settlement information, fees, net amounts
 
-Analyze this PDF and return ONLY a JSON object (no markdown formatting) with:
+Analyze this document and return ONLY a JSON object (no markdown formatting) with:
 {
   "detectedType": "po" | "packing-list" | "sales-report" | "settlement",
   "confidence": "high" | "medium" | "low",
@@ -220,7 +222,7 @@ Important: Extract artistOrTourName, showDate, and venueName even if confidence 
 - Venue names (e.g., "CFG Bank Arena", "Madison Square Garden")
 - Show dates in any format`;
 
-    const parsedResponse = await parseDocument(base64Pdf, 'application/pdf', instructions, CLASSIFICATION_SCHEMA, {
+    const parsedResponse = await parseDocumentInput(document, instructions, CLASSIFICATION_SCHEMA, {
       task: 'document-classification',
       maxTokens: 2048,
     });
