@@ -3,13 +3,17 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { StreamingText } from './ThinkingDisplay';
 import { OverridePreview } from './OverridePreview';
-import type { SuggestedOverride } from '@/lib/ai/streaming-projection-agent';
+import type { SuggestedOverride } from '@/lib/ai/chat-tools';
+import { readSseEvents } from './sse';
 
 interface ChatInterfaceProps {
   tourId: string;
   scenarioId: string;
   useStreaming?: boolean;
   onOverridesApplied?: () => void;
+  /** The sheet's current inputs, so the assistant quotes the same projection */
+  expectedAttendance?: number;
+  expectedPerHead?: number;
 }
 
 interface ChatMessage {
@@ -19,7 +23,8 @@ interface ChatMessage {
 }
 
 interface StreamEvent {
-  type: 'content' | 'override_suggestion' | 'complete' | 'error';
+  type: 'phase' | 'thinking' | 'content' | 'override_suggestion' | 'complete' | 'error';
+  phase?: string;
   content?: string;
   overrides?: SuggestedOverride[];
 }
@@ -28,12 +33,15 @@ export function ChatInterface({
   tourId,
   scenarioId,
   useStreaming = false,
-  onOverridesApplied
+  onOverridesApplied,
+  expectedAttendance,
+  expectedPerHead
 }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
+  const [streamingThinking, setStreamingThinking] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [pendingOverrides, setPendingOverrides] = useState<SuggestedOverride[]>([]);
   const [isApplying, setIsApplying] = useState(false);
@@ -115,6 +123,7 @@ export function ChatInterface({
   async function sendMessageWithStreaming(userMessage: string) {
     setIsStreaming(true);
     setStreamingContent('');
+    setStreamingThinking('');
 
     try {
       const response = await fetch('/api/projections/chat-stream', {
@@ -124,6 +133,8 @@ export function ChatInterface({
           tourId,
           scenarioId,
           message: userMessage,
+          expectedAttendance,
+          expectedPerHead,
           history: messages.map(m => ({ role: m.role, content: m.content }))
         })
       });
@@ -132,56 +143,44 @@ export function ChatInterface({
         throw new Error(`API error: ${response.status}`);
       }
 
-      const reader = response.body?.getReader();
-      if (!reader) {
-        throw new Error('No response body');
-      }
-
-      const decoder = new TextDecoder();
       let fullContent = '';
       let receivedOverrides: SuggestedOverride[] = [];
+      let streamError: string | null = null;
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      for await (const event of readSseEvents<StreamEvent>(response)) {
+        switch (event.type) {
+          case 'thinking':
+            setStreamingThinking(prev => prev + (event.content || ''));
+            break;
 
-        const text = decoder.decode(value);
-        const lines = text.split('\n').filter(line => line.startsWith('data: '));
+          case 'content':
+            fullContent += event.content || '';
+            setStreamingContent(fullContent);
+            break;
 
-        for (const line of lines) {
-          try {
-            const event: StreamEvent = JSON.parse(line.replace('data: ', ''));
-
-            switch (event.type) {
-              case 'content':
-                fullContent += event.content || '';
-                setStreamingContent(fullContent);
-                break;
-
-              case 'override_suggestion':
-                if (event.overrides && event.overrides.length > 0) {
-                  receivedOverrides = event.overrides;
-                  setPendingOverrides(event.overrides);
-                }
-                break;
-
-              case 'complete':
-                setMessages(prev => [...prev, {
-                  role: 'assistant',
-                  content: fullContent,
-                  overrides: receivedOverrides.length > 0 ? receivedOverrides : undefined
-                }]);
-                setStreamingContent('');
-                break;
-
-              case 'error':
-                throw new Error(event.content || 'Stream error');
+          case 'override_suggestion':
+            if (event.overrides && event.overrides.length > 0) {
+              receivedOverrides = event.overrides;
+              setPendingOverrides(event.overrides);
             }
-          } catch (parseError) {
-            console.warn('Failed to parse SSE event:', line);
-          }
+            break;
+
+          case 'complete':
+            setMessages(prev => [...prev, {
+              role: 'assistant',
+              content: fullContent || (receivedOverrides.length > 0 ? 'Here are the suggested changes.' : ''),
+              overrides: receivedOverrides.length > 0 ? receivedOverrides : undefined
+            }]);
+            setStreamingContent('');
+            setStreamingThinking('');
+            break;
+
+          case 'error':
+            streamError = event.content || 'Stream error';
+            break;
         }
       }
+      if (streamError) throw new Error(streamError);
     } catch (error) {
       console.error('Chat stream error:', error);
       setMessages(prev => [...prev, {
@@ -189,6 +188,7 @@ export function ChatInterface({
         content: 'Sorry, I encountered an error. Please try again.'
       }]);
       setStreamingContent('');
+      setStreamingThinking('');
       setPendingOverrides([]);
     } finally {
       setLoading(false);
@@ -209,7 +209,14 @@ export function ChatInterface({
       });
 
       const data = await response.json();
-      setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+      if (!response.ok) throw new Error(data.error || `API error: ${response.status}`);
+      const overrides: SuggestedOverride[] = data.overrides ?? [];
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: data.response,
+        overrides: overrides.length > 0 ? overrides : undefined
+      }]);
+      if (overrides.length > 0) setPendingOverrides(overrides);
     } catch (error) {
       console.error('Chat error:', error);
       setMessages(prev => [...prev, {
@@ -255,6 +262,19 @@ export function ChatInterface({
           </div>
         ))}
 
+        {/* Summarized reasoning while the reply is being prepared */}
+        {isStreaming && streamingThinking && !streamingContent && (
+          <div className="p-3 rounded-lg bg-[var(--color-bg-border)] mr-8">
+            <div className="text-xs text-[var(--color-text-secondary)] mb-1 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[var(--color-red-primary)] animate-pulse" />
+              Thinking
+            </div>
+            <div className="text-xs text-[var(--color-text-secondary)] whitespace-pre-wrap max-h-24 overflow-y-auto">
+              {streamingThinking.slice(-600)}
+            </div>
+          </div>
+        )}
+
         {/* Streaming response */}
         {isStreaming && streamingContent && (
           <div className="p-3 rounded-lg bg-[var(--color-bg-border)] mr-8">
@@ -279,8 +299,8 @@ export function ChatInterface({
           </div>
         )}
 
-        {/* Legacy loading state */}
-        {loading && !isStreaming && !streamingContent && (
+        {/* Waiting for the first token */}
+        {loading && !streamingContent && !streamingThinking && (
           <div className="p-3 rounded-lg bg-[var(--color-bg-border)] mr-8">
             <div className="text-xs text-[var(--color-text-secondary)] mb-1">Claude</div>
             <div className="text-sm flex items-center gap-2">

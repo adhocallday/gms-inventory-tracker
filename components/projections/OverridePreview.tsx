@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Check, X, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
-import type { SuggestedOverride } from '@/lib/ai/streaming-projection-agent';
+import type { SuggestedOverride } from '@/lib/ai/chat-tools';
 
 interface OverridePreviewProps {
   overrides: SuggestedOverride[];
@@ -135,7 +135,7 @@ export function OverridePreview({
                         </span>
                       )}
                       <span className="text-xs text-[var(--color-text-secondary)]">
-                        {override.bucket.replace(/_/g, ' ')}
+                        {override.size ? 'units' : 'total units'}
                       </span>
                     </div>
 

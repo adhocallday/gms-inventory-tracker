@@ -1,101 +1,74 @@
 import { NextRequest } from 'next/server';
 import { streamChat } from '@/lib/ai/streaming-projection-agent';
+import { MAX_MESSAGE_CHARS, validateHistory } from '@/lib/ai/chat-tools';
+import { loadChatContext } from '@/lib/projections/load-context';
 import { createServiceClient } from '@/lib/supabase/client';
 
 export const maxDuration = 300;
 
+const json = (body: unknown, status: number) =>
+  new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
+
+const positive = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : undefined);
+
 /**
  * POST /api/projections/chat-stream
- * Stream chat responses token by token using SSE
+ * Stream chat responses using SSE. Body: { tourId, scenarioId?, message,
+ * history?, expectedAttendance?, expectedPerHead? }.
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { tourId, scenarioId, message, history = [] } = body;
+    const body = await request.json().catch(() => null);
+    const { tourId, scenarioId, message } = body ?? {};
 
-    if (!tourId || !message) {
-      return new Response(
-        JSON.stringify({ error: 'tourId and message are required' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+    if (typeof tourId !== 'string' || !tourId || typeof message !== 'string' || !message.trim()) {
+      return json({ error: 'tourId and message are required' }, 400);
+    }
+    if (message.length > MAX_MESSAGE_CHARS) {
+      return json({ error: 'message is too long' }, 400);
+    }
+    const history = validateHistory(body.history);
+    if (!history.ok) {
+      return json({ error: history.error }, 400);
     }
 
-    // Fetch context data
-    const supabase = createServiceClient();
-
-    const [tourRes, productSummaryRes, showSummaryRes, inventoryRes] = await Promise.all([
-      supabase.from('tours').select('id, name, artist').eq('id', tourId).single(),
-      supabase.from('product_summary_view').select('*').eq('tour_id', tourId),
-      supabase.from('show_summary_view').select('*').eq('tour_id', tourId),
-      supabase.from('inventory_balances').select('*').eq('tour_id', tourId)
-    ]);
-
-    if (tourRes.error || !tourRes.data) {
-      return new Response(
-        JSON.stringify({ error: 'Tour not found' }),
-        { status: 404, headers: { 'Content-Type': 'application/json' } }
-      );
+    const loaded = await loadChatContext(createServiceClient(), tourId, {
+      scenarioId: typeof scenarioId === 'string' ? scenarioId : null,
+      expectedAttendance: positive(body.expectedAttendance),
+      expectedPerHead: positive(body.expectedPerHead),
+    });
+    if (!loaded) {
+      return json({ error: 'Tour not found' }, 404);
     }
 
-    // Calculate expected values from show data
-    const showSummary = showSummaryRes.data || [];
-    const totalAttendance = showSummary.reduce((sum: number, s: any) => sum + (s.attendance || 0), 0);
-    const totalGross = showSummary.reduce((sum: number, s: any) => sum + (s.total_gross || 0), 0);
-    const expectedPerHead = totalAttendance > 0 ? totalGross / totalAttendance : 15;
-
-    const context = {
-      tourId,
-      tourName: tourRes.data.name,
-      productSummary: productSummaryRes.data || [],
-      showSummary,
-      inventoryBalances: inventoryRes.data || [],
-      poOpenQuantities: [],
-      expectedAttendance: totalAttendance || 10000,
-      expectedPerHead: expectedPerHead || 15
-    };
-
-    // Build conversation history
-    const conversationHistory = [
-      ...history,
-      { role: 'user', content: message }
-    ];
-
-    // Create SSE stream
+    const messages = [...history.messages, { role: 'user' as const, content: message }];
     const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const event of streamChat(conversationHistory, context)) {
-            const data = `data: ${JSON.stringify(event)}\n\n`;
-            controller.enqueue(encoder.encode(data));
+          for await (const event of streamChat(messages, loaded.context, loaded.currentValues)) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
           }
-          controller.close();
         } catch (error: any) {
           console.error('[chat-stream] Error:', error);
-          const errorEvent = `data: ${JSON.stringify({
-            type: 'error',
-            content: error.message || 'Chat failed'
-          })}\n\n`;
-          controller.enqueue(encoder.encode(errorEvent));
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'error', content: 'Chat failed' })}\n\n`));
+        } finally {
           controller.close();
         }
-      }
+      },
     });
 
     return new Response(stream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'X-Accel-Buffering': 'no'
-      }
+        Connection: 'keep-alive',
+        'X-Accel-Buffering': 'no',
+      },
     });
   } catch (error: any) {
     console.error('[chat-stream] Setup error:', error);
-    return new Response(
-      JSON.stringify({ error: error.message || 'Failed to start chat' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    return json({ error: 'Failed to start chat' }, 500);
   }
 }

@@ -6,6 +6,7 @@ import { ChatInterface } from './ChatInterface';
 import { AnalysisPanel } from './AnalysisPanel';
 import { SizeAnalysisPanel } from './SizeAnalysisPanel';
 import { ThinkingDisplay } from './ThinkingDisplay';
+import { readSseEvents } from './sse';
 
 interface SizeAnalysisData {
   analysis: Record<string, {
@@ -101,57 +102,39 @@ export function EnhancedAIAgentPanel({
         throw new Error(`API error: ${response.status}`);
       }
 
-      const reader = response.body?.getReader();
-      if (!reader) {
-        throw new Error('No response body');
-      }
-
-      const decoder = new TextDecoder();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const text = decoder.decode(value);
-        const lines = text.split('\n').filter(line => line.startsWith('data: '));
-
-        for (const line of lines) {
-          try {
-            const event: StreamEvent = JSON.parse(line.replace('data: ', ''));
-
-            switch (event.type) {
-              case 'phase':
-                setStreamPhase(event.phase || '');
-                if (event.progress !== undefined) {
-                  setStreamProgress(event.progress);
-                }
-                break;
-
-              case 'thinking':
-              case 'content':
-                setStreamContent(prev => prev + (event.content || ''));
-                break;
-
-              case 'json':
-                setAnalysis(event.data);
-                break;
-
-              case 'complete':
-                setGenerated(true);
-                setStreamPhase('Complete');
-                setStreamProgress(100);
-                // Also generate projections
-                await onGenerateProjections();
-                break;
-
-              case 'error':
-                throw new Error(event.content || 'Stream error');
+      let streamError: string | null = null;
+      for await (const event of readSseEvents<StreamEvent>(response)) {
+        switch (event.type) {
+          case 'phase':
+            setStreamPhase(event.phase || '');
+            if (event.progress !== undefined) {
+              setStreamProgress(event.progress);
             }
-          } catch (parseError) {
-            console.warn('Failed to parse SSE event:', line);
-          }
+            break;
+
+          case 'thinking':
+          case 'content':
+            setStreamContent(prev => prev + (event.content || ''));
+            break;
+
+          case 'json':
+            setAnalysis(event.data);
+            break;
+
+          case 'complete':
+            setGenerated(true);
+            setStreamPhase('Complete');
+            setStreamProgress(100);
+            // Also generate projections
+            await onGenerateProjections();
+            break;
+
+          case 'error':
+            streamError = event.content || 'Stream error';
+            break;
         }
       }
+      if (streamError) throw new Error(streamError);
     } catch (error: any) {
       console.error('Streaming failed:', error);
       setError(error.message || 'Failed to generate projections');
@@ -336,7 +319,14 @@ export function EnhancedAIAgentPanel({
           </div>
         )}
         {activeTab === 'chat' && (
-          <ChatInterface tourId={tourId} scenarioId={scenarioId} useStreaming={true} onOverridesApplied={onOverridesApplied} />
+          <ChatInterface
+            tourId={tourId}
+            scenarioId={scenarioId}
+            useStreaming={true}
+            onOverridesApplied={onOverridesApplied}
+            expectedAttendance={currentInputs.expectedAttendance}
+            expectedPerHead={currentInputs.expectedPerHead}
+          />
         )}
       </div>
     </div>

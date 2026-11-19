@@ -1,25 +1,39 @@
-import Anthropic from '@anthropic-ai/sdk';
-import { getModelForTask, getModelName } from './models';
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-});
-
-// Current models always think, so the first content block may be a thinking
-// block — collect the text blocks instead of reading content[0].
-function responseText(response: Anthropic.Message): string {
-  return response.content
-    .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-    .map(b => b.text)
-    .join('');
-}
+/**
+ * Projection agent: analysis, recommendations, full projections and size
+ * curves on Opus 5.5 (effort high), plus the non-streaming chat on Sonnet 5.5.
+ *
+ * Every JSON-returning call uses structured outputs (output_config.format),
+ * so there is no code-fence parsing. Tour data goes in a cached system block
+ * (lib/ai/projection-prompt.ts); per-call inputs go in the user message.
+ * Records keyed by size or SKU are requested as arrays (structured outputs
+ * need fixed keys) and converted back to the shapes the UI uses.
+ */
+import type Anthropic from '@anthropic-ai/sdk';
+import {
+  getAnthropicClient,
+  readTextOrThrow,
+  strictSchema,
+  toAIParseError,
+  AIParseError,
+  type JsonSchema,
+} from './claude-client';
+import { fallbackParams, getModelName, getModelProfile, type TaskType } from './models';
+import { logUsage } from './usage';
+import { projectionInputs, projectionSystem } from './projection-prompt';
+import {
+  SUGGEST_OVERRIDES_TOOL,
+  currentProjectionBlock,
+  parseOverrideToolUses,
+  type SuggestedOverride,
+} from './chat-tools';
+import type { CurrentSkuValues } from '@/lib/projections/current-values';
 
 // Types
 export interface ProjectionContext {
   tourId: string;
   tourName: string;
-  productSummary: any[]; // from product_summary_view
-  showSummary: any[];    // from show_summary_view
+  productSummary: any[]; // from product_summary_view (size-level rows)
+  showSummary: any[]; // from show_summary_view
   inventoryBalances: any[];
   poOpenQuantities: any[];
   expectedAttendance: number;
@@ -29,13 +43,13 @@ export interface ProjectionContext {
     name: string;
     location_type: string;
     display_order: number;
-  }>; // Warehouse locations for allocation
+  }>;
 }
 
 export interface AIRecommendation {
   sku: string;
-  size?: string;
-  bucket?: string;
+  size?: string | null;
+  bucket?: string | null;
   recommendedUnits: number;
   reasoning: string;
   confidence: number;
@@ -57,7 +71,7 @@ export interface ProjectionAnalysis {
   };
   stockoutRisks: {
     sku: string;
-    size?: string;
+    size?: string | null;
     forecastDemand: number;
     currentSupply: number;
     riskLevel: 'critical' | 'high' | 'medium' | 'low';
@@ -69,373 +83,11 @@ export interface ComprehensiveProjection {
   sku: string;
   baselineUnits: number;
   retailPrice: number;
-  sizeBreakdown: Record<string, number>; // {S: 50, M: 100, L: 120, ...}
-  warehouseAllocations: Record<string, number>; // {Road: 500, Warehouse: 200, Web: 100, ...}
+  sizeBreakdown: Record<string, number>; // {S: 50, M: 100, ...}
+  warehouseAllocations: Record<string, number>; // {Road: 500, Warehouse: 200, ...}
   confidence: number;
   reasoning: string;
 }
-
-// Main analysis function
-export async function analyzeProjectionData(
-  context: ProjectionContext
-): Promise<ProjectionAnalysis> {
-  const prompt = buildAnalysisPrompt(context);
-  const model = getModelForTask('projection-analysis');
-
-  console.log(`[ProjectionAgent] analyzeProjectionData using ${getModelName(model)}`);
-
-  const response = await anthropic.messages.stream({
-    model,
-    max_tokens: 32000,
-    messages: [{
-      role: 'user',
-      content: prompt
-    }]
-  }).finalMessage();
-
-  const content = responseText(response);
-
-  return parseAnalysisResponse(content);
-}
-
-// Generate recommendations
-export async function generateRecommendations(
-  context: ProjectionContext,
-  constraints?: {
-    maxBudget?: number;
-    priorityProducts?: string[];
-    avoidStockouts?: boolean;
-  }
-): Promise<AIRecommendation[]> {
-  const prompt = buildRecommendationPrompt(context, constraints);
-  const model = getModelForTask('recommendations');
-
-  console.log(`[ProjectionAgent] generateRecommendations using ${getModelName(model)}`);
-
-  const response = await anthropic.messages.stream({
-    model,
-    max_tokens: 32000,
-    messages: [{
-      role: 'user',
-      content: prompt
-    }]
-  }).finalMessage();
-
-  const content = responseText(response);
-
-  return parseRecommendationsResponse(content);
-}
-
-// Chat interface (uses Sonnet for balanced conversational performance)
-export async function chatWithAgent(
-  conversationHistory: { role: string; content: string }[],
-  context: ProjectionContext
-): Promise<string> {
-  const systemPrompt = buildChatSystemPrompt(context);
-  const model = getModelForTask('chat');
-
-  console.log(`[ProjectionAgent] chatWithAgent using ${getModelName(model)}`);
-
-  const response = await anthropic.messages.stream({
-    model,
-    max_tokens: 16000,
-    system: systemPrompt,
-    messages: conversationHistory.map(m => ({
-      role: m.role as 'user' | 'assistant',
-      content: m.content
-    }))
-  }).finalMessage();
-
-  return responseText(response);
-}
-
-// Generate comprehensive projections (prices, units, sizes, buckets)
-export async function generateComprehensiveProjections(
-  context: ProjectionContext
-): Promise<ComprehensiveProjection[]> {
-  const prompt = buildComprehensiveProjectionPrompt(context);
-  const model = getModelForTask('comprehensive-projections');
-
-  console.log(`[ProjectionAgent] generateComprehensiveProjections using ${getModelName(model)}`);
-
-  const response = await anthropic.messages.stream({
-    model,
-    max_tokens: 32000,
-    messages: [{
-      role: 'user',
-      content: prompt
-    }]
-  }).finalMessage();
-
-  const content = responseText(response);
-
-  return parseComprehensiveProjectionsResponse(content);
-}
-
-// Prompt builders
-function buildAnalysisPrompt(context: ProjectionContext): string {
-  return `You are an expert merchandise inventory analyst for concert tours.
-
-TOUR: ${context.tourName}
-
-HISTORICAL SALES DATA:
-${JSON.stringify(context.productSummary, null, 2)}
-
-SHOW PERFORMANCE:
-${JSON.stringify(context.showSummary, null, 2)}
-
-CURRENT INVENTORY:
-${JSON.stringify(context.inventoryBalances, null, 2)}
-
-OPEN PURCHASE ORDERS:
-${JSON.stringify(context.poOpenQuantities, null, 2)}
-
-PROJECTION INPUTS:
-- Expected attendance: ${context.expectedAttendance.toLocaleString()}
-- Expected per-head: $${context.expectedPerHead.toFixed(2)}
-- Expected gross: $${(context.expectedAttendance * context.expectedPerHead).toLocaleString()}
-
-Analyze this data and return a JSON object with:
-
-1. **sizeCurveRecommendations**: Array of size distribution recommendations per product
-   - Include historical curve (actual sales by size)
-   - Recommended curve (may differ if patterns suggest changes)
-   - Reasoning for any deviations
-
-2. **productPerformance**:
-   - topPerformers: Top 5 products by total sold and margin
-   - underperformers: Products with low sell-through or margin
-   - opportunities: Products that could perform better with different strategy
-
-3. **stockoutRisks**:
-   - Identify products at risk of stockout
-   - Calculate forecast demand vs current supply (on-hand + on-order)
-   - Risk level (critical/high/medium/low)
-   - Specific recommendations
-
-Return ONLY valid JSON matching this structure:
-{
-  "sizeCurveRecommendations": [{
-    "sku": "string",
-    "historicalCurve": {"S": 0.12, "M": 0.26, ...},
-    "recommendedCurve": {"S": 0.12, "M": 0.26, ...},
-    "reasoning": "string"
-  }],
-  "productPerformance": {
-    "topPerformers": [{"sku": "string", "totalSold": number, "margin": number, "reasoning": "string"}],
-    "underperformers": [{"sku": "string", "totalSold": number, "margin": number, "reasoning": "string"}],
-    "opportunities": [{"sku": "string", "reasoning": "string"}]
-  },
-  "stockoutRisks": [{
-    "sku": "string",
-    "size": "string or null",
-    "forecastDemand": number,
-    "currentSupply": number,
-    "riskLevel": "critical|high|medium|low",
-    "recommendation": "string"
-  }]
-}`;
-}
-
-function buildRecommendationPrompt(
-  context: ProjectionContext,
-  constraints?: any
-): string {
-  return `You are generating projection recommendations for ${context.tourName}.
-
-HISTORICAL DATA: ${JSON.stringify(context.productSummary, null, 2)}
-EXPECTED GROSS: $${(context.expectedAttendance * context.expectedPerHead).toLocaleString()}
-CONSTRAINTS: ${JSON.stringify(constraints || {})}
-
-Generate specific unit recommendations. For each product:
-1. Baseline units (overall forecast)
-2. Size adjustments (S/M/L/XL/2XL/3XL breakdown)
-
-Return JSON array:
-[{
-  "sku": "string",
-  "size": "string or null",
-  "bucket": "string or null",
-  "recommendedUnits": number,
-  "reasoning": "2-3 sentence explanation",
-  "confidence": 0.0-1.0,
-  "type": "baseline|size_adjustment|risk_mitigation|product_priority"
-}]
-
-Focus on actionable recommendations with clear reasoning.`;
-}
-
-function buildChatSystemPrompt(context: ProjectionContext): string {
-  return `You are an AI assistant helping with merchandise projections for ${context.tourName}.
-
-You have access to:
-- Historical sales data by product/size
-- Show performance (attendance, per-head revenue)
-- Current inventory and open POs
-- Projection inputs (expected attendance: ${context.expectedAttendance}, expected per-head: $${context.expectedPerHead})
-
-Answer questions conversationally using data to support your responses. Suggest actionable next steps when appropriate.`;
-}
-
-function buildComprehensiveProjectionPrompt(context: ProjectionContext): string {
-  // Get warehouse locations for this tour
-  const warehouseLocations = context.warehouseLocations || [];
-  const locationNames = warehouseLocations.map(loc => loc.name);
-
-  // Build allocation instructions based on warehouse locations
-  const allocationInstructions = `   - Distribute baseline units across warehouse locations: ${locationNames.join(', ')}
-   - Typical distribution:
-     * Road: 50-60% (touring stock that travels)
-     * Warehouse: 20-30% (backup inventory)
-     * Web: 5-10% (online store)
-     * Custom locations: Remaining based on regional demand`;
-
-  const exampleAllocation = locationNames.length > 0
-    ? locationNames.map((name: string) => `"${name}": number`).join(', ')
-    : '"Road": number, "Warehouse": number, "Web": number';
-
-  return `You are generating complete projection data for ${context.tourName}.
-
-IMPORTANT: The historical data below contains SIZE-LEVEL records (one row per SKU+SIZE combination).
-You MUST aggregate these by SKU to generate projections.
-
-HISTORICAL SALES DATA (SIZE-LEVEL):
-${JSON.stringify(context.productSummary, null, 2)}
-
-SHOW PERFORMANCE:
-${JSON.stringify(context.showSummary, null, 2)}
-
-CURRENT INVENTORY:
-${JSON.stringify(context.inventoryBalances, null, 2)}
-
-OPEN PURCHASE ORDERS:
-${JSON.stringify(context.poOpenQuantities, null, 2)}
-
-PROJECTION INPUTS:
-- Expected attendance: ${context.expectedAttendance.toLocaleString()}
-- Expected per-head: $${context.expectedPerHead.toFixed(2)}
-- Expected gross: $${(context.expectedAttendance * context.expectedPerHead).toLocaleString()}
-
-INSTRUCTIONS:
-
-For EACH UNIQUE SKU (aggregating across all sizes):
-
-1. **Calculate Baseline Units**:
-   - Sum total_sold across all sizes for this SKU
-   - Calculate this SKU's % of historical gross sales
-   - Apply same % to expected gross to get projected revenue
-   - Divide by average selling price to get baseline units
-
-2. **Determine Retail Price**:
-   - Calculate: total_gross / total_sold across all sizes
-   - This gives average selling price per unit
-   - Use this as the recommended retail price
-
-3. **Calculate Size Breakdown**:
-   - For each size (S/M/L/XL/2XL/3XL):
-     - Calculate: (units sold in this size) / (total units sold across all sizes)
-     - This gives the size distribution percentage
-     - Apply this % to baseline units to get units per size
-   - Example: If S was 20% historically, and baseline is 100 units, then S gets 20 units
-
-4. **Estimate Warehouse Allocation**:
-${allocationInstructions}
-
-Return ONLY valid JSON array with ONE object per unique SKU:
-[{
-  "sku": "string",
-  "baselineUnits": number,
-  "retailPrice": number,
-  "sizeBreakdown": {"S": number, "M": number, "L": number, "XL": number, "2XL": number, "3XL": number},
-  "warehouseAllocations": {${exampleAllocation}},
-  "confidence": 0.0-1.0,
-  "reasoning": "brief 1-2 sentence explanation of this SKU's forecast"
-}]
-
-CRITICAL VALIDATION:
-- Size breakdown units MUST sum to baselineUnits
-- Warehouse allocation units MUST sum to baselineUnits
-- Include all warehouse locations: ${locationNames.join(', ')}
-- Include all sizes even if 0 units
-- Confidence: 0.9+ for SKUs with strong historical data, lower for sparse data
-- CRITICAL: warehouseAllocations must use the exact location names listed above`;
-}
-
-// Response parsers
-function parseAnalysisResponse(content: string): ProjectionAnalysis {
-  // Extract JSON from markdown code blocks if present
-  let jsonText = content;
-  if (content.includes('```')) {
-    const match = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-    if (match) jsonText = match[1];
-  }
-
-  try {
-    return JSON.parse(jsonText);
-  } catch (error) {
-    console.error('Failed to parse analysis response:', error);
-    console.error('Content:', content);
-    throw new Error('Invalid AI response format');
-  }
-}
-
-function parseRecommendationsResponse(content: string): AIRecommendation[] {
-  let jsonText = content;
-  if (content.includes('```')) {
-    const match = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-    if (match) jsonText = match[1];
-  }
-
-  try {
-    return JSON.parse(jsonText);
-  } catch (error) {
-    console.error('Failed to parse recommendations response:', error);
-    throw new Error('Invalid AI response format');
-  }
-}
-
-function parseComprehensiveProjectionsResponse(content: string): ComprehensiveProjection[] {
-  let jsonText = content;
-  if (content.includes('```')) {
-    const match = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-    if (match) jsonText = match[1];
-  }
-
-  try {
-    const projections = JSON.parse(jsonText);
-
-    // Validate each projection
-    for (const proj of projections) {
-      // Check size breakdown sums to baseline
-      const sizeTotal = Object.values(proj.sizeBreakdown || {}).reduce((sum: number, val: any) => sum + (val || 0), 0);
-      if (Math.abs(sizeTotal - proj.baselineUnits) > 1) {
-        console.warn(`Size breakdown mismatch for ${proj.sku}: ${sizeTotal} vs ${proj.baselineUnits}`);
-      }
-
-      // Check warehouse allocation sums to baseline
-      const warehouseTotal = Object.values(proj.warehouseAllocations || {}).reduce((sum: number, val: any) => sum + (val || 0), 0);
-      if (Math.abs(warehouseTotal - proj.baselineUnits) > 1) {
-        console.warn(`Warehouse allocation mismatch for ${proj.sku}: ${warehouseTotal} vs ${proj.baselineUnits}`);
-      }
-
-      // Ensure all required fields exist
-      if (!proj.sku || !proj.baselineUnits || !proj.retailPrice || !proj.sizeBreakdown || !proj.warehouseAllocations) {
-        console.error(`Missing required fields for projection:`, proj);
-      }
-    }
-
-    console.log(`✅ Successfully parsed ${projections.length} projections`);
-    return projections;
-  } catch (error) {
-    console.error('Failed to parse comprehensive projections response:', error);
-    console.error('Content:', content);
-    throw new Error('Invalid AI response format');
-  }
-}
-
-// ============================================================================
-// SIZE DISTRIBUTION ANALYSIS
-// ============================================================================
 
 export interface SizeAnalysisResult {
   analysis: {
@@ -454,204 +106,417 @@ export interface SizeAnalysisResult {
   };
 }
 
-export async function analyzeSizeDistribution(
-  context: ProjectionContext
-): Promise<SizeAnalysisResult> {
-  const prompt = buildSizeAnalysisPrompt(context);
-  const model = getModelForTask('size-distribution');
+// ---------------------------------------------------------------------------
+// Schemas
+// ---------------------------------------------------------------------------
 
-  console.log(`[ProjectionAgent] analyzeSizeDistribution using ${getModelName(model)}`);
+const STR = { type: 'string' };
+const NUM = { type: 'number' };
+const INT = { type: 'integer' };
+const NULLABLE_STR = { type: ['string', 'null'] };
 
-  const response = await anthropic.messages.stream({
-    model,
-    max_tokens: 32000,
-    messages: [{
-      role: 'user',
-      content: prompt
-    }]
-  }).finalMessage();
+const obj = (properties: Record<string, unknown>): JsonSchema => ({
+  type: 'object',
+  properties,
+  required: Object.keys(properties),
+});
+const arr = (items: unknown): JsonSchema => ({ type: 'array', items });
 
-  const content = responseText(response);
+const CURVE = arr(obj({ size: STR, share: { type: 'number', description: '0-1; shares sum to 1' } }));
 
-  return parseSizeAnalysisResponse(content);
+const ANALYSIS_SCHEMA = obj({
+  sizeCurveRecommendations: arr(obj({ sku: STR, historicalCurve: CURVE, recommendedCurve: CURVE, reasoning: STR })),
+  productPerformance: obj({
+    topPerformers: arr(obj({ sku: STR, totalSold: NUM, margin: NUM, reasoning: STR })),
+    underperformers: arr(obj({ sku: STR, totalSold: NUM, margin: NUM, reasoning: STR })),
+    opportunities: arr(obj({ sku: STR, reasoning: STR })),
+  }),
+  stockoutRisks: arr(
+    obj({
+      sku: STR,
+      size: NULLABLE_STR,
+      forecastDemand: NUM,
+      currentSupply: NUM,
+      riskLevel: { type: 'string', enum: ['critical', 'high', 'medium', 'low'] },
+      recommendation: STR,
+    })
+  ),
+});
+
+const RECOMMENDATIONS_SCHEMA = obj({
+  recommendations: arr(
+    obj({
+      sku: STR,
+      size: NULLABLE_STR,
+      bucket: NULLABLE_STR,
+      recommendedUnits: INT,
+      reasoning: STR,
+      confidence: { type: 'number', description: '0-1' },
+      type: { type: 'string', enum: ['baseline', 'size_adjustment', 'risk_mitigation', 'product_priority'] },
+    })
+  ),
+});
+
+function projectionsSchema(locations: string[]): JsonSchema {
+  return obj({
+    projections: arr(
+      obj({
+        sku: STR,
+        baselineUnits: INT,
+        retailPrice: NUM,
+        sizeBreakdown: arr(obj({ size: STR, units: INT })),
+        warehouseAllocations: arr(obj({ location: { type: 'string', enum: locations }, units: INT })),
+        confidence: { type: 'number', description: '0-1' },
+        reasoning: STR,
+      })
+    ),
+  });
 }
 
-function buildSizeAnalysisPrompt(context: ProjectionContext): string {
-  // Calculate historical size curves from product summary WITH QUANTITIES
-  const sizeData: Record<string, { sizes: Record<string, { sold: number; gross: number }>; totalSold: number; totalGross: number }> = {};
+const SIZE_ANALYSIS_SCHEMA = obj({
+  analysis: arr(
+    obj({
+      sku: STR,
+      historicalCurve: CURVE,
+      recommendedCurve: CURVE,
+      confidence: { type: 'number', description: '0-1' },
+      reasoning: STR,
+      insights: arr(STR),
+    })
+  ),
+  globalInsights: obj({ audienceDemographic: STR, sizeTrends: arr(STR), recommendations: arr(STR) }),
+});
 
-  context.productSummary.forEach((row: any) => {
-    if (!row.sku) return;
-    if (!sizeData[row.sku]) {
-      sizeData[row.sku] = { sizes: {}, totalSold: 0, totalGross: 0 };
-    }
-    const size = row.size || 'ONE_SIZE';
-    if (!sizeData[row.sku].sizes[size]) {
-      sizeData[row.sku].sizes[size] = { sold: 0, gross: 0 };
-    }
-    sizeData[row.sku].sizes[size].sold += row.total_sold || 0;
-    sizeData[row.sku].sizes[size].gross += row.total_gross || 0;
-    sizeData[row.sku].totalSold += row.total_sold || 0;
-    sizeData[row.sku].totalGross += row.total_gross || 0;
-  });
+// ---------------------------------------------------------------------------
+// Converters (array shapes → the record shapes the UI uses)
+// ---------------------------------------------------------------------------
 
-  // Calculate percentages AND include raw quantities
-  const sizeAnalysis = Object.entries(sizeData).map(([sku, data]) => {
-    const curve: Record<string, number> = {};
-    const quantities: Record<string, number> = {};
-    Object.entries(data.sizes).forEach(([size, stats]) => {
-      curve[size] = data.totalSold ? Math.round((stats.sold / data.totalSold) * 1000) / 1000 : 0;
-      quantities[size] = stats.sold;
-    });
-    return {
-      sku,
-      totalUnits: data.totalSold,
-      totalGross: data.totalGross,
-      avgPrice: data.totalSold ? Math.round(data.totalGross / data.totalSold * 100) / 100 : 0,
-      historicalCurve: curve,
-      quantitiesBySizeActual: quantities  // RAW QUANTITIES for analysis
+type Pair<K extends string> = { size?: string; location?: string } & Record<K, number>;
+
+function toRecord<K extends string>(list: Pair<K>[] | undefined, key: 'size' | 'location', value: K) {
+  const out: Record<string, number> = {};
+  for (const item of list ?? []) {
+    const k = item[key];
+    if (k) out[k] = Number(item[value]) || 0;
+  }
+  return out;
+}
+
+/** Normalize a curve to sum to 1 (logs when the model's curve was off). */
+export function normalizeCurve(curve: Record<string, number>, label: string): Record<string, number> {
+  const sum = Object.values(curve).reduce((s, v) => s + (v || 0), 0);
+  if (sum > 0 && Math.abs(sum - 1) > 0.05) {
+    console.warn(`[ProjectionAgent] ${label} sums to ${sum.toFixed(3)}; normalizing`);
+    return Object.fromEntries(Object.entries(curve).map(([k, v]) => [k, v / sum]));
+  }
+  return curve;
+}
+
+function toAnalysis(raw: any): ProjectionAnalysis {
+  return {
+    sizeCurveRecommendations: (raw.sizeCurveRecommendations ?? []).map((r: any) => ({
+      sku: r.sku,
+      historicalCurve: toRecord(r.historicalCurve, 'size', 'share'),
+      recommendedCurve: normalizeCurve(toRecord(r.recommendedCurve, 'size', 'share'), `${r.sku} recommended curve`),
+      reasoning: r.reasoning,
+    })),
+    productPerformance: raw.productPerformance,
+    stockoutRisks: raw.stockoutRisks ?? [],
+  };
+}
+
+function toProjections(raw: any): ComprehensiveProjection[] {
+  return (raw.projections ?? []).map((p: any) => {
+    const proj: ComprehensiveProjection = {
+      sku: p.sku,
+      baselineUnits: p.baselineUnits,
+      retailPrice: p.retailPrice,
+      sizeBreakdown: toRecord(p.sizeBreakdown, 'size', 'units'),
+      warehouseAllocations: toRecord(p.warehouseAllocations, 'location', 'units'),
+      confidence: p.confidence,
+      reasoning: p.reasoning,
     };
-  });
-
-  // Calculate overall distribution across ALL products
-  const overallSizes: Record<string, number> = {};
-  let overallTotal = 0;
-  Object.values(sizeData).forEach(data => {
-    Object.entries(data.sizes).forEach(([size, stats]) => {
-      overallSizes[size] = (overallSizes[size] || 0) + stats.sold;
-      overallTotal += stats.sold;
-    });
-  });
-  const overallPercentages: Record<string, string> = {};
-  Object.entries(overallSizes).forEach(([size, qty]) => {
-    overallPercentages[size] = `${qty.toLocaleString()} units (${((qty / overallTotal) * 100).toFixed(1)}%)`;
-  });
-
-  return `You are an expert merchandise analyst specializing in concert tour merchandise sizing patterns.
-
-TOUR: ${context.tourName}
-
-CRITICAL: Pay close attention to the RAW QUANTITIES (quantitiesBySizeActual) - not just percentages.
-The quantities tell you whether you have enough data to make confident recommendations.
-
-INDUSTRY STANDARD SIZE DISTRIBUTION (typical bell curve):
-- S: 12% (smaller audience segment)
-- M: 26% (common size)
-- L: 28% (most common)
-- XL: 20% (second most common)
-- 2XL: 9% (larger sizes)
-- 3XL: 5% (specialty size)
-
-OVERALL SIZE DISTRIBUTION ACROSS ALL PRODUCTS:
-Total units: ${overallTotal.toLocaleString()}
-${JSON.stringify(overallPercentages, null, 2)}
-
-HISTORICAL SIZE DATA BY PRODUCT (includes raw quantities):
-${JSON.stringify(sizeAnalysis, null, 2)}
-
-SHOW PERFORMANCE (for context):
-${JSON.stringify(context.showSummary.slice(0, 10), null, 2)}
-
-TASK: Analyze the size distribution patterns and provide recommendations.
-
-DATA QUALITY CHECKS TO PERFORM:
-1. Is the distribution realistic? (Uniform distribution ~16-17% each size is SUSPICIOUS - may indicate test data)
-2. Does the data follow expected patterns? (M/L should typically be highest)
-3. Are there enough total units for statistical significance? (< 100 units = low confidence)
-4. Are there anomalies that suggest data issues?
-
-For each product (SKU), analyze:
-1. **Historical Curve** - The actual sales distribution by size (use the calculated percentages)
-2. **Recommended Curve** - Your optimized recommendation:
-   - If historical data is suspicious/uniform, recommend industry standard curve
-   - If historical data looks realistic, use it with minor adjustments
-   - If sample size is small, weight toward industry average
-3. **Confidence** - Score based on:
-   - Sample size (totalUnits): < 50 = 0.3-0.5, 50-200 = 0.5-0.7, 200+ = 0.7-0.9
-   - Data quality: Suspicious patterns reduce confidence by 0.2
-   - Consistency: Matching industry patterns = higher confidence
-4. **Reasoning** - Include specific quantities and explain your recommendation
-5. **Insights** - Flag any data quality concerns, include quantities in observations
-
-Also provide global insights:
-- **Audience Demographic** - What the ACTUAL QUANTITIES suggest (be skeptical of unrealistic distributions)
-- **Size Trends** - Notable patterns WITH quantities cited
-- **Recommendations** - If data quality is questionable, recommend collecting more data or using industry defaults
-
-IMPORTANT GUIDELINES:
-- Size keys should be: S, M, L, XL, 2XL, 3XL (or ONE_SIZE for non-sized items)
-- Curves must sum to 1.0 (100%)
-- ALWAYS mention actual quantities in your reasoning
-- If distribution looks suspiciously uniform (all sizes ~15-17%), FLAG THIS and recommend industry defaults
-- Be honest about data quality concerns
-
-Return ONLY valid JSON matching this structure:
-{
-  "analysis": {
-    "SKU1": {
-      "historicalCurve": {"S": 0.12, "M": 0.26, "L": 0.28, "XL": 0.20, "2XL": 0.09, "3XL": 0.05},
-      "recommendedCurve": {"S": 0.12, "M": 0.26, "L": 0.28, "XL": 0.20, "2XL": 0.09, "3XL": 0.05},
-      "confidence": 0.85,
-      "reasoning": "Based on 1,234 units sold: M (320) and L (345) lead as expected. Pattern matches industry standards.",
-      "insights": ["Data quality: Good - realistic bell curve pattern", "Sample size: 1,234 units provides high confidence"]
+    const sizeTotal = Object.values(proj.sizeBreakdown).reduce((s, v) => s + v, 0);
+    const whTotal = Object.values(proj.warehouseAllocations).reduce((s, v) => s + v, 0);
+    if (Object.keys(proj.sizeBreakdown).length && Math.abs(sizeTotal - proj.baselineUnits) > 1) {
+      console.warn(`[ProjectionAgent] Size breakdown mismatch for ${proj.sku}: ${sizeTotal} vs ${proj.baselineUnits}`);
     }
-  },
-  "globalInsights": {
-    "audienceDemographic": "Based on 15,000 total units: Size distribution suggests [demographic]. [Any data quality concerns]",
-    "sizeTrends": ["L (4,200 units, 28%) is top seller - matches industry average", "2XL at 1,350 units (9%) - in line with expectations"],
-    "recommendations": ["Data quality assessment: [GOOD/SUSPICIOUS/INSUFFICIENT]", "Recommendation based on [X] total units"]
-  }
-}`;
+    if (Object.keys(proj.warehouseAllocations).length && Math.abs(whTotal - proj.baselineUnits) > 1) {
+      console.warn(`[ProjectionAgent] Warehouse allocation mismatch for ${proj.sku}: ${whTotal} vs ${proj.baselineUnits}`);
+    }
+    return proj;
+  });
 }
 
-function parseSizeAnalysisResponse(content: string): SizeAnalysisResult {
-  let jsonText = content;
-  if (content.includes('```')) {
-    const match = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-    if (match) jsonText = match[1];
+function toSizeAnalysis(raw: any): SizeAnalysisResult {
+  const analysis: SizeAnalysisResult['analysis'] = {};
+  for (const a of raw.analysis ?? []) {
+    analysis[a.sku] = {
+      historicalCurve: normalizeCurve(toRecord(a.historicalCurve, 'size', 'share'), `${a.sku} historical curve`),
+      recommendedCurve: normalizeCurve(toRecord(a.recommendedCurve, 'size', 'share'), `${a.sku} recommended curve`),
+      confidence: a.confidence,
+      reasoning: a.reasoning,
+      insights: a.insights ?? [],
+    };
   }
+  return { analysis, globalInsights: raw.globalInsights };
+}
 
+// ---------------------------------------------------------------------------
+// Task definitions (shared with the streaming agent)
+// ---------------------------------------------------------------------------
+
+export interface ProjectionTask<T> {
+  task: TaskType;
+  /** Used in error messages */
+  what: string;
+  user: string;
+  schema: JsonSchema;
+  transform: (raw: any) => T;
+}
+
+export function analysisTask(context: ProjectionContext): ProjectionTask<ProjectionAnalysis> {
+  return {
+    task: 'projection-analysis',
+    what: 'analysis',
+    schema: ANALYSIS_SCHEMA,
+    transform: toAnalysis,
+    user: `${projectionInputs(context)}
+
+Analyze the tour data:
+1. sizeCurveRecommendations: for each product with sized sales, the historical curve (share of units by size) and a recommended curve, with reasoning for any deviation.
+2. productPerformance: the top 5 products by units and margin, underperformers (low sell-through or margin), and opportunities. margin is (avgPrice - unitCost) / avgPrice.
+3. stockoutRisks: products or sizes whose forecast demand for the expected gross exceeds supply (onHand + onOrder), with a risk level and a specific recommendation.`,
+  };
+}
+
+export function recommendationsTask(
+  context: ProjectionContext,
+  constraints?: { maxBudget?: number; priorityProducts?: string[]; avoidStockouts?: boolean }
+): ProjectionTask<AIRecommendation[]> {
+  return {
+    task: 'recommendations',
+    what: 'recommendation',
+    schema: RECOMMENDATIONS_SCHEMA,
+    transform: raw => raw.recommendations ?? [],
+    user: `${projectionInputs(context)}
+CONSTRAINTS: ${JSON.stringify(constraints ?? {})}
+
+Generate specific unit recommendations for this tour: a baseline unit forecast per product, and size adjustments (S/M/L/XL/2XL/3XL) where the curve should change. Give 2-3 sentences of reasoning and a 0-1 confidence for each. size and bucket are null when they do not apply.`,
+  };
+}
+
+export function comprehensiveTask(context: ProjectionContext): ProjectionTask<ComprehensiveProjection[]> {
+  const locations = (context.warehouseLocations ?? []).map(l => l.name);
+  const names = locations.length ? locations : ['Road', 'Warehouse', 'Web'];
+  return {
+    task: 'comprehensive-projections',
+    what: 'projection',
+    schema: projectionsSchema(names),
+    transform: toProjections,
+    user: `${projectionInputs(context)}
+WAREHOUSE LOCATIONS: ${names.join(', ')}
+
+Generate projections with one entry per SKU:
+1. baselineUnits: the SKU's share of tour-to-date gross, applied to the expected gross, divided by its avgPrice.
+2. retailPrice: the SKU's avgPrice.
+3. sizeBreakdown: baselineUnits split by the SKU's historical size shares; include every size the SKU sold. Units must sum to baselineUnits.
+4. warehouseAllocations: baselineUnits split across every location listed (typically Road 50-60%, Warehouse 20-30%, Web 5-10%, others by regional demand). Units must sum to baselineUnits.
+5. confidence: 0.9+ for SKUs with strong history, lower for sparse data; reasoning: 1-2 sentences.`,
+  };
+}
+
+export function sizeAnalysisTask(context: ProjectionContext): ProjectionTask<SizeAnalysisResult> {
+  return {
+    task: 'size-distribution',
+    what: 'size analysis',
+    schema: SIZE_ANALYSIS_SCHEMA,
+    transform: toSizeAnalysis,
+    user: `Analyze the size distribution of every sized product in the tour data (products.sizes holds units sold per size).
+
+Industry standard curve for reference: S 12%, M 26%, L 28%, XL 20%, 2XL 9%, 3XL 5%.
+
+Data quality checks:
+1. A near-uniform distribution (each size about 16-17%) is suspicious and may be test data.
+2. M and L are usually the largest sizes.
+3. Under 100 units total is low confidence.
+4. Flag anomalies that suggest data issues.
+
+For each SKU give:
+- historicalCurve: actual share of units by size.
+- recommendedCurve: if the history is suspicious, the industry curve; if realistic, the history with minor adjustments; if the sample is small, weighted toward the industry curve. Shares sum to 1.
+- confidence: by sample size (under 50 units 0.3-0.5, 50-200 0.5-0.7, 200+ 0.7-0.9), minus 0.2 for suspicious patterns.
+- reasoning that cites the actual unit counts, and insights flagging any data quality concerns.
+
+Also give global insights: what the quantities suggest about the audience, size trends with quantities, and recommendations (say when the data quality calls for industry defaults).
+Size keys: S, M, L, XL, 2XL, 3XL, or OS for non-sized items.`,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Request building and running
+// ---------------------------------------------------------------------------
+
+export function buildProjectionRequest<T>(context: ProjectionContext, t: ProjectionTask<T>) {
+  const profile = getModelProfile(t.task);
+  return {
+    model: profile.model,
+    max_tokens: profile.maxTokens,
+    system: projectionSystem(context),
+    messages: [{ role: 'user' as const, content: t.user }],
+    thinking: { type: 'adaptive' as const, display: profile.thinkingDisplay },
+    output_config: {
+      effort: profile.effort,
+      format: { type: 'json_schema' as const, schema: strictSchema(t.schema) },
+    },
+    ...fallbackParams(profile.model),
+  };
+}
+
+/** Log usage, check stop_reason, parse and transform a finished projection message. */
+export async function finishProjectionMessage<T>(
+  message: Anthropic.Beta.BetaMessage,
+  context: ProjectionContext,
+  t: ProjectionTask<T>,
+  startedAt: number
+): Promise<T> {
+  const profile = getModelProfile(t.task);
+  await logUsage({
+    task: t.task,
+    model: message.model,
+    effort: profile.effort,
+    usage: message.usage,
+    latencyMs: Date.now() - startedAt,
+    stopReason: message.stop_reason,
+    tourId: context.tourId,
+  });
+  const text = readTextOrThrow(message, profile.maxTokens, t.what);
   try {
-    const result = JSON.parse(jsonText);
-
-    // Validate structure
-    if (!result.analysis || !result.globalInsights) {
-      throw new Error('Missing required fields in response');
-    }
-
-    // Validate each SKU analysis
-    for (const [sku, analysis] of Object.entries(result.analysis)) {
-      const a = analysis as any;
-      if (!a.historicalCurve || !a.recommendedCurve) {
-        console.warn(`Missing curves for ${sku}`);
-      }
-      // Ensure curves sum to ~1.0
-      const histSum = Object.values(a.historicalCurve || {}).reduce((sum: number, v: any) => sum + (v || 0), 0);
-      const recSum = Object.values(a.recommendedCurve || {}).reduce((sum: number, v: any) => sum + (v || 0), 0);
-      if (Math.abs(histSum - 1) > 0.05) {
-        console.warn(`Historical curve for ${sku} sums to ${histSum}, normalizing`);
-        // Normalize
-        if (histSum > 0) {
-          Object.keys(a.historicalCurve).forEach(k => {
-            a.historicalCurve[k] = a.historicalCurve[k] / histSum;
-          });
-        }
-      }
-      if (Math.abs(recSum - 1) > 0.05) {
-        console.warn(`Recommended curve for ${sku} sums to ${recSum}, normalizing`);
-        if (recSum > 0) {
-          Object.keys(a.recommendedCurve).forEach(k => {
-            a.recommendedCurve[k] = a.recommendedCurve[k] / recSum;
-          });
-        }
-      }
-    }
-
-    console.log(`✅ Successfully parsed size analysis for ${Object.keys(result.analysis).length} SKUs`);
-    return result;
-  } catch (error) {
-    console.error('Failed to parse size analysis response:', error);
-    console.error('Content:', content);
-    throw new Error('Invalid AI response format for size analysis');
+    return t.transform(JSON.parse(text));
+  } catch (e) {
+    throw new AIParseError('Could not read the AI response', 'Invalid JSON: ' + (e as Error).message);
   }
+}
+
+export async function runProjectionTask<T>(context: ProjectionContext, t: ProjectionTask<T>): Promise<T> {
+  const request = buildProjectionRequest(context, t);
+  console.log(`[ProjectionAgent] ${t.task} using ${getModelName(request.model)} (effort ${request.output_config.effort})`);
+  const started = Date.now();
+  let message: Anthropic.Beta.BetaMessage;
+  try {
+    message = await getAnthropicClient().beta.messages.stream(request).finalMessage();
+  } catch (error) {
+    throw toAIParseError(error);
+  }
+  return finishProjectionMessage(message, context, t, started);
+}
+
+export function analyzeProjectionData(context: ProjectionContext): Promise<ProjectionAnalysis> {
+  return runProjectionTask(context, analysisTask(context));
+}
+
+export function generateRecommendations(
+  context: ProjectionContext,
+  constraints?: { maxBudget?: number; priorityProducts?: string[]; avoidStockouts?: boolean }
+): Promise<AIRecommendation[]> {
+  return runProjectionTask(context, recommendationsTask(context, constraints));
+}
+
+export function generateComprehensiveProjections(context: ProjectionContext): Promise<ComprehensiveProjection[]> {
+  return runProjectionTask(context, comprehensiveTask(context));
+}
+
+export function analyzeSizeDistribution(context: ProjectionContext): Promise<SizeAnalysisResult> {
+  return runProjectionTask(context, sizeAnalysisTask(context));
+}
+
+// ---------------------------------------------------------------------------
+// Chat (shared request builder; streaming in streaming-projection-agent.ts)
+// ---------------------------------------------------------------------------
+
+const CHAT_ROLE = `You are the merchandise projection assistant in MerchFlow Tracker. You help the user understand and adjust the projection for this tour.
+
+Answer questions from the tour data and the current projection; cite real figures and do not invent any. Be concise.
+
+When the user asks to change the projection (for example "increase hoodies by 20%", "double the XL quantities", "we expect 50% more attendance"), first explain in a sentence or two what you will change, then call suggest_overrides with the new unit values. Compute each new value from the current value in CURRENT PROJECTION. Use size null to change a SKU's total units, or a size to change that size. The user reviews the suggestions before anything is applied. Do not call the tool for questions, analysis, or when the user cancels a change.`;
+
+export function buildChatRequest(
+  context: ProjectionContext,
+  currentValues: CurrentSkuValues[],
+  messages: Anthropic.MessageParam[]
+) {
+  const profile = getModelProfile('chat');
+  const system: Anthropic.Beta.BetaTextBlockParam[] = [
+    ...projectionSystem(context).map((b, i) => (i === 0 ? { ...b, text: CHAT_ROLE + '\n\n' + b.text } : b)),
+    {
+      type: 'text',
+      text: currentProjectionBlock(currentValues, context),
+      cache_control: { type: 'ephemeral' },
+    },
+  ];
+  return {
+    model: profile.model,
+    max_tokens: profile.maxTokens,
+    system,
+    messages,
+    tools: [SUGGEST_OVERRIDES_TOOL],
+    tool_choice: { type: 'auto' as const },
+    thinking: { type: 'adaptive' as const, display: profile.thinkingDisplay },
+    output_config: { effort: profile.effort },
+    ...fallbackParams(profile.model),
+  };
+}
+
+export interface ChatReply {
+  text: string;
+  overrides: SuggestedOverride[];
+}
+
+/** Turn a finished chat message into reply text + validated overrides; logs usage. */
+export async function finishChatMessage(
+  message: Anthropic.Beta.BetaMessage,
+  context: ProjectionContext,
+  currentValues: CurrentSkuValues[],
+  startedAt: number
+): Promise<ChatReply> {
+  await logUsage({
+    task: 'chat',
+    model: message.model,
+    effort: getModelProfile('chat').effort,
+    usage: message.usage,
+    latencyMs: Date.now() - startedAt,
+    stopReason: message.stop_reason,
+    tourId: context.tourId,
+  });
+  if (message.stop_reason === 'refusal') {
+    throw new AIParseError('The AI declined to answer this message', message.stop_details?.explanation ?? undefined);
+  }
+  const text = message.content
+    .filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === 'text')
+    .map(b => b.text)
+    .join('');
+  // A tool call cut off by max_tokens may carry partial input: don't suggest it.
+  const { overrides, rejected } =
+    message.stop_reason === 'max_tokens'
+      ? { overrides: [], rejected: ['response cut off'] }
+      : parseOverrideToolUses(message.content as any, currentValues);
+  if (rejected.length) console.warn('[ProjectionAgent] Rejected override suggestions:', rejected);
+  return { text, overrides };
+}
+
+/** Non-streaming chat (legacy /api/projections/chat). */
+export async function chatWithAgent(
+  messages: Anthropic.MessageParam[],
+  context: ProjectionContext,
+  currentValues: CurrentSkuValues[]
+): Promise<ChatReply> {
+  const request = buildChatRequest(context, currentValues, messages);
+  const started = Date.now();
+  let message: Anthropic.Beta.BetaMessage;
+  try {
+    message = await getAnthropicClient().beta.messages.stream(request).finalMessage();
+  } catch (error) {
+    throw toAIParseError(error);
+  }
+  return finishChatMessage(message, context, currentValues, started);
 }
