@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { asDocumentInput, firstPages, hashPages, sniffMediaType } from './document-input';
 import { buildDocumentBlocks } from './claude-client';
 
-const bytes = (...parts: (number[] | string)[]) =>
+const bytes = (...parts: (number[] | string | Uint8Array)[]) =>
   Buffer.concat(parts.map((p) => (typeof p === 'string' ? Buffer.from(p, 'latin1') : Buffer.from(p))));
 const pad = Buffer.alloc(16);
 

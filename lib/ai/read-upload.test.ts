@@ -14,7 +14,7 @@ const PDF = Buffer.concat([Buffer.from('%PDF-1.7\n'), pad]);
 function post(form: FormData) {
   return new NextRequest('http://localhost/api/parse/settlement', { method: 'POST', body: form });
 }
-const file = (buf: Buffer, name: string, type = 'application/octet-stream') => new File([buf], name, { type });
+const file = (buf: Buffer, name: string, type = 'application/octet-stream') => new File([new Uint8Array(buf)], name, { type });
 
 describe('readUploadedFile', () => {
   it('reads repeated pages[] fields as page images in order, with the multi-page hash', async () => {
