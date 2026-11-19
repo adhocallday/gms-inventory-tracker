@@ -216,7 +216,8 @@ export function InlineDraftReview({
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <StatCard label="Total gross" value={formatCurrency(editedData?.total_gross || 0)} />
+              {/* Six-figure currency needs the full row on a phone */}
+              <StatCard className="col-span-2 sm:col-span-1" label="Total gross" value={formatCurrency(editedData?.total_gross || 0)} />
               <StatCard label="Line items" value={lineItems.length} />
             </div>
           </div>
@@ -225,10 +226,10 @@ export function InlineDraftReview({
         {/* Settlement totals */}
         {docType === 'settlement' && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <StatCard label="Gross sales" value={formatCurrency(editedData?.gross_sales_total || 0)} />
+            <StatCard className="col-span-2 md:col-span-1" label="Gross sales" value={formatCurrency(editedData?.gross_sales_total || 0)} />
             <StatCard label="Sales tax" value={formatCurrency(editedData?.sales_tax_total || 0)} />
             <StatCard label="Card fees" value={formatCurrency(editedData?.credit_card_fees || 0)} />
-            <StatCard label="Comp lines" value={lineItems.length} />
+            <StatCard className="col-span-2 md:col-span-1" label="Comp lines" value={lineItems.length} />
           </div>
         )}
 
@@ -398,7 +399,14 @@ export function InlineDraftReview({
           isLoading={isPosting}
           className="flex-1"
         >
-          {isPosting ? 'Posting...' : 'Post to Database'}
+          {isPosting ? (
+            'Posting...'
+          ) : (
+            <>
+              <span className="sm:hidden">Post</span>
+              <span className="hidden sm:inline">Post to Database</span>
+            </>
+          )}
         </Button>
       </div>
     </div>
