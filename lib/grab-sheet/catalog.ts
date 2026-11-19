@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { fetchAll } from '@/lib/supabase/fetch-all';
-import { dataUrlToBuffer, differenceHash } from './image';
+import { dataUrlToBuffer, existingImageHashes } from './image';
 import type { CatalogProduct } from './sku-match';
 
 /** Read-only catalog lookups for grab-sheet matching. */
@@ -67,6 +67,6 @@ export function primaryHashLoader(supabase: SupabaseClient) {
     const { data, error } = await supabase.from('product_images').select('file_url').eq('id', imageId).maybeSingle();
     if (error || !data?.file_url) return null;
     const bytes = await readImageBytes(supabase, data.file_url as string);
-    return bytes ? differenceHash(bytes) : null;
+    return bytes ? existingImageHashes(bytes) : null;
   };
 }

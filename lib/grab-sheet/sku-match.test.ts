@@ -22,6 +22,7 @@ describe('normaliseSku', () => {
     expect(normaliseSku('GHOSRX103437OT')).toBe('GHOSRX103437OT');
     expect(normaliseSku('ghosrx 103437 0t')).toBe('GHOSRX103437OT');
     expect(normaliseSku('GHOSNS103665BK: Satanic Panic Cap')).toBe('GHOSNS103665BK');
+    expect(normaliseSku('GH0SRX203801BK')).toBe('GHOSRX203801BK');
     expect(normaliseSku('GHOSRX203275B')).toBeNull();
     expect(normaliseSku('')).toBeNull();
   });
@@ -66,6 +67,11 @@ describe('matchTile', () => {
     const m = matchTile({ sku: 'GHOSNS103665BK', rawSku: 'GHOSNS103665BK', cropHash: '0000ffff0000ffff' }, catalog);
     expect(m).toMatchObject({ status: 'conflict', existingImageId: 'img-cd' });
   });
+  it('uses the closest of several existing-image hashes', () => {
+    const cat = [{ ...catalog[0], primaryImageHash: 'ffff0000ffff0000,0000ffff0000fffe' }];
+    const m = matchTile({ sku: 'GHOSNS103665BK', rawSku: 'GHOSNS103665BK', cropHash: '0000ffff0000ffff' }, cat);
+    expect(m).toMatchObject({ status: 'matched', hashDistance: 1 });
+  });
   it('conflict when the existing image could not be compared', () => {
     expect(matchTile({ sku: 'GHOSNS103665BK', rawSku: 'GHOSNS103665BK', cropHash: null }, catalog).status).toBe('conflict');
   });
@@ -87,7 +93,7 @@ describe('helpers', () => {
   it('hamming distance on hex', () => {
     expect(hammingHex('ff', '00')).toBe(8);
     expect(hammingHex('abc', 'abc')).toBe(0);
-    expect(hammingHex('a', 'ab')).toBe(64);
+    expect(hammingHex('a', 'ab')).toBe(8);
   });
   it('flags repeated SKUs after the first', () => {
     const v = { status: 'verified' as const, skuRead: null, rawRead: '', captionMatchesItem: true };

@@ -12,10 +12,21 @@ export function cleanRead(raw: string): string {
   return raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
 }
 
-/** A caption read → a valid SKU (with OCR suffix repair), or null. */
+const PREFIX_LETTERS: Record<string, string> = { '0': 'O', '1': 'I', '5': 'S', '8': 'B' };
+
+/**
+ * A caption read → a valid SKU (with OCR suffix repair), or null.
+ * Also repairs digits read in the four-letter artist code ("GH0S" → "GHOS")
+ * when the read starts with the SKU; the vendored normaliser only repairs the
+ * colourway suffix.
+ */
 export function normaliseSku(raw: string | null | undefined): string | null {
   if (!raw) return null;
-  return skuFromCaption(raw) ?? null;
+  const direct = skuFromCaption(raw);
+  if (direct) return direct;
+  const cleaned = cleanRead(raw);
+  const fixed = cleaned.slice(0, 4).replace(/[0158]/g, (d) => PREFIX_LETTERS[d] ?? d) + cleaned.slice(4);
+  return fixed !== cleaned ? (skuFromCaption(fixed) ?? null) : null;
 }
 
 /**
@@ -56,12 +67,16 @@ export interface CatalogProduct {
   description: string | null;
   /** Primary product_images row, if any. */
   primaryImageId?: string | null;
-  /** 64-bit difference hash of that image, hex. */
+  /** Difference hashes of that image (hex, comma-separated variants; the closest counts). */
   primaryImageHash?: string | null;
 }
 
-/** Hamming distance at or below this counts as the same picture. */
-export const SAME_IMAGE_MAX_DISTANCE = 12;
+/**
+ * Hamming distance (of 256 bits) at or below this counts as the same picture.
+ * Deliberately strict: on the Ghost sheets two different black tees came
+ * within 29, so anything looser would hide a wrong image as "same".
+ */
+export const SAME_IMAGE_MAX_DISTANCE = 24;
 
 /** For a malformed read like GHOSRX203275B: the one catalog SKU that extends it by a single character. */
 export function suggestSku(raw: string, catalog: CatalogProduct[]): string | null {
@@ -98,7 +113,7 @@ export function matchTile(
   if (!product.primaryImageId) return { ...base, status: 'matched', hashDistance: null };
 
   if (input.cropHash && product.primaryImageHash) {
-    const d = hashDistance(input.cropHash, product.primaryImageHash);
+    const d = Math.min(...product.primaryImageHash.split(',').map((h) => hashDistance(input.cropHash!, h)));
     return {
       ...base,
       status: d <= SAME_IMAGE_MAX_DISTANCE ? 'matched' : 'conflict',
@@ -124,7 +139,7 @@ export function flagDuplicateSkus<T extends { sku: string | null; verification: 
 
 /** Hamming distance between two equal-length hex strings. */
 export function hammingHex(a: string, b: string): number {
-  if (a.length !== b.length) return 64;
+  if (a.length !== b.length) return Math.max(a.length, b.length) * 4;
   let d = 0;
   for (let i = 0; i < a.length; i += 1) {
     let x = parseInt(a[i], 16) ^ parseInt(b[i], 16);

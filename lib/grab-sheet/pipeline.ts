@@ -62,7 +62,9 @@ export async function runGrabSheetPage(input: PageInput, deps: PipelineDeps): Pr
   const tiles = await mapLimit(usable, deps.concurrency ?? 4, async ({ t, imageBox, captionBox }, i): Promise<GrabSheetTile> => {
     const id = `${pageKey}-t${i + 1}`;
     const crop = await cropProduct(page.jpeg, imageBox);
-    const sku = normaliseSku(t.sku) ?? normaliseSku(`${t.sku} ${t.name}`);
+    // Only fall back to the name when no SKU was printed: joining a malformed
+    // SKU to the name would invent a colourway ("GHOSRX203275B" + "PAPA…").
+    const sku = t.sku.trim() ? normaliseSku(t.sku) : normaliseSku(t.name);
 
     let verification: TileVerification;
     try {
