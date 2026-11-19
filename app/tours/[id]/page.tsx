@@ -343,12 +343,14 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
       <nav data-tour="tour-tabs" aria-label="Tour pages" className="flex gap-1 mt-6 border-b border-[var(--color-bg-border)] pb-2 overflow-x-auto">
         <Link
           href={`/tours/${tour.id}/projections`}
+          data-tour="tab-projections"
           className={tabClass}
         >
           <BarChart3 className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Projections
         </Link>
         <Link
           href={`/tours/${tour.id}/reports`}
+          data-tour="tab-reports"
           className={tabClass}
         >
           <TrendingUp className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> Reports
@@ -362,6 +364,7 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         </Link>
         <Link
           href={`/tours/${tour.id}/cogs`}
+          data-tour="tab-cogs"
           className={tabClass}
         >
           <DollarSign className="inline-block h-4 w-4 align-[-0.125em] mr-1" aria-hidden="true" /> COGS

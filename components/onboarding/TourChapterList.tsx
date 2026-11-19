@@ -1,7 +1,7 @@
 'use client';
 
 import { TOURS, chapterNumber, type TourId } from './tour-chapters';
-import { requestTour } from './tour-control';
+import { TourSpinner, preloadTour, useTourStart } from './GuidedTourLoader';
 
 const ORDER: TourId[] = ['overview', 'full'];
 
@@ -11,9 +11,10 @@ const ORDER: TourId[] = ['overview', 'full'];
  * Every chapter row starts its tour at that chapter.
  */
 export function TourChoices({ compact = false, onStart }: { compact?: boolean; onStart?: () => void }) {
+  const { pending, start: startTour } = useTourStart();
   const start = (tour: TourId, chapter = 0) => {
     onStart?.();
-    requestTour(tour, chapter);
+    startTour(tour, chapter);
   };
 
   return (
@@ -40,12 +41,16 @@ export function TourChoices({ compact = false, onStart }: { compact?: boolean; o
             <button
               type="button"
               onClick={() => start(id)}
+              onPointerEnter={preloadTour}
+              onFocus={preloadTour}
+              aria-busy={pending === `${id}:0` || undefined}
               className={
                 primary
-                  ? 'self-start inline-flex items-center h-10 px-5 rounded-md text-sm font-semibold bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] active:bg-[var(--color-red-active)] transition'
-                  : 'self-start inline-flex items-center h-10 px-5 rounded-md text-sm font-semibold border border-[var(--color-bg-border)] text-[var(--color-text-primary)] hover:border-[var(--color-text-muted)] transition'
+                  ? 'self-start inline-flex items-center gap-2 h-10 px-5 rounded-md text-sm font-semibold bg-[var(--color-red-primary)] text-white hover:bg-[var(--color-red-hover)] active:bg-[var(--color-red-active)] transition'
+                  : 'self-start inline-flex items-center gap-2 h-10 px-5 rounded-md text-sm font-semibold border border-[var(--color-bg-border)] text-[var(--color-text-primary)] hover:border-[var(--color-text-muted)] transition'
               }
             >
+              {pending === `${id}:0` && <TourSpinner />}
               {primary ? 'Start the overview' : 'Start the full walkthrough'}
             </button>
             <ol
@@ -58,6 +63,8 @@ export function TourChoices({ compact = false, onStart }: { compact?: boolean; o
                   <button
                     type="button"
                     onClick={() => start(id, index)}
+                    onPointerEnter={preloadTour}
+                    aria-busy={pending === `${id}:${index}` || undefined}
                     className="w-full text-left rounded-md px-2 py-1.5 hover:bg-[var(--color-bg-elevated)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-red-primary)]"
                   >
                     <span className="flex items-baseline justify-between gap-3">
@@ -68,7 +75,7 @@ export function TourChoices({ compact = false, onStart }: { compact?: boolean; o
                         {chapter.title}
                       </span>
                       <span className="text-xs text-[var(--color-text-muted)] whitespace-nowrap tabular-nums">
-                        {chapter.steps.length} steps
+                        {pending === `${id}:${index}` ? <TourSpinner /> : `${chapter.steps.length} steps`}
                       </span>
                     </span>
                     {!compact && (

@@ -22,7 +22,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { href: '/', label: 'Tours', icon: LineChart, tour: 'nav-tours' },
   { href: '/dashboard/parsed-documents', label: 'Documents', icon: FileText, tour: 'documents' },
-  { href: '/admin', label: 'Admin', icon: Settings },
+  { href: '/admin', label: 'Admin', icon: Settings, tour: 'nav-admin' },
 ];
 
 export const APP_ICONS: Record<AppId, LucideIcon> = {

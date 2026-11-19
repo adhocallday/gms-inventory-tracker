@@ -4,7 +4,7 @@ import { MobileNav } from '@/components/layout/MobileNav';
 import { SidebarProvider } from '@/components/layout/SidebarContext';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { GuidedTour } from '@/components/onboarding/GuidedTour';
+import { GuidedTour } from '@/components/onboarding/GuidedTourLoader';
 import './globals.css';
 
 export const metadata: Metadata = {

@@ -87,6 +87,7 @@ export function MobileNav() {
             aria-haspopup="dialog"
             aria-expanded={open}
             aria-controls="mf-mobile-menu"
+            data-tour="nav-menu"
             className={itemClass(open)}
           >
             <Menu className="h-5 w-5" aria-hidden="true" />
