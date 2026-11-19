@@ -472,7 +472,15 @@ export default async function TourDetailPage({ params }: TourDetailParams) {
         </section>
 
         <section className="g-card p-5">
-          <h2 className="text-base font-semibold">Grab sheet</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-semibold">Grab sheet</h2>
+            <Link
+              href={`/admin/products/grab-sheet?tourId=${tour.id}`}
+              className="text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+            >
+              Import grab sheet <ArrowRight className="inline-block h-4 w-4 align-[-0.125em] ml-1" aria-hidden="true" />
+            </Link>
+          </div>
           <p className="text-sm text-[var(--color-text-secondary)] mt-2">
             Design images for this tour&apos;s products.
           </p>
