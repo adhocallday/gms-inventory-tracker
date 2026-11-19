@@ -5,6 +5,7 @@ import { BarChart3 } from 'lucide-react';
 import { formatDate } from '@/lib/format';
 import { loadAnalytics } from '@/lib/analytics';
 import { StatCard, STAT_GRID } from '@/components/dashboard/StatCard';
+import { loadAiUsage } from '@/lib/ai/usage-summary';
 
 // Read live on every request (the Supabase client is no-store), never prerendered at build.
 export const dynamic = 'force-dynamic';
@@ -15,6 +16,15 @@ function formatCurrency(value: number): string {
     currency: 'USD',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
+  }).format(value);
+}
+
+function formatUsd(value: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
   }).format(value);
 }
 
@@ -29,10 +39,13 @@ export default async function AnalyticsPage() {
   ]);
 
   // Rendered on the server: the page arrives with its figures.
-  const data = await loadAnalytics().catch((error) => {
-    console.error('[Analytics page] Load failed:', error);
-    return null;
-  });
+  const [data, aiUsage] = await Promise.all([
+    loadAnalytics().catch((error) => {
+      console.error('[Analytics page] Load failed:', error);
+      return null;
+    }),
+    loadAiUsage(),
+  ]);
 
   if (!data) {
     return (
@@ -231,6 +244,50 @@ export default async function AnalyticsPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+      </div>
+
+      {/* AI usage */}
+      <div className="g-card overflow-hidden mt-5">
+        <div className="p-4 border-b border-[var(--color-bg-border)]">
+          <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">AI usage</h2>
+          <p className="text-[12.5px] text-[var(--color-text-secondary)]">
+            Claude calls and cost this month, from each call&apos;s token usage.
+          </p>
+        </div>
+        {!aiUsage.available ? (
+          <div className="p-6 text-center text-[var(--color-text-secondary)]">
+            Usage logging starts once database migration 009 is applied.
+          </div>
+        ) : (
+          <div className="p-4">
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <StatCard label="Calls this month" value={formatNumber(aiUsage.calls)} />
+              <StatCard label="Cost this month" value={formatUsd(aiUsage.costUsd)} />
+            </div>
+            {aiUsage.byTask.length === 0 ? (
+              <div className="text-center text-[var(--color-text-secondary)]">No AI calls this month yet.</div>
+            ) : (
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-[var(--color-bg-border)] bg-[var(--color-table-head)] text-left">
+                    <th className="px-3 py-2 text-[12.5px] font-semibold text-[var(--color-text-secondary)]">Task</th>
+                    <th className="px-3 py-2 text-[12.5px] font-semibold text-[var(--color-text-secondary)] text-right">Calls</th>
+                    <th className="px-3 py-2 text-[12.5px] font-semibold text-[var(--color-text-secondary)] text-right">Cost</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[var(--color-bg-border)]">
+                  {aiUsage.byTask.map(t => (
+                    <tr key={t.task} className="tabular-nums">
+                      <td className="px-3 py-2 text-[13.5px] text-[var(--color-text-primary)]">{t.task}</td>
+                      <td className="px-3 py-2 text-[13.5px] text-right text-[var(--color-text-primary)]">{formatNumber(t.calls)}</td>
+                      <td className="px-3 py-2 text-[13.5px] text-right text-[var(--color-text-primary)]">{formatUsd(t.costUsd)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
       </div>
