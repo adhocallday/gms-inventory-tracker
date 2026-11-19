@@ -18,10 +18,10 @@ describe('model profiles', () => {
       'admin-parsing': [MODELS.SONNET, 'medium'],
       'grab-sheet-detect': [MODELS.OPUS, 'medium'],
       'grab-sheet-verify': [MODELS.HAIKU, 'low'],
-      'projection-analysis': [MODELS.OPUS, 'high'],
+      'projection-analysis': [MODELS.OPUS, 'medium'],
       'recommendations': [MODELS.OPUS, 'high'],
       'size-distribution': [MODELS.OPUS, 'high'],
-      'comprehensive-projections': [MODELS.OPUS, 'high'],
+      'comprehensive-projections': [MODELS.OPUS, 'medium'],
       'chat': [MODELS.SONNET, 'medium'],
     };
     for (const [task, [model, effort]] of Object.entries(expected) as [TaskType, [string, string]][]) {

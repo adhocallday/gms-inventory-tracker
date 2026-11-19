@@ -69,10 +69,12 @@ export const MODEL_PROFILES: Record<TaskType, ModelProfile> = {
   'grab-sheet-verify': profile(MODELS.HAIKU, 'low', 2048),
 
   // Money decisions: effort set explicitly (Opus 5.5 defaults to medium).
-  'projection-analysis': profile(MODELS.OPUS, 'high', 64000, 'summarized'),
+  // The long whole-tour runs use medium: at high they took 3-3.7 min, near the
+  // 300 s route limit (2026-11-19). The shorter calls stay at high.
+  'projection-analysis': profile(MODELS.OPUS, 'medium', 64000, 'summarized'),
   'recommendations': profile(MODELS.OPUS, 'high', 64000),
   'size-distribution': profile(MODELS.OPUS, 'high', 64000),
-  'comprehensive-projections': profile(MODELS.OPUS, 'high', 64000, 'summarized'),
+  'comprehensive-projections': profile(MODELS.OPUS, 'medium', 64000, 'summarized'),
 
   // Interactive; summarized thinking so the stream shows progress.
   'chat': profile(MODELS.SONNET, 'medium', 16000, 'summarized'),
