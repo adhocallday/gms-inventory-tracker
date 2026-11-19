@@ -56,7 +56,7 @@ export default async function AnalyticsPage() {
       />
 
       {/* Summary Stats */}
-      <div data-tour="admin-analytics" className={`${STAT_GRID} 2xl:grid-cols-7 mt-5 mb-5`}>
+      <div data-tour="admin-analytics" className={`${STAT_GRID} xl:grid-cols-7 mt-5 mb-5`}>
         {[
           ['Gross sales', formatCurrency(summary.totalGross)],
           ['Per head', formatCurrency(summary.avgPerHead)],
