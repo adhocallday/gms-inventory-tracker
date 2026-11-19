@@ -148,3 +148,33 @@ export const MODEL_INFO: Record<ModelName, { name: string; tier: 'opus' | 'sonne
 export function getModelName(modelId: string): string {
   return MODEL_INFO[modelId as ModelName]?.name || modelId;
 }
+
+/**
+ * Grab-sheet image recognition (lib/ai/parsers/grab-sheet-parser.ts).
+ *
+ * - detect: Opus 5.5 at medium effort finds every product tile on a page,
+ *   reads its caption and returns the picture and caption boxes.
+ * - verify: Haiku 5.5 at low effort reads the SKU back from one crop, a cheap
+ *   second read that rejects mislabelled crops. Haiku 5.5 has no server-side
+ *   refusal fallback, so callers handle `refusal` themselves.
+ *
+ * Prices are USD per million tokens, for the per-call cost log.
+ */
+export const GRAB_SHEET_PROFILES = {
+  detect: {
+    model: MODELS.OPUS,
+    effort: 'medium',
+    maxTokens: 32000,
+    serverFallback: true,
+    price: { input: 4, output: 20, cacheRead: 0.2 },
+  },
+  verify: {
+    model: 'claude-haiku-5-5',
+    effort: 'low',
+    maxTokens: 2048,
+    serverFallback: false,
+    price: { input: 0.1, output: 0.5, cacheRead: 0.01 },
+  },
+} as const;
+
+export type GrabSheetProfile = (typeof GRAB_SHEET_PROFILES)[keyof typeof GRAB_SHEET_PROFILES];

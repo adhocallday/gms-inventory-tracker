@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { Plus, Search, X } from 'lucide-react';
+import { ImageUp, Plus, Search, X } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { generateBreadcrumbs } from '@/lib/utils/breadcrumbs';
 import { Button } from '@/components/ui/Button';
@@ -212,10 +212,20 @@ export default function AdminProductsPage() {
         subtitle="Manage the global product catalog. Products can be assigned to multiple tours with tour-specific pricing."
         breadcrumbs={breadcrumbs}
         actions={
-          <Button onClick={() => setShowForm(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            New product
-          </Button>
+          <div className="flex gap-2">
+            <Link
+              href="/admin/products/grab-sheet"
+              data-tour="grab-sheet-link"
+              className="inline-flex h-10 items-center gap-2 rounded-md border border-[var(--color-bg-border)] bg-[var(--color-bg-surface)] px-4 text-sm font-semibold text-[var(--color-text-primary)] hover:bg-[var(--color-bg-elevated)]"
+            >
+              <ImageUp className="w-4 h-4" aria-hidden="true" />
+              Import grab sheet
+            </Link>
+            <Button onClick={() => setShowForm(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              New product
+            </Button>
+          </div>
         }
       />
 

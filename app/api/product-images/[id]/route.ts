@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
 import { createServiceClient } from '@/lib/supabase/client';
+import { PRODUCT_IMAGES_BUCKET, storagePathFromUrl } from '@/lib/grab-sheet/catalog';
 
 /**
  * GET /api/product-images/[id]?w=480 → one product photo, resized to WebP.
  *
- * Photos are stored in product_images.file_url as data URLs (~400 KB each).
- * Embedding them in pages made the tour report 16 MB, so pages link here and
- * the CDN caches the resized image.
+ * file_url is either a legacy data URL (~400 KB each) or a URL in the
+ * product-images storage bucket (grab-sheet approvals and uploads). Both are
+ * resized here, so pages link to this route and the CDN caches the result;
+ * storage is read with the service role, so it works for a private bucket too.
+ * Any other https URL is redirected to.
  */
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -33,14 +36,23 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     const url = data?.file_url as string | undefined;
     if (!url) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    if (/^https:\/\//.test(url)) return NextResponse.redirect(url);
-
-    const match = /^data:([^;,]+);base64,([A-Za-z0-9+/=\s]*)$/.exec(url);
-    if (!match || !IMAGE_TYPES.has(match[1])) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    let source: Buffer;
+    const storagePath = /^https:\/\//.test(url) ? storagePathFromUrl(url) : null;
+    if (storagePath) {
+      const { data: file, error: dlError } = await supabase.storage.from(PRODUCT_IMAGES_BUCKET).download(storagePath);
+      if (dlError || !file) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+      source = Buffer.from(await file.arrayBuffer());
+    } else if (/^https:\/\//.test(url)) {
+      return NextResponse.redirect(url);
+    } else {
+      const match = /^data:([^;,]+);base64,([A-Za-z0-9+/=\s]*)$/.exec(url);
+      if (!match || !IMAGE_TYPES.has(match[1])) {
+        return NextResponse.json({ error: 'Not found' }, { status: 404 });
+      }
+      source = Buffer.from(match[2], 'base64');
     }
 
-    const resized = await sharp(Buffer.from(match[2], 'base64'))
+    const resized = await sharp(source)
       .resize({ width, withoutEnlargement: true })
       .webp({ quality: 80 })
       .toBuffer();
