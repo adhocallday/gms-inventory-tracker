@@ -23,7 +23,7 @@ export async function stageLargeUpload(file: File): Promise<string | null> {
   const { path, token } = await readJsonResponse<{ path: string; token: string }>(signResponse);
 
   const { error } = await supabase.storage.from('documents').uploadToSignedUrl(path, token, file, {
-    contentType: 'application/pdf',
+    contentType: file.type || 'application/pdf',
   });
   if (error) throw new Error(`Upload failed: ${error.message}`);
   return path;

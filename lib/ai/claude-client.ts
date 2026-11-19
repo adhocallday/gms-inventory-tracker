@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { fallbackParams, getModelProfile, type Effort, type TaskType } from './models';
 import { logUsage, type UsageRecord } from './usage';
+import type { DocumentInput, PageImage } from './document-input';
 
 export interface ParsedDocument {
   [key: string]: any;
@@ -220,4 +221,50 @@ export async function parseText(
     schema,
     { task: 'admin-parsing', ...options }
   );
+}
+
+/**
+ * Content blocks for a document: a PDF as one `document` block, or page images
+ * interleaved with "Page N" labels so Claude keeps the reading order.
+ */
+export function buildDocumentBlocks(input: DocumentInput): Anthropic.Beta.BetaContentBlockParam[] {
+  if (input.kind === 'pdf') {
+    return [{ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: input.data } }];
+  }
+  return input.pages.flatMap((page, i): Anthropic.Beta.BetaContentBlockParam[] => [
+    { type: 'text', text: `Page ${i + 1}` },
+    { type: 'image', source: { type: 'base64', media_type: page.mediaType, data: page.data } },
+  ]);
+}
+
+/**
+ * Parse a document photographed as page images (phone scanner, iPad app).
+ */
+export async function parseDocumentPages(
+  pages: PageImage[],
+  instructions: string,
+  schema: JsonSchema,
+  options: ParseOptions = {}
+): Promise<ParsedDocument> {
+  if (pages.length === 0) throw new AIParseError('No pages to read');
+  const note =
+    `The document is ${pages.length === 1 ? 'one photographed page' : `${pages.length} photographed pages, in order`}. ` +
+    'Read every page; a table may continue across pages.';
+  return runStructured(
+    [...buildDocumentBlocks({ kind: 'images', pages }), { type: 'text', text: `${note}\n\n${instructions}` }],
+    schema,
+    options
+  );
+}
+
+/** Parse a PDF or page images with the same instructions and schema. */
+export async function parseDocumentInput(
+  input: DocumentInput,
+  instructions: string,
+  schema: JsonSchema,
+  options: ParseOptions = {}
+): Promise<ParsedDocument> {
+  return input.kind === 'pdf'
+    ? parseDocument(input.data, 'application/pdf', instructions, schema, options)
+    : parseDocumentPages(input.pages, instructions, schema, options);
 }

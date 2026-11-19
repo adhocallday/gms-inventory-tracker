@@ -273,7 +273,7 @@ export const OVERVIEW_CHAPTERS: Chapter[] = [
         page: 'upload',
         anchor: 'upload-dropzone',
         title: 'One intake for every document',
-        body: 'Purchase orders, packing lists, sales reports and settlements all come in here, with no form per document type. AI recognises the type and matches the tour and show. Upload in the browser works today; an email-in address and iPad scanning at receiving are planned to feed this same intake.',
+        body: 'Purchase orders, packing lists, sales reports and settlements all come in here, with no form per document type. AI recognises the type and matches the tour and show. PDFs upload in the browser, and a phone or iPad can photograph the pages (Upload in the bottom bar opens the camera scanner); an email-in address is planned to feed this same intake.',
       },
       openDocuments,
       {

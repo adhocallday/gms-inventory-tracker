@@ -1,4 +1,5 @@
-import { parseDocument, type JsonSchema, type ParseOptions } from '../claude-client';
+import { parseDocumentInput, type JsonSchema, type ParseOptions } from '../claude-client';
+import { asDocumentInput, type DocumentInput } from '../document-input';
 
 export interface SalesLineItem {
   sku: string;
@@ -49,7 +50,7 @@ const SALES_REPORT_SCHEMA: JsonSchema = {
 };
 
 export async function parseSalesReport(
-  pdfBase64: string,
+  input: DocumentInput | string,
   options: ParseOptions = {}
 ): Promise<SalesReportData> {
   const instructions = `
@@ -84,5 +85,5 @@ Important:
 - Return ONLY the JSON object
 `;
 
-  return parseDocument(pdfBase64, 'application/pdf', instructions, SALES_REPORT_SCHEMA, options) as Promise<SalesReportData>;
+  return parseDocumentInput(asDocumentInput(input), instructions, SALES_REPORT_SCHEMA, options) as Promise<SalesReportData>;
 }

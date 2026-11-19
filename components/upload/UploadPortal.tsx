@@ -7,8 +7,8 @@ import { InlineDraftReview } from '@/components/upload/InlineDraftReview';
 import { useShows } from '@/hooks/useShows';
 import { useTours } from '@/hooks/useTours';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { Button } from '@/components/ui/Button';
-import { ArrowRight, Check } from 'lucide-react';
+import { Button, buttonVariants } from '@/components/ui/Button';
+import { ArrowRight, Camera, Check } from 'lucide-react';
 import { formatDate } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
@@ -118,6 +118,12 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
       <PageHeader
         title="Upload a document"
         subtitle="One PDF at a time: a purchase order, packing list, sales report or settlement. Claude reads it into a draft, and nothing is posted until you review and approve the draft."
+        actions={
+          <Link href="/scan" className={buttonVariants({ variant: 'secondary', size: 'md' })}>
+            <Camera className="h-4 w-4" aria-hidden="true" />
+            Use camera or photos
+          </Link>
+        }
       />
 
       {/* Document type: detected by Claude, or chosen by hand */}
@@ -285,8 +291,11 @@ export default function UploadPortal({ searchParams }: UploadPortalProps) {
         )}
 
         <p data-tour="upload-channels" className="text-sm text-[var(--color-text-secondary)]">
-          <span className="font-semibold text-[var(--color-text-primary)]">Ways in:</span> upload here (live). An
-          email-in address and iPad scan at receiving are planned and will feed this same intake.
+          <span className="font-semibold text-[var(--color-text-primary)]">Ways in:</span> upload a PDF here, or{' '}
+          <Link href="/scan" className="font-medium text-[var(--color-red-text)] hover:underline">
+            photograph the pages
+          </Link>{' '}
+          with a phone or iPad. An email-in address is planned and will feed this same intake.
         </p>
 
         <div className="space-y-3" data-tour="upload-status">

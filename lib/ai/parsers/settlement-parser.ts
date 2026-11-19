@@ -1,4 +1,5 @@
-import { parseDocument, type JsonSchema, type ParseOptions } from '../claude-client';
+import { parseDocumentInput, type JsonSchema, type ParseOptions } from '../claude-client';
+import { asDocumentInput, type DocumentInput } from '../document-input';
 
 export interface SettlementComp {
   sku: string;
@@ -43,7 +44,7 @@ const SETTLEMENT_SCHEMA: JsonSchema = {
 };
 
 export async function parseSettlementReport(
-  pdfBase64: string,
+  input: DocumentInput | string,
   options: ParseOptions = {}
 ): Promise<SettlementReportData> {
   const instructions = `
@@ -76,5 +77,5 @@ Rules:
 - Return ONLY the JSON, no explanation or markdown
 `;
 
-  return parseDocument(pdfBase64, 'application/pdf', instructions, SETTLEMENT_SCHEMA, options) as Promise<SettlementReportData>;
+  return parseDocumentInput(asDocumentInput(input), instructions, SETTLEMENT_SCHEMA, options) as Promise<SettlementReportData>;
 }
