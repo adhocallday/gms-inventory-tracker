@@ -94,7 +94,7 @@ function detectPrompt(width: number, height: number): string {
     '- sku: the SKU exactly as printed (keep every character; do not fix or complete it). Empty string if the tile has no SKU.',
     '- name: the product name as printed.',
     '- sizes and price: only if printed for that product; otherwise [] and null.',
-    '- image_box: the box around that product\'s picture only, covering every view of the same product, and not the caption text.',
+    '- image_box: a tight box around that product\'s picture only, covering every view of the same product. It must not include the caption, sales figures or percentages, or any part of a neighbouring product.',
     '- caption_box: the box around that product\'s caption (name and SKU lines).',
     '- confidence: 0 to 1.',
     '',
