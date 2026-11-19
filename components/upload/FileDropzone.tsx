@@ -2,9 +2,9 @@
 
 import { useCallback, useState, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from '@/components/layout/NavigationProgress';
 import { buildUploadBody, readJsonResponse, stageLargeUpload } from '@/lib/upload/upload-client';
-import { Check, Upload } from 'lucide-react';
+import { Check, Loader2, Upload } from 'lucide-react';
 
 type DocType = 'po' | 'packing-list' | 'sales-report' | 'settlement';
 
@@ -49,7 +49,7 @@ export function FileDropzone({
   autoDetect = false,
   onTypeDetected
 }: FileDropzoneProps) {
-  const router = useRouter();
+  const { navigate, isPending: opening } = useNavigate();
   const [uploading, setUploading] = useState(false);
   const [parsing, setParsing] = useState(false);
   const [detecting, setDetecting] = useState(false);
@@ -149,7 +149,7 @@ export function FileDropzone({
       if (autoRedirect && result.parsedDocumentId) {
         // Small delay to show success message
         setTimeout(() => {
-          router.push(`/dashboard/parsed-documents/${result.parsedDocumentId}`);
+          navigate(`/dashboard/parsed-documents/${result.parsedDocumentId}`);
         }, 1500);
       }
     } catch (err: any) {
@@ -159,7 +159,7 @@ export function FileDropzone({
       setUploading(false);
       setParsing(false);
     }
-  }, [tourId, showId, onParseComplete, autoRedirect, router, getStagedPath]);
+  }, [tourId, showId, onParseComplete, autoRedirect, navigate, getStagedPath]);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) return;
@@ -380,6 +380,12 @@ export function FileDropzone({
           <p className="text-sm text-[var(--color-text-primary)] font-semibold mb-2">
             <Check className="inline-block h-4 w-4 align-[-0.125em] mr-1 text-success" aria-hidden="true" /> Document read
           </p>
+          {autoRedirect && (
+            <p className="mb-2 flex items-center gap-2 text-sm text-[var(--color-text-secondary)]" role="status">
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              {opening ? 'Opening the draft…' : 'Opening the draft for review…'}
+            </p>
+          )}
           <pre className="text-xs bg-[var(--color-bg-elevated)] p-2 md:p-3 rounded border border-[var(--color-bg-border)] overflow-auto max-h-48 md:max-h-64 lg:max-h-96 text-[var(--color-text-secondary)]">
             {JSON.stringify(parsedData, null, 2)}
           </pre>

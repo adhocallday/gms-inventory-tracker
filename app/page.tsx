@@ -9,7 +9,6 @@ import { RecentActivityPanel, type RecentDocument } from '@/components/dashboard
 import { UpcomingShowsPanel, type UpcomingShow } from '@/components/dashboard/UpcomingShowsPanel';
 import { cn } from '@/lib/utils';
 import { fetchAll } from '@/lib/supabase/fetch-all';
-import { FirstVisitRedirect } from '@/components/onboarding/FirstVisitRedirect';
 
 type TourRow = {
   id: string;
@@ -182,7 +181,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8 py-6">
-      <FirstVisitRedirect />
       <PageHeader
         title="Tours"
         subtitle="Every tour with its posted sales, and the documents waiting for review."

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from '@/components/layout/NavigationProgress';
 import { Check, X, Edit2, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
@@ -29,7 +29,7 @@ export function InlineDraftReview({
   onClose,
   onPosted,
 }: InlineDraftReviewProps) {
-  const router = useRouter();
+  const { navigate, isPending: opening } = useNavigate();
   const [isPosting, setIsPosting] = useState(false);
   const [postError, setPostError] = useState<string | null>(null);
   const [postSuccess, setPostSuccess] = useState(false);
@@ -99,7 +99,7 @@ export function InlineDraftReview({
           <Button onClick={onClose} variant="outline">
             Upload Another
           </Button>
-          <Button onClick={() => router.push(`/dashboard/parsed-documents/${parsedDocumentId}`)}>
+          <Button onClick={() => navigate(`/dashboard/parsed-documents/${parsedDocumentId}`)} isLoading={opening}>
             View Details
           </Button>
         </div>
@@ -308,16 +308,18 @@ export function InlineDraftReview({
       {/* Actions */}
       <div className="p-4 border-t border-[var(--color-bg-border)] bg-[var(--color-bg-elevated)] flex gap-2">
         <Button
-          onClick={() => router.push(`/dashboard/parsed-documents/${parsedDocumentId}`)}
+          onClick={() => navigate(`/dashboard/parsed-documents/${parsedDocumentId}`)}
           variant="outline"
           className="flex-1"
+          isLoading={opening}
         >
-          <Edit2 className="w-4 h-4 mr-2" />
+          {!opening && <Edit2 className="w-4 h-4 mr-2" />}
           Full Edit
         </Button>
         <Button
           onClick={handlePost}
-          disabled={isPosting || hasErrors}
+          disabled={hasErrors}
+          isLoading={isPosting}
           className="flex-1"
         >
           {isPosting ? 'Posting...' : 'Post to Database'}

@@ -26,6 +26,33 @@ const PUBLIC_PREFIXES = [
 // Server-to-server link from MerchFlow Charts; protected by MERCHFLOW_LINK_SECRET.
 const MERCH_FLOW_DATA = /^\/api\/tours\/[^/]+\/merch-flow-data$/;
 
+/**
+ * First visit: / redirects to /welcome once. The cookie is set on that
+ * redirect and on any visit to /welcome, so the dashboard never loads twice
+ * (the old client-side redirect rendered / and then replaced it).
+ * Bump the value to show /welcome again to everyone.
+ */
+const ONBOARDED_COOKIE = 'mf_onboarded';
+const ONBOARDED_VALUE = '3';
+const ONE_YEAR = 60 * 60 * 24 * 365;
+
+function onboarding(request: NextRequest): NextResponse {
+  const { pathname } = request.nextUrl;
+  const seen = request.cookies.get(ONBOARDED_COOKIE)?.value === ONBOARDED_VALUE;
+  // A link prefetch is not a visit: it must not set the cookie or redirect.
+  const prefetch = request.headers.has('next-router-prefetch') || request.headers.get('purpose') === 'prefetch';
+  if (seen || prefetch || (pathname !== '/' && pathname !== '/welcome')) return NextResponse.next();
+
+  const response =
+    pathname === '/' ? NextResponse.redirect(new URL('/welcome', request.url)) : NextResponse.next();
+  response.cookies.set(ONBOARDED_COOKIE, ONBOARDED_VALUE, {
+    path: '/',
+    maxAge: ONE_YEAR,
+    sameSite: 'lax',
+  });
+  return response;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -35,10 +62,10 @@ export async function middleware(request: NextRequest) {
 
   const password = process.env.SITE_PASSWORD;
   const secret = process.env.SITE_SESSION_SECRET;
-  if (!password || !secret) return NextResponse.next();
+  if (!password || !secret) return onboarding(request);
 
   if (await verifySession(request.cookies.get(SESSION_COOKIE)?.value, secret)) {
-    return NextResponse.next();
+    return onboarding(request);
   }
 
   // API calls get a 401 instead of a login page.

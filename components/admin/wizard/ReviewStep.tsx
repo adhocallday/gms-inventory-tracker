@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import { useNavigate } from '@/components/layout/NavigationProgress';
 
 interface TourData {
   name: string;
@@ -46,7 +46,7 @@ interface ReviewStepProps {
 }
 
 export default function ReviewStep({ tourData, shows, products, initialInventory, onPrev }: ReviewStepProps) {
-  const router = useRouter();
+  const { navigate, isPending } = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState({
@@ -105,7 +105,7 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
       const result = await response.json();
 
       // Redirect to the new tour page
-      router.push(`/tours/${result.tourId}`);
+      navigate(`/tours/${result.tourId}`);
     } catch (err: any) {
       setError(err.message);
       console.error('Tour creation error:', err);
@@ -381,10 +381,12 @@ export default function ReviewStep({ tourData, shows, products, initialInventory
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={submitting || validation.missingFields.length > 0}
-          className="px-6 py-2 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={submitting || isPending || validation.missingFields.length > 0}
+          aria-busy={submitting || isPending}
+          className="inline-flex items-center gap-2 px-6 py-2 bg-[var(--color-red-primary)] text-white rounded-lg hover:bg-[var(--color-red-hover)] transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {submitting ? 'Creating Tour...' : 'Create Tour'}
+          {(submitting || isPending) && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+          {submitting ? 'Creating tour…' : isPending ? 'Opening the tour…' : 'Create Tour'}
         </button>
       </div>
     </div>

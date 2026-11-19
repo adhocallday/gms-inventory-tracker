@@ -822,3 +822,8 @@ dialog.mf-sheet::backdrop { background: var(--color-scrim); }
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
+
+/* Navigation progress bar (components/layout/NavigationProgress.tsx): no growth animation under reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .mf-nav-progress > div { transition: none !important; width: 100% !important; }
+}

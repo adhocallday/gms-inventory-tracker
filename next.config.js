@@ -5,6 +5,10 @@ const nextConfig = {
     serverComponentsExternalPackages: ['canvas', 'pdfjs-dist', 'pdf-parse', 'tesseract.js'],
     // Tree-shake icon imports so each page only ships the icons it uses
     optimizePackageImports: ['lucide-react', 'recharts', 'date-fns'],
+    // Client router cache: a page visited in the last 30s (180s for static
+    // pages) shows again at once on back/forward and repeat links. Writes call
+    // revalidateDashboards() and router.refresh(), which clear it.
+    staleTimes: { dynamic: 30, static: 180 },
   },
 }
 

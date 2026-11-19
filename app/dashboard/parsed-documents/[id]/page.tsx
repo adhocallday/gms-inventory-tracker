@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from '@/components/layout/NavigationProgress';
 import DocumentReviewHeader from '@/components/review/DocumentReviewHeader';
 import ValidationPanel from '@/components/review/ValidationPanel';
 import TourShowSelector from '@/components/review/TourShowSelector';
@@ -9,7 +9,7 @@ import ReviewFormPO from '@/components/review/ReviewFormPO';
 import ReviewFormPackingList from '@/components/review/ReviewFormPackingList';
 import ReviewFormSalesReport from '@/components/review/ReviewFormSalesReport';
 import ReviewFormSettlement from '@/components/review/ReviewFormSettlement';
-import { CheckIcon, X } from 'lucide-react';
+import { CheckIcon, Loader2, X } from 'lucide-react';
 
 interface ParsedDocument {
   id: string;
@@ -35,7 +35,7 @@ export default function ReviewDocumentPage({
 }: {
   params: { id: string };
 }) {
-  const router = useRouter();
+  const { navigate, isPending: leaving } = useNavigate();
   const [document, setDocument] = useState<ParsedDocument | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -59,18 +59,18 @@ export default function ReviewDocumentPage({
           setFormData(initialData);
         } else {
           console.error('Failed to fetch document');
-          router.push('/dashboard/parsed-documents');
+          navigate('/dashboard/parsed-documents');
         }
       } catch (err) {
         console.error('Error fetching document:', err);
-        router.push('/dashboard/parsed-documents');
+        navigate('/dashboard/parsed-documents');
       } finally {
         setLoading(false);
       }
     }
 
     fetchDocument();
-  }, [params.id, router]);
+  }, [params.id, navigate]);
 
   const handleTourShowChange = async (tourId: string | null, showId: string | null) => {
     if (!document) return;
@@ -168,7 +168,7 @@ export default function ReviewDocumentPage({
         const result = await res.json();
         setStatusMessage('Document posted successfully!');
         setTimeout(() => {
-          router.push('/dashboard/parsed-documents');
+          navigate('/dashboard/parsed-documents');
         }, 2000);
       } else {
         const error = await res.json();
@@ -196,7 +196,7 @@ export default function ReviewDocumentPage({
       });
 
       if (res.ok) {
-        router.push('/dashboard/parsed-documents');
+        navigate('/dashboard/parsed-documents');
       } else {
         setStatusMessage('Failed to reject document');
       }
@@ -327,25 +327,29 @@ export default function ReviewDocumentPage({
               type="button"
               onClick={handleReject}
               className="g-button g-button-outline"
-              disabled={saving || posting}
+              disabled={saving || posting || leaving}
             >
               Reject
             </button>
             <button
               type="button"
               onClick={handleSaveDraft}
-              disabled={saving || posting}
+              disabled={saving || posting || leaving}
+              aria-busy={saving}
               className="g-button g-button-outline"
             >
+              {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
               {saving ? 'Saving…' : 'Save draft'}
             </button>
             <button
               type="button"
               onClick={handleApproveAndPost}
-              disabled={saving || posting || (document.validation?.missing_fields?.length || 0) > 0}
+              disabled={saving || posting || leaving || (document.validation?.missing_fields?.length || 0) > 0}
+              aria-busy={posting || leaving}
               className="g-button"
             >
-              {posting ? 'Posting…' : 'Approve and post'}
+              {(posting || leaving) && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+              {posting ? 'Posting…' : leaving ? 'Opening documents…' : 'Approve and post'}
             </button>
           </div>
         </div>

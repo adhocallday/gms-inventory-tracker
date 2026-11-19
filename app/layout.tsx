@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 import { NavBar } from '@/components/layout/NavBar';
 import { MobileNav } from '@/components/layout/MobileNav';
+import { NavigationProgress } from '@/components/layout/NavigationProgress';
 import { SidebarProvider } from '@/components/layout/SidebarContext';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
@@ -42,6 +44,10 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="bg-[var(--color-bg-base)] text-[var(--color-text-primary)]">
+        {/* useSearchParams needs a Suspense boundary so static pages still prerender. */}
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         <ThemeProvider>
           <SidebarProvider>
             <div className="min-h-screen flex bg-[var(--color-bg-base)]">
