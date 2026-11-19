@@ -296,7 +296,7 @@ lib/ai/
 - Theme set via `data-theme` attribute on `<html>`; `:root` and `[data-theme="light"]` hold the light values, `[data-theme="dark"]` the dark ones.
 - Inline script in `<head>` sets it before hydration to prevent a flash.
 - Brand tokens (`--mf-*`) mirror `merchflow-brand/out/tokens.css`; the `--color-*` variables map onto them. Red `#E8003D` is an accent; white on it is 4.67:1 (AA), so red buttons with white text are fine. Hover/active go darker (`--color-red-hover` `#C70034`, `--color-red-active` `#A8002C`).
-- Fonts: Inter (`--font-sans`) and Inconsolata (`--font-mono`).
+- Fonts: Inter (`--font-sans`) and Inconsolata (`--font-mono`), self-hosted through `next/font/google` in `app/layout.tsx` (variable fonts; no Google Fonts `@import`).
 - Don't hard-code dark-only classes (`border-white/10`, `bg-black/20`, `text-white` on surfaces); use the CSS variables.
 - Logo: `components/brand/MerchFlowLogo.tsx` (inline, follows `currentColor`).
 

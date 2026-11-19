@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
+import { Inconsolata, Inter } from 'next/font/google';
 import { NavBar } from '@/components/layout/NavBar';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { NavigationProgress } from '@/components/layout/NavigationProgress';
@@ -8,6 +9,13 @@ import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { GuidedTour } from '@/components/onboarding/GuidedTour';
 import './globals.css';
+
+// Self-hosted by next/font (no render-blocking Google Fonts request, and a
+// metric-matched fallback so text does not shift when the font loads). Both
+// are variable fonts: one file each covers every weight the app uses.
+// globals.css maps --font-sans / --font-mono onto these variables.
+const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' });
+const inconsolata = Inconsolata({ subsets: ['latin'], display: 'swap', variable: '--font-inconsolata' });
 
 export const metadata: Metadata = {
   title: 'MerchFlow Tracker',
@@ -39,7 +47,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${inconsolata.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
