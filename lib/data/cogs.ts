@@ -24,11 +24,13 @@ export class CogsLoadError extends Error {}
 export async function loadTourCogs(tourId: string): Promise<TourCogs> {
   const supabase = createServiceClient();
 
-  // Product summary, show summary and the tour's show ids, in parallel
+  // Product summary, show summary and every sale on the tour, in parallel.
+  // Sales filter on the tour through the show join, so they need no first
+  // round trip for the tour's show ids.
   const [
     { data: productData, error: productError },
     { data: showData, error: showError },
-    { data: tourShows },
+    tourSales,
   ] = await Promise.all([
     supabase
       .from('product_summary_view')
@@ -40,7 +42,14 @@ export async function loadTourCogs(tourId: string): Promise<TourCogs> {
       .select('*')
       .eq('tour_id', tourId)
       .order('show_date', { ascending: true }),
-    supabase.from('shows').select('id').eq('tour_id', tourId),
+    fetchAll<{ show_id: string; qty_sold: number | null; tour_products: any }>((from, to) =>
+      supabase
+        .from('sales')
+        .select('id, show_id, qty_sold, tour_products!inner(full_package_cost), shows!inner(tour_id)')
+        .eq('shows.tour_id', tourId)
+        .order('id')
+        .range(from, to)
+    ),
   ]);
 
   if (productError) {
@@ -68,19 +77,7 @@ export async function loadTourCogs(tourId: string): Promise<TourCogs> {
   totals.margin_percentage =
     totals.total_revenue > 0 ? (totals.total_margin / totals.total_revenue) * 100 : 0;
 
-  // Show-level COGS: one query for every sale on the tour, grouped in memory
-  const showIds = (tourShows ?? []).map((row) => row.id);
-  const tourSales = showIds.length
-    ? await fetchAll<{ show_id: string; qty_sold: number | null; tour_products: any }>((from, to) =>
-        supabase
-          .from('sales')
-          .select('id, show_id, qty_sold, tour_products!inner(full_package_cost)')
-          .in('show_id', showIds)
-          .order('id')
-          .range(from, to)
-      )
-    : [];
-
+  // Show-level COGS: the tour's sales grouped by show in memory
   const cogsByShow = new Map<string, number>();
   for (const sale of tourSales) {
     const cost = (sale.qty_sold || 0) * (sale.tour_products?.full_package_cost || 0);
